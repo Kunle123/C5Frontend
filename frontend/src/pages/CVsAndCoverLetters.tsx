@@ -303,7 +303,8 @@ const Application: React.FC = () => {
               fullWidth
               required
             />
-            <Button variant="contained" color="primary" onClick={handleNextFromJobDesc} disabled={!jobDesc}>
+            <Button variant="contained" color="primary" onClick={handleNextFromJobDesc} disabled={!jobDesc || loading || extracting}>
+              {loading || extracting ? <CircularProgress size={22} sx={{ color: 'white', mr: 1 }} /> : null}
               Next: Review Arc Data
             </Button>
           </Stack>
@@ -346,7 +347,8 @@ const Application: React.FC = () => {
                   Your Career Ark profile is empty. Please upload a CV or add data in Career Ark before proceeding.
                 </Alert>
               )}
-              <Button variant="contained" color="primary" onClick={() => setStep(2)}>
+              <Button variant="contained" color="primary" onClick={() => setStep(2)} disabled={loading}>
+                {loading ? <CircularProgress size={22} sx={{ color: 'white', mr: 1 }} /> : null}
                 Next: Analyse & Optimise
               </Button>
               <Button variant="outlined" color="secondary" onClick={() => window.open('/career-ark', '_blank')}>
@@ -372,7 +374,8 @@ const Application: React.FC = () => {
           <Stack spacing={3}>
             <Typography variant="subtitle1">Ready to generate your optimised CV and cover letter using your Career Ark profile and the job description?</Typography>
             <Button variant="contained" color="secondary" onClick={handleAnalyzeAndOptimize} disabled={optimizing}>
-              {optimizing ? <CircularProgress size={24} /> : 'Optimise with AI'}
+              {optimizing ? <CircularProgress size={22} sx={{ color: 'white', mr: 1 }} /> : null}
+              Optimise with AI
             </Button>
           </Stack>
         )}
