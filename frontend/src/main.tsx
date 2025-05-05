@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ChakraProvider, createSystem, defaultConfig, defineConfig } from '@chakra-ui/react';
 
 const theme = createTheme({
   palette: {
@@ -17,10 +18,16 @@ const theme = createTheme({
   },
 });
 
+// Set up Chakra system theming for v3+
+const chakraConfig = defineConfig({});
+const chakraSystem = createSystem(defaultConfig, chakraConfig);
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <App />
+      <ChakraProvider value={chakraSystem}>
+        <App />
+      </ChakraProvider>
     </ThemeProvider>
   </React.StrictMode>
 );
