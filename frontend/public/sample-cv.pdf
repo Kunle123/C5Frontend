@@ -1,0 +1,62 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 273 >>
+stream
+BT
+/F1 24 Tf
+70 750 Td
+(Simple CV Example) Tj
+/F1 12 Tf
+70 720 Td
+(Name: John Doe) Tj
+70 700 Td
+(Email: john.doe@email.com) Tj
+70 680 Td
+(Phone: +44 1234 567890) Tj
+70 650 Td
+(Experience:) Tj
+/F1 10 Tf
+90 630 Td
+(- Frontend Developer, TechCorp, 2021-2024) Tj
+90 615 Td
+(- Junior Developer, WebStart, 2019-2021) Tj
+/F1 12 Tf
+70 590 Td
+(Education:) Tj
+/F1 10 Tf
+90 570 Td
+(- BSc Computer Science, University of London, 2015-2019) Tj
+/F1 12 Tf
+70 540 Td
+(Skills:) Tj
+/F1 10 Tf
+90 520 Td
+(- JavaScript, React, TypeScript, HTML, CSS) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000010 00000 n 
+0000000061 00000 n 
+0000000116 00000 n 
+0000000271 00000 n 
+0000000622 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+693
+%%EOF 

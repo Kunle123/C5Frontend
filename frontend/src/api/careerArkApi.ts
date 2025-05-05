@@ -1,0 +1,101 @@
+const API_BASE = 'https://api-gw-production.up.railway.app/api/arc';
+
+function getAuthHeaders() {
+  return {
+    Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+  };
+}
+
+// 1. Health Check
+export async function healthCheck() {
+  const res = await fetch(`${API_BASE}/health`);
+  if (!res.ok) throw new Error('Health check failed');
+  return res.json();
+}
+
+// 2. Upload CV
+export async function uploadCV(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch(`${API_BASE}/cv`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: formData,
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Upload failed'));
+  return res.json();
+}
+
+// 3. Poll CV Processing Status
+export async function getCVStatus(taskId: string) {
+  const res = await fetch(`${API_BASE}/cv/status/${taskId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Status check failed'));
+  return res.json();
+}
+
+// 4. Get Arc Data
+export async function getArcData() {
+  const res = await fetch(`${API_BASE}/data`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to fetch Arc data'));
+  return res.json();
+}
+
+// 5. Update Arc Data
+export async function updateArcData(data: any) {
+  const res = await fetch(`${API_BASE}/data`, {
+    method: 'PUT',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update Arc data'));
+  return res.json();
+}
+
+// 6. Generate Application Materials
+export async function generateApplicationMaterials(jobAdvert: string, arcData: any) {
+  const res = await fetch(`${API_BASE}/generate`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ jobAdvert, arcData }),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to generate application materials'));
+  return res.json();
+}
+
+// 7. Delete a CV Task
+export async function deleteCVTask(taskId: string) {
+  const res = await fetch(`${API_BASE}/cv/${taskId}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete CV task'));
+  return res.json();
+}
+
+// 8. (Optional) List All CV Tasks
+export async function listCVTasks() {
+  const res = await fetch(`${API_BASE}/cv/tasks`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to list CV tasks'));
+  return res.json();
+}
+
+// 9. (Optional) Download Processed CV
+export async function downloadProcessedCV(taskId: string) {
+  const res = await fetch(`${API_BASE}/cv/download/${taskId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to download processed CV');
+  return res.blob();
+} 
