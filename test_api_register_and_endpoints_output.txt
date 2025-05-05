@@ -1,0 +1,1 @@
+Failed to register or extract token. Response: Internal Server Error

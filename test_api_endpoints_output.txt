@@ -1,0 +1,48 @@
+
+==================== GET /api/auth/me ====================
+
+{"detail":"Not Found"}
+Status: 404
+
+==================== GET /cvs ====================
+
+{"detail":"Invalid authentication credentials: Not enough segments"}
+Status: 401
+
+==================== POST /cvs (create dummy CV) ====================
+
+{"detail":"Invalid authentication credentials: Not enough segments"}
+Status: 401
+
+==================== GET /cover-letters ====================
+
+{"detail":"Not Found"}
+Status: 404
+
+==================== POST /cover-letters (create dummy) ====================
+
+{"detail":"Not Found"}
+Status: 404
+
+==================== GET /mega-cv/previous-cvs ====================
+
+{"detail":"Not Found"}
+Status: 404
+
+==================== POST /mega-cv (create dummy) ====================
+
+{"detail":"Not Found"}
+Status: 404
+
+==================== GET /applications ====================
+
+{"detail":"Not Found"}
+Status: 404
+
+==================== POST /applications (create dummy) ====================
+
+{"detail":"Not Found"}
+Status: 404
+
+All endpoint tests complete.
+
