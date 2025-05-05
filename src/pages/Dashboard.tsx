@@ -10,7 +10,7 @@ const Dashboard: React.FC = () => {
   return (
     <Box sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', py: 8 }}>
       <Grid container spacing={4} justifyContent="center" alignItems="center" maxWidth={800}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} sx={{ display: 'flex' }}>
           <Card sx={{ height: 220, display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: 6 }}>
             <CardActionArea onClick={() => navigate('/cvs')} sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <CardContent sx={{ textAlign: 'center' }}>
@@ -25,7 +25,7 @@ const Dashboard: React.FC = () => {
             </CardActionArea>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} sx={{ display: 'flex' }}>
           <Card sx={{ height: 220, display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: 6 }}>
             <CardActionArea onClick={() => navigate('/career-ark')} sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <CardContent sx={{ textAlign: 'center' }}>
