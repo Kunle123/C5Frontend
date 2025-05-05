@@ -35,7 +35,7 @@ const Pricing: React.FC = () => (
     <Grid templateColumns="repeat(3, 1fr)" gap={4} mb={6}>
       {plans.map(plan => (
         <GridItem key={plan.name}>
-          <Card elevation={plan.name === 'Pro' ? 8 : 3} sx={{ p: 2, border: plan.name === 'Pro' ? '2px solid #1976d2' : undefined }}>
+          <Card elevation={plan.name === 'Pro' ? 8 : 3} sx={{ p: 2, border: plan.name === 'Pro' ? '2px solid #1976d2' : undefined, maxWidth: { xs: '100%', md: 400 }, width: '100%', boxSizing: 'border-box', mx: 'auto' }}>
             <CardContent>
               <Typography variant="h5" gutterBottom color={plan.color}>{plan.name}</Typography>
               <Typography variant="h4" color="primary" gutterBottom>{plan.price}</Typography>

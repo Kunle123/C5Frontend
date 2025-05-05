@@ -14,10 +14,10 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', py: 8 }}>
-      <Grid templateColumns="repeat(2, 1fr)" gap={6} maxW={900} w="100%">
+      <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={{ base: 4, md: 6 }} maxW={900} w="100%">
         <GridItem>
           <Box sx={{ height: '100%', display: 'flex', flex: 1 }}>
-            <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: 6, minHeight: 240, height: 320, overflow: 'hidden', maxWidth: 400, width: '100%', backgroundColor: '#fff' }}>
+            <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: 6, minHeight: 240, height: 320, overflow: 'hidden', maxWidth: { xs: '100%', md: 400 }, width: '100%', backgroundColor: '#fff', boxSizing: 'border-box', mx: 'auto' }}>
               <CardActionArea onClick={() => navigate('/cvs')} sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <AutoAwesomeIcon color="primary" sx={{ fontSize: 48, mb: 1 }} />
@@ -36,7 +36,7 @@ const Dashboard: React.FC = () => {
         </GridItem>
         <GridItem>
           <Box sx={{ height: '100%', display: 'flex', flex: 1 }}>
-            <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: 6, minHeight: 240, height: 320, overflow: 'hidden', maxWidth: 400, width: '100%', backgroundColor: '#fff' }}>
+            <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: 6, minHeight: 240, height: 320, overflow: 'hidden', maxWidth: { xs: '100%', md: 400 }, width: '100%', backgroundColor: '#fff', boxSizing: 'border-box', mx: 'auto' }}>
               <CardActionArea onClick={() => navigate('/career-ark')} sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <WorkIcon color="secondary" sx={{ fontSize: 48, mb: 1 }} />

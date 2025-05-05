@@ -84,9 +84,9 @@ const Landing: React.FC = () => {
           </Button>
         </Box>
         <Divider sx={{ my: 3 }} />
-        <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={3}>
+        <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={{ base: 4, md: 6 }} mb={3}>
           <GridItem>
-            <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(106,130,251,0.07)' }}>
+            <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(106,130,251,0.07)', maxWidth: { xs: '100%', md: 400 }, width: '100%', boxSizing: 'border-box', mx: 'auto' }}>
               <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <WorkIcon color="primary" /> Career Ark – Build Once, Apply Forever
               </Typography>
@@ -105,7 +105,7 @@ const Landing: React.FC = () => {
             </Paper>
           </GridItem>
           <GridItem>
-            <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(252,92,125,0.07)' }}>
+            <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(252,92,125,0.07)', maxWidth: { xs: '100%', md: 400 }, width: '100%', boxSizing: 'border-box', mx: 'auto' }}>
               <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <AutoAwesomeIcon color="secondary" /> Application Wizard – Custom Applications in Seconds
               </Typography>
@@ -158,7 +158,7 @@ const Landing: React.FC = () => {
           <b>Start applying smarter today.</b>
         </Typography>
         {token && (
-          <Grid templateColumns="repeat(2, 1fr)" gap={4} mb={4}>
+          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={{ base: 2, md: 4 }} mb={4}>
             <GridItem>
               <Button
                 variant="contained"
