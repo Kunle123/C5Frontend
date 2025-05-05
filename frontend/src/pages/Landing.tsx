@@ -1,8 +1,9 @@
 import React from 'react';
-import { Box, Button, Typography, Paper, Divider } from '@mui/material';
+import { Box, Button, Typography, Paper, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import WorkIcon from '@mui/icons-material/Work';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
 import { Grid, GridItem } from '@chakra-ui/react';
 
@@ -87,38 +88,62 @@ const Landing: React.FC = () => {
         <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={{ base: 4, md: 6 }} mb={3}>
           <GridItem>
             <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(106,130,251,0.07)', maxWidth: { xs: '100%', md: 400 }, width: '100%', boxSizing: 'border-box', mx: 'auto' }}>
-              <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <WorkIcon color="primary" /> Career Ark – Build Once, Apply Forever
+              <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'primary.main', letterSpacing: 0.5 }}>
+                <WorkIcon color="primary" sx={{ mr: 1 }} /> Career Ark – Build Once, Apply Forever
               </Typography>
-              <Typography sx={{ mb: 1 }}>
+              <Typography sx={{ mb: 1, fontSize: 17, color: 'text.secondary' }}>
                 Career Ark is your personal career hub. Add your CVs, skills, experiences, and achievements to create a living profile that grows with you.
               </Typography>
-              <ul style={{ marginBottom: 16 }}>
-                <li>Every new skill or update feeds future applications</li>
-                <li>Keep your career story consistent and compelling</li>
-                <li>No more digging through files or rewriting the same content</li>
-                <li>Always ready, always up to date</li>
-              </ul>
-              <Typography sx={{ mb: 1 }}>
+              <List sx={{ mb: 2 }}>
+                <ListItem disableGutters>
+                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="success" /></ListItemIcon>
+                  <ListItemText primary="Every new skill or update feeds future applications" />
+                </ListItem>
+                <ListItem disableGutters>
+                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="success" /></ListItemIcon>
+                  <ListItemText primary="Keep your career story consistent and compelling" />
+                </ListItem>
+                <ListItem disableGutters>
+                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="success" /></ListItemIcon>
+                  <ListItemText primary="No more digging through files or rewriting the same content" />
+                </ListItem>
+                <ListItem disableGutters>
+                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="success" /></ListItemIcon>
+                  <ListItemText primary="Always ready, always up to date" />
+                </ListItem>
+              </List>
+              <Typography sx={{ mb: 1, fontSize: 16, color: 'text.secondary', fontStyle: 'italic' }}>
                 With Career Ark, every application makes your next one even stronger.
               </Typography>
             </Paper>
           </GridItem>
           <GridItem>
             <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(252,92,125,0.07)', maxWidth: { xs: '100%', md: 400 }, width: '100%', boxSizing: 'border-box', mx: 'auto' }}>
-              <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <AutoAwesomeIcon color="secondary" /> Application Wizard – Custom Applications in Seconds
+              <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'secondary.main', letterSpacing: 0.5 }}>
+                <AutoAwesomeIcon color="secondary" sx={{ mr: 1 }} /> Application Wizard – Custom Applications in Seconds
               </Typography>
-              <Typography sx={{ mb: 1 }}>
+              <Typography sx={{ mb: 1, fontSize: 17, color: 'text.secondary' }}>
                 Paste a job advert—and let Application Wizard do the rest. It instantly generates a CV and cover letter tailored to that exact role by:
               </Typography>
-              <ul style={{ marginBottom: 16 }}>
-                <li>Integrating the right keywords</li>
-                <li>Highlighting your most relevant experience first</li>
-                <li>Adapting tone and language to match the job description</li>
-                <li>Ensuring a clean, professional format every time</li>
-              </ul>
-              <Typography sx={{ mb: 1 }}>
+              <List sx={{ mb: 2 }}>
+                <ListItem disableGutters>
+                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="primary" /></ListItemIcon>
+                  <ListItemText primary="Integrating the right keywords" />
+                </ListItem>
+                <ListItem disableGutters>
+                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="primary" /></ListItemIcon>
+                  <ListItemText primary="Highlighting your most relevant experience first" />
+                </ListItem>
+                <ListItem disableGutters>
+                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="primary" /></ListItemIcon>
+                  <ListItemText primary="Adapting tone and language to match the job description" />
+                </ListItem>
+                <ListItem disableGutters>
+                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="primary" /></ListItemIcon>
+                  <ListItemText primary="Ensuring a clean, professional format every time" />
+                </ListItem>
+              </List>
+              <Typography sx={{ mb: 1, fontSize: 16, color: 'text.secondary', fontStyle: 'italic' }}>
                 Apply confidently from anywhere—whether you're at your desk or on the move.
               </Typography>
             </Paper>
