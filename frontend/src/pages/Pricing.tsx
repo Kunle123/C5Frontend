@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, Button } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button, Paper } from '@mui/material';
 import { Grid, GridItem } from '@chakra-ui/react';
 
 const plans = [
