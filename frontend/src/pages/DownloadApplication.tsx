@@ -3,6 +3,8 @@ import { Box, Button, Typography, Paper, Stack, Divider, Alert, TextField, IconB
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DescriptionIcon from '@mui/icons-material/Description';
 import { generateApplicationMaterials, listCVTasks, downloadProcessedCV, deleteCVTask, getArcData } from '../api/careerArkApi';
 
 const DownloadApplication: React.FC = () => {
@@ -103,54 +105,100 @@ const DownloadApplication: React.FC = () => {
           </Button>
           {genError && <Alert severity="error">{genError}</Alert>}
           {genResult && (
-            <Box>
-              <Typography variant="subtitle1" fontWeight={600}>Generated CV</Typography>
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<FileDownloadIcon />}
-                  onClick={() => {
-                    const blob = new Blob([genResult.cv], { type: 'text/plain' });
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'cv.txt';
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                  }}
-                >
-                  Download CV
-                </Button>
-                <IconButton onClick={() => handleCopy(genResult.cv)}><ContentCopyIcon /></IconButton>
-                {copyMsg && <Typography color="success.main">{copyMsg}</Typography>}
-              </Stack>
-              <TextField value={genResult.cv} multiline minRows={6} fullWidth sx={{ mb: 2 }} />
-              <Typography variant="subtitle1" fontWeight={600}>Generated Cover Letter</Typography>
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<FileDownloadIcon />}
-                  onClick={() => {
-                    const blob = new Blob([genResult.coverLetter], { type: 'text/plain' });
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'cover_letter.txt';
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                  }}
-                >
-                  Download Cover Letter
-                </Button>
-                <IconButton onClick={() => handleCopy(genResult.coverLetter)}><ContentCopyIcon /></IconButton>
-                {copyMsg && <Typography color="success.main">{copyMsg}</Typography>}
-              </Stack>
-              <TextField value={genResult.coverLetter} multiline minRows={6} fullWidth />
-            </Box>
+            <Stack spacing={4}>
+              <Paper elevation={3} sx={{ p: 4, mb: 2, background: 'linear-gradient(135deg, #f5f7fa 0%, #e3eafc 100%)', borderRadius: 3, boxShadow: 3 }}>
+                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                  <Typography variant="h5" fontWeight={700} color="primary.main">Generated CV</Typography>
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<FileDownloadIcon />}
+                      onClick={() => {
+                        const blob = new Blob([genResult.cv], { type: 'text/plain' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'cv.txt';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                      }}
+                    >
+                      Download TXT
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={<PictureAsPdfIcon />}
+                      onClick={() => {
+                        const blob = new Blob([genResult.cv], { type: 'application/pdf' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'cv.pdf';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                      }}
+                    >
+                      Download PDF
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={<DescriptionIcon />}
+                      onClick={() => {
+                        const blob = new Blob([genResult.cv], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'cv.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                      }}
+                    >
+                      Download DOCX
+                    </Button>
+                    <IconButton onClick={() => handleCopy(genResult.cv)}><ContentCopyIcon /></IconButton>
+                  </Stack>
+                </Stack>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ whiteSpace: 'pre-wrap', fontFamily: 'serif', fontSize: 17, color: 'text.primary', minHeight: 180 }}>
+                  {genResult.cv}
+                </Box>
+              </Paper>
+              <Paper elevation={3} sx={{ p: 4, background: 'linear-gradient(135deg, #f5f7fa 0%, #fceabb 100%)', borderRadius: 3, boxShadow: 3 }}>
+                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                  <Typography variant="h5" fontWeight={700} color="secondary.main">Generated Cover Letter</Typography>
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<FileDownloadIcon />}
+                      onClick={() => {
+                        const blob = new Blob([genResult.coverLetter], { type: 'text/plain' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'cover_letter.txt';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                      }}
+                    >
+                      Download TXT
+                    </Button>
+                    <IconButton onClick={() => handleCopy(genResult.coverLetter)}><ContentCopyIcon /></IconButton>
+                  </Stack>
+                </Stack>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ whiteSpace: 'pre-wrap', fontFamily: 'serif', fontSize: 17, color: 'text.primary', minHeight: 180 }}>
+                  {genResult.coverLetter}
+                </Box>
+              </Paper>
+            </Stack>
           )}
         </Stack>
         <Divider sx={{ my: 4 }} />
