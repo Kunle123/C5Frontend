@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Button, Typography, Paper, Divider } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import WorkIcon from '@mui/icons-material/Work';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { useNavigate } from 'react-router-dom';
+import { Grid, GridItem } from '@chakra-ui/react';
 
 const accentGradient = 'linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%)';
 
@@ -84,14 +84,14 @@ const Landing: React.FC = () => {
           </Button>
         </Box>
         <Divider sx={{ my: 3 }} />
-        <Grid container spacing={3} sx={{ mb: 3 }}>
-          <Grid item xs={12} md={6}>
+        <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={3}>
+          <GridItem>
             <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(106,130,251,0.07)' }}>
               <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <WorkIcon color="primary" /> The Ark – Build Once, Apply Forever
+                <WorkIcon color="primary" /> Career Ark – Build Once, Apply Forever
               </Typography>
               <Typography sx={{ mb: 1 }}>
-                The Ark is your personal career hub. Add your CVs, skills, experiences, and achievements to create a living profile that grows with you.
+                Career Ark is your personal career hub. Add your CVs, skills, experiences, and achievements to create a living profile that grows with you.
               </Typography>
               <ul style={{ marginBottom: 16 }}>
                 <li>Every new skill or update feeds future applications</li>
@@ -100,17 +100,17 @@ const Landing: React.FC = () => {
                 <li>Always ready, always up to date</li>
               </ul>
               <Typography sx={{ mb: 1 }}>
-                With The Ark, every application makes your next one even stronger.
+                With Career Ark, every application makes your next one even stronger.
               </Typography>
             </Paper>
-          </Grid>
-          <Grid item xs={12} md={6}>
+          </GridItem>
+          <GridItem>
             <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(252,92,125,0.07)' }}>
               <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <AutoAwesomeIcon color="secondary" /> Perfect Match – Custom Applications in Seconds
+                <AutoAwesomeIcon color="secondary" /> Application Wizard – Custom Applications in Seconds
               </Typography>
               <Typography sx={{ mb: 1 }}>
-                Paste a job advert—and let Perfect Match do the rest. It instantly generates a CV and cover letter tailored to that exact role by:
+                Paste a job advert—and let Application Wizard do the rest. It instantly generates a CV and cover letter tailored to that exact role by:
               </Typography>
               <ul style={{ marginBottom: 16 }}>
                 <li>Integrating the right keywords</li>
@@ -122,7 +122,7 @@ const Landing: React.FC = () => {
                 Apply confidently from anywhere—whether you're at your desk or on the move.
               </Typography>
             </Paper>
-          </Grid>
+          </GridItem>
         </Grid>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
           <Button
@@ -158,8 +158,8 @@ const Landing: React.FC = () => {
           <b>Start applying smarter today.</b>
         </Typography>
         {token && (
-          <Grid container spacing={2} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={6}>
+          <Grid templateColumns="repeat(2, 1fr)" gap={4} mb={4}>
+            <GridItem>
               <Button
                 variant="contained"
                 color="primary"
@@ -169,10 +169,10 @@ const Landing: React.FC = () => {
                 onClick={() => navigate('/cvs')}
                 startIcon={<AutoAwesomeIcon />}
               >
-                Perfect Match
+                Application Wizard
               </Button>
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </GridItem>
+            <GridItem>
               <Button
                 variant="outlined"
                 color="secondary"
@@ -182,9 +182,9 @@ const Landing: React.FC = () => {
                 onClick={() => navigate('/career-ark')}
                 startIcon={<WorkIcon />}
               >
-                The Ark
+                Career Ark
               </Button>
-            </Grid>
+            </GridItem>
           </Grid>
         )}
       </Paper>

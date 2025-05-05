@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, Button, Grid, Paper } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button } from '@mui/material';
+import { Grid, GridItem } from '@chakra-ui/react';
 
 const plans = [
   {
@@ -31,9 +32,9 @@ const Pricing: React.FC = () => (
     <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 6 }}>
       Choose the plan that fits your job search needs. Upgrade anytime.
     </Typography>
-    <Grid container spacing={4} justifyContent="center">
+    <Grid templateColumns="repeat(3, 1fr)" gap={4} mb={6}>
       {plans.map(plan => (
-        <Grid item xs={12} sm={6} md={4} key={plan.name}>
+        <GridItem key={plan.name}>
           <Card elevation={plan.name === 'Pro' ? 8 : 3} sx={{ p: 2, border: plan.name === 'Pro' ? '2px solid #1976d2' : undefined }}>
             <CardContent>
               <Typography variant="h5" gutterBottom color={plan.color}>{plan.name}</Typography>
@@ -50,7 +51,7 @@ const Pricing: React.FC = () => (
               </Button>
             </CardContent>
           </Card>
-        </Grid>
+        </GridItem>
       ))}
     </Grid>
     <Paper elevation={0} sx={{ mt: 8, p: 4, bgcolor: 'grey.100', textAlign: 'center' }}>

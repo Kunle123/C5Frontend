@@ -213,7 +213,7 @@ const Application: React.FC = () => {
       try {
         data = await getArcData();
       } catch (err: any) {
-        setError('Sorry, we could not load your Ark profile. Please try again later.');
+        setError('Sorry, we could not load your Career Ark profile. Please try again later.');
         console.error('Arc data fetch failed:', err);
         setLoading(false);
         return;
@@ -311,7 +311,7 @@ const Application: React.FC = () => {
         {step === 1 && (
           arcData && Object.keys(arcData).length > 0 ? (
             <Stack spacing={3}>
-              <Typography variant="h6">Your Arc Data (Profile)</Typography>
+              <Typography variant="h6">Your Career Ark Data (Profile)</Typography>
               <Paper sx={{ p: 2, bgcolor: 'grey.50', maxHeight: 300, overflow: 'auto' }}>
                 <pre style={{ fontSize: 14 }}>{JSON.stringify(arcData, null, 2)}</pre>
               </Paper>
@@ -343,24 +343,24 @@ const Application: React.FC = () => {
               )}
               {Object.values(arcData).every(v => v == null || (Array.isArray(v) && v.length === 0)) && (
                 <Alert severity="warning">
-                  Your Ark profile is empty. Please upload a CV or add data in The Ark before proceeding.
+                  Your Career Ark profile is empty. Please upload a CV or add data in Career Ark before proceeding.
                 </Alert>
               )}
               <Button variant="contained" color="primary" onClick={() => setStep(2)}>
                 Next: Analyse & Optimise
               </Button>
               <Button variant="outlined" color="secondary" onClick={() => window.open('/career-ark', '_blank')}>
-                Edit in The Ark
+                Edit in Career Ark
               </Button>
             </Stack>
           ) : (
             <Stack spacing={3}>
               <Alert severity="warning">
-                You need to create your Arc profile before generating applications.<br />
-                Please go to The Ark and complete your profile.
+                You need to create your Career Ark profile before generating applications.<br />
+                Please go to Career Ark and complete your profile.
               </Alert>
               <Button variant="contained" color="primary" onClick={() => window.open('/career-ark', '_blank')}>
-                Go to The Ark
+                Go to Career Ark
               </Button>
               <Button variant="outlined" color="secondary" onClick={() => setStep(0)}>
                 Back
@@ -370,7 +370,7 @@ const Application: React.FC = () => {
         )}
         {step === 2 && arcData && (
           <Stack spacing={3}>
-            <Typography variant="subtitle1">Ready to generate your optimised CV and cover letter using your Arc profile and the job description?</Typography>
+            <Typography variant="subtitle1">Ready to generate your optimised CV and cover letter using your Career Ark profile and the job description?</Typography>
             <Button variant="contained" color="secondary" onClick={handleAnalyzeAndOptimize} disabled={optimizing}>
               {optimizing ? <CircularProgress size={24} /> : 'Optimise with AI'}
             </Button>
