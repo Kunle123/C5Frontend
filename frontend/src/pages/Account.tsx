@@ -1,5 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Button, Stack, Chip, Divider, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Alert } from '@mui/material';
+import {
+  Box,
+  Heading,
+  Text,
+  Button,
+  Stack,
+  Badge,
+  Divider,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Spinner,
+  Alert,
+  AlertIcon,
+  useColorModeValue,
+  VStack,
+  HStack,
+  Flex,
+} from '@chakra-ui/react';
 import { getUser, getSubscription, getPaymentMethods, getPaymentHistory, cancelSubscription, addPaymentMethod, deletePaymentMethod, setDefaultPaymentMethod, getUserIdFromToken } from '../api';
 
 const Account: React.FC = () => {
@@ -15,7 +36,7 @@ const Account: React.FC = () => {
   const token = localStorage.getItem('token') || '';
   const userId = getUserIdFromToken(token);
 
-  if (!userId) return <Box sx={{ py: 6, textAlign: 'center' }}><Alert severity="error">Invalid or missing user ID in JWT. Please log in again.</Alert></Box>;
+  if (!userId) return <Box py={6} textAlign="center"><Alert status="error"><AlertIcon />Invalid or missing user ID in JWT. Please log in again.</Alert></Box>;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,80 +123,78 @@ const Account: React.FC = () => {
     }
   };
 
-  if (loading) return <Box sx={{ py: 6, textAlign: 'center' }}><CircularProgress /></Box>;
-  if (error) return <Box sx={{ py: 6, textAlign: 'center' }}><Alert severity="error">{error}</Alert></Box>;
+  if (loading) return <Box py={6} textAlign="center"><Spinner /></Box>;
+  if (error) return <Box py={6} textAlign="center"><Alert status="error"><AlertIcon />{error}</Alert></Box>;
 
   return (
-    <Box sx={{ py: 6, maxWidth: 700, mx: 'auto' }}>
-      <Typography variant="h4" gutterBottom>Account & Subscription</Typography>
-      <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
-        <Typography variant="h6">User Info</Typography>
-        <Typography>Name: {user?.name}</Typography>
-        <Typography>Email: {user?.email}</Typography>
-        <Divider sx={{ my: 2 }} />
-        <Typography variant="h6">Current Plan</Typography>
-        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-          <Chip label={subscription?.plan_name || 'None'} color="primary" />
-          <Typography>Renewal: {subscription?.renewal_date || 'N/A'}</Typography>
-          <Chip label={subscription?.status || 'Inactive'} color={subscription?.status === 'Active' ? 'success' : 'warning'} />
-        </Stack>
-        <Stack direction="row" spacing={2}>
-          <Button variant="contained" color="primary">Upgrade</Button>
-          <Button variant="outlined" color="primary">Downgrade</Button>
-        </Stack>
-        <Button variant="text" color="error" sx={{ mt: 2 }} onClick={handleCancel} disabled={cancelling || subscription?.status !== 'Active'}>
-          {cancelling ? <CircularProgress size={18} /> : 'Cancel Subscription'}
+    <Box py={6} maxW="700px" mx="auto">
+      <Heading as="h2" size="lg" mb={4}>Account & Subscription</Heading>
+      <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="md" borderRadius="lg" p={6} mb={6}>
+        <Heading as="h3" size="md" mb={2}>User Info</Heading>
+        <Text>Name: {user?.name}</Text>
+        <Text>Email: {user?.email}</Text>
+        <Divider my={4} />
+        <Heading as="h3" size="md" mb={2}>Current Plan</Heading>
+        <HStack spacing={4} mb={2}>
+          <Badge colorScheme="blue">{subscription?.plan_name || 'None'}</Badge>
+          <Text>Renewal: {subscription?.renewal_date || 'N/A'}</Text>
+          <Badge colorScheme={subscription?.status === 'Active' ? 'green' : 'yellow'}>{subscription?.status || 'Inactive'}</Badge>
+        </HStack>
+        <HStack spacing={4} mb={2}>
+          <Button colorScheme="blue" variant="solid">Upgrade</Button>
+          <Button colorScheme="blue" variant="outline">Downgrade</Button>
+        </HStack>
+        <Button colorScheme="red" variant="ghost" mt={2} onClick={handleCancel} isDisabled={cancelling || subscription?.status !== 'Active'}>
+          {cancelling ? <Spinner size="sm" /> : 'Cancel Subscription'}
         </Button>
-        <Typography color="text.secondary" sx={{ mt: 1 }}>
-          [Retention offer or feedback form coming soon!]
-        </Typography>
-      </Paper>
-      <Paper elevation={2} sx={{ p: 4, mb: 4 }}>
-        <Typography variant="h6" gutterBottom>Billing History</Typography>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+        <Text color="gray.500" mt={2} fontSize="sm">[Retention offer or feedback form coming soon!]</Text>
+      </Box>
+      <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="sm" borderRadius="lg" p={6} mb={6}>
+        <Heading as="h3" size="md" mb={2}>Billing History</Heading>
+        <Table size="sm" variant="simple">
+          <Thead>
+            <Tr>
+              <Th>Date</Th>
+              <Th>Amount</Th>
+              <Th>Status</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
             {billing.map((bill, idx) => (
-              <TableRow key={bill.id || idx}>
-                <TableCell>{bill.date || bill.created_at}</TableCell>
-                <TableCell>{bill.amount}</TableCell>
-                <TableCell>{bill.status}</TableCell>
-              </TableRow>
+              <Tr key={bill.id || idx}>
+                <Td>{bill.date || bill.created_at}</Td>
+                <Td>{bill.amount}</Td>
+                <Td>{bill.status}</Td>
+              </Tr>
             ))}
-          </TableBody>
+          </Tbody>
         </Table>
-      </Paper>
-      <Paper elevation={1} sx={{ p: 4 }}>
-        <Typography variant="h6" gutterBottom>Payment Methods</Typography>
-        <Button variant="contained" color="primary" onClick={handleAddPaymentMethod} disabled={pmLoading} sx={{ mb: 2 }}>
-          {pmLoading ? <CircularProgress size={18} /> : 'Add Payment Method'}
+      </Box>
+      <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="sm" borderRadius="lg" p={6}>
+        <Heading as="h3" size="md" mb={2}>Payment Methods</Heading>
+        <Button colorScheme="blue" onClick={handleAddPaymentMethod} isLoading={pmLoading} mb={2}>
+          Add Payment Method
         </Button>
         {paymentMethods.length === 0 ? (
-          <Typography color="text.secondary">No payment methods on file.</Typography>
+          <Text color="gray.500">No payment methods on file.</Text>
         ) : (
-          <ul>
+          <VStack align="start" spacing={3} mt={2}>
             {paymentMethods.map((pm: any) => (
-              <li key={pm.id} style={{ marginBottom: 8 }}>
-                {pm.brand} ****{pm.last4} (exp {pm.exp_month}/{pm.exp_year}) {pm.is_default && <strong>[Default]</strong>}
-                <Button size="small" color="error" onClick={() => handleDeletePaymentMethod(pm.id)} disabled={pmActionId === pm.id} sx={{ ml: 2 }}>
-                  {pmActionId === pm.id ? <CircularProgress size={14} /> : 'Delete'}
+              <Flex key={pm.id} align="center">
+                <Text>{pm.brand} ****{pm.last4} (exp {pm.exp_month}/{pm.exp_year}) {pm.is_default && <strong>[Default]</strong>}</Text>
+                <Button size="sm" colorScheme="red" ml={2} onClick={() => handleDeletePaymentMethod(pm.id)} isLoading={pmActionId === pm.id}>
+                  Delete
                 </Button>
                 {!pm.is_default && (
-                  <Button size="small" color="primary" onClick={() => handleSetDefaultPaymentMethod(pm.id)} disabled={pmActionId === pm.id} sx={{ ml: 1 }}>
-                    {pmActionId === pm.id ? <CircularProgress size={14} /> : 'Set Default'}
+                  <Button size="sm" colorScheme="blue" ml={2} onClick={() => handleSetDefaultPaymentMethod(pm.id)} isLoading={pmActionId === pm.id}>
+                    Set Default
                   </Button>
                 )}
-              </li>
+              </Flex>
             ))}
-          </ul>
+          </VStack>
         )}
-      </Paper>
+      </Box>
     </Box>
   );
 };

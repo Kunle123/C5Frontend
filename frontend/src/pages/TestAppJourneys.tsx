@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, Paper, TextField, Stack, Divider, Alert } from '@mui/material';
+import {
+  Box,
+  Heading,
+  Text,
+  Button,
+  Input,
+  Stack,
+  Divider,
+  Alert,
+  AlertIcon,
+  useColorModeValue,
+  Spinner,
+  Textarea,
+} from '@chakra-ui/react';
 import { login, register } from '../api';
 import { uploadCV, getArcData, generateApplicationMaterials } from '../api/careerArkApi';
 
@@ -86,50 +99,50 @@ const TestAppJourneys: React.FC = () => {
   };
 
   return (
-    <Box sx={{ py: 6, maxWidth: 700, mx: 'auto' }}>
-      <Paper elevation={4} sx={{ p: 5, mb: 6 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom align="center">
+    <Box py={6} maxW="700px" mx="auto">
+      <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="lg" p={8} borderRadius="lg" mb={6}>
+        <Heading as="h2" size="lg" fontWeight={700} mb={4} textAlign="center">
           Test Application Journeys
-        </Typography>
-        <Divider sx={{ my: 3 }} />
+        </Heading>
+        <Divider my={3} />
         <Stack spacing={3}>
-          <Typography variant="h6">1. Signup / Login</Typography>
-          <TextField label="Email" value={email} onChange={e => setEmail(e.target.value)} fullWidth />
-          <TextField label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} fullWidth />
+          <Heading as="h3" size="md">1. Signup / Login</Heading>
+          <Input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+          <Input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
           <Stack direction="row" spacing={2}>
-            <Button variant="contained" onClick={handleSignup}>Sign Up</Button>
-            <Button variant="contained" color="primary" onClick={handleLogin}>Log In</Button>
-            <Button variant="outlined" color="secondary" onClick={handleLogout}>Log Out</Button>
+            <Button colorScheme="blue" onClick={handleSignup}>Sign Up</Button>
+            <Button colorScheme="blue" variant="outline" onClick={handleLogin}>Log In</Button>
+            <Button colorScheme="red" variant="outline" onClick={handleLogout}>Log Out</Button>
           </Stack>
-          {signupResult && <Alert severity="success">Signup: {JSON.stringify(signupResult)}</Alert>}
-          {loginResult && <Alert severity="success">Login: {JSON.stringify(loginResult)}</Alert>}
+          {signupResult && <Alert status="success"><AlertIcon />Signup: {JSON.stringify(signupResult)}</Alert>}
+          {loginResult && <Alert status="success"><AlertIcon />Login: {JSON.stringify(loginResult)}</Alert>}
         </Stack>
-        <Divider sx={{ my: 3 }} />
+        <Divider my={3} />
         <Stack spacing={3}>
-          <Typography variant="h6">2. Upload CV</Typography>
-          <Button variant="outlined" component="label">
+          <Heading as="h3" size="md">2. Upload CV</Heading>
+          <Button as="label" colorScheme="blue" variant="outline">
             Select CV File
             <input type="file" accept=".pdf,.doc,.docx" hidden onChange={e => setCvFile(e.target.files?.[0] || null)} />
           </Button>
-          {cvFile && <Typography>Selected: {cvFile.name}</Typography>}
-          <Button variant="contained" onClick={handleUploadCV} disabled={!cvFile}>Upload CV</Button>
-          {cvUploadResult && <Alert severity="success">Upload: {JSON.stringify(cvUploadResult)}</Alert>}
+          {cvFile && <Text>Selected: {cvFile.name}</Text>}
+          <Button colorScheme="blue" onClick={handleUploadCV} isDisabled={!cvFile}>Upload CV</Button>
+          {cvUploadResult && <Alert status="success"><AlertIcon />Upload: {JSON.stringify(cvUploadResult)}</Alert>}
         </Stack>
-        <Divider sx={{ my: 3 }} />
+        <Divider my={3} />
         <Stack spacing={3}>
-          <Typography variant="h6">3. Fetch Arc Data</Typography>
-          <Button variant="contained" onClick={handleFetchArcData}>Fetch Arc Data</Button>
-          {arcData && <Alert severity="info" sx={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}>{JSON.stringify(arcData, null, 2)}</Alert>}
+          <Heading as="h3" size="md">3. Fetch Arc Data</Heading>
+          <Button colorScheme="blue" onClick={handleFetchArcData}>Fetch Arc Data</Button>
+          {arcData && <Alert status="info" whiteSpace="pre-wrap" maxH={200} overflowY="auto"><AlertIcon />{JSON.stringify(arcData, null, 2)}</Alert>}
         </Stack>
-        <Divider sx={{ my: 3 }} />
+        <Divider my={3} />
         <Stack spacing={3}>
-          <Typography variant="h6">4. Generate Application Materials</Typography>
-          <TextField label="Job Advert" value={jobAdvert} onChange={e => setJobAdvert(e.target.value)} fullWidth multiline minRows={3} />
-          <Button variant="contained" onClick={handleGenerate}>Generate CV & Cover Letter</Button>
-          {genResult && <Alert severity="success" sx={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}>{JSON.stringify(genResult, null, 2)}</Alert>}
+          <Heading as="h3" size="md">4. Generate Application Materials</Heading>
+          <Textarea placeholder="Job Advert" value={jobAdvert} onChange={e => setJobAdvert(e.target.value)} minH={100} />
+          <Button colorScheme="blue" onClick={handleGenerate}>Generate CV & Cover Letter</Button>
+          {genResult && <Alert status="success" whiteSpace="pre-wrap" maxH={200} overflowY="auto"><AlertIcon />{JSON.stringify(genResult, null, 2)}</Alert>}
         </Stack>
-        {error && <Alert severity="error" sx={{ mt: 3 }}>{error}</Alert>}
-      </Paper>
+        {error && <Alert status="error" mt={3}><AlertIcon />{error}</Alert>}
+      </Box>
     </Box>
   );
 };

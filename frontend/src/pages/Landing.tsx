@@ -1,11 +1,17 @@
 import React from 'react';
-import { Box, Button, Typography, Paper, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import WorkIcon from '@mui/icons-material/Work';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import {
+  Box,
+  Button,
+  Text,
+  Heading,
+  HStack,
+  useBreakpointValue,
+  Grid,
+  GridItem,
+  Divider,
+} from '@chakra-ui/react';
+import { FaRocket, FaBriefcase, FaMagic, FaCheckCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { Grid, GridItem } from '@chakra-ui/react';
 
 const accentGradient = 'linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%)';
 
@@ -16,203 +22,153 @@ const Landing: React.FC = () => {
   const startTrial = () => navigate('/signup');
 
   return (
-    <Box sx={{
-      minHeight: '100vh',
-      py: 8,
-      px: 2,
-      background: 'linear-gradient(120deg, #f5f7fa 0%, #c3cfe2 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
-      <Paper elevation={8} sx={{ p: { xs: 3, md: 6 }, borderRadius: 4, maxWidth: 800, mx: 'auto', width: '100%', boxShadow: 6 }}>
-        <Typography variant="h3" align="center" fontWeight={800} color="primary.main" gutterBottom>
+    <Box minH="100vh" py={8} px={2} bgGradient="linear(120deg, white 0%, lilac 100%)" display="flex" alignItems="center" justifyContent="center">
+      <Box bg="white" borderRadius="2xl" boxShadow="lg" maxW={800} w="100%" p={{ base: 4, md: 8 }}>
+        <Heading as="h1" size="2xl" textAlign="center" fontWeight={800} color="brand.500" mb={2}>
           Candidate 5 – Your Edge in a Competitive Job Market
-        </Typography>
-        <Divider sx={{ my: 3, borderColor: 'primary.main', borderWidth: 2, width: 80, mx: 'auto' }} />
-        <Typography variant="h5" align="center" sx={{ mb: 2 }}>
+        </Heading>
+        <Divider my={4} borderColor="brand.500" borderWidth={2} w={20} mx="auto" />
+        <Heading as="h2" size="lg" textAlign="center" mb={2}>
           Apply in minutes, not hours. Never miss an opportunity again.
-        </Typography>
-        <Typography align="center" sx={{ mb: 4, color: 'text.secondary' }}>
+        </Heading>
+        <Text textAlign="center" mb={4} color="text.secondary">
           Tired of spending hours rewriting your CV for every role? With Candidate 5, you can generate tailored applications in just minutes—so you can act fast, apply smarter, and stay ready for what's next.
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+        </Text>
+        <Box display="flex" justifyContent="center" mb={4}>
           <Button
-            variant="contained"
-            color="primary"
-            size="large"
+            size="lg"
+            borderRadius="lg"
+            fontWeight={700}
+            fontSize="xl"
+            bgGradient={accentGradient}
+            color="white"
+            _hover={{ transform: 'scale(1.05)', boxShadow: 'lg', bgGradient: accentGradient }}
             onClick={startTrial}
-            sx={{
-              px: 6,
-              py: 2,
-              borderRadius: 3,
-              fontWeight: 700,
-              fontSize: 22,
-              boxShadow: 3,
-              background: accentGradient,
-              color: '#fff',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              '&:hover': { transform: 'scale(1.05)', boxShadow: 6, background: accentGradient },
-            }}
-            startIcon={<RocketLaunchIcon />}
           >
-            Start Your Free Trial
+            <HStack gap={2}><FaRocket /> <span>Start Your Free Trial</span></HStack>
           </Button>
         </Box>
-        <Divider sx={{ my: 3 }} />
-        <Typography variant="h6" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <RocketLaunchIcon color="primary" /> What is Candidate 5?
-        </Typography>
-        <Typography sx={{ mb: 3 }}>
+        <Divider my={4} />
+        <Heading as="h3" size="md" fontWeight={700} mb={1} display="flex" alignItems="center" gap={2}>
+          <FaRocket color="#3366CC" /> What is Candidate 5?
+        </Heading>
+        <Text mb={3}>
           Candidate 5 is your intelligent application assistant, built to transform how you apply for jobs. It combines customisation, optimisation, and long-term career management into one seamless platform.
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+        </Text>
+        <Box display="flex" justifyContent="center" mb={3}>
           <Button
-            variant="contained"
-            color="primary"
-            size="large"
+            size="lg"
+            borderRadius="lg"
+            fontWeight={600}
+            bgGradient={accentGradient}
+            color="white"
+            _hover={{ bgGradient: accentGradient, opacity: 0.9 }}
             onClick={startTrial}
-            sx={{
-              px: 5,
-              fontWeight: 600,
-              background: accentGradient,
-              color: '#fff',
-              '&:hover': { background: accentGradient, opacity: 0.9 },
-            }}
-            startIcon={<RocketLaunchIcon />}
           >
-            Start Your Free Trial
+            <HStack gap={2}><FaRocket /> <span>Start Your Free Trial</span></HStack>
           </Button>
         </Box>
-        <Divider sx={{ my: 3 }} />
+        <Divider my={4} />
         <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={{ base: 4, md: 6 }} mb={3}>
           <GridItem>
-            <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(106,130,251,0.07)', maxWidth: { xs: '100%', md: 400 }, width: '100%', boxSizing: 'border-box', mx: 'auto' }}>
-              <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'primary.main', letterSpacing: 0.5 }}>
-                <WorkIcon color="primary" sx={{ mr: 1 }} /> Career Ark – Build Once, Apply Forever
-              </Typography>
-              <Typography sx={{ mb: 1, fontSize: 17, color: 'text.secondary' }}>
+            <Box bg="brand.50" borderRadius="lg" boxShadow="md" h="100%" p={4}>
+              <Heading as="h4" size="md" fontWeight={700} color="brand.500" display="flex" alignItems="center" gap={2} mb={2}>
+                <FaBriefcase color="#3366CC" /> Career Ark – Build Once, Apply Forever
+              </Heading>
+              <Text mb={1} fontSize="md" color="text.secondary">
                 Career Ark is your personal career hub. Add your CVs, skills, experiences, and achievements to create a living profile that grows with you.
-              </Typography>
-              <List sx={{ mb: 2 }}>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="success" /></ListItemIcon>
-                  <ListItemText primary="Every new skill or update feeds future applications" />
-                </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="success" /></ListItemIcon>
-                  <ListItemText primary="Keep your career story consistent and compelling" />
-                </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="success" /></ListItemIcon>
-                  <ListItemText primary="No more digging through files or rewriting the same content" />
-                </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="success" /></ListItemIcon>
-                  <ListItemText primary="Always ready, always up to date" />
-                </ListItem>
-              </List>
-              <Typography sx={{ mb: 1, fontSize: 16, color: 'text.secondary', fontStyle: 'italic' }}>
+              </Text>
+              <Box display="flex" flexDirection="column" alignItems="flex-start" gap={2} mb={2}>
+                <HStack gap={2}><FaCheckCircle color="#22C55E" /><Text>Every new skill or update feeds future applications</Text></HStack>
+                <HStack gap={2}><FaCheckCircle color="#22C55E" /><Text>Keep your career story consistent and compelling</Text></HStack>
+                <HStack gap={2}><FaCheckCircle color="#22C55E" /><Text>No more digging through files or rewriting the same content</Text></HStack>
+                <HStack gap={2}><FaCheckCircle color="#22C55E" /><Text>Always ready, always up to date</Text></HStack>
+              </Box>
+              <Text fontSize="sm" color="text.secondary" fontStyle="italic">
                 With Career Ark, every application makes your next one even stronger.
-              </Typography>
-            </Paper>
+              </Text>
+            </Box>
           </GridItem>
           <GridItem>
-            <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: '100%', background: 'rgba(252,92,125,0.07)', maxWidth: { xs: '100%', md: 400 }, width: '100%', boxSizing: 'border-box', mx: 'auto' }}>
-              <Typography variant="h5" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'secondary.main', letterSpacing: 0.5 }}>
-                <AutoAwesomeIcon color="secondary" sx={{ mr: 1 }} /> Application Wizard – Custom Applications in Seconds
-              </Typography>
-              <Typography sx={{ mb: 1, fontSize: 17, color: 'text.secondary' }}>
+            <Box bg="pink.50" borderRadius="lg" boxShadow="md" h="100%" p={4}>
+              <Heading as="h4" size="md" fontWeight={700} color="pink.500" display="flex" alignItems="center" gap={2} mb={2}>
+                <FaMagic color="#fc5c7d" /> Application Wizard – Custom Applications in Seconds
+              </Heading>
+              <Text mb={1} fontSize="md" color="text.secondary">
                 Paste a job advert—and let Application Wizard do the rest. It instantly generates a CV and cover letter tailored to that exact role by:
-              </Typography>
-              <List sx={{ mb: 2 }}>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="primary" /></ListItemIcon>
-                  <ListItemText primary="Integrating the right keywords" />
-                </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="primary" /></ListItemIcon>
-                  <ListItemText primary="Highlighting your most relevant experience first" />
-                </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="primary" /></ListItemIcon>
-                  <ListItemText primary="Adapting tone and language to match the job description" />
-                </ListItem>
-                <ListItem disableGutters>
-                  <ListItemIcon sx={{ minWidth: 32 }}><CheckCircleIcon color="primary" /></ListItemIcon>
-                  <ListItemText primary="Ensuring a clean, professional format every time" />
-                </ListItem>
-              </List>
-              <Typography sx={{ mb: 1, fontSize: 16, color: 'text.secondary', fontStyle: 'italic' }}>
+              </Text>
+              <Box display="flex" flexDirection="column" alignItems="flex-start" gap={2} mb={2}>
+                <HStack gap={2}><FaCheckCircle color="#3366CC" /><Text>Integrating the right keywords</Text></HStack>
+                <HStack gap={2}><FaCheckCircle color="#3366CC" /><Text>Highlighting your most relevant experience first</Text></HStack>
+                <HStack gap={2}><FaCheckCircle color="#3366CC" /><Text>Adapting tone and language to match the job description</Text></HStack>
+                <HStack gap={2}><FaCheckCircle color="#3366CC" /><Text>Ensuring a clean, professional format every time</Text></HStack>
+              </Box>
+              <Text fontSize="sm" color="text.secondary" fontStyle="italic">
                 Apply confidently from anywhere—whether you're at your desk or on the move.
-              </Typography>
-            </Paper>
+              </Text>
+            </Box>
           </GridItem>
         </Grid>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+        <Box display="flex" justifyContent="center" mb={3}>
           <Button
-            variant="contained"
-            color="primary"
-            size="large"
+            size="lg"
+            borderRadius="lg"
+            fontWeight={600}
+            bgGradient={accentGradient}
+            color="white"
+            _hover={{ bgGradient: accentGradient, opacity: 0.9 }}
             onClick={startTrial}
-            sx={{
-              px: 5,
-              fontWeight: 600,
-              background: accentGradient,
-              color: '#fff',
-              '&:hover': { background: accentGradient, opacity: 0.9 },
-            }}
-            startIcon={<RocketLaunchIcon />}
           >
-            Start Your Free Trial
+            <HStack gap={2}><FaRocket /> <span>Start Your Free Trial</span></HStack>
           </Button>
         </Box>
-        <Divider sx={{ my: 3 }} />
-        <Typography variant="h6" fontWeight={700} sx={{ mb: 1 }}>
+        <Divider my={4} />
+        <Heading as="h4" size="md" fontWeight={700} mb={1}>
           Why Candidates Choose Candidate 5
-        </Typography>
-        <ul style={{ marginBottom: 16 }}>
-          <li>Cut application time from hours to minutes</li>
-          <li>Stay ready for any opportunity</li>
-          <li>Make your experience work harder for you</li>
-          <li>Apply more often with less effort</li>
-        </ul>
-        <Divider sx={{ my: 3 }} />
-        <Typography align="center" sx={{ mb: 4, fontWeight: 500 }}>
+        </Heading>
+        <Box display="flex" flexDirection="column" alignItems="flex-start" mb={4} gap={2} pl={2}>
+          <Text>• Cut application time from hours to minutes</Text>
+          <Text>• Stay ready for any opportunity</Text>
+          <Text>• Make your experience work harder for you</Text>
+          <Text>• Apply more often with less effort</Text>
+        </Box>
+        <Divider my={4} />
+        <Text textAlign="center" mb={4} fontWeight={500}>
           Candidate 5 isn't just a tool—it's your career advantage.<br />
           <b>Start applying smarter today.</b>
-        </Typography>
+        </Text>
         {token && (
           <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={{ base: 2, md: 4 }} mb={4}>
             <GridItem>
               <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                fullWidth
-                sx={{ py: 3, fontSize: 22, fontWeight: 600, background: accentGradient, color: '#fff', '&:hover': { background: accentGradient, opacity: 0.9 } }}
+                size="lg"
+                borderRadius="lg"
+                fontWeight={600}
+                bgGradient={accentGradient}
+                color="white"
+                w="100%"
+                _hover={{ bgGradient: accentGradient, opacity: 0.9 }}
                 onClick={() => navigate('/cvs')}
-                startIcon={<AutoAwesomeIcon />}
               >
-                Application Wizard
+                <HStack gap={2}><FaMagic /> <span>Application Wizard</span></HStack>
               </Button>
             </GridItem>
             <GridItem>
               <Button
-                variant="outlined"
-                color="secondary"
-                size="large"
-                fullWidth
-                sx={{ py: 3, fontSize: 22, fontWeight: 600, borderWidth: 2, borderColor: '#fc5c7d' }}
+                size="lg"
+                borderRadius="lg"
+                fontWeight={700}
+                variant="outline"
+                borderWidth={2}
+                w="100%"
                 onClick={() => navigate('/career-ark')}
-                startIcon={<WorkIcon />}
               >
-                Career Ark
+                <HStack gap={2}><FaBriefcase /> <span>Career Ark</span></HStack>
               </Button>
             </GridItem>
           </Grid>
         )}
-      </Paper>
+      </Box>
     </Box>
   );
 };

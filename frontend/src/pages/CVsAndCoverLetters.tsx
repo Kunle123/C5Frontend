@@ -1,5 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Typography, Paper, Stepper, Step, StepLabel, TextField, Stack, Button, CircularProgress, Alert, Chip, MenuItem } from '@mui/material';
+import {
+  Box,
+  Heading,
+  Text,
+  VStack,
+  HStack,
+  Stack,
+  Button,
+  Input,
+  Textarea,
+  Spinner,
+  Alert,
+  AlertIcon,
+  Divider,
+  Badge,
+  useColorModeValue,
+  Progress,
+} from '@chakra-ui/react';
 import { listCVs, uploadCV, deleteCV, downloadCV, getCurrentUser } from '../api';
 import { optimizeCV as aiOptimizeCV, extractKeywords, analyzeCV as aiAnalyzeCV } from '../api/aiApi';
 import { useNavigate } from 'react-router-dom';
@@ -277,94 +294,101 @@ const Application: React.FC = () => {
   };
 
   return (
-    <Box sx={{ py: 6, maxWidth: 900, mx: 'auto' }}>
-      <Typography variant="h4" fontWeight={700} align="center" sx={{ mb: 4 }}>
+    <Box py={6} maxW="900px" mx="auto">
+      <Heading as="h2" size="lg" fontWeight={700} textAlign="center" mb={4}>
         CVs & Cover Letters
-      </Typography>
-      <Paper elevation={4} sx={{ p: 4, mb: 6, maxWidth: 700, mx: 'auto' }}>
-        <Stepper activeStep={step} alternativeLabel sx={{ mb: 4 }}>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
+      </Heading>
+      <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="lg" p={8} borderRadius="lg" mb={6} maxW={700} mx="auto">
+        <HStack justify="center" mb={6} spacing={4}>
+          {steps.map((label, idx) => (
+            <VStack key={label} spacing={1} align="center">
+              <Box
+                w={8}
+                h={8}
+                borderRadius="full"
+                bg={step === idx ? 'blue.500' : 'gray.300'}
+                color={step === idx ? 'white' : 'gray.700'}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                fontWeight="bold"
+                fontSize="lg"
+              >
+                {idx + 1}
+              </Box>
+              <Text fontSize="sm" color={step === idx ? 'blue.500' : 'gray.500'}>{label}</Text>
+            </VStack>
           ))}
-        </Stepper>
+        </HStack>
         {step === 0 && (
           <Stack spacing={3}>
-            <Typography variant="h5" gutterBottom>
-              Paste a job description to get your optimised CV and cover letter.
-            </Typography>
-            <TextField
-              label="Paste Job Description"
+            <Heading as="h3" size="md">Paste a job description to get your optimised CV and cover letter.</Heading>
+            <Textarea
+              placeholder="Paste Job Description"
               value={jobDesc}
               onChange={e => setJobDesc(e.target.value)}
-              multiline
-              minRows={3}
-              fullWidth
+              minH={100}
               required
             />
-            <Button variant="contained" color="primary" onClick={handleNextFromJobDesc} disabled={!jobDesc || loading || extracting}>
-              {loading || extracting ? <CircularProgress size={22} sx={{ color: 'white', mr: 1 }} /> : null}
-              Next: Review Arc Data
+            <Button colorScheme="blue" onClick={handleNextFromJobDesc} isDisabled={!jobDesc || loading || extracting}>
+              {(loading || extracting) && <Spinner size="sm" mr={2} />}Next: Review Arc Data
             </Button>
           </Stack>
         )}
         {step === 1 && (
           arcData && Object.keys(arcData).length > 0 ? (
             <Stack spacing={3}>
-              <Typography variant="h6">Your Career Ark Data (Profile)</Typography>
-              <Paper sx={{ p: 2, bgcolor: 'grey.50', maxHeight: 300, overflow: 'auto' }}>
+              <Heading as="h3" size="md">Your Career Ark Data (Profile)</Heading>
+              <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} maxH={300} overflowY="auto" borderRadius="md">
                 <pre style={{ fontSize: 14 }}>{JSON.stringify(arcData, null, 2)}</pre>
-              </Paper>
+              </Box>
               {keywordAnalysis.length > 0 && (
                 <Box>
-                  <Typography variant="subtitle1">Keyword Match Analysis</Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                    {keywordAnalysis.map(function(k: KeywordAnalysisEntry, idx: number) {
-                      return (
-                        <span key={k.keyword + idx} style={{
-                          background: k.status === 'green' ? '#c8e6c9' : k.status === 'amber' ? '#fff9c4' : '#ffcdd2',
-                          color: k.status === 'red' ? '#b71c1c' : k.status === 'amber' ? '#ff6f00' : '#256029',
-                          borderRadius: 8,
-                          padding: '4px 10px',
-                          fontWeight: 600,
-                          fontSize: 15,
-                          border: '1px solid #eee',
-                          display: 'inline-block',
-                        }}>{k.keyword}</span>
-                      );
-                    })}
-                  </Box>
+                  <Text fontWeight="semibold">Keyword Match Analysis</Text>
+                  <HStack wrap="wrap" gap={2} mb={2}>
+                    {keywordAnalysis.map((k, idx) => (
+                      <Badge
+                        key={k.keyword + idx}
+                        colorScheme={k.status === 'green' ? 'green' : k.status === 'amber' ? 'yellow' : 'red'}
+                        px={3}
+                        py={1}
+                        borderRadius="md"
+                        fontSize="md"
+                        fontWeight={600}
+                      >
+                        {k.keyword}
+                      </Badge>
+                    ))}
+                  </HStack>
                   {matchScore !== null && (
-                    <Typography variant="h6" sx={{ color: matchScore >= 80 ? 'green' : matchScore >= 50 ? 'orange' : 'red' }}>
+                    <Heading as="h4" size="sm" color={matchScore >= 80 ? 'green.500' : matchScore >= 50 ? 'orange.500' : 'red.500'}>
                       Match Score: {matchScore}%
-                    </Typography>
+                    </Heading>
                   )}
                 </Box>
               )}
               {Object.values(arcData).every(v => v == null || (Array.isArray(v) && v.length === 0)) && (
-                <Alert severity="warning">
-                  Your Career Ark profile is empty. Please upload a CV or add data in Career Ark before proceeding.
+                <Alert status="warning">
+                  <AlertIcon />Your Career Ark profile is empty. Please upload a CV or add data in Career Ark before proceeding.
                 </Alert>
               )}
-              <Button variant="contained" color="primary" onClick={() => setStep(2)} disabled={loading}>
-                {loading ? <CircularProgress size={22} sx={{ color: 'white', mr: 1 }} /> : null}
+              <Button colorScheme="blue" onClick={() => setStep(2)} isLoading={loading}>
                 Next: Analyse & Optimise
               </Button>
-              <Button variant="outlined" color="secondary" onClick={() => window.open('/career-ark', '_blank')}>
+              <Button variant="outline" colorScheme="gray" onClick={() => window.open('/career-ark', '_blank')}>
                 Edit in Career Ark
               </Button>
             </Stack>
           ) : (
             <Stack spacing={3}>
-              <Alert severity="warning">
-                You need to create your Career Ark profile before generating applications.<br />
+              <Alert status="warning">
+                <AlertIcon />You need to create your Career Ark profile before generating applications.<br />
                 Please go to Career Ark and complete your profile.
               </Alert>
-              <Button variant="contained" color="primary" onClick={() => window.open('/career-ark', '_blank')}>
+              <Button colorScheme="blue" onClick={() => window.open('/career-ark', '_blank')}>
                 Go to Career Ark
               </Button>
-              <Button variant="outlined" color="secondary" onClick={() => setStep(0)}>
+              <Button variant="outline" colorScheme="gray" onClick={() => setStep(0)}>
                 Back
               </Button>
             </Stack>
@@ -372,29 +396,28 @@ const Application: React.FC = () => {
         )}
         {step === 2 && arcData && (
           <Stack spacing={3}>
-            <Typography variant="subtitle1">Ready to generate your optimised CV and cover letter using your Career Ark profile and the job description?</Typography>
-            <Button variant="contained" color="secondary" onClick={handleAnalyzeAndOptimize} disabled={optimizing}>
-              {optimizing ? <CircularProgress size={22} sx={{ color: 'white', mr: 1 }} /> : null}
+            <Text fontWeight="semibold">Ready to generate your optimised CV and cover letter using your Career Ark profile and the job description?</Text>
+            <Button colorScheme="purple" onClick={handleAnalyzeAndOptimize} isLoading={optimizing}>
               Optimise with AI
             </Button>
           </Stack>
         )}
         {step === 3 && (
           <Stack spacing={3}>
-            <Alert severity="success">Optimized CV and cover letter generated!</Alert>
-            <Typography variant="h6">Optimized CV</Typography>
-            <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{optimizedCV}</Typography>
-            </Paper>
-            <Typography variant="h6">Optimized Cover Letter</Typography>
-            <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{optimizedCL}</Typography>
-            </Paper>
-            <Button variant="text" sx={{ mt: 2 }} onClick={() => { setStep(0); setJobDesc(''); setArcData(null); setOptimizedCV(''); setOptimizedCL(''); }}>Optimise for Another Job</Button>
+            <Alert status="success"><AlertIcon />Optimized CV and cover letter generated!</Alert>
+            <Heading as="h4" size="md">Optimized CV</Heading>
+            <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
+              <Text whiteSpace="pre-wrap">{optimizedCV}</Text>
+            </Box>
+            <Heading as="h4" size="md">Optimized Cover Letter</Heading>
+            <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
+              <Text whiteSpace="pre-wrap">{optimizedCL}</Text>
+            </Box>
+            <Button variant="ghost" mt={2} onClick={() => { setStep(0); setJobDesc(''); setArcData(null); setOptimizedCV(''); setOptimizedCL(''); }}>Optimise for Another Job</Button>
           </Stack>
         )}
-        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-      </Paper>
+        {error && <Alert status="error" mt={2}><AlertIcon />{error}</Alert>}
+      </Box>
     </Box>
   );
 };

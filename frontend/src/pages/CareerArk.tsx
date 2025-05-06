@@ -1,5 +1,17 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Box, Button, Typography, Paper, Stack, Divider, LinearProgress, Alert } from '@mui/material';
+import {
+  Box,
+  Button,
+  Heading,
+  Text,
+  Stack,
+  Divider,
+  useColorModeValue,
+  Spinner,
+  Alert,
+  AlertIcon,
+  Progress,
+} from '@chakra-ui/react';
 import { NotificationContext } from '../App';
 import {
   uploadCV,
@@ -99,20 +111,18 @@ const CareerArk: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ py: 6, maxWidth: 900, mx: 'auto' }}>
-      <Paper elevation={4} sx={{ p: 5, mb: 6, maxWidth: 700, mx: 'auto' }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom align="center">
+    <Box py={6} maxW="900px" mx="auto">
+      <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="lg" p={8} borderRadius="lg" mb={6} maxW={700} mx="auto">
+        <Heading as="h2" size="lg" fontWeight={700} mb={4} textAlign="center">
           The Ark: Build Your Career Profile
-        </Typography>
-        <Typography variant="subtitle1" align="center" sx={{ mb: 4 }}>
+        </Heading>
+        <Text fontSize="lg" textAlign="center" mb={4}>
           Add CVs, skills, and experiences to create a comprehensive career profile for future applications.
-        </Typography>
+        </Text>
         <Stack spacing={4}>
           <Box>
-            <Typography variant="h6" gutterBottom>
-              Upload a CV
-            </Typography>
-            <Button variant="contained" color="primary" onClick={handleUploadClick} sx={{ mb: 2 }} disabled={uploading || polling}>
+            <Heading as="h3" size="md" mb={2}>Upload a CV</Heading>
+            <Button colorScheme="blue" onClick={handleUploadClick} mb={2} isDisabled={uploading || polling}>
               {uploading ? 'Uploading...' : 'Upload CV'}
             </Button>
             <input
@@ -123,20 +133,20 @@ const CareerArk: React.FC = () => {
               onChange={handleFileChange}
               disabled={uploading || polling}
             />
-            <Typography variant="body2" color="text.secondary">
+            <Text fontSize="sm" color="gray.500">
               Supported formats: PDF, DOC, DOCX
-            </Typography>
-            {uploadError && <Alert severity="error" sx={{ mt: 2 }}>{uploadError}</Alert>}
-            {uploading && <LinearProgress sx={{ mt: 2 }} />}
+            </Text>
+            {uploadError && <Alert status="error" mt={2}><AlertIcon />{uploadError}</Alert>}
+            {uploading && <Progress size="xs" isIndeterminate mt={2} />}
             {taskId && (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="body2">Processing status: <b>{status}</b></Typography>
-                {status !== 'completed' && status !== 'failed' && <LinearProgress sx={{ mt: 1 }} />}
+              <Box mt={2}>
+                <Text fontSize="sm">Processing status: <b>{status}</b></Text>
+                {status !== 'completed' && status !== 'failed' && <Progress size="xs" isIndeterminate mt={1} />}
                 {summary && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle2">Extracted Data Summary:</Typography>
-                    <Typography variant="body2">Work Experience: {summary.workExperienceCount}</Typography>
-                    <Typography variant="body2">Skills Found: {summary.skillsFound}</Typography>
+                  <Box mt={2}>
+                    <Text fontWeight="bold">Extracted Data Summary:</Text>
+                    <Text fontSize="sm">Work Experience: {summary.workExperienceCount}</Text>
+                    <Text fontSize="sm">Skills Found: {summary.skillsFound}</Text>
                   </Box>
                 )}
               </Box>
@@ -144,16 +154,16 @@ const CareerArk: React.FC = () => {
           </Box>
           <Divider />
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Heading as="h3" size="md" mb={2}>
               Your Arc Data
-            </Typography>
-            {arcError && <Alert severity="error" sx={{ mt: 2 }}>{arcError}</Alert>}
-            {!arcError && !arcData && <Typography variant="body2">Loading...</Typography>}
+            </Heading>
+            {arcError && <Alert status="error" mt={2}><AlertIcon />{arcError}</Alert>}
+            {!arcError && !arcData && <Text fontSize="sm">Loading...</Text>}
             {arcData && (
-              <Box sx={{ mt: 2 }}>
+              <Box mt={2}>
                 {arcData.work_experience && arcData.work_experience.length > 0 && (
                   <>
-                    <Typography variant="subtitle2">Work Experience</Typography>
+                    <Text fontWeight="bold">Work Experience</Text>
                     <ul>
                       {arcData.work_experience.map((exp: any, idx: number) => (
                         <li key={exp.id || idx}>
@@ -177,7 +187,7 @@ const CareerArk: React.FC = () => {
                 )}
                 {arcData.education && arcData.education.length > 0 && (
                   <>
-                    <Typography variant="subtitle2">Education</Typography>
+                    <Text fontWeight="bold">Education</Text>
                     <ul>
                       {arcData.education.map((edu: any, idx: number) => (
                         <li key={edu.id || idx}>
@@ -189,7 +199,7 @@ const CareerArk: React.FC = () => {
                 )}
                 {arcData.skills && arcData.skills.length > 0 && (
                   <>
-                    <Typography variant="subtitle2">Skills</Typography>
+                    <Text fontWeight="bold">Skills</Text>
                     <ul>
                       {arcData.skills.map((skill: any, idx: number) => (
                         <li key={skill.id || idx}>{typeof skill === 'string' ? skill : skill.skillName || skill.name}</li>
@@ -199,7 +209,7 @@ const CareerArk: React.FC = () => {
                 )}
                 {arcData.projects && arcData.projects.length > 0 && (
                   <>
-                    <Typography variant="subtitle2">Projects</Typography>
+                    <Text fontWeight="bold">Projects</Text>
                     <ul>
                       {arcData.projects.map((proj: any, idx: number) => (
                         <li key={proj.id || idx}>
@@ -214,7 +224,7 @@ const CareerArk: React.FC = () => {
                 )}
                 {arcData.certifications && arcData.certifications.length > 0 && (
                   <>
-                    <Typography variant="subtitle2">Certifications</Typography>
+                    <Text fontWeight="bold">Certifications</Text>
                     <ul>
                       {arcData.certifications.map((cert: any, idx: number) => (
                         <li key={cert.id || idx}>
@@ -231,33 +241,33 @@ const CareerArk: React.FC = () => {
           </Box>
           <Divider />
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Heading as="h3" size="md" mb={2}>
               Add Skills, Projects, Certifications
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+            </Heading>
+            <Text fontSize="sm" color="gray.500">
               (Coming soon) Add new items to your Arc profile.
-            </Typography>
+            </Text>
           </Box>
           <Divider />
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Heading as="h3" size="md" mb={2}>
               CV Processing & Job Analysis Status
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+            </Heading>
+            <Text fontSize="sm" color="gray.500">
               (Coming soon) Track the status of your CV uploads and job analyses.
-            </Typography>
+            </Text>
           </Box>
           <Divider />
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Heading as="h3" size="md" mb={2}>
               Generate Application Materials
-            </Typography>
-            <Button variant="outlined" color="secondary" disabled>
+            </Heading>
+            <Button colorScheme="blue" isDisabled>
               Generate CV & Cover Letter (Coming soon)
             </Button>
           </Box>
         </Stack>
-      </Paper>
+      </Box>
     </Box>
   );
 };

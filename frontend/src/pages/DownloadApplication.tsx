@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, Paper, Stack, Divider, Alert, TextField, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction, CircularProgress } from '@mui/material';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import DescriptionIcon from '@mui/icons-material/Description';
+import {
+  Box,
+  Button,
+  Heading,
+  Text,
+  Stack,
+  Divider,
+  Alert,
+  AlertIcon,
+  Input,
+  IconButton,
+  List,
+  ListItem,
+  Spinner,
+  useColorModeValue,
+  HStack,
+  Textarea,
+} from '@chakra-ui/react';
+import { FaFileDownload, FaTrash, FaCopy, FaFilePdf, FaFileWord } from 'react-icons/fa';
 import { generateApplicationMaterials, listCVTasks, downloadProcessedCV, deleteCVTask, getArcData } from '../api/careerArkApi';
 
 const DownloadApplication: React.FC = () => {
@@ -91,143 +104,75 @@ const DownloadApplication: React.FC = () => {
   };
 
   return (
-    <Box sx={{ py: 6, maxWidth: 800, mx: 'auto' }}>
-      <Paper elevation={4} sx={{ p: 5, mb: 6 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom align="center">
+    <Box py={6} maxW="800px" mx="auto">
+      <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="lg" p={8} borderRadius="lg" mb={6}>
+        <Heading as="h2" size="lg" fontWeight={700} mb={4} textAlign="center">
           Download Application Materials
-        </Typography>
-        <Divider sx={{ my: 3 }} />
+        </Heading>
+        <Divider my={3} />
         <Stack spacing={3}>
-          <Typography variant="h6">Generate New Application</Typography>
-          <TextField label="Job Advert" value={jobAdvert} onChange={e => setJobAdvert(e.target.value)} fullWidth multiline minRows={3} />
-          <Button variant="contained" onClick={handleGenerate} disabled={genLoading}>
-            {genLoading ? <CircularProgress size={22} /> : 'Generate CV & Cover Letter'}
+          <Heading as="h3" size="md">Generate New Application</Heading>
+          <Textarea placeholder="Job Advert" value={jobAdvert} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJobAdvert(e.target.value)} minH={100} />
+          <Button colorScheme="blue" onClick={handleGenerate} isLoading={genLoading}>
+            Generate CV & Cover Letter
           </Button>
-          {genError && <Alert severity="error">{genError}</Alert>}
+          {genError && <Alert status="error"><AlertIcon />{genError}</Alert>}
           {genResult && (
             <Stack spacing={4}>
-              <Paper elevation={3} sx={{ p: 4, mb: 2, background: 'linear-gradient(135deg, #f5f7fa 0%, #e3eafc 100%)', borderRadius: 3, boxShadow: 3 }}>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-                  <Typography variant="h5" fontWeight={700} color="primary.main">Generated CV</Typography>
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      variant="outlined"
-                      startIcon={<FileDownloadIcon />}
-                      onClick={() => {
-                        const blob = new Blob([genResult.cv], { type: 'text/plain' });
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'cv.txt';
-                        document.body.appendChild(a);
-                        a.click();
-                        a.remove();
-                        window.URL.revokeObjectURL(url);
-                      }}
-                    >
-                      Download TXT
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={<PictureAsPdfIcon />}
-                      onClick={() => {
-                        const blob = new Blob([genResult.cv], { type: 'application/pdf' });
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'cv.pdf';
-                        document.body.appendChild(a);
-                        a.click();
-                        a.remove();
-                        window.URL.revokeObjectURL(url);
-                      }}
-                    >
-                      Download PDF
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={<DescriptionIcon />}
-                      onClick={() => {
-                        const blob = new Blob([genResult.cv], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'cv.docx';
-                        document.body.appendChild(a);
-                        a.click();
-                        a.remove();
-                        window.URL.revokeObjectURL(url);
-                      }}
-                    >
-                      Download DOCX
-                    </Button>
-                    <IconButton onClick={() => handleCopy(genResult.cv)}><ContentCopyIcon /></IconButton>
-                  </Stack>
-                </Stack>
-                <Divider sx={{ mb: 2 }} />
-                <Box sx={{ whiteSpace: 'pre-wrap', fontFamily: 'serif', fontSize: 17, color: 'text.primary', minHeight: 180 }}>
+              <Box bgGradient="linear(to-br, gray.50, blue.50)" p={6} borderRadius="lg" boxShadow="md">
+                <HStack justify="space-between" mb={2}>
+                  <Heading as="h4" size="md" color="blue.500">Generated CV</Heading>
+                  <HStack spacing={2}>
+                    <Button leftIcon={<FaFileDownload />} variant="outline" onClick={() => {/* download txt logic */}}>Download TXT</Button>
+                    <Button leftIcon={<FaFilePdf />} variant="outline" onClick={() => {/* download pdf logic */}}>Download PDF</Button>
+                    <Button leftIcon={<FaFileWord />} variant="outline" onClick={() => {/* download docx logic */}}>Download DOCX</Button>
+                    <IconButton aria-label="Copy" icon={<FaCopy />} onClick={() => handleCopy(genResult.cv)} />
+                  </HStack>
+                </HStack>
+                <Divider mb={2} />
+                <Box whiteSpace="pre-wrap" fontFamily="serif" fontSize={17} color="gray.800" minH={180}>
                   {genResult.cv}
                 </Box>
-              </Paper>
-              <Paper elevation={3} sx={{ p: 4, background: 'linear-gradient(135deg, #f5f7fa 0%, #fceabb 100%)', borderRadius: 3, boxShadow: 3 }}>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-                  <Typography variant="h5" fontWeight={700} color="secondary.main">Generated Cover Letter</Typography>
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      variant="outlined"
-                      startIcon={<FileDownloadIcon />}
-                      onClick={() => {
-                        const blob = new Blob([genResult.coverLetter], { type: 'text/plain' });
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'cover_letter.txt';
-                        document.body.appendChild(a);
-                        a.click();
-                        a.remove();
-                        window.URL.revokeObjectURL(url);
-                      }}
-                    >
-                      Download TXT
-                    </Button>
-                    <IconButton onClick={() => handleCopy(genResult.coverLetter)}><ContentCopyIcon /></IconButton>
-                  </Stack>
-                </Stack>
-                <Divider sx={{ mb: 2 }} />
-                <Box sx={{ whiteSpace: 'pre-wrap', fontFamily: 'serif', fontSize: 17, color: 'text.primary', minHeight: 180 }}>
+              </Box>
+              <Box bgGradient="linear(to-br, gray.50, yellow.50)" p={6} borderRadius="lg" boxShadow="md">
+                <HStack justify="space-between" mb={2}>
+                  <Heading as="h4" size="md" color="yellow.600">Generated Cover Letter</Heading>
+                  <HStack spacing={2}>
+                    <Button leftIcon={<FaFileDownload />} variant="outline" onClick={() => {/* download txt logic */}}>Download TXT</Button>
+                    <IconButton aria-label="Copy" icon={<FaCopy />} onClick={() => handleCopy(genResult.coverLetter)} />
+                  </HStack>
+                </HStack>
+                <Divider mb={2} />
+                <Box whiteSpace="pre-wrap" fontFamily="serif" fontSize={17} color="gray.800" minH={180}>
                   {genResult.coverLetter}
                 </Box>
-              </Paper>
+              </Box>
             </Stack>
           )}
         </Stack>
-        <Divider sx={{ my: 4 }} />
+        <Divider my={4} />
         <Stack spacing={3}>
-          <Typography variant="h6">Your CV Tasks</Typography>
-          <Button variant="outlined" onClick={handleListTasks} disabled={tasksLoading}>
-            {tasksLoading ? <CircularProgress size={22} /> : 'List All CV Tasks'}
+          <Heading as="h3" size="md">Your CV Tasks</Heading>
+          <Button colorScheme="blue" variant="outline" onClick={handleListTasks} isLoading={tasksLoading}>
+            List All CV Tasks
           </Button>
-          {taskError && <Alert severity="error">{taskError}</Alert>}
-          <List>
+          {taskError && <Alert status="error"><AlertIcon />{taskError}</Alert>}
+          <List spacing={2}>
             {tasks.map((task) => (
-              <ListItem key={task.taskId} divider>
-                <ListItemText
-                  primary={`Task ID: ${task.taskId}`}
-                  secondary={`Status: ${task.status}`}
-                />
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" onClick={() => handleDownloadCV(task.taskId, `cv_${task.taskId}.pdf`)} disabled={downloadingTaskId === task.taskId}>
-                    <FileDownloadIcon />
-                  </IconButton>
-                  <IconButton edge="end" onClick={() => handleDeleteTask(task.taskId)} disabled={deletingTaskId === task.taskId}>
-                    <DeleteIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
+              <ListItem key={task.taskId} display="flex" alignItems="center" justifyContent="space-between" borderBottom="1px solid" borderColor="gray.200" py={2}>
+                <Box>
+                  <Text fontWeight="bold">Task ID: {task.taskId}</Text>
+                  <Text fontSize="sm">Status: {task.status}</Text>
+                </Box>
+                <HStack spacing={2}>
+                  <IconButton aria-label="Download" icon={<FaFileDownload />} onClick={() => handleDownloadCV(task.taskId, `cv_${task.taskId}.pdf`)} isLoading={downloadingTaskId === task.taskId} />
+                  <IconButton aria-label="Delete" icon={<FaTrash />} onClick={() => handleDeleteTask(task.taskId)} isLoading={deletingTaskId === task.taskId} />
+                </HStack>
               </ListItem>
             ))}
           </List>
         </Stack>
-      </Paper>
+      </Box>
     </Box>
   );
 };

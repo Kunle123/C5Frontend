@@ -1,13 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper, TextField, Stack, Button, Chip } from '@mui/material';
+import {
+  Box,
+  Heading,
+  Text,
+  Input,
+  Stack,
+  Button,
+  Badge,
+  useColorModeValue,
+  Spinner,
+  Alert,
+  AlertIcon,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+} from '@chakra-ui/react';
 
 const statusColor = (status: string) => {
   switch (status) {
-    case 'Sent': return 'primary';
-    case 'Interview': return 'info';
-    case 'Offer': return 'success';
-    case 'Rejected': return 'error';
-    default: return 'default';
+    case 'Sent': return 'blue';
+    case 'Interview': return 'teal';
+    case 'Offer': return 'green';
+    case 'Rejected': return 'red';
+    default: return 'gray';
   }
 };
 
@@ -34,53 +52,52 @@ const Applications: React.FC = () => {
     app.company.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) return <Box sx={{ py: 6, textAlign: 'center' }}><Typography>Loading...</Typography></Box>;
-  if (error) return <Box sx={{ py: 6, textAlign: 'center' }}><Typography color="error">{error}</Typography></Box>;
+  if (loading) return <Box py={6} textAlign="center"><Spinner /></Box>;
+  if (error) return <Box py={6} textAlign="center"><Alert status="error"><AlertIcon />{error}</Alert></Box>;
 
   return (
-    <Box sx={{ py: 6, maxWidth: 900, mx: 'auto' }}>
-      <Typography variant="h4" gutterBottom>My Applications</Typography>
-      <TextField
-        label="Search Applications"
-        variant="outlined"
-        size="small"
+    <Box py={6} maxW="900px" mx="auto">
+      <Heading as="h2" size="lg" mb={4}>My Applications</Heading>
+      <Input
+        placeholder="Search Applications"
         value={search}
         onChange={e => setSearch(e.target.value)}
-        sx={{ mb: 2, width: '100%' }}
+        mb={4}
+        size="md"
       />
-      <Paper elevation={1} sx={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f5f5f5' }}>
-              <th style={{ padding: 12, textAlign: 'left' }}>Job Title</th>
-              <th style={{ padding: 12, textAlign: 'left' }}>Company</th>
-              <th style={{ padding: 12, textAlign: 'left' }}>Date Applied</th>
-              <th style={{ padding: 12, textAlign: 'left' }}>Status</th>
-              <th style={{ padding: 12, textAlign: 'left' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="sm" borderRadius="lg" p={4}>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>Job Title</Th>
+              <Th>Company</Th>
+              <Th>Date Applied</Th>
+              <Th>Status</Th>
+              <Th>Actions</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
             {filtered.map(app => (
-              <tr key={app.id} style={{ borderBottom: '1px solid #eee' }}>
-                <td style={{ padding: 12 }}>{app.job}</td>
-                <td style={{ padding: 12 }}>{app.company}</td>
-                <td style={{ padding: 12 }}>{app.date}</td>
-                <td style={{ padding: 12 }}>
-                  <Chip label={app.status} color={statusColor(app.status)} />
-                </td>
-                <td style={{ padding: 12 }}>
-                  <Stack direction="row" spacing={1}>
-                    <Button size="small" variant="outlined">View</Button>
-                    <Button size="small" variant="outlined">Edit</Button>
-                    <Button size="small" variant="outlined" color="error">Withdraw</Button>
-                    <Button size="small" variant="contained" color="primary">Track</Button>
+              <Tr key={app.id}>
+                <Td>{app.job}</Td>
+                <Td>{app.company}</Td>
+                <Td>{app.date}</Td>
+                <Td>
+                  <Badge colorScheme={statusColor(app.status)}>{app.status}</Badge>
+                </Td>
+                <Td>
+                  <Stack direction="row" spacing={2}>
+                    <Button size="sm" variant="outline">View</Button>
+                    <Button size="sm" variant="outline">Edit</Button>
+                    <Button size="sm" colorScheme="red" variant="outline">Withdraw</Button>
+                    <Button size="sm" colorScheme="blue">Track</Button>
                   </Stack>
-                </td>
-              </tr>
+                </Td>
+              </Tr>
             ))}
-          </tbody>
-        </table>
-      </Paper>
+          </Tbody>
+        </Table>
+      </Box>
     </Box>
   );
 };
