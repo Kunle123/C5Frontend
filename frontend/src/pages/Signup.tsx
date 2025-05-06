@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Link as MuiLink, Stack, Paper, CircularProgress, Alert } from '@mui/material';
+import { Box, Heading, Text, Input, Button, Link as ChakraLink, Stack, Alert, useColorModeValue } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../api';
 
@@ -11,6 +11,8 @@ const Signup: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const cardShadow = useColorModeValue('md', 'dark-lg');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,48 +36,59 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh' }}>
-      <Paper elevation={3} sx={{ p: 5, minWidth: 340, maxWidth: 400 }}>
-        <Typography variant="h4" gutterBottom>Sign Up</Typography>
+    <Box display="flex" justifyContent="center" alignItems="center" minH="70vh">
+      <Box bg={cardBg} boxShadow={cardShadow} p={8} minW={340} maxW={400} w="100%" borderRadius="xl">
+        <Heading as="h1" size="lg" textAlign="center" fontWeight={700} mb={6}>
+          Sign Up
+        </Heading>
         <form onSubmit={handleSubmit}>
-          <Stack spacing={3}>
-            <TextField
-              label="Name"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              fullWidth
-              required
-            />
-            <TextField
-              label="Email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              fullWidth
-              required
-            />
-            <TextField
-              label="Password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              fullWidth
-              required
-            />
-            {error && <Alert severity="error">{error}</Alert>}
-            {success && <Alert severity="success">Signup successful! Redirecting to login...</Alert>}
-            <Button type="submit" variant="contained" color="primary" size="large" fullWidth disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : 'Sign Up'}
+          <Stack spacing={4}>
+            <Box>
+              <Text mb={1} fontWeight={600}>Name</Text>
+              <Input
+                placeholder="Name"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+                autoComplete="name"
+              />
+            </Box>
+            <Box>
+              <Text mb={1} fontWeight={600}>Email</Text>
+              <Input
+                placeholder="Email"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
+            </Box>
+            <Box>
+              <Text mb={1} fontWeight={600}>Password</Text>
+              <Input
+                placeholder="Password"
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                autoComplete="new-password"
+              />
+            </Box>
+            {error && <Alert status="error">{error}</Alert>}
+            {success && <Alert status="success">Signup successful! Redirecting to login...</Alert>}
+            <Button type="submit" colorScheme="brand" size="lg" fontWeight={700} isLoading={loading} loadingText="Signing up" w="100%">
+              Sign Up
             </Button>
-            <Typography variant="body2" sx={{ textAlign: 'center' }}>
+            <Text fontSize="sm" textAlign="center">
               Already have an account?{' '}
-              <MuiLink component={Link} to="/login" underline="hover">
+              <ChakraLink as={Link} to="/login" color="brand.500" fontWeight={600} _hover={{ textDecoration: 'underline' }}>
                 Login
-              </MuiLink>
-            </Typography>
+              </ChakraLink>
+            </Text>
           </Stack>
         </form>
-      </Paper>
+      </Box>
     </Box>
   );
 };
