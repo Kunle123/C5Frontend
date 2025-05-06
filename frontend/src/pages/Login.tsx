@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Link as MuiLink, Stack, Paper, CircularProgress, Alert } from '@mui/material';
+import { Box, Heading, Text, Input, Button, Link as ChakraLink, Stack, Alert, Spinner, useColorModeValue } from '@chakra-ui/react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { login } from '../api';
 
@@ -10,6 +10,8 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const cardShadow = useColorModeValue('md', 'dark-lg');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,43 +38,49 @@ const Login: React.FC = () => {
   const showAuthMsg = params.get('reason') === 'auth';
 
   return (
-    <Box sx={{ py: 8, minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Paper elevation={4} sx={{ p: 5, maxWidth: 400, width: '100%' }}>
-        <Typography variant="h4" align="center" fontWeight={700} gutterBottom>
+    <Box py={8} minH="80vh" display="flex" alignItems="center" justifyContent="center">
+      <Box bg={cardBg} boxShadow={cardShadow} p={8} maxW={400} w="100%" borderRadius="xl">
+        <Heading as="h1" size="lg" textAlign="center" fontWeight={700} mb={6}>
           Login
-        </Typography>
-        {showAuthMsg && <Alert severity="warning" sx={{ mb: 2 }}>You must be logged in to access this page.</Alert>}
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        </Heading>
+        {showAuthMsg && <Alert status="warning" mb={2}>You must be logged in to access this page.</Alert>}
+        {error && <Alert status="error" mb={2}>{error}</Alert>}
         <form onSubmit={handleSubmit}>
-          <Stack spacing={3}>
-            <TextField
-              label="Email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              fullWidth
-            />
-            <TextField
-              label="Password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              fullWidth
-            />
-            <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : 'Login'}
+          <Stack spacing={4}>
+            <Box>
+              <Text mb={1} fontWeight={600}>Email</Text>
+              <Input
+                placeholder="Email"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
+            </Box>
+            <Box>
+              <Text mb={1} fontWeight={600}>Password</Text>
+              <Input
+                placeholder="Password"
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+            </Box>
+            <Button type="submit" colorScheme="brand" size="lg" fontWeight={700} isLoading={loading} loadingText="Logging in" w="100%">
+              Login
             </Button>
           </Stack>
         </form>
-        <Typography variant="body2" align="center" sx={{ mt: 3 }}>
+        <Text fontSize="sm" textAlign="center" mt={6}>
           Don't have an account?{' '}
-          <MuiLink component={Link} to="/signup">
+          <ChakraLink as={Link} to="/signup" color="brand.500" fontWeight={600} _hover={{ textDecoration: 'underline' }}>
             Sign up
-          </MuiLink>
-        </Typography>
-      </Paper>
+          </ChakraLink>
+        </Text>
+      </Box>
     </Box>
   );
 };
