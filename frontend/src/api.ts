@@ -3,6 +3,7 @@ import { authFetch } from './api/authFetch';
 import { analyzeCV as aiAnalyzeCV } from './api/aiApi';
 
 const API_BASE = 'https://api-gw-production.up.railway.app/api/auth';
+const API_GATEWAY_BASE = 'https://api-gw-production.up.railway.app';
 
 export async function register({ name, email, password }: { name?: string; email: string; password: string }) {
   const res = await authFetch(`${API_BASE}/register`, {
@@ -124,22 +125,27 @@ export async function downloadCV(cvId: string, token: string) {
 
 // User Service
 export async function getUser(token: string) {
-  const res = await authFetch('/api/users/me');
-  if (!res) throw new Error('Unauthorized or network error');
-  if (!res.ok) throw await res.json();
+  const res = await fetch("https://api-gw-production.up.railway.app/users/me", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
+  if (!res.ok) throw new Error("Failed to fetch user profile");
   return res.json();
 }
 
 // Subscription Service
 export async function getSubscription(userId: string, token: string) {
-  const res = await authFetch(`/api/subscriptions/user/${userId}`);
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/subscriptions/user/${userId}`);
   if (!res) throw new Error('Unauthorized or network error');
   if (!res.ok) throw await res.json();
   return res.json();
 }
 
 export async function cancelSubscription(subscriptionId: string, token: string) {
-  const res = await authFetch(`/api/subscriptions/cancel/${subscriptionId}`, {
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/subscriptions/cancel/${subscriptionId}`, {
     method: 'POST',
   });
   if (!res) throw new Error('Unauthorized or network error');
@@ -149,21 +155,21 @@ export async function cancelSubscription(subscriptionId: string, token: string) 
 
 // Payments Service
 export async function getPaymentMethods(userId: string, token: string) {
-  const res = await authFetch(`/api/payments/methods/${userId}`);
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/payments/methods/${userId}`);
   if (!res) throw new Error('Unauthorized or network error');
   if (!res.ok) throw await res.json();
   return res.json();
 }
 
 export async function getPaymentHistory(userId: string, token: string) {
-  const res = await authFetch(`/api/payments/history/${userId}`);
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/payments/history/${userId}`);
   if (!res) throw new Error('Unauthorized or network error');
   if (!res.ok) throw await res.json();
   return res.json();
 }
 
 export async function addPaymentMethod(token: string) {
-  const res = await authFetch('/api/payments/methods/add', {
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/payments/methods/add`, {
     method: 'POST',
   });
   if (!res) throw new Error('Unauthorized or network error');
@@ -172,7 +178,7 @@ export async function addPaymentMethod(token: string) {
 }
 
 export async function deletePaymentMethod(paymentMethodId: string, token: string) {
-  const res = await authFetch(`/api/payments/methods/${paymentMethodId}`, {
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/payments/methods/${paymentMethodId}`, {
     method: 'DELETE',
   });
   if (!res) throw new Error('Unauthorized or network error');
@@ -181,7 +187,7 @@ export async function deletePaymentMethod(paymentMethodId: string, token: string
 }
 
 export async function setDefaultPaymentMethod(paymentMethodId: string, token: string) {
-  const res = await authFetch(`/api/payments/methods/${paymentMethodId}/default`, {
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/payments/methods/${paymentMethodId}/default`, {
     method: 'POST',
   });
   if (!res) throw new Error('Unauthorized or network error');
@@ -211,6 +217,41 @@ export async function listPreviousCVs(token: string) {
   const res = await fetch('https://api-gw-production.up.railway.app/mega-cv/previous-cvs', {
     headers: { 'Authorization': `Bearer ${token}` },
   });
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+// Update user profile
+export async function updateUser(data: { name?: string; email?: string; phone?: string }, token: string) {
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/users/profile`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!res) throw new Error('Unauthorized or network error');
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+// Send verification email
+export async function sendVerificationEmail(token: string) {
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/auth/send-verification`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!res) throw new Error('Unauthorized or network error');
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+// Change password
+export async function changePassword(old_password: string, new_password: string, token: string) {
+  const res = await authFetch(`${API_GATEWAY_BASE}/api/auth/change-password`, {
+    method: 'POST',
+    body: JSON.stringify({ old_password, new_password }),
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!res) throw new Error('Unauthorized or network error');
   if (!res.ok) throw await res.json();
   return res.json();
 } 

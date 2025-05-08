@@ -133,8 +133,9 @@ const CareerHistory: React.FC = () => {
           w={leftPaneWidth}
           minW={{ md: '250px' }}
           maxW={{ md: '350px' }}
-          borderRight={{ md: '1px solid #e2e8f0' }}
-          bg={bg}
+          borderRight={{ md: '2px solid', base: 'none' }}
+          borderColor={{ md: 'gray.200', base: 'transparent' }}
+          bg={{ base: bg, md: 'white' }}
           overflowY="auto"
           h={{ base: 'auto', md: '100%' }}
           mb={{ base: 4, md: 0 }}
@@ -142,7 +143,15 @@ const CareerHistory: React.FC = () => {
           {(['job', 'education', 'training'] as const).map((section) =>
             grouped[section] ? (
               <Box key={section} mb={6}>
-                <Text fontWeight="bold" fontSize="lg" mb={2} mt={section !== 'job' ? 4 : 0}>
+                <Text
+                  fontWeight="bold"
+                  fontSize="lg"
+                  mb={2}
+                  mt={section !== 'job' ? 4 : 0}
+                  color="brand.400"
+                  pl={4}
+                  style={{ minHeight: 32, display: 'flex', alignItems: 'center' }}
+                >
                   {sectionTitles[section]}
                 </Text>
                 <VStack spacing={1} align="stretch">
@@ -150,6 +159,7 @@ const CareerHistory: React.FC = () => {
                     <Box
                       key={item.idx}
                       p={2}
+                      pl={8}
                       borderRadius="md"
                       bg={selectedIdx === item.idx ? 'gray.100' : 'transparent'}
                       _hover={{ bg: 'gray.50', cursor: 'pointer' }}
@@ -159,6 +169,7 @@ const CareerHistory: React.FC = () => {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') setSelectedIdx(item.idx);
                       }}
+                      textAlign="left"
                     >
                       <Text fontWeight="semibold">{item.title}</Text>
                       <Text fontSize="sm" color="gray.600">{item.org}</Text>

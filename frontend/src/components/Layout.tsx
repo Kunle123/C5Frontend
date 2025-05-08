@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Footer from './Footer';
 
 const navLinks = [
   { label: 'Home', path: '/' },
@@ -166,11 +167,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {children}
       </Box>
       {/* Footer */}
-      <Box as="footer" bg="brand.50" py={3} textAlign="center">
-        <Text color="text.secondary" fontSize="sm">
-          © {new Date().getFullYear()} CandidateV. All rights reserved.
-        </Text>
-      </Box>
+      <Footer />
     </Box>
   );
 };

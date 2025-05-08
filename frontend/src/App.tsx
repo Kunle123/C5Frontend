@@ -18,6 +18,9 @@ import CareerHistory from './pages/CareerHistory';
 import ProtectedRoute from './components/ProtectedRoute';
 import TestAppJourneys from './pages/TestAppJourneys';
 import DownloadApplication from './pages/DownloadApplication';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
+import FAQ from './pages/FAQ';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -65,6 +68,9 @@ function App() {
               <Route path="/subscription-cancel" element={<SubscriptionCancel />} />
               <Route path="/test" element={<TestAppJourneys />} />
               <Route path="/download" element={<ProtectedRoute><DownloadApplication /></ProtectedRoute>} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/faq" element={<FAQ />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Box>

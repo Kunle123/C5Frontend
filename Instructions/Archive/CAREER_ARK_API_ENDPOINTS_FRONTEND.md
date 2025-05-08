@@ -140,3 +140,142 @@ displayCoverLetter(data.coverLetter);
 ## TypeScript Interface for ArcData
 
 ```
+
+---
+
+## /api/ai/keywords Endpoint (Keyword Extraction)
+
+**POST** `/api/arc/ai/keywords`
+
+### Request Body
+```json
+{
+  "jobDescription": "Paste the full job description here."
+}
+```
+
+### Response
+```json
+{
+  "keywords": [
+    "Python",
+    "Machine Learning",
+    "Data Analysis",
+    "AWS",
+    "Leadership"
+    // ...up to 20 keywords
+  ]
+}
+```
+
+### TypeScript Interfaces
+```typescript
+export interface KeywordsRequest {
+  jobDescription: string;
+}
+
+export interface KeywordsResponse {
+  keywords: string[];
+}
+```
+
+### Example API Call (Fetch)
+```typescript
+import { KeywordsRequest, KeywordsResponse } from './types/ai';
+
+export async function fetchKeywords(
+  jobDescription: string,
+  token: string // Pass the user's auth token if required
+): Promise<string[]> {
+  const response = await fetch('/api/arc/ai/keywords', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` // Remove if not using auth
+    },
+    body: JSON.stringify({ jobDescription })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch keywords');
+  }
+
+  const data: KeywordsResponse = await response.json();
+  return data.keywords;
+}
+```
+
+### Example API Call (Axios)
+```typescript
+import axios from 'axios';
+import { KeywordsRequest, KeywordsResponse } from './types/ai';
+
+export async function fetchKeywords(
+  jobDescription: string,
+  token: string
+): Promise<string[]> {
+  const { data } = await axios.post<KeywordsResponse>(
+    '/api/arc/ai/keywords',
+    { jobDescription },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return data.keywords;
+}
+```
+
+### Example React UI Integration
+```tsx
+import React, { useState } from 'react';
+import { fetchKeywords } from './api/ai'; // Adjust import path as needed
+
+const KeywordExtractor: React.FC<{ token: string }> = ({ token }) => {
+  const [jobDescription, setJobDescription] = useState('');
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleExtract = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await fetchKeywords(jobDescription, token);
+      setKeywords(result);
+    } catch (err) {
+      setError('Failed to extract keywords');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <textarea
+        value={jobDescription}
+        onChange={e => setJobDescription(e.target.value)}
+        placeholder="Paste job description here"
+        rows={8}
+        style={{ width: '100%' }}
+      />
+      <button onClick={handleExtract} disabled={loading || !jobDescription}>
+        {loading ? 'Extracting...' : 'Extract Keywords'}
+      </button>
+      {error && <div style={{ color: 'red' }}>{error}</div>}
+      {keywords.length > 0 && (
+        <div>
+          <h4>Extracted Keywords:</h4>
+          <ul>
+            {keywords.map((kw, idx) => <li key={idx}>{kw}</li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default KeywordExtractor;
+```
+
+### Notes
+- The endpoint is `/api/arc/ai/keywords` (adjust the base URL if your frontend and backend are on different domains).
+- Pass the user's auth token if your backend requires authentication.
+- The response is always a JSON array of up to 20 keywords.
+- Handle errors gracefully (e.g., network issues, backend errors).
