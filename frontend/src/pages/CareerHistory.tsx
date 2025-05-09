@@ -10,7 +10,13 @@ import {
   HStack,
   Avatar,
   Divider,
+  Input,
+  Textarea,
+  Button,
+  IconButton,
+  useToast,
 } from '@chakra-ui/react';
+import { AddIcon, EditIcon, DeleteIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';
 
 // Mock data
 const user = {
@@ -78,17 +84,86 @@ const sectionTitles = {
 
 const CareerHistory: React.FC = () => {
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [editIdx, setEditIdx] = useState<number | null>(null);
+  const [editData, setEditData] = useState<any>(null);
+  const [careerData, setCareerData] = useState([...career]);
+  const [addSection, setAddSection] = useState<null | keyof typeof sectionTitles>(null);
+  const [addData, setAddData] = useState<any>({ title: '', org: '', date: '', details: [''] });
   const bg = '#f5f5f5';
   const leftPaneWidth = useBreakpointValue({ base: '100%', md: '30%' });
   const rightPaneWidth = useBreakpointValue({ base: '100%', md: '70%' });
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const toast = useToast();
 
   // Group items by type for left pane
-  const grouped = career.reduce((acc, item, idx) => {
+  const grouped = careerData.reduce((acc, item, idx) => {
     acc[item.type] = acc[item.type] || [];
     acc[item.type].push({ ...item, idx });
     return acc;
   }, {} as Record<string, any[]>);
+
+  // Handlers for editing
+  const handleEdit = (idx: number) => {
+    setEditIdx(idx);
+    setEditData({ ...careerData[idx], details: [...careerData[idx].details] });
+  };
+  const handleEditChange = (field: string, value: any) => {
+    setEditData((prev: any) => ({ ...prev, [field]: value }));
+  };
+  const handleEditDetailChange = (i: number, value: string) => {
+    setEditData((prev: any) => {
+      const details = [...prev.details];
+      details[i] = value;
+      return { ...prev, details };
+    });
+  };
+  const handleSaveEdit = () => {
+    setCareerData((prev) => prev.map((item, idx) => (idx === editIdx ? { ...editData } : item)));
+    setEditIdx(null);
+    setEditData(null);
+    toast({ status: 'success', title: 'Entry updated' });
+  };
+  const handleCancelEdit = () => {
+    setEditIdx(null);
+    setEditData(null);
+  };
+  const handleDelete = (idx: number) => {
+    setCareerData((prev) => prev.filter((_, i) => i !== idx));
+    if (selectedIdx === idx) setSelectedIdx(0);
+    toast({ status: 'info', title: 'Entry deleted' });
+  };
+
+  // Handlers for adding
+  const handleAdd = (section: keyof typeof sectionTitles) => {
+    setAddSection(section);
+    setAddData({ title: '', org: '', date: '', details: [''] });
+  };
+  const handleAddChange = (field: string, value: any) => {
+    setAddData((prev: any) => ({ ...prev, [field]: value }));
+  };
+  const handleAddDetailChange = (i: number, value: string) => {
+    setAddData((prev: any) => {
+      const details = [...prev.details];
+      details[i] = value;
+      return { ...prev, details };
+    });
+  };
+  const handleAddDetailRow = () => {
+    setAddData((prev: any) => ({ ...prev, details: [...prev.details, ''] }));
+  };
+  const handleSaveAdd = () => {
+    setCareerData((prev) => [
+      ...prev,
+      { ...addData, type: addSection, idx: prev.length },
+    ]);
+    setAddSection(null);
+    setAddData({ title: '', org: '', date: '', details: [''] });
+    toast({ status: 'success', title: 'Entry added' });
+  };
+  const handleCancelAdd = () => {
+    setAddSection(null);
+    setAddData({ title: '', org: '', date: '', details: [''] });
+  };
 
   return (
     <Box minH="100vh" bg={bg}>
@@ -96,12 +171,13 @@ const CareerHistory: React.FC = () => {
       <Box
         as="header"
         w="100%"
-        bg={bg}
+        bg="brand.100"
         px={{ base: 4, md: 8 }}
-        py={4}
+        py={3}
         boxShadow="sm"
+        borderBottom="2px solid #e2e8f0"
         position="fixed"
-        top={0}
+        top="64px"
         zIndex={10}
       >
         <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={4} alignItems="center">
@@ -122,7 +198,7 @@ const CareerHistory: React.FC = () => {
 
       {/* Main Content */}
       <Flex
-        pt={{ base: 32, md: 28 }}
+        pt="112px"
         direction={{ base: 'column', md: 'row' }}
         h="calc(100vh - 80px)"
         maxW="1200px"
@@ -133,27 +209,31 @@ const CareerHistory: React.FC = () => {
           w={leftPaneWidth}
           minW={{ md: '250px' }}
           maxW={{ md: '350px' }}
-          borderRight={{ md: '2px solid', base: 'none' }}
-          borderColor={{ md: 'gray.200', base: 'transparent' }}
+          borderRight={{ md: '2px solid #b3ccff', base: 'none' }}
           bg={{ base: bg, md: 'white' }}
           overflowY="auto"
-          h={{ base: 'auto', md: '100%' }}
+          h={{ base: 'auto', md: '100vh' }}
           mb={{ base: 4, md: 0 }}
         >
           {(['job', 'education', 'training'] as const).map((section) =>
             grouped[section] ? (
               <Box key={section} mb={6}>
-                <Text
-                  fontWeight="bold"
-                  fontSize="lg"
-                  mb={2}
-                  mt={section !== 'job' ? 4 : 0}
-                  color="brand.400"
-                  pl={4}
-                  style={{ minHeight: 32, display: 'flex', alignItems: 'center' }}
-                >
-                  {sectionTitles[section]}
-                </Text>
+                <HStack justify="space-between" align="center" mb={2} pl={4}>
+                  <Text
+                    fontWeight="bold"
+                    fontSize="lg"
+                    color="brand.400"
+                    style={{ minHeight: 32, display: 'flex', alignItems: 'center' }}
+                  >
+                    {sectionTitles[section]}
+                  </Text>
+                  <IconButton
+                    aria-label={`Add ${section}`}
+                    icon={<AddIcon />}
+                    size="sm"
+                    onClick={() => handleAdd(section)}
+                  />
+                </HStack>
                 <VStack spacing={1} align="stretch">
                   {grouped[section].map((item) => (
                     <Box
@@ -161,8 +241,8 @@ const CareerHistory: React.FC = () => {
                       p={2}
                       pl={8}
                       borderRadius="md"
-                      bg={selectedIdx === item.idx ? 'gray.100' : 'transparent'}
-                      _hover={{ bg: 'gray.50', cursor: 'pointer' }}
+                      bg={selectedIdx === item.idx ? 'brand.100' : 'transparent'}
+                      _hover={{ bg: selectedIdx === item.idx ? 'brand.100' : 'brand.200', cursor: 'pointer' }}
                       onClick={() => setSelectedIdx(item.idx)}
                       tabIndex={0}
                       aria-selected={selectedIdx === item.idx}
@@ -171,11 +251,75 @@ const CareerHistory: React.FC = () => {
                       }}
                       textAlign="left"
                     >
-                      <Text fontWeight="semibold">{item.title}</Text>
-                      <Text fontSize="sm" color="gray.600">{item.org}</Text>
-                      <Text fontSize="xs" color="gray.500">{item.date}</Text>
+                      <HStack justify="space-between">
+                        <Box>
+                          <Text fontWeight="semibold">{item.title}</Text>
+                          <Text fontSize="sm" color="gray.600">{item.org}</Text>
+                          <Text fontSize="xs" color="gray.500">{item.date}</Text>
+                        </Box>
+                        <HStack>
+                          <IconButton
+                            aria-label="Edit"
+                            icon={<EditIcon />}
+                            size="xs"
+                            variant="ghost"
+                            colorScheme="blue"
+                            onClick={(e) => { e.stopPropagation(); handleEdit(item.idx); }}
+                          />
+                          <IconButton
+                            aria-label="Delete"
+                            icon={<DeleteIcon />}
+                            size="xs"
+                            variant="ghost"
+                            colorScheme="red"
+                            onClick={(e) => { e.stopPropagation(); handleDelete(item.idx); }}
+                          />
+                        </HStack>
+                      </HStack>
                     </Box>
                   ))}
+                  {addSection === section && (
+                    <Box p={2} pl={8} borderRadius="md" bg="brand.50">
+                      <Input
+                        placeholder="Title"
+                        value={addData.title}
+                        onChange={e => handleAddChange('title', e.target.value)}
+                        mb={1}
+                      />
+                      <Input
+                        placeholder="Organisation/Institution"
+                        value={addData.org}
+                        onChange={e => handleAddChange('org', e.target.value)}
+                        mb={1}
+                      />
+                      <Input
+                        placeholder="Date"
+                        value={addData.date}
+                        onChange={e => handleAddChange('date', e.target.value)}
+                        mb={1}
+                      />
+                      {addData.details.map((d: string, i: number) => (
+                        <Textarea
+                          key={i}
+                          placeholder="Detail"
+                          value={d}
+                          onChange={e => handleAddDetailChange(i, e.target.value)}
+                          mb={1}
+                        />
+                      ))}
+                      <Button size="xs" leftIcon={<AddIcon />} onClick={handleAddDetailRow} mb={1}>
+                        Add Detail
+                      </Button>
+                      <HStack mt={2}>
+                        <Button size="xs" colorScheme="green" leftIcon={<CheckIcon />} onClick={handleSaveAdd}>
+                          Save
+                        </Button>
+                        <Button size="xs" colorScheme="gray" leftIcon={<CloseIcon />} onClick={handleCancelAdd}>
+                          Cancel
+                        </Button>
+                      </HStack>
+                    </Box>
+                  )}
                 </VStack>
               </Box>
             ) : null
@@ -193,24 +337,68 @@ const CareerHistory: React.FC = () => {
           borderRadius={{ base: 'md', md: 'none' }}
           boxShadow={{ base: 'md', md: 'none' }}
         >
-          {career[selectedIdx] && (
+          {editIdx === selectedIdx ? (
             <Box>
-              <Heading size="lg" mb={1}>{career[selectedIdx].title}</Heading>
-              {career[selectedIdx].org && (
-                <Text fontWeight="semibold" color="gray.700" mb={1}>
-                  {career[selectedIdx].org}
-                </Text>
-              )}
-              <Text fontSize="sm" color="gray.500" mb={4}>{career[selectedIdx].date}</Text>
+              <Input
+                value={editData.title}
+                onChange={e => handleEditChange('title', e.target.value)}
+                mb={1}
+                fontWeight="bold"
+                fontSize="lg"
+              />
+              <Input
+                value={editData.org}
+                onChange={e => handleEditChange('org', e.target.value)}
+                mb={1}
+              />
+              <Input
+                value={editData.date}
+                onChange={e => handleEditChange('date', e.target.value)}
+                mb={2}
+              />
               <Divider mb={4} />
               <VStack align="start" spacing={3}>
-                {career[selectedIdx].details.map((d: string, i: number) => (
-                  <Text as="li" key={i} ml={4} fontSize="md">
-                    {d}
-                  </Text>
+                {editData.details.map((d: string, i: number) => (
+                  <Textarea
+                    key={i}
+                    value={d}
+                    onChange={e => handleEditDetailChange(i, e.target.value)}
+                    mb={1}
+                  />
                 ))}
               </VStack>
+              <Button size="xs" leftIcon={<AddIcon />} onClick={() => handleEditChange('details', [...editData.details, ''])} mb={1} mt={2}>
+                Add Detail
+              </Button>
+              <HStack mt={4}>
+                <Button size="sm" colorScheme="green" leftIcon={<CheckIcon />} onClick={handleSaveEdit}>
+                  Save
+                </Button>
+                <Button size="sm" colorScheme="gray" leftIcon={<CloseIcon />} onClick={handleCancelEdit}>
+                  Cancel
+                </Button>
+              </HStack>
             </Box>
+          ) : (
+            careerData[selectedIdx] && (
+              <Box>
+                <Heading size="lg" mb={1}>{careerData[selectedIdx].title}</Heading>
+                {careerData[selectedIdx].org && (
+                  <Text fontWeight="semibold" color="gray.700" mb={1}>
+                    {careerData[selectedIdx].org}
+                  </Text>
+                )}
+                <Text fontSize="sm" color="gray.500" mb={4}>{careerData[selectedIdx].date}</Text>
+                <Divider mb={4} />
+                <VStack align="start" spacing={3}>
+                  {careerData[selectedIdx].details.map((d: string, i: number) => (
+                    <Text as="li" key={i} ml={4} fontSize="md">
+                      {d}
+                    </Text>
+                  ))}
+                </VStack>
+              </Box>
+            )
           )}
         </Box>
       </Flex>
