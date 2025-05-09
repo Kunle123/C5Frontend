@@ -24,7 +24,8 @@ import {
   ModalFooter,
 } from '@chakra-ui/react';
 import { EditIcon, CheckIcon } from '@chakra-ui/icons';
-import { getUser, updateUser, sendVerificationEmail, changePassword } from '../api';
+import { getUser, updateUser, sendVerificationEmail, changePassword, deleteAccount } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileSection: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -41,6 +42,10 @@ const ProfileSection: React.FC = () => {
   const [pwSuccess, setPwSuccess] = useState('');
   const toast = useToast();
   const token = localStorage.getItem('token') || '';
+  const navigate = useNavigate();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   // Phone validation regex for E.164 format
   const phoneRegex = /^\+\d{10,15}$/;
@@ -135,6 +140,21 @@ const ProfileSection: React.FC = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      await deleteAccount(token);
+      toast({ status: 'success', title: 'Account deleted' });
+      localStorage.removeItem('token');
+      navigate('/');
+    } catch (err: any) {
+      setDeleteError(err?.error || err?.message || 'Failed to delete account');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) return <Spinner size="lg" />;
 
   return (
@@ -187,9 +207,13 @@ const ProfileSection: React.FC = () => {
           <Button onClick={() => setShowPasswordModal(true)} colorScheme="blue" variant="outline">
             Change Password
           </Button>
+          <Button onClick={() => setShowDeleteModal(true)} colorScheme="red" variant="outline">
+            Delete Account
+          </Button>
         </HStack>
         {error && <Alert status="error"><AlertIcon />{error}</Alert>}
         {success && <Alert status="success"><AlertIcon />{success}</Alert>}
+        {deleteError && <Alert status="error"><AlertIcon />{deleteError}</Alert>}
       </Stack>
 
       {/* Change Password Modal */}
@@ -233,6 +257,26 @@ const ProfileSection: React.FC = () => {
               Change Password
             </Button>
             <Button variant="ghost" onClick={() => setShowPasswordModal(false)}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Account Modal */}
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete Account</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Are you sure you want to delete your account? This action cannot be undone.</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={handleDeleteAccount} isLoading={deleting}>
+              Delete
+            </Button>
+            <Button variant="ghost" onClick={() => setShowDeleteModal(false)}>
               Cancel
             </Button>
           </ModalFooter>

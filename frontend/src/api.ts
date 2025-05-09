@@ -254,4 +254,14 @@ export async function changePassword(old_password: string, new_password: string,
   if (!res) throw new Error('Unauthorized or network error');
   if (!res.ok) throw await res.json();
   return res.json();
+}
+
+export async function deleteAccount(token: string) {
+  const res = await authFetch('https://api-gw-production.up.railway.app/api/auth/delete', {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!res) throw new Error('Unauthorized or network error');
+  if (!res.ok) throw await res.json();
+  return res.json();
 } 
