@@ -189,25 +189,25 @@ const ProfileSection: React.FC = () => {
             <Text fontSize="xs" color="red.500">Phone number must be in international format, e.g. +447966461005</Text>
           )}
         </FormControl>
-        <HStack>
+        <HStack spacing={2} wrap="wrap">
           {!editMode ? (
-            <Button leftIcon={<EditIcon />} onClick={handleEdit} colorScheme="blue">
+            <Button leftIcon={<EditIcon />} onClick={handleEdit} colorScheme="blue" size="sm">
               Edit
             </Button>
           ) : (
             <>
-              <Button leftIcon={<CheckIcon />} onClick={handleSave} colorScheme="green" isLoading={saving}>
+              <Button leftIcon={<CheckIcon />} onClick={handleSave} colorScheme="green" isLoading={saving} size="sm">
                 Save
               </Button>
-              <Button onClick={handleCancel} colorScheme="gray" variant="outline">
+              <Button onClick={handleCancel} colorScheme="gray" variant="outline" size="sm">
                 Cancel
               </Button>
             </>
           )}
-          <Button onClick={() => setShowPasswordModal(true)} colorScheme="blue" variant="outline">
+          <Button onClick={() => setShowPasswordModal(true)} colorScheme="blue" variant="outline" size="sm">
             Change Password
           </Button>
-          <Button onClick={() => setShowDeleteModal(true)} colorScheme="red" variant="outline">
+          <Button onClick={() => setShowDeleteModal(true)} colorScheme="red" variant="solid" size="sm">
             Delete Account
           </Button>
         </HStack>

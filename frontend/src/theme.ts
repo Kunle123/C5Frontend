@@ -34,11 +34,11 @@ const theme = extendTheme({
   },
   radii: {
     none: '0',
-    sm: '4px',
-    md: '8px',
-    lg: '12px',
-    xl: '16px',
-    '2xl': '24px',
+    sm: '0',
+    md: '0',
+    lg: '0',
+    xl: '0',
+    '2xl': '0',
   },
   space: {
     px: '1px',
@@ -79,20 +79,22 @@ const theme = extendTheme({
   },
   components: {
     Button: {
+      baseStyle: {
+        borderRadius: '0',
+      },
       variants: {
         solid: {
-          bg: 'brand.500',
-          color: 'white',
           _hover: {
             bg: 'sky',
           },
+          borderRadius: '0',
         },
         outline: {
           borderColor: 'brand.500',
-          color: 'brand.500',
           _hover: {
             bg: 'brand.50',
           },
+          borderRadius: '0',
         },
       },
     },
@@ -100,6 +102,7 @@ const theme = extendTheme({
       baseStyle: {
         field: {
           _placeholder: { color: 'text.placeholder' },
+          borderRadius: '0',
         },
       },
       variants: {
@@ -109,6 +112,7 @@ const theme = extendTheme({
             _focus: {
               borderColor: 'brand.500',
             },
+            borderRadius: '0',
           },
         },
       },
@@ -116,7 +120,7 @@ const theme = extendTheme({
     Card: {
       baseStyle: {
         padding: 4,
-        borderRadius: 'lg',
+        borderRadius: '0',
         background: 'white',
         boxShadow: 'md',
       },
@@ -125,6 +129,7 @@ const theme = extendTheme({
       baseStyle: {
         spacing: 3,
         color: 'text.secondary',
+        borderRadius: '0',
       },
     },
     ListItem: {
@@ -132,6 +137,7 @@ const theme = extendTheme({
         paddingY: 2,
         borderBottom: '1px solid',
         borderColor: 'gray.200',
+        borderRadius: '0',
       },
     },
   },

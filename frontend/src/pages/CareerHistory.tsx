@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -15,69 +15,23 @@ import {
   Button,
   IconButton,
   useToast,
+  Spinner,
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, DeleteIcon, CheckIcon, CloseIcon, ArrowBackIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
+import { getArcData } from '../api/careerArkApi';
 
-// Mock data
+// Empty initial state
 const user = {
-  name: 'John Smith',
-  address: '123 Elm Street, Springfield, SP1 2AB',
-  phone: '+44 7000 000000',
-  dob: '6 Mar 1984',
-  email: 'john.smith@email.com',
+  name: '',
+  address: '',
+  phone: '',
+  dob: '',
+  email: '',
 };
 
-const career = [
-  {
-    type: 'job',
-    title: 'Project Manager',
-    org: 'Royal Bank of Scotland',
-    date: 'June 2020 – Sept 2022',
-    details: [
-      'Managed multiple projects simultaneously through the entire lifecycle',
-      'Led cross-functional teams to deliver projects on time and within budget',
-      'Developed project plans, schedules, and budgets',
-      'Collaborated with stakeholders to define project requirements',
-    ],
-  },
-  {
-    type: 'job',
-    title: 'Business Analyst',
-    org: 'Lloyds Bank',
-    date: 'Jan 2017 – May 2020',
-    details: [
-      'Analyzed business processes and identified improvement opportunities',
-      'Facilitated requirements gathering and documentation',
-    ],
-  },
-  {
-    type: 'job',
-    title: 'Finance Assistant',
-    org: 'BW Finance',
-    date: 'Jul 2012 – Dec 2016',
-    details: [
-      'Processed invoices and managed accounts payable',
-      'Assisted with monthly financial reporting',
-    ],
-  },
-  {
-    type: 'education',
-    title: 'Manchester University',
-    org: 'BEng – Mechanical Engineering',
-    date: '2002 – 2005',
-    details: ['Graduated with honors'],
-  },
-  {
-    type: 'training',
-    title: 'Leadership Course',
-    org: '',
-    date: 'April 2021',
-    details: ['Completed leadership development program'],
-  },
-];
-
+// Section titles for display
 const sectionTitles = {
   job: 'Career History',
   education: 'Education',
@@ -85,23 +39,68 @@ const sectionTitles = {
 };
 
 const CareerHistory: React.FC = () => {
+  const [career, setCareer] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const toast = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editedItem, setEditedItem] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchCareerData = async () => {
+      try {
+        const data = await getArcData();
+        // Transform the data into the expected format
+        const transformedData = [
+          ...(data.work_experience || []).map((exp: any) => ({
+            type: 'job',
+            title: exp.positionTitle,
+            org: exp.companyName,
+            date: `${exp.startDate} – ${exp.endDate || 'Present'}`,
+            details: exp.responsibilities || [],
+          })),
+          ...(data.education || []).map((edu: any) => ({
+            type: 'education',
+            title: edu.institutionName,
+            org: edu.degree,
+            date: `${edu.startDate} – ${edu.endDate || 'Present'}`,
+            details: edu.relevantCoursework || [],
+          })),
+        ];
+        setCareer(transformedData);
+      } catch (err) {
+        setError('Failed to load career history');
+        toast({
+          title: 'Error',
+          description: 'Failed to load career history',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCareerData();
+  }, [toast]);
+
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editData, setEditData] = useState<any>(null);
-  const [careerData, setCareerData] = useState([...career]);
   const [addSection, setAddSection] = useState<null | keyof typeof sectionTitles>(null);
   const [addData, setAddData] = useState<any>({ title: '', org: '', date: '', details: [''] });
   const bg = '#f5f5f5';
   const leftPaneWidth = useBreakpointValue({ base: '100%', md: '30%' });
   const rightPaneWidth = useBreakpointValue({ base: '100%', md: '70%' });
-  const isMobile = useBreakpointValue({ base: true, md: false });
-  const toast = useToast();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { idx = '' } = useParams();
 
   // Group items by type for left pane
-  const grouped = careerData.reduce((acc, item, idx) => {
+  const grouped = career.reduce((acc, item, idx) => {
     acc[item.type] = acc[item.type] || [];
     acc[item.type].push({ ...item, idx });
     return acc;
@@ -110,7 +109,7 @@ const CareerHistory: React.FC = () => {
   // Handlers for editing
   const handleEdit = (idx: number) => {
     setEditIdx(idx);
-    setEditData({ ...careerData[idx], details: [...careerData[idx].details] });
+    setEditData({ ...career[idx], details: [...career[idx].details] });
   };
   const handleEditChange = (field: string, value: any) => {
     setEditData((prev: any) => ({ ...prev, [field]: value }));
@@ -123,7 +122,7 @@ const CareerHistory: React.FC = () => {
     });
   };
   const handleSaveEdit = () => {
-    setCareerData((prev) => prev.map((item, idx) => (idx === editIdx ? { ...editData } : item)));
+    setCareer((prev) => prev.map((item, idx) => (idx === editIdx ? { ...editData } : item)));
     setEditIdx(null);
     setEditData(null);
     toast({ status: 'success', title: 'Entry updated' });
@@ -133,7 +132,7 @@ const CareerHistory: React.FC = () => {
     setEditData(null);
   };
   const handleDelete = (idx: number) => {
-    setCareerData((prev) => prev.filter((_, i) => i !== idx));
+    setCareer((prev) => prev.filter((_, i) => i !== idx));
     if (selectedIdx === idx) setSelectedIdx(0);
     toast({ status: 'info', title: 'Entry deleted' });
   };
@@ -157,7 +156,7 @@ const CareerHistory: React.FC = () => {
     setAddData((prev: any) => ({ ...prev, details: [...prev.details, ''] }));
   };
   const handleSaveAdd = () => {
-    setCareerData((prev) => [
+    setCareer((prev) => [
       ...prev,
       { ...addData, type: addSection, idx: prev.length },
     ]);
@@ -172,10 +171,10 @@ const CareerHistory: React.FC = () => {
 
   // Mobile: show detail view if idx param is present, else show list
   if (isMobile) {
-    if (idx) {
+    if (params.idx) {
       // Show detail view
-      const parsedIdx = parseInt(idx, 10);
-      const entry = careerData[parsedIdx];
+      const parsedIdx = parseInt(params.idx, 10);
+      const entry = career[parsedIdx];
       if (!entry) return <Box p={4}>Not found</Box>;
       return (
         <Box minH="100vh" bg="white" p={4}>
@@ -247,7 +246,7 @@ const CareerHistory: React.FC = () => {
                     <IconButton aria-label={`Add ${section}`} icon={<AddIcon />} size="sm" onClick={() => handleAdd(section)} />
                   </HStack>
                   <VStack spacing={1} align="stretch">
-                    {grouped[section].map((item) => (
+                    {grouped[section].map((item: any) => (
                       <Box
                         key={item.idx}
                         p={2}
@@ -255,9 +254,12 @@ const CareerHistory: React.FC = () => {
                         borderRadius="md"
                         bg={selectedIdx === item.idx ? 'brand.100' : 'transparent'}
                         _hover={{ bg: selectedIdx === item.idx ? 'brand.100' : 'brand.200', cursor: 'pointer' }}
-                        onClick={() => navigate(`/career-history/${item.idx}`)}
+                        onClick={() => setSelectedIdx(item.idx)}
                         tabIndex={0}
                         aria-selected={selectedIdx === item.idx}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') setSelectedIdx(item.idx);
+                        }}
                         textAlign="left"
                       >
                         <HStack justify="space-between">
@@ -267,17 +269,49 @@ const CareerHistory: React.FC = () => {
                             <Text fontSize="xs" color="gray.500">{item.date}</Text>
                           </Box>
                           <HStack>
-                            <IconButton aria-label="Edit" icon={<EditIcon />} size="xs" variant="ghost" colorScheme="blue" onClick={e => { e.stopPropagation(); handleEdit(item.idx); navigate(`/career-history/${item.idx}?edit=1`); }} />
-                            <IconButton aria-label="Delete" icon={<DeleteIcon />} size="xs" variant="ghost" colorScheme="red" onClick={e => { e.stopPropagation(); handleDelete(item.idx); }} />
+                            <IconButton
+                              aria-label="Edit"
+                              icon={<EditIcon />}
+                              size="xs"
+                              variant="ghost"
+                              colorScheme="blue"
+                              onClick={(e) => { e.stopPropagation(); handleEdit(item.idx); }}
+                            />
+                            <IconButton
+                              aria-label="Delete"
+                              icon={<DeleteIcon />}
+                              size="xs"
+                              variant="ghost"
+                              colorScheme="red"
+                              onClick={(e) => { e.stopPropagation(); handleDelete(item.idx); }}
+                              borderRadius="none"
+                              _hover={{ bg: 'red.50' }}
+                              _active={{ bg: 'red.100' }}
+                            />
                           </HStack>
                         </HStack>
                       </Box>
                     ))}
                     {addSection === section && (
                       <Box p={2} pl={8} borderRadius="md" bg="brand.50">
-                        <Input placeholder="Title" value={addData.title} onChange={e => handleAddChange('title', e.target.value)} mb={1} />
-                        <Input placeholder="Organisation/Institution" value={addData.org} onChange={e => handleAddChange('org', e.target.value)} mb={1} />
-                        <Input placeholder="Date" value={addData.date} onChange={e => handleAddChange('date', e.target.value)} mb={1} />
+                        <Input
+                          placeholder="Title"
+                          value={addData.title}
+                          onChange={e => handleAddChange('title', e.target.value)}
+                          mb={1}
+                        />
+                        <Input
+                          placeholder="Organisation/Institution"
+                          value={addData.org}
+                          onChange={e => handleAddChange('org', e.target.value)}
+                          mb={1}
+                        />
+                        <Input
+                          placeholder="Date"
+                          value={addData.date}
+                          onChange={e => handleAddChange('date', e.target.value)}
+                          mb={1}
+                        />
                         {addData.details.map((d: string, i: number) => (
                           <TextareaAutosize
                             key={i}
@@ -288,10 +322,16 @@ const CareerHistory: React.FC = () => {
                             style={{ width: '100%', marginBottom: 8 }}
                           />
                         ))}
-                        <Button size="xs" leftIcon={<AddIcon />} onClick={handleAddDetailRow} mb={1}>Add Detail</Button>
+                        <Button size="xs" leftIcon={<AddIcon />} onClick={handleAddDetailRow} mb={1}>
+                          Add Detail
+                        </Button>
                         <HStack mt={2}>
-                          <Button size="xs" colorScheme="green" leftIcon={<CheckIcon />} onClick={handleSaveAdd}>Save</Button>
-                          <Button size="xs" colorScheme="gray" leftIcon={<CloseIcon />} onClick={handleCancelAdd}>Cancel</Button>
+                          <Button size="xs" colorScheme="green" leftIcon={<CheckIcon />} onClick={handleSaveAdd}>
+                            Save
+                          </Button>
+                          <Button size="xs" colorScheme="gray" leftIcon={<CloseIcon />} onClick={handleCancelAdd}>
+                            Cancel
+                          </Button>
                         </HStack>
                       </Box>
                     )}
@@ -359,23 +399,11 @@ const CareerHistory: React.FC = () => {
             grouped[section] ? (
               <Box key={section} mb={6}>
                 <HStack justify="space-between" align="center" mb={2} pl={4}>
-                  <Text
-                    fontWeight="bold"
-                    fontSize="lg"
-                    color="brand.400"
-                    style={{ minHeight: 32, display: 'flex', alignItems: 'center' }}
-                  >
-                    {sectionTitles[section]}
-                  </Text>
-                  <IconButton
-                    aria-label={`Add ${section}`}
-                    icon={<AddIcon />}
-                    size="sm"
-                    onClick={() => handleAdd(section)}
-                  />
+                  <Text fontWeight="bold" fontSize="lg" color="brand.400" style={{ minHeight: 32, display: 'flex', alignItems: 'center' }}>{sectionTitles[section]}</Text>
+                  <IconButton aria-label={`Add ${section}`} icon={<AddIcon />} size="sm" onClick={() => handleAdd(section)} />
                 </HStack>
                 <VStack spacing={1} align="stretch">
-                  {grouped[section].map((item) => (
+                  {grouped[section].map((item: any) => (
                     <Box
                       key={item.idx}
                       p={2}
@@ -413,6 +441,9 @@ const CareerHistory: React.FC = () => {
                             variant="ghost"
                             colorScheme="red"
                             onClick={(e) => { e.stopPropagation(); handleDelete(item.idx); }}
+                            borderRadius="none"
+                            _hover={{ bg: 'red.50' }}
+                            _active={{ bg: 'red.100' }}
                           />
                         </HStack>
                       </HStack>
@@ -522,18 +553,18 @@ const CareerHistory: React.FC = () => {
               </HStack>
             </Box>
           ) : (
-            careerData[selectedIdx] && (
+            career[selectedIdx] && (
               <Box>
-                <Heading size="lg" mb={1}>{careerData[selectedIdx].title}</Heading>
-                {careerData[selectedIdx].org && (
+                <Heading size="lg" mb={1}>{career[selectedIdx].title}</Heading>
+                {career[selectedIdx].org && (
                   <Text fontWeight="semibold" color="gray.700" mb={1}>
-                    {careerData[selectedIdx].org}
+                    {career[selectedIdx].org}
                   </Text>
                 )}
-                <Text fontSize="sm" color="gray.500" mb={4}>{careerData[selectedIdx].date}</Text>
+                <Text fontSize="sm" color="gray.500" mb={4}>{career[selectedIdx].date}</Text>
                 <Divider mb={4} />
                 <VStack align="start" spacing={3}>
-                  {careerData[selectedIdx].details.map((d: string, i: number) => (
+                  {career[selectedIdx].details.map((d: string, i: number) => (
                     <Text as="li" key={i} ml={4} fontSize="md">
                       {d}
                     </Text>

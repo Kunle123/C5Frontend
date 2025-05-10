@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -12,12 +12,41 @@ import {
 } from '@chakra-ui/react';
 import { FaRocket, FaBriefcase, FaMagic, FaCheckCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { getArcData } from '../api/careerArkApi';
 
 const accentGradient = 'linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%)';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const [arcData, setArcData] = useState<any>(null);
+  const [arcLoading, setArcLoading] = useState(false);
+  const [arcError, setArcError] = useState('');
+  const [arcHasData, setArcHasData] = useState(true);
+
+  useEffect(() => {
+    if (token) {
+      setArcLoading(true);
+      getArcData()
+        .then(data => {
+          setArcData(data);
+          // Check if any key sections have data
+          const hasData = !!(
+            (data.work_experience && data.work_experience.length > 0) ||
+            (data.education && data.education.length > 0) ||
+            (data.skills && data.skills.length > 0) ||
+            (data.projects && data.projects.length > 0) ||
+            (data.certifications && data.certifications.length > 0)
+          );
+          setArcHasData(hasData);
+        })
+        .catch(err => {
+          setArcError('Could not load Career Ark data.');
+          setArcHasData(false);
+        })
+        .finally(() => setArcLoading(false));
+    }
+  }, [token]);
 
   const startTrial = () => navigate('/signup');
 
@@ -137,37 +166,6 @@ const Landing: React.FC = () => {
           Candidate 5 isn't just a tool—it's your career advantage.<br />
           <b>Start applying smarter today.</b>
         </Text>
-        {token && (
-          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={{ base: 2, md: 4 }} mb={4}>
-            <GridItem>
-              <Button
-                size="lg"
-                borderRadius="lg"
-                fontWeight={600}
-                bgGradient={accentGradient}
-                color="white"
-                w="100%"
-                _hover={{ bgGradient: accentGradient, opacity: 0.9 }}
-                onClick={() => navigate('/cvs')}
-              >
-                <HStack gap={2}><FaMagic /> <span>Application Wizard</span></HStack>
-              </Button>
-            </GridItem>
-            <GridItem>
-              <Button
-                size="lg"
-                borderRadius="lg"
-                fontWeight={700}
-                variant="outline"
-                borderWidth={2}
-                w="100%"
-                onClick={() => navigate('/career-ark')}
-              >
-                <HStack gap={2}><FaBriefcase /> <span>Career Ark</span></HStack>
-              </Button>
-            </GridItem>
-          </Grid>
-        )}
       </Box>
     </Box>
   );

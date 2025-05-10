@@ -111,7 +111,7 @@ const CareerArk: React.FC = () => {
   }, []);
 
   return (
-    <Box py={6} maxW="900px" mx="auto">
+    <Box py={6} mt={20} maxW="900px" mx="auto">
       <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="lg" p={8} borderRadius="lg" mb={6} maxW={700} mx="auto">
         <Heading as="h2" size="lg" fontWeight={700} mb={4} textAlign="center">
           The Ark: Build Your Career Profile
