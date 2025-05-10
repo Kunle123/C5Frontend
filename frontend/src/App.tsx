@@ -21,6 +21,7 @@ import DownloadApplication from './pages/DownloadApplication';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import FAQ from './pages/FAQ';
+import { checkTokenExpiration } from './utils/auth';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -48,6 +49,12 @@ function App() {
     return () => window.removeEventListener('session-expired', handler);
   }, []);
 
+  // Check token expiration every minute
+  useEffect(() => {
+    const checkInterval = setInterval(checkTokenExpiration, 60000);
+    return () => clearInterval(checkInterval);
+  }, []);
+
   return (
     <NotificationContext.Provider value={{ notify }}>
       <Router>
@@ -61,6 +68,7 @@ function App() {
               <Route path="/cvs" element={<ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute>} />
               <Route path="/career-ark" element={<ProtectedRoute><CareerHistory /></ProtectedRoute>} />
               <Route path="/career-history" element={<ProtectedRoute><CareerHistory /></ProtectedRoute>} />
+              <Route path="/career-history/:idx" element={<ProtectedRoute><CareerHistory /></ProtectedRoute>} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/account" element={<Account />} />
               <Route path="/applications" element={<Applications />} />
