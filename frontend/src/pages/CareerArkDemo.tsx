@@ -10,7 +10,10 @@ import {
   Spinner,
   Alert,
   AlertIcon,
+  IconButton,
+  HStack,
 } from '@chakra-ui/react';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
 
 // Mock API calls (replace with real endpoints as needed)
 const fetchUser = async () => ({
@@ -120,7 +123,10 @@ const CareerArkDemo: React.FC = () => {
         <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} overflowY="auto">
           {Object.entries(sectionTitles).map(([key, label]) => (
             <Box key={key} mb={6}>
-              <Text fontWeight="bold" fontSize="lg" color="brand.500" mb={2}>{label}</Text>
+              <HStack justify="space-between" align="center" mb={2}>
+                <Text fontWeight="bold" fontSize="lg" color="brand.500">{label}</Text>
+                <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" />
+              </HStack>
               <VStack spacing={1} align="stretch">
                 {grouped[key]?.length > 0 ? grouped[key].map((item: any) => (
                   <Box
@@ -150,7 +156,10 @@ const CareerArkDemo: React.FC = () => {
             <Alert status="error"><AlertIcon />{error}</Alert>
           ) : career[selectedIdx] ? (
             <Box>
-              <Heading size="lg" mb={1}>{career[selectedIdx].title}</Heading>
+              <HStack justify="space-between" align="center" mb={2}>
+                <Heading size="lg" mb={1}>{career[selectedIdx].title}</Heading>
+                <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" />
+              </HStack>
               {career[selectedIdx].org && (
                 <Text fontWeight="semibold" color="gray.700" mb={1}>{career[selectedIdx].org}</Text>
               )}
