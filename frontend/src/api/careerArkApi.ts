@@ -98,4 +98,88 @@ export async function downloadProcessedCV(taskId: string) {
   });
   if (!res.ok) throw new Error('Failed to download processed CV');
   return res.blob();
+}
+
+// Add Work Experience
+export async function addWorkExperience(data: any) {
+  const res = await fetch(`${API_BASE}/work_experience`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to add work experience'));
+  return res.json();
+}
+
+// Update Work Experience
+export async function updateWorkExperience(id: string, data: any) {
+  const res = await fetch(`${API_BASE}/work_experience/${id}`, {
+    method: 'PATCH',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update work experience'));
+  return res.json();
+}
+
+// Add Education
+export async function addEducation(data: any) {
+  const res = await fetch(`${API_BASE}/education`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to add education'));
+  return res.json();
+}
+
+// Update Education
+export async function updateEducation(id: string, data: any) {
+  const res = await fetch(`${API_BASE}/education/${id}`, {
+    method: 'PATCH',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update education'));
+  return res.json();
+}
+
+// Add Training
+export async function addTraining(data: any) {
+  const res = await fetch(`${API_BASE}/training`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to add training'));
+  return res.json();
+}
+
+// Update Training
+export async function updateTraining(id: string, data: any) {
+  const res = await fetch(`${API_BASE}/training/${id}`, {
+    method: 'PATCH',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update training'));
+  return res.json();
 } 
