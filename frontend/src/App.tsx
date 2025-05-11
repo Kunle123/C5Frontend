@@ -14,7 +14,7 @@ import Applications from './pages/Applications';
 import SubscriptionSuccess from './pages/SubscriptionSuccess';
 import SubscriptionCancel from './pages/SubscriptionCancel';
 import CVsAndCoverLetters from './pages/CVsAndCoverLetters';
-import CareerHistory from './pages/CareerHistory';
+import CareerArk from './pages/CareerArk';
 import ProtectedRoute from './components/ProtectedRoute';
 import TestAppJourneys from './pages/TestAppJourneys';
 import DownloadApplication from './pages/DownloadApplication';
@@ -68,9 +68,9 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/cvs" element={<ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute>} />
-              <Route path="/career-ark" element={<ProtectedRoute><CareerHistory /></ProtectedRoute>} />
-              <Route path="/career-history" element={<ProtectedRoute><CareerHistory /></ProtectedRoute>} />
-              <Route path="/career-history/:idx" element={<ProtectedRoute><CareerHistory /></ProtectedRoute>} />
+              <Route path="/career-ark" element={<ProtectedRoute><CareerArk /></ProtectedRoute>} />
+              <Route path="/career-history" element={<ProtectedRoute><CareerArk /></ProtectedRoute>} />
+              <Route path="/career-history/:idx" element={<ProtectedRoute><CareerArk /></ProtectedRoute>} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/account" element={<Account />} />
               <Route path="/applications" element={<Applications />} />
