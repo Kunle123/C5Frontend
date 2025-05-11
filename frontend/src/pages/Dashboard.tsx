@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { FaBriefcase, FaMagic } from 'react-icons/fa';
 import { getArcData } from '../api/careerArkApi';
 
+const accentGradient = 'linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%)';
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -49,8 +51,13 @@ const Dashboard: React.FC = () => {
                 isDisabled={arcLoading || !arcHasData}
                 onClick={() => navigate('/cvs')}
                 w="100%"
+                color={(!arcHasData && !arcLoading) ? 'gray.400' : 'white'}
+                _hover={(!arcHasData && !arcLoading) ? { bg: 'gray.100', color: 'gray.400' } : { bgGradient: accentGradient, opacity: 0.9 }}
               >
-                <HStack gap={2}><FaMagic /> <span>Application Wizard</span></HStack>
+                <HStack gap={2}>
+                  <FaMagic color={(!arcHasData && !arcLoading) ? '#A0AEC0' : '#fff'} />
+                  <span>Application Wizard</span>
+                </HStack>
               </Button>
               {(!arcLoading && !arcHasData) && (
                 <Text color="red.500" fontSize="sm" mt={2} textAlign="center">
@@ -84,11 +91,6 @@ const Dashboard: React.FC = () => {
           </Card>
         </GridItem>
       </Grid>
-      <Box textAlign="center" mt={8}>
-        <Button colorScheme="blue" size="lg" onClick={() => navigate('/download-cvs')}>
-          Download Recent CVs
-        </Button>
-      </Box>
     </Box>
   );
 };
