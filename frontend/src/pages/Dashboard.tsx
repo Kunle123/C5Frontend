@@ -35,8 +35,8 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box minH="80vh" display="flex" alignItems="center" justifyContent="center" py={8}>
-      <Box w="100%" mb={8}>
-        <Text fontSize={{ base: 'xl', md: '2xl' }} color="gray.700" fontWeight={600} textAlign="center" mb={6}>
+      <Box w="100%" mb={8} display="flex" justifyContent="center">
+        <Text fontSize={{ base: 'xl', md: '2xl' }} color="gray.700" fontWeight={600} textAlign="center" mb={6} maxW="600px" mx="auto">
           To enable the application wizard, upload a CV or use our handy tools to start your Career Ark.
         </Text>
       </Box>
