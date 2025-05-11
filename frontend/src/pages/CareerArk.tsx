@@ -134,90 +134,96 @@ const CareerArk: React.FC = () => {
 
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
-      {/* Top User Info Bar */}
-      <Box w="100%" bg="gray.100" px={{ base: 4, md: 12 }} py={4} boxShadow="sm" display="flex" alignItems="center" justifyContent="space-between">
-        <Box>
-          <Heading size="md">{user?.name || 'Your Name'}</Heading>
-          <Text fontSize="sm">{user?.address || 'Address'}</Text>
-          <Text fontSize="sm">{user?.phone || 'Phone'}</Text>
-        </Box>
-        <Box textAlign="right">
-          <Text fontWeight="bold" as="span">DOB: </Text>
-          <Text as="span" fontSize="sm">{user?.dob || ''}</Text>
-          <br />
-          <Text fontWeight="bold" as="span">Email: </Text>
-          <Text as="span" fontSize="sm">{user?.email || ''}</Text>
-        </Box>
-        <Button colorScheme="blue" onClick={handleUploadClick} isLoading={uploading} ml={8}>
-          Import CV
-        </Button>
-        <input
-          type="file"
-          accept=".pdf,.doc,.docx"
-          style={{ display: 'none' }}
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          disabled={uploading || polling}
-        />
+      {/* User Info Header Bar */}
+      <Box w="100%" bg="white" px={{ base: 4, md: 12 }} py={3} boxShadow="sm" borderBottom="1px solid #e2e8f0">
+        <Flex align="center" justify="space-between" maxW="1200px" mx="auto">
+          <Box>
+            <Heading size="md">{user?.name || 'Your Name'}</Heading>
+            <Text fontSize="sm">{user?.address || 'Address'}</Text>
+            <Text fontSize="sm">{user?.phone || 'Phone'}</Text>
+          </Box>
+        </Flex>
       </Box>
       {/* Main Two-Column Layout */}
-      <Flex direction={{ base: 'column', md: 'row' }} maxW="1200px" mx="auto" mt={8} gap={6}>
-        {/* Left Sidebar */}
-        <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} mb={{ base: 4, md: 0 }}>
-          {Object.entries(sectionTitles).map(([key, label]) => (
-            <Box key={key} mb={6}>
-              <Text fontWeight="bold" fontSize="lg" color="brand.500" mb={2}>{label}</Text>
-              <VStack spacing={1} align="stretch">
-                {(grouped as any)[key]?.length > 0 ? (grouped as any)[key].map((item: any, idx: number) => (
-                  <Box
-                    key={item.id || idx}
-                    p={2}
-                    borderRadius="md"
-                    bg={selectedSection === key && selectedIdx === idx ? 'brand.100' : 'gray.50'}
-                    _hover={{ bg: 'brand.50', cursor: 'pointer' }}
-                    onClick={() => { setSelectedSection(key as any); setSelectedIdx(idx); }}
-                  >
-                    <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
-                    <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
-                    <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
-                  </Box>
-                )) : (
-                  <Text fontSize="sm" color="gray.400">No entries</Text>
-                )}
-              </VStack>
-            </Box>
-          ))}
+      <Box px={{ base: 2, md: 0 }}>
+        <Box w="100%" bg="gray.100" px={{ base: 4, md: 12 }} py={4} boxShadow="sm" display="flex" alignItems="center" justifyContent="space-between" mt={0} mb={0} borderRadius={0}>
+          <Box textAlign="right">
+            <Text fontWeight="bold" as="span">DOB: </Text>
+            <Text as="span" fontSize="sm">{user?.dob || ''}</Text>
+            <br />
+            <Text fontWeight="bold" as="span">Email: </Text>
+            <Text as="span" fontSize="sm">{user?.email || ''}</Text>
+          </Box>
+          <Button colorScheme="blue" onClick={handleUploadClick} isLoading={uploading} ml={8}>
+            Import CV
+          </Button>
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx"
+            style={{ display: 'none' }}
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            disabled={uploading || polling}
+          />
         </Box>
-        {/* Right Detail Pane */}
-        <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={8} minH="400px">
-          {uploadError && <Alert status="error" mb={4}><AlertIcon />{uploadError}</Alert>}
-          {arcError && <Alert status="error" mb={4}><AlertIcon />{arcError}</Alert>}
-          {uploading && <Progress size="xs" isIndeterminate mb={4} />}
-          {selectedItem ? (
-            <Box>
-              <Heading size="lg" mb={1}>{selectedItem.title || selectedItem.positionTitle || selectedItem.degree || selectedItem.name}</Heading>
-              {selectedItem.company || selectedItem.institution || selectedItem.org ? (
-                <Text fontWeight="semibold" color="gray.700" mb={1}>{selectedItem.company || selectedItem.institution || selectedItem.org}</Text>
-              ) : null}
-              <Text fontSize="sm" color="gray.500" mb={4}>{selectedItem.start_date || selectedItem.startDate || ''} - {selectedItem.end_date || selectedItem.endDate || ''}</Text>
-              <Divider mb={4} />
-              <VStack align="start" spacing={3}>
-                {selectedItem.details && selectedItem.details.length > 0 ? (
-                  selectedItem.details.map((d: string, i: number) => (
-                    <Text as="li" key={i} ml={4} fontSize="md">{d}</Text>
-                  ))
-                ) : selectedItem.description ? (
-                  <Text fontSize="md">{selectedItem.description}</Text>
-                ) : (
-                  <Text fontSize="sm" color="gray.400">No details available.</Text>
-                )}
-              </VStack>
-            </Box>
-          ) : (
-            <Text fontSize="md" color="gray.400">Select an item from the left to view details.</Text>
-          )}
-        </Box>
-      </Flex>
+        <Flex direction={{ base: 'column', md: 'row' }} maxW="1200px" mx="auto" mt={8} gap={6}>
+          {/* Left Sidebar */}
+          <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} mb={{ base: 4, md: 0 }}>
+            {Object.entries(sectionTitles).map(([key, label]) => (
+              <Box key={key} mb={6}>
+                <Text fontWeight="bold" fontSize="lg" color="brand.500" mb={2}>{label}</Text>
+                <VStack spacing={1} align="stretch">
+                  {(grouped as any)[key]?.length > 0 ? (grouped as any)[key].map((item: any, idx: number) => (
+                    <Box
+                      key={item.id || idx}
+                      p={2}
+                      borderRadius="md"
+                      bg={selectedSection === key && selectedIdx === idx ? 'brand.100' : 'gray.50'}
+                      _hover={{ bg: 'brand.50', cursor: 'pointer' }}
+                      onClick={() => { setSelectedSection(key as any); setSelectedIdx(idx); }}
+                    >
+                      <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
+                      <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
+                      <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
+                    </Box>
+                  )) : (
+                    <Text fontSize="sm" color="gray.400">No entries</Text>
+                  )}
+                </VStack>
+              </Box>
+            ))}
+          </Box>
+          {/* Right Detail Pane */}
+          <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={8} minH="400px">
+            {uploadError && <Alert status="error" mb={4}><AlertIcon />{uploadError}</Alert>}
+            {arcError && <Alert status="error" mb={4}><AlertIcon />{arcError}</Alert>}
+            {uploading && <Progress size="xs" isIndeterminate mb={4} />}
+            {selectedItem ? (
+              <Box>
+                <Heading size="lg" mb={1}>{selectedItem.title || selectedItem.positionTitle || selectedItem.degree || selectedItem.name}</Heading>
+                {selectedItem.company || selectedItem.institution || selectedItem.org ? (
+                  <Text fontWeight="semibold" color="gray.700" mb={1}>{selectedItem.company || selectedItem.institution || selectedItem.org}</Text>
+                ) : null}
+                <Text fontSize="sm" color="gray.500" mb={4}>{selectedItem.start_date || selectedItem.startDate || ''} - {selectedItem.end_date || selectedItem.endDate || ''}</Text>
+                <Divider mb={4} />
+                <VStack align="start" spacing={3}>
+                  {selectedItem.details && selectedItem.details.length > 0 ? (
+                    selectedItem.details.map((d: string, i: number) => (
+                      <Text as="li" key={i} ml={4} fontSize="md">{d}</Text>
+                    ))
+                  ) : selectedItem.description ? (
+                    <Text fontSize="md">{selectedItem.description}</Text>
+                  ) : (
+                    <Text fontSize="sm" color="gray.400">No details available.</Text>
+                  )}
+                </VStack>
+              </Box>
+            ) : (
+              <Text fontSize="md" color="gray.400">Select an item from the left to view details.</Text>
+            )}
+          </Box>
+        </Flex>
+      </Box>
     </Box>
   );
 };
