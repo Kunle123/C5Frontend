@@ -84,6 +84,11 @@ const Dashboard: React.FC = () => {
           </Card>
         </GridItem>
       </Grid>
+      <Box textAlign="center" mt={8}>
+        <Button colorScheme="blue" size="lg" onClick={() => navigate('/download-cvs')}>
+          Download Recent CVs
+        </Button>
+      </Box>
     </Box>
   );
 };

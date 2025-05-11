@@ -250,6 +250,66 @@ This document outlines the required API endpoints for the newly scaffolded pages
 
 ---
 
+## CV Storage and Download Endpoints (for Application Wizard)
+
+### 1. Store a New CV
+- **Method:** POST
+- **Path:** `/api/cvs`
+- **Auth:** Bearer token required
+- **Request Body:**
+```json
+{
+  "title": "string",           // Optional, e.g. job title or custom name
+  "content": "string",         // The CV content (could be HTML, Markdown, or plain text)
+  "source": "wizard",          // Must be 'wizard' to distinguish from other CVs
+  "createdAt": "ISO8601 string" // Optional, backend can set
+}
+```
+- **Behavior:**
+  - Stores the new CV for the user.
+  - If the user already has 5 CVs created by the Application Wizard, deletes the oldest before saving the new one.
+- **Response:**
+```json
+{
+  "success": true,
+  "cv": { /* saved CV object */ }
+}
+```
+
+### 2. List Last 5 CVs Created by Application Wizard
+- **Method:** GET
+- **Path:** `/api/cvs?limit=5&source=wizard`
+- **Auth:** Bearer token required
+- **Response:**
+```json
+[
+  {
+    "id": "string",
+    "title": "string",
+    "createdAt": "ISO8601 string"
+  }
+  // ...up to 5 items
+]
+```
+
+### 3. Download a CV in RTF Format
+- **Method:** GET
+- **Path:** `/api/cvs/:id/download?format=rtf`
+- **Auth:** Bearer token required
+- **Response:**
+  - Returns the CV as an RTF file (Content-Type: `application/rtf`)
+  - Sets `Content-Disposition: attachment; filename="cv_<id>.rtf"`
+
+---
+
+**Notes:**
+- All endpoints require a valid JWT Bearer token in the `Authorization` header.
+- Only CVs created by the Application Wizard (`source=wizard`) are included in the 5-CV limit and listing.
+- The backend should handle RTF conversion if the CVs are stored in another format (e.g., HTML or Markdown).
+- The frontend will POST to `/api/cvs` when a new CV is generated, GET `/api/cvs?limit=5&source=wizard` to list, and GET `/api/cvs/:id/download?format=rtf` to download.
+
+---
+
 ## General Notes
 - All endpoints should return appropriate error codes and messages for validation/auth failures.
 - All timestamps should be ISO8601 strings.

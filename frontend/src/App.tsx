@@ -21,6 +21,7 @@ import DownloadApplication from './pages/DownloadApplication';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import FAQ from './pages/FAQ';
+import DownloadCVs from './pages/DownloadCVs';
 import { checkTokenExpiration } from './utils/auth';
 
 // Notification context
@@ -76,6 +77,7 @@ function App() {
               <Route path="/subscription-cancel" element={<SubscriptionCancel />} />
               <Route path="/test" element={<TestAppJourneys />} />
               <Route path="/download" element={<ProtectedRoute><DownloadApplication /></ProtectedRoute>} />
+              <Route path="/download-cvs" element={<ProtectedRoute><DownloadCVs /></ProtectedRoute>} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/faq" element={<FAQ />} />
