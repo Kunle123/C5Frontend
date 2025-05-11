@@ -39,7 +39,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <Box minH="100vh" bg="lilac">
+    <Box minH="100vh" bg="lilac" display="flex" flexDirection="column">
       {/* App Bar */}
       <Flex as="nav" align="center" justify="space-between" wrap="wrap" w="100%" px={6} py={3} bg="brand.500" color="white" boxShadow="md" position="sticky" top={0} zIndex={100}>
         <Box
@@ -163,7 +163,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </Box>
       )}
       {/* Main Content */}
-      <Box as="main" minH="80vh" py={4} px={{ base: 2, md: 0 }}>
+      <Box as="main" flex="1 0 auto" py={4} px={{ base: 2, md: 0 }}>
         {children}
       </Box>
       {/* Footer */}
