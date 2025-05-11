@@ -75,7 +75,7 @@ const sectionTitles = {
 const CareerArkDemo: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [career, setCareer] = useState<any[]>([]);
-  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -125,7 +125,7 @@ const CareerArkDemo: React.FC = () => {
             <Box key={key} mb={6}>
               <HStack justify="space-between" align="center" mb={2}>
                 <Text fontWeight="bold" fontSize="lg" color="brand.500">{label}</Text>
-                <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" />
+                <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" onClick={() => setSelectedIdx(null)} />
               </HStack>
               <VStack spacing={1} align="stretch">
                 {grouped[key]?.length > 0 ? grouped[key].map((item: any) => (
@@ -154,7 +154,7 @@ const CareerArkDemo: React.FC = () => {
             <Spinner />
           ) : error ? (
             <Alert status="error"><AlertIcon />{error}</Alert>
-          ) : career[selectedIdx] ? (
+          ) : selectedIdx !== null && career[selectedIdx] ? (
             <Box>
               <HStack justify="space-between" align="center" mb={2}>
                 <Heading size="lg" mb={1}>{career[selectedIdx].title}</Heading>
