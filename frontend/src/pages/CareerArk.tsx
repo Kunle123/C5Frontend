@@ -133,42 +133,41 @@ const CareerArk: React.FC = () => {
   const selectedItem = selectedList && selectedList[selectedIdx];
 
   return (
-    <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
-      {/* User Info Header Bar */}
-      <Box w="100%" bg="white" px={{ base: 4, md: 12 }} py={3} boxShadow="sm" borderBottom="1px solid #e2e8f0">
-        <Flex align="center" justify="space-between" maxW="1200px" mx="auto">
-          <Box>
-            <Heading size="md">{user?.name || 'Your Name'}</Heading>
-            <Text fontSize="sm">{user?.address || 'Address'}</Text>
-            <Text fontSize="sm">{user?.phone || 'Phone'}</Text>
-          </Box>
-        </Flex>
-      </Box>
-      {/* Main Two-Column Layout */}
-      <Box px={{ base: 2, md: 0 }}>
-        <Box w="100%" bg="gray.100" px={{ base: 4, md: 12 }} py={4} boxShadow="sm" display="flex" alignItems="center" justifyContent="space-between" mt={0} mb={0} borderRadius={0}>
-          <Box textAlign="right">
-            <Text fontWeight="bold" as="span">DOB: </Text>
-            <Text as="span" fontSize="sm">{user?.dob || ''}</Text>
-            <br />
-            <Text fontWeight="bold" as="span">Email: </Text>
-            <Text as="span" fontSize="sm">{user?.email || ''}</Text>
-          </Box>
-          <Button colorScheme="blue" onClick={handleUploadClick} isLoading={uploading} ml={8}>
-            Import CV
-          </Button>
-          <input
-            type="file"
-            accept=".pdf,.doc,.docx"
-            style={{ display: 'none' }}
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            disabled={uploading || polling}
-          />
+    <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>    
+      {/* Main Content Container */}
+      <Box maxW="1200px" mx="auto" display="flex" flexDirection="column" minH="calc(100vh - 64px - 32px)">
+        {/* User Info Header Bar */}
+        <Box w="100%" bg="white" py={3} boxShadow="sm" borderBottom="1px solid #e2e8f0">
+          <Flex align="center" justify="space-between">
+            <Box>
+              <Heading size="md">{user?.name || 'Your Name'}</Heading>
+              <Text fontSize="sm">{user?.address || 'Address'}</Text>
+              <Text fontSize="sm">{user?.phone || 'Phone'}</Text>
+            </Box>
+            <Box textAlign="right">
+              <Text fontWeight="bold" as="span">DOB: </Text>
+              <Text as="span" fontSize="sm">{user?.dob || ''}</Text>
+              <br />
+              <Text fontWeight="bold" as="span">Email: </Text>
+              <Text as="span" fontSize="sm">{user?.email || ''}</Text>
+            </Box>
+            <Button colorScheme="blue" onClick={handleUploadClick} isLoading={uploading} ml={8}>
+              Import CV
+            </Button>
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx"
+              style={{ display: 'none' }}
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              disabled={uploading || polling}
+            />
+          </Flex>
         </Box>
-        <Flex direction={{ base: 'column', md: 'row' }} maxW="1200px" mx="auto" mt={8} gap={6}>
+        {/* Two-Column Layout filling remaining height */}
+        <Flex flex={1} direction={{ base: 'column', md: 'row' }} gap={6} minH={0}>
           {/* Left Sidebar */}
-          <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} mb={{ base: 4, md: 0 }}>
+          <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} mb={{ base: 4, md: 0 }} h="100%" minH={0} overflowY="auto">
             {Object.entries(sectionTitles).map(([key, label]) => (
               <Box key={key} mb={6}>
                 <Text fontWeight="bold" fontSize="lg" color="brand.500" mb={2}>{label}</Text>
@@ -194,7 +193,7 @@ const CareerArk: React.FC = () => {
             ))}
           </Box>
           {/* Right Detail Pane */}
-          <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={8} minH="400px">
+          <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={8} minH={0} h="100%" overflowY="auto">
             {uploadError && <Alert status="error" mb={4}><AlertIcon />{uploadError}</Alert>}
             {arcError && <Alert status="error" mb={4}><AlertIcon />{arcError}</Alert>}
             {uploading && <Progress size="xs" isIndeterminate mb={4} />}
