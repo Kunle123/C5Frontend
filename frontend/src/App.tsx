@@ -23,6 +23,7 @@ import Terms from './pages/Terms';
 import FAQ from './pages/FAQ';
 import DownloadCVs from './pages/DownloadCVs';
 import { checkTokenExpiration } from './utils/auth';
+import CareerArkDemo from './pages/CareerArkDemo';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -81,6 +82,7 @@ function App() {
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/career-ark-demo" element={<CareerArkDemo />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Box>
