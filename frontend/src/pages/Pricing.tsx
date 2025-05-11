@@ -32,10 +32,10 @@ const Pricing: React.FC = () => {
     <Box py={8} maxW="1100px" mx="auto">
       <Heading as="h2" size="xl" textAlign="center" mb={2}>Pricing Plans</Heading>
       <Text fontSize="lg" textAlign="center" color="gray.500" mb={6}>
-        Choose the plan that fits your job search needs. Upgrade anytime.
+      Choose the plan that fits your job search needs. Upgrade anytime.
       </Text>
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={6}>
-        {plans.map(plan => (
+      {plans.map(plan => (
           <Box
             key={plan.name}
             bg={cardBg}
@@ -62,14 +62,14 @@ const Pricing: React.FC = () => {
               </Button>
             </VStack>
           </Box>
-        ))}
+      ))}
       </SimpleGrid>
       <Box mt={8} p={8} bg={useColorModeValue('gray.100', 'gray.700')} borderRadius="lg" textAlign="center">
         <Heading as="h4" size="md" mb={2}>Questions about pricing or need a custom plan?</Heading>
         <Button colorScheme="blue" variant="outline" size="lg">Contact Us</Button>
       </Box>
-    </Box>
-  );
+  </Box>
+);
 };
 
 export default Pricing; 

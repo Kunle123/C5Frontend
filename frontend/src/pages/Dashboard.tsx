@@ -35,6 +35,11 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box minH="80vh" display="flex" alignItems="center" justifyContent="center" py={8}>
+      <Box w="100%" mb={8}>
+        <Text fontSize={{ base: 'xl', md: '2xl' }} color="gray.700" fontWeight={600} textAlign="center" mb={6}>
+          To enable the application wizard, upload a CV or use our handy tools to start your Career Ark.
+        </Text>
+      </Box>
       <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={{ base: 4, md: 6 }} maxW={900} w="100%">
         <GridItem>
           <Card bg={cardBg} boxShadow={cardShadow} minH={240} h={320} maxW={{ base: '100%', md: 400 }} w="100%" mx="auto" cursor="pointer" onClick={() => navigate('/cvs')} _hover={{ boxShadow: 'xl', transform: 'scale(1.03)' }} transition="all 0.2s">
