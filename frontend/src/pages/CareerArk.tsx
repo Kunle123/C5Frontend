@@ -13,10 +13,11 @@ import {
   IconButton,
   HStack,
   Progress,
+  useToast,
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { getUser, uploadCV } from '../api';
-import { getArcData, getCVStatus } from '../api/careerArkApi';
+import { getArcData, getCVStatus, addWorkExperience } from '../api/careerArkApi';
 
 const sectionTitles = {
   work_experience: 'Career History',
@@ -39,6 +40,14 @@ const CareerArk: React.FC = () => {
   const [polling, setPolling] = useState(false);
   const [summary, setSummary] = useState<any>(null);
   const token: string = (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '';
+  const toast = useToast();
+  const [addTitle, setAddTitle] = useState('');
+  const [addCompany, setAddCompany] = useState('');
+  const [addStartDate, setAddStartDate] = useState('');
+  const [addEndDate, setAddEndDate] = useState('');
+  const [addDetails, setAddDetails] = useState('');
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -198,26 +207,96 @@ const CareerArk: React.FC = () => {
               </VStack>
             </Box>
           ) : (
-            <Box as="form" w="100%" maxW="500px" mx="auto">
+            <Box as="form" w="100%" maxW="500px" mx="auto"
+              onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+                e.preventDefault();
+                setAddLoading(true);
+                setAddError('');
+                try {
+                  // Only handle work_experience for now
+                  if (selectedSection === 'work_experience') {
+                    await addWorkExperience({
+                      title: addTitle,
+                      company: addCompany,
+                      start_date: addStartDate,
+                      end_date: addEndDate || null,
+                      details: addDetails.split('\n').map(s => s.trim()).filter(Boolean),
+                    });
+                    // Refresh data
+                    const arcData = await getArcData();
+                    setArcData(arcData);
+                    // Reset form
+                    setAddTitle('');
+                    setAddCompany('');
+                    setAddStartDate('');
+                    setAddEndDate('');
+                    setAddDetails('');
+                    setSelectedIdx(arcData.work_experience.length); // select the new entry
+                    toast({ status: 'success', title: 'Work experience added!' });
+                  }
+                } catch (err: any) {
+                  setAddError(err?.message || 'Failed to add work experience');
+                } finally {
+                  setAddLoading(false);
+                }
+              }}
+            >
               <Heading size="md" mb={4}>New Entry</Heading>
               <VStack spacing={4} align="stretch">
                 <Box>
                   <Text mb={1} fontWeight={600}>Title</Text>
-                  <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Title" />
+                  <input
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="Title"
+                    value={addTitle}
+                    onChange={e => setAddTitle(e.target.value)}
+                    required
+                  />
                 </Box>
                 <Box>
-                  <Text mb={1} fontWeight={600}>Organization</Text>
-                  <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Organization/Institution" />
+                  <Text mb={1} fontWeight={600}>Company</Text>
+                  <input
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="Company"
+                    value={addCompany}
+                    onChange={e => setAddCompany(e.target.value)}
+                    required
+                  />
                 </Box>
                 <Box>
-                  <Text mb={1} fontWeight={600}>Date</Text>
-                  <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Date" />
+                  <Text mb={1} fontWeight={600}>Start Date</Text>
+                  <input
+                    type="date"
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="Start Date"
+                    value={addStartDate}
+                    onChange={e => setAddStartDate(e.target.value)}
+                    required
+                  />
+                </Box>
+                <Box>
+                  <Text mb={1} fontWeight={600}>End Date</Text>
+                  <input
+                    type="date"
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="End Date (leave blank if current)"
+                    value={addEndDate}
+                    onChange={e => setAddEndDate(e.target.value)}
+                  />
                 </Box>
                 <Box>
                   <Text mb={1} fontWeight={600}>Details</Text>
-                  <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" />
+                  <textarea
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }}
+                    placeholder="Details (one per line)"
+                    value={addDetails}
+                    onChange={e => setAddDetails(e.target.value)}
+                  />
                 </Box>
-                <Button colorScheme="blue" isDisabled>Save (Demo Only)</Button>
+                {addError && <Text color="red.500">{addError}</Text>}
+                <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle || !addCompany || !addStartDate}>
+                  Save
+                </Button>
               </VStack>
             </Box>
           )}
