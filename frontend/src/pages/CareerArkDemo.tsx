@@ -176,7 +176,28 @@ const CareerArkDemo: React.FC = () => {
               </VStack>
             </Box>
           ) : (
-            <Text fontSize="md" color="gray.400">Select an item from the left to view details.</Text>
+            <Box as="form" w="100%" maxW="500px" mx="auto">
+              <Heading size="md" mb={4}>New Entry</Heading>
+              <VStack spacing={4} align="stretch">
+                <Box>
+                  <Text mb={1} fontWeight={600}>Title</Text>
+                  <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Title" />
+                </Box>
+                <Box>
+                  <Text mb={1} fontWeight={600}>Organization</Text>
+                  <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Organization/Institution" />
+                </Box>
+                <Box>
+                  <Text mb={1} fontWeight={600}>Date</Text>
+                  <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Date" />
+                </Box>
+                <Box>
+                  <Text mb={1} fontWeight={600}>Details</Text>
+                  <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" />
+                </Box>
+                <Button colorScheme="blue" isDisabled>Save (Demo Only)</Button>
+              </VStack>
+            </Box>
           )}
         </Box>
       </Flex>
