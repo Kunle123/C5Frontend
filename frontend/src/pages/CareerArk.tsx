@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { getUser, uploadCV } from '../api';
-import { getArcData, getCVStatus, addWorkExperience } from '../api/careerArkApi';
+import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience } from '../api/careerArkApi';
 
 const sectionTitles = {
   work_experience: 'Career History',
@@ -48,6 +48,14 @@ const CareerArk: React.FC = () => {
   const [addDetails, setAddDetails] = useState('');
   const [addLoading, setAddLoading] = useState(false);
   const [addError, setAddError] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editCompany, setEditCompany] = useState('');
+  const [editStartDate, setEditStartDate] = useState('');
+  const [editEndDate, setEditEndDate] = useState('');
+  const [editDetails, setEditDetails] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -118,6 +126,24 @@ const CareerArk: React.FC = () => {
     return () => clearInterval(interval);
   }, [polling, taskId]);
 
+  // When selectedIdx changes, reset edit state
+  useEffect(() => {
+    if (selectedIdx !== null && grouped[selectedSection][selectedIdx]) {
+      const entry = grouped[selectedSection][selectedIdx];
+      setEditTitle(entry.title || entry.positionTitle || '');
+      setEditCompany(entry.company || '');
+      setEditStartDate(entry.start_date || entry.startDate || '');
+      setEditEndDate(entry.end_date || entry.endDate || '');
+      setEditDetails((entry.details || []).join('\n'));
+      setEditError('');
+      setEditLoading(false);
+      setEditMode(false);
+    } else {
+      setEditMode(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIdx, selectedSection]);
+
   return (
     <Box minH="100vh" bg="gray.50">
       {/* User Info Header */}
@@ -187,7 +213,7 @@ const CareerArk: React.FC = () => {
             <Box>
               <HStack justify="space-between" align="center" mb={2}>
                 <Heading size="lg" mb={1}>{grouped[selectedSection][selectedIdx].title || grouped[selectedSection][selectedIdx].positionTitle || grouped[selectedSection][selectedIdx].degree || grouped[selectedSection][selectedIdx].name}</Heading>
-                <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" />
+                <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => setEditMode(true)} />
               </HStack>
               {grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org ? (
                 <Text fontWeight="semibold" color="gray.700" mb={1}>{grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org}</Text>
@@ -204,6 +230,93 @@ const CareerArk: React.FC = () => {
                 ) : (
                   <Text fontSize="sm" color="gray.400">No details available.</Text>
                 )}
+              </VStack>
+            </Box>
+          ) : selectedIdx !== null && editMode && selectedSection === 'work_experience' ? (
+            <Box as="form" w="100%" maxW="500px" mx="auto"
+              onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+                e.preventDefault();
+                setEditLoading(true);
+                setEditError('');
+                try {
+                  const entry = grouped[selectedSection][selectedIdx];
+                  await updateWorkExperience(entry.id, {
+                    title: editTitle,
+                    company: editCompany,
+                    start_date: editStartDate,
+                    end_date: editEndDate || null,
+                    details: editDetails.split('\n').map(s => s.trim()).filter(Boolean),
+                  });
+                  const arcData = await getArcData();
+                  setArcData(arcData);
+                  setEditMode(false);
+                  toast({ status: 'success', title: 'Work experience updated!' });
+                } catch (err: any) {
+                  setEditError(err?.message || 'Failed to update work experience');
+                } finally {
+                  setEditLoading(false);
+                }
+              }}
+            >
+              <Heading size="md" mb={4}>Edit Work Experience</Heading>
+              <VStack spacing={4} align="stretch">
+                <Box>
+                  <Text mb={1} fontWeight={600}>Title</Text>
+                  <input
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="Title"
+                    value={editTitle}
+                    onChange={e => setEditTitle(e.target.value)}
+                    required
+                  />
+                </Box>
+                <Box>
+                  <Text mb={1} fontWeight={600}>Company</Text>
+                  <input
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="Company"
+                    value={editCompany}
+                    onChange={e => setEditCompany(e.target.value)}
+                    required
+                  />
+                </Box>
+                <Box>
+                  <Text mb={1} fontWeight={600}>Start Date</Text>
+                  <input
+                    type="date"
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="Start Date"
+                    value={editStartDate}
+                    onChange={e => setEditStartDate(e.target.value)}
+                    required
+                  />
+                </Box>
+                <Box>
+                  <Text mb={1} fontWeight={600}>End Date</Text>
+                  <input
+                    type="date"
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="End Date (leave blank if current)"
+                    value={editEndDate}
+                    onChange={e => setEditEndDate(e.target.value)}
+                  />
+                </Box>
+                <Box>
+                  <Text mb={1} fontWeight={600}>Details</Text>
+                  <textarea
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }}
+                    placeholder="Details (one per line)"
+                    value={editDetails}
+                    onChange={e => setEditDetails(e.target.value)}
+                  />
+                </Box>
+                {editError && <Text color="red.500">{editError}</Text>}
+                <HStack>
+                  <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle || !editCompany || !editStartDate}>
+                    Save
+                  </Button>
+                  <Button onClick={() => setEditMode(false)} isDisabled={editLoading} variant="ghost">Cancel</Button>
+                </HStack>
               </VStack>
             </Box>
           ) : (
