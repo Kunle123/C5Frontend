@@ -17,8 +17,8 @@ import {
 } from '@chakra-ui/react';
 import { NotificationContext } from '../App';
 import { AddIcon } from '@chakra-ui/icons';
-import { getUser } from '../api';
-import { uploadCV, getCVStatus, getArcData } from '../api/careerArkApi';
+import { getUser, uploadCV } from '../api';
+import { getCVStatus, getArcData } from '../api/careerArkApi';
 
 const sectionTitles = {
   work_experience: 'Career History',
@@ -42,7 +42,7 @@ const CareerArk: React.FC = () => {
   const [selectedSection, setSelectedSection] = useState<'work_experience' | 'education' | 'training'>('work_experience');
   const [selectedIdx, setSelectedIdx] = useState(0);
   const { notify } = React.useContext(NotificationContext);
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+  const token: string = (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '';
 
   useEffect(() => {
     if (token) {
@@ -63,7 +63,7 @@ const CareerArk: React.FC = () => {
     setStatus('');
     setSummary(null);
     try {
-      const data = await uploadCV(file, token);
+      const data = await uploadCV(file, token || '');
       setTaskId(data.taskId);
       setStatus('pending');
       setPolling(true);
