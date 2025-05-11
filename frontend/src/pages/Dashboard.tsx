@@ -64,11 +64,6 @@ const Dashboard: React.FC = () => {
                   <span>Application Wizard</span>
                 </HStack>
               </Button>
-              {(!arcLoading && !arcHasData) && (
-                <Text color="red.500" fontSize="sm" mt={2} textAlign="center">
-                  Please add your career data in Career Ark before using the Application Wizard.
-                </Text>
-              )}
               {arcError && (
                 <Text color="red.500" fontSize="sm" mt={2}>{arcError}</Text>
               )}
