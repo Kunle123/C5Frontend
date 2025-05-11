@@ -15,8 +15,9 @@ import Footer from './Footer';
 const navLinks = [
   { label: 'Home', path: '/' },
   { label: 'Dashboard', path: '/dashboard', protected: true },
+  { label: 'My CVs', path: '/download-cvs', protected: true },
   { label: 'Pricing', path: '/pricing', hideWhenLoggedIn: true },
-  { label: 'Account', path: '/account', account: true },
+  { label: 'Account', path: '/account', protected: true },
 ];
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -28,7 +29,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Only show protected links if logged in
   const filteredLinks = navLinks.filter(link => {
     if (link.protected && !token) return false;
-    if (link.account && !token) return false;
     if (link.hideWhenLoggedIn && token) return false;
     return true;
   });
