@@ -17,7 +17,7 @@ export async function healthCheck() {
 export async function uploadCV(file: File) {
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch(`${API_BASE}/cv`, {
+  const res = await fetch(`https://api-gw-production.up.railway.app/api/arc/cv`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: formData,
