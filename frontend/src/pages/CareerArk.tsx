@@ -56,6 +56,7 @@ const CareerArk: React.FC = () => {
   const [editDetails, setEditDetails] = useState('');
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
     setLoading(true);
@@ -91,40 +92,72 @@ const CareerArk: React.FC = () => {
     setTaskId(null);
     setStatus('');
     setSummary(null);
+    setUploadProgress(10);
     try {
-      const data = await uploadCV(file, token);
-      setTaskId(data.taskId);
-      setStatus('pending');
-      setPolling(true);
+      // Use XMLHttpRequest for progress
+      const formData = new FormData();
+      formData.append('file', file);
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://api-gw-production.up.railway.app/api/arc/cv', true);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          setUploadProgress(Math.round((event.loaded / event.total) * 60)); // up to 60%
+        }
+      };
+      xhr.onreadystatechange = async () => {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            setUploadProgress(70);
+            const data = JSON.parse(xhr.responseText);
+            setTaskId(data.taskId);
+            setStatus('pending');
+            setPolling(true);
+            // Poll for extraction completion
+            let pollCount = 0;
+            const poll = async () => {
+              try {
+                const statusData = await getCVStatus(data.taskId);
+                setStatus(statusData.status);
+                if (statusData.status === 'completed') {
+                  setUploadProgress(100);
+                  setPolling(false);
+                  setSummary(statusData.extractedDataSummary || null);
+                  // Refresh Ark data
+                  const arcData = await getArcData();
+                  setArcData(arcData);
+                  toast({ status: 'success', title: 'CV imported and Ark updated!' });
+                } else if (statusData.status === 'failed') {
+                  setPolling(false);
+                  setUploadError('CV extraction failed.');
+                } else if (pollCount < 30) { // poll up to 1 minute
+                  setTimeout(poll, 2000);
+                  pollCount++;
+                  setUploadProgress(70 + Math.min(30, pollCount));
+                } else {
+                  setPolling(false);
+                  setUploadError('CV extraction timed out.');
+                }
+              } catch {
+                setPolling(false);
+                setUploadError('Failed to check CV extraction status.');
+              } finally {
+                setUploading(false);
+              }
+            };
+            poll();
+          } else {
+            setUploadError('Upload failed');
+            setUploading(false);
+          }
+        }
+      };
+      xhr.send(formData);
     } catch (err: any) {
       setUploadError(err?.error || err?.message || 'Upload failed');
-    } finally {
       setUploading(false);
     }
   };
-
-  // Poll for status
-  useEffect(() => {
-    let interval: any;
-    if (polling && taskId) {
-      const poll = async () => {
-        try {
-          const data = await getCVStatus(taskId);
-          setStatus(data.status);
-          if (data.status === 'completed' || data.status === 'failed') {
-            setPolling(false);
-            setSummary(data.extractedDataSummary || null);
-            // Optionally, refresh arcData here
-          }
-        } catch {
-          // ignore
-        }
-      };
-      poll();
-      interval = setInterval(poll, 2000);
-    }
-    return () => clearInterval(interval);
-  }, [polling, taskId]);
 
   // When selectedIdx changes, reset edit state
   useEffect(() => {
@@ -167,7 +200,10 @@ const CareerArk: React.FC = () => {
       <Flex maxW="1200px" mx="auto" flex={1} minH="calc(100vh - 120px)" gap={6}>
         {/* Left Sidebar */}
         <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} overflowY="auto">
-          <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick}>Import a CV</Button>
+          <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
+          {uploading && (
+            <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />
+          )}
           <input
             type="file"
             accept=".pdf,.doc,.docx"
