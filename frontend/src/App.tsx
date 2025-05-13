@@ -24,6 +24,7 @@ import FAQ from './pages/FAQ';
 import DownloadCVs from './pages/DownloadCVs';
 import { checkTokenExpiration } from './utils/auth';
 import CareerArkDemo from './pages/CareerArkDemo';
+import HighConvertingLanding from './pages/HighConvertingLanding';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -83,6 +84,7 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/career-ark-demo" element={<CareerArkDemo />} />
+              <Route path="/high-converting-landing" element={<HighConvertingLanding />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Box>
