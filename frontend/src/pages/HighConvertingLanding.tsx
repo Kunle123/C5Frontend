@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box, Flex, Heading, Text, Button, VStack, HStack, Image, Icon, Divider, SimpleGrid, Avatar, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, useColorModeValue, Stack, Link
 } from '@chakra-ui/react';
@@ -92,6 +92,10 @@ const plans = [
 ];
 
 const HighConvertingLanding: React.FC = () => {
+  useEffect(() => {
+    document.title = 'Landing';
+  }, []);
+
   const bg = 'lilac'; // theme color
   const cardBg = 'white';
   const accent = 'brand.400';

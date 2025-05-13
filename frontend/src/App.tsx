@@ -2,7 +2,6 @@ import React, { useState, createContext, useContext, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Box, Alert, useToast } from '@chakra-ui/react';
 import Layout from './components/Layout';
-import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
@@ -64,7 +63,7 @@ function App() {
         <Layout>
           <Box maxW="container.lg" mx="auto">
             <Routes>
-              <Route path="/" element={<Landing />} />
+              <Route path="/" element={<HighConvertingLanding />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -84,7 +83,6 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/career-ark-demo" element={<CareerArkDemo />} />
-              <Route path="/high-converting-landing" element={<HighConvertingLanding />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Box>
