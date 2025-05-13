@@ -98,9 +98,9 @@ const HighConvertingLanding: React.FC = () => {
   return (
     <Box bg={bg} minH="100vh">
       {/* 1. Navigation Bar */}
-      <Flex as="nav" position="sticky" top={0} zIndex={10} bg={cardBg} boxShadow="sm" py={3} px={8} align="center" justify="space-between">
-        <HStack spacing={6} align="center">
-          <Image src="/logo-placeholder.png" alt="CandidateV Logo" boxSize="40px" />
+      <Flex as="nav" position="sticky" top={0} zIndex={10} bg={cardBg} boxShadow="sm" py={3} px={{ base: 2, md: 8 }} align="center" justify="space-between" direction={{ base: 'column', md: 'row' }}>
+        <HStack spacing={6} align="center" w={{ base: '100%', md: 'auto' }} justify={{ base: 'space-between', md: 'flex-start' }}>
+          <Image src="/logo-placeholder.png" alt="CandidateV Logo" boxSize={{ base: '32px', md: '40px' }} />
           <HStack spacing={4} display={{ base: 'none', md: 'flex' }}>
             <Link href="#features">Features</Link>
             <Link href="#how-it-works">How It Works</Link>
@@ -108,56 +108,56 @@ const HighConvertingLanding: React.FC = () => {
             <Link href="#blog">Blog</Link>
           </HStack>
         </HStack>
-        <HStack spacing={4}>
-          <Button variant="ghost">Login</Button>
-          <Button colorScheme="teal" leftIcon={<FaRocket />}>Sign Up Free</Button>
+        <HStack spacing={2} mt={{ base: 2, md: 0 }} w={{ base: '100%', md: 'auto' }} justify={{ base: 'flex-end', md: 'flex-end' }}>
+          <Button variant="ghost" size={{ base: 'sm', md: 'md' }}>Login</Button>
+          <Button colorScheme="teal" leftIcon={<FaRocket />} size={{ base: 'sm', md: 'md' }}>Sign Up Free</Button>
         </HStack>
       </Flex>
 
       {/* 2. Hero Section */}
-      <Flex direction={{ base: 'column', md: 'row' }} align="center" justify="space-between" px={{ base: 4, md: 16 }} py={16} bgGradient="linear(to-r, teal.50, white)">
-        <VStack align="start" spacing={6} maxW="lg">
-          <Heading as="h1" size="2xl" fontWeight="bold">
+      <Flex direction={{ base: 'column', md: 'row' }} align="center" justify="space-between" px={{ base: 2, sm: 4, md: 16 }} py={{ base: 8, md: 16 }} bgGradient="linear(to-r, teal.50, white)">
+        <VStack align="start" spacing={6} maxW={{ base: '100%', md: 'lg' }} w="100%">
+          <Heading as="h1" fontSize={{ base: '2xl', sm: '3xl', md: '5xl' }} fontWeight="bold">
             Stop Rewriting, Start Applying: Land Your Dream Job Faster with CandidateV.
           </Heading>
-          <Text fontSize="xl" color="gray.600">
+          <Text fontSize={{ base: 'md', md: 'xl' }} color="gray.600">
             Tired of endless CV tweaks for every job? CandidateV's AI uses your unique career history—your personal Career Arc™—to craft perfectly tailored CVs and cover letters in minutes, so you get noticed by employers.
           </Text>
-          <HStack spacing={4}>
-            <Button colorScheme="teal" size="lg" leftIcon={<FaRocket />}>Create Your Free Account</Button>
-            <Button variant="outline" colorScheme="teal" size="lg" leftIcon={<FaPlay />}>See How It Works (60s Video)</Button>
+          <HStack spacing={4} flexWrap="wrap">
+            <Button colorScheme="teal" size={{ base: 'md', md: 'lg' }} leftIcon={<FaRocket />}>Create Your Free Account</Button>
+            <Button variant="outline" colorScheme="teal" size={{ base: 'md', md: 'lg' }} leftIcon={<FaPlay />}>See How It Works (60s Video)</Button>
           </HStack>
-          <Text fontSize="sm" color="gray.500" mt={2}>
+          <Text fontSize={{ base: 'xs', md: 'sm' }} color="gray.500" mt={2}>
             Join 10,000+ job seekers already optimizing their applications!
           </Text>
         </VStack>
-        <Box flex={1} display="flex" justifyContent="center" alignItems="center" mt={{ base: 10, md: 0 }}>
-          <Image src="/hero-placeholder.png" alt="Hero Visual" boxSize={{ base: '300px', md: '400px' }} objectFit="contain" />
+        <Box flex={1} display="flex" justifyContent="center" alignItems="center" mt={{ base: 10, md: 0 }} w="100%">
+          <Image src="/hero-placeholder.png" alt="Hero Visual" boxSize={{ base: '220px', sm: '300px', md: '400px' }} objectFit="contain" />
         </Box>
       </Flex>
 
       {/* 3. Social Proof / As Seen On */}
       <Box w="full" py={4} bg="gray.100">
-        <HStack justify="center" spacing={8}>
-          <Text color="gray.600">As seen on</Text>
-          <Image src="/logo1-placeholder.png" alt="Logo 1" boxSize="60px" />
-          <Image src="/logo2-placeholder.png" alt="Logo 2" boxSize="60px" />
-          <Image src="/logo3-placeholder.png" alt="Logo 3" boxSize="60px" />
+        <HStack justify="center" spacing={{ base: 4, md: 8 }} flexWrap="wrap">
+          <Text color="gray.600" fontSize={{ base: 'xs', md: 'md' }}>As seen on</Text>
+          <Image src="/logo1-placeholder.png" alt="Logo 1" boxSize={{ base: '36px', md: '60px' }} />
+          <Image src="/logo2-placeholder.png" alt="Logo 2" boxSize={{ base: '36px', md: '60px' }} />
+          <Image src="/logo3-placeholder.png" alt="Logo 3" boxSize={{ base: '36px', md: '60px' }} />
         </HStack>
       </Box>
 
       {/* 4. Problem / Solution Section */}
-      <Box py={16} px={{ base: 4, md: 16 }} textAlign="center">
-        <Heading as="h2" size="xl" mb={4}>The Job Application Grind is Real. CandidateV is Your Way Out.</Heading>
-        <Text fontSize="lg" color="gray.600" maxW="2xl" mx="auto">
+      <Box py={{ base: 8, md: 16 }} px={{ base: 2, sm: 4, md: 16 }} textAlign="center">
+        <Heading as="h2" fontSize={{ base: 'xl', md: '2xl', lg: '4xl' }} mb={4}>The Job Application Grind is Real. CandidateV is Your Way Out.</Heading>
+        <Text fontSize={{ base: 'md', md: 'lg' }} color="gray.600" maxW="2xl" mx="auto">
           Spending hours tailoring your CV for each role? Worried your application will get lost in the ATS black hole? Juggling multiple CV versions? It's exhausting and inefficient. CandidateV automates the tedious parts, so you can focus on what matters: acing the interview.
         </Text>
       </Box>
 
       {/* 5. Core Features & Benefits */}
-      <Box id="features" py={16} px={{ base: 4, md: 16 }}>
-        <Heading as="h2" size="xl" mb={12} textAlign="center">Meet Your AI-Powered Application Toolkit</Heading>
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
+      <Box id="features" py={{ base: 8, md: 16 }} px={{ base: 2, sm: 4, md: 16 }}>
+        <Heading as="h2" fontSize={{ base: '2xl', md: '4xl' }} mb={12} textAlign="center">Meet Your AI-Powered Application Toolkit</Heading>
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 6, md: 10 }}>
           <VStack align="start" spacing={4} bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
             <Icon as={FaBrain} boxSize={10} color={accent} />
             <Heading as="h3" size="md">Build Once, Apply Perfectly, Forever.</Heading>
@@ -259,9 +259,9 @@ const HighConvertingLanding: React.FC = () => {
       </Box>
 
       {/* 9. Pricing Section */}
-      <Box id="pricing" py={16} px={{ base: 4, md: 16 }}>
-        <Heading as="h2" size="xl" mb={12} textAlign="center">Find the Perfect Plan to Launch Your Next Career Move</Heading>
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
+      <Box id="pricing" py={{ base: 8, md: 16 }} px={{ base: 2, sm: 4, md: 16 }}>
+        <Heading as="h2" fontSize={{ base: '2xl', md: '4xl' }} mb={12} textAlign="center">Find the Perfect Plan to Launch Your Next Career Move</Heading>
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 6, md: 10 }}>
           {plans.map((plan, i) => (
             <VStack key={i} align="center" spacing={4} bg={plan.highlight ? 'teal.50' : cardBg} p={8} borderRadius="lg" boxShadow={plan.highlight ? 'lg' : 'md'} border={plan.highlight ? '2px solid' : undefined} borderColor={plan.highlight ? 'teal.400' : undefined}>
               <Heading as="h3" size="md">{plan.name}</Heading>
@@ -279,8 +279,8 @@ const HighConvertingLanding: React.FC = () => {
       </Box>
 
       {/* 10. FAQ Section */}
-      <Box py={16} px={{ base: 4, md: 16 }} bg="gray.50">
-        <Heading as="h2" size="xl" mb={12} textAlign="center">Frequently Asked Questions</Heading>
+      <Box py={{ base: 8, md: 16 }} px={{ base: 2, sm: 4, md: 16 }} bg="gray.50">
+        <Heading as="h2" fontSize={{ base: '2xl', md: '4xl' }} mb={12} textAlign="center">Frequently Asked Questions</Heading>
         <Accordion allowToggle maxW="3xl" mx="auto">
           {faqs.map((faq, i) => (
             <AccordionItem key={i}>
@@ -295,17 +295,17 @@ const HighConvertingLanding: React.FC = () => {
       </Box>
 
       {/* 11. Final CTA Section */}
-      <Box py={16} px={{ base: 4, md: 16 }} bgGradient="linear(to-r, teal.400, teal.600)">
+      <Box py={{ base: 8, md: 16 }} px={{ base: 2, sm: 4, md: 16 }} bgGradient="linear(to-r, teal.400, teal.600)">
         <VStack spacing={6} align="center" color="white">
-          <Heading as="h2" size="2xl">Ready to Transform Your Job Search?</Heading>
-          <Text fontSize="xl">Stop letting tedious applications hold you back. Join CandidateV today and start applying smarter, faster, and with more confidence.</Text>
-          <Button size="lg" colorScheme="whiteAlpha" bg="white" color="teal.600" _hover={{ bg: 'gray.100' }} px={10} py={6} fontSize="xl">Sign Up for Your Free Trial Now</Button>
-          <Text fontSize="sm">No credit card required for trial. Takes less than 2 minutes to get started.</Text>
+          <Heading as="h2" fontSize={{ base: '2xl', md: '4xl' }}>Ready to Transform Your Job Search?</Heading>
+          <Text fontSize={{ base: 'md', md: 'xl' }}>Stop letting tedious applications hold you back. Join CandidateV today and start applying smarter, faster, and with more confidence.</Text>
+          <Button size={{ base: 'md', md: 'lg' }} colorScheme="whiteAlpha" bg="white" color="teal.600" _hover={{ bg: 'gray.100' }} px={10} py={6} fontSize={{ base: 'md', md: 'xl' }}>Sign Up for Your Free Trial Now</Button>
+          <Text fontSize={{ base: 'xs', md: 'sm' }}>No credit card required for trial. Takes less than 2 minutes to get started.</Text>
         </VStack>
       </Box>
 
       {/* 12. Footer */}
-      <Box as="footer" py={8} px={{ base: 4, md: 16 }} bg={cardBg}>
+      <Box as="footer" py={8} px={{ base: 2, sm: 4, md: 16 }} bg={cardBg}>
         <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="center" gap={4}>
           <HStack spacing={6}>
             <Link href="#">About Us</Link>
