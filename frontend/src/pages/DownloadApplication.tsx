@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { FaFileDownload, FaTrash, FaCopy, FaFilePdf, FaFileWord } from 'react-icons/fa';
 import { generateApplicationMaterials, listCVTasks, downloadProcessedCV, deleteCVTask, getArcData } from '../api/careerArkApi';
+import { useNavigate } from 'react-router-dom';
 
 const DownloadApplication: React.FC = () => {
   // State for generation
@@ -34,6 +35,7 @@ const DownloadApplication: React.FC = () => {
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   // Clipboard
   const [copyMsg, setCopyMsg] = useState('');
+  const navigate = useNavigate();
 
   // Generate application
   const handleGenerate = async () => {
@@ -147,6 +149,9 @@ const DownloadApplication: React.FC = () => {
                   {genResult.coverLetter}
                 </Box>
               </Box>
+              <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download-cvs')}>
+                Go to Download Page
+              </Button>
             </Stack>
           )}
         </Stack>
