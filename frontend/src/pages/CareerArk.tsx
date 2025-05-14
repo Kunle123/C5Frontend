@@ -14,8 +14,9 @@ import {
   HStack,
   Progress,
   useToast,
+  useBreakpointValue,
 } from '@chakra-ui/react';
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { AddIcon, EditIcon, ArrowBackIcon } from '@chakra-ui/icons';
 import { getUser, uploadCV } from '../api';
 import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience } from '../api/careerArkApi';
 
@@ -57,6 +58,8 @@ const CareerArk: React.FC = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const [mobileDetailMode, setMobileDetailMode] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -177,6 +180,19 @@ const CareerArk: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIdx, selectedSection]);
 
+  // When a list item is tapped on mobile, show detail view
+  const handleListItemClick = (section: any, idx: number) => {
+    setSelectedSection(section);
+    setSelectedIdx(idx);
+    if (isMobile) setMobileDetailMode(true);
+  };
+
+  // When back is pressed on mobile, return to list view
+  const handleBack = () => {
+    setMobileDetailMode(false);
+    setEditMode(false);
+  };
+
   return (
     <Box minH="100vh" bg="gray.50">
       {/* User Info Header */}
@@ -196,260 +212,268 @@ const CareerArk: React.FC = () => {
           </Box>
         </Flex>
       </Box>
-      {/* Main Two-Column Layout */}
-      <Flex maxW="1200px" mx="auto" flex={1} minH="calc(100vh - 120px)" gap={6}>
-        {/* Left Sidebar */}
-        <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} overflowY="auto">
-          <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
-          {uploading && (
-            <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />
-          )}
-          <input
-            type="file"
-            accept=".pdf,.doc,.docx"
-            style={{ display: 'none' }}
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            disabled={uploading || polling}
-          />
-          {Object.entries(sectionTitles).map(([key, label]) => (
-            <Box key={key} mb={6}>
-              <HStack justify="space-between" align="center" mb={2}>
-                <Text fontWeight="bold" fontSize="lg" color="brand.500">{label}</Text>
-                <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" onClick={() => setSelectedIdx(null)} />
-              </HStack>
-              <VStack spacing={1} align="stretch">
-                {grouped[key]?.length > 0 ? grouped[key].map((item: any, idx: number) => (
-                  <Box
-                    key={item.id || idx}
-                    p={2}
-                    borderRadius="md"
-                    bg={selectedSection === key && selectedIdx === idx ? 'brand.100' : 'gray.50'}
-                    _hover={{ bg: 'brand.50', cursor: 'pointer' }}
-                    onClick={() => { setSelectedSection(key as any); setSelectedIdx(idx); }}
-                  >
-                    <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
-                    <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
-                    <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
-                  </Box>
-                )) : (
-                  <Text fontSize="sm" color="gray.400">No entries</Text>
-                )}
-              </VStack>
-            </Box>
-          ))}
-        </Box>
-        {/* Right Detail Pane */}
-        <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={8} minH={0} h="100%" overflowY="auto">
-          {loading ? (
-            <Spinner />
-          ) : error ? (
-            <Alert status="error"><AlertIcon />{error}</Alert>
-          ) : selectedIdx !== null && grouped[selectedSection][selectedIdx] ? (
-            <Box>
-              <HStack justify="space-between" align="center" mb={2}>
-                <Heading size="lg" mb={1}>{grouped[selectedSection][selectedIdx].title || grouped[selectedSection][selectedIdx].positionTitle || grouped[selectedSection][selectedIdx].degree || grouped[selectedSection][selectedIdx].name}</Heading>
-                <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => setEditMode(true)} />
-              </HStack>
-              {grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org ? (
-                <Text fontWeight="semibold" color="gray.700" mb={1}>{grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org}</Text>
-              ) : null}
-              <Text fontSize="sm" color="gray.500" mb={4}>{grouped[selectedSection][selectedIdx].start_date || grouped[selectedSection][selectedIdx].startDate || ''} - {grouped[selectedSection][selectedIdx].end_date || grouped[selectedSection][selectedIdx].endDate || ''}</Text>
-              <Divider mb={4} />
-              <VStack align="start" spacing={3}>
-                {grouped[selectedSection][selectedIdx].details && grouped[selectedSection][selectedIdx].details.length > 0 ? (
-                  grouped[selectedSection][selectedIdx].details.map((d: string, i: number) => (
-                    <Text as="li" key={i} ml={4} fontSize="md">{d}</Text>
-                  ))
-                ) : grouped[selectedSection][selectedIdx].description ? (
-                  <Text fontSize="md">{grouped[selectedSection][selectedIdx].description}</Text>
-                ) : (
-                  <Text fontSize="sm" color="gray.400">No details available.</Text>
-                )}
-              </VStack>
-            </Box>
-          ) : selectedIdx !== null && editMode && selectedSection === 'work_experience' ? (
-            <Box as="form" w="100%" maxW="500px" mx="auto"
-              onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-                e.preventDefault();
-                setEditLoading(true);
-                setEditError('');
-                try {
-                  const entry = grouped[selectedSection][selectedIdx];
-                  await updateWorkExperience(entry.id, {
-                    title: editTitle,
-                    company: editCompany,
-                    start_date: editStartDate,
-                    end_date: editEndDate || null,
-                    details: editDetails.split('\n').map(s => s.trim()).filter(Boolean),
-                  });
-                  const arcData = await getArcData();
-                  setArcData(arcData);
-                  setEditMode(false);
-                  toast({ status: 'success', title: 'Work experience updated!' });
-                } catch (err: any) {
-                  setEditError(err?.message || 'Failed to update work experience');
-                } finally {
-                  setEditLoading(false);
-                }
-              }}
-            >
-              <Heading size="md" mb={4}>Edit Work Experience</Heading>
-              <VStack spacing={4} align="stretch">
-                <Box>
-                  <Text mb={1} fontWeight={600}>Title</Text>
-                  <input
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="Title"
-                    value={editTitle}
-                    onChange={e => setEditTitle(e.target.value)}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Text mb={1} fontWeight={600}>Company</Text>
-                  <input
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="Company"
-                    value={editCompany}
-                    onChange={e => setEditCompany(e.target.value)}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Text mb={1} fontWeight={600}>Start Date</Text>
-                  <input
-                    type="date"
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="Start Date"
-                    value={editStartDate}
-                    onChange={e => setEditStartDate(e.target.value)}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Text mb={1} fontWeight={600}>End Date</Text>
-                  <input
-                    type="date"
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="End Date (leave blank if current)"
-                    value={editEndDate}
-                    onChange={e => setEditEndDate(e.target.value)}
-                  />
-                </Box>
-                <Box>
-                  <Text mb={1} fontWeight={600}>Details</Text>
-                  <textarea
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }}
-                    placeholder="Details (one per line)"
-                    value={editDetails}
-                    onChange={e => setEditDetails(e.target.value)}
-                  />
-                </Box>
-                {editError && <Text color="red.500">{editError}</Text>}
-                <HStack>
-                  <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle || !editCompany || !editStartDate}>
-                    Save
-                  </Button>
-                  <Button onClick={() => setEditMode(false)} isDisabled={editLoading} variant="ghost">Cancel</Button>
+      {/* Responsive Layout */}
+      <Flex maxW="1200px" mx="auto" flex={1} minH="calc(100vh - 120px)" gap={6} direction={{ base: 'column', md: 'row' }}>
+        {/* List/Sidebar View */}
+        {(!isMobile || !mobileDetailMode) && (
+          <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} overflowY="auto">
+            <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
+            {uploading && (
+              <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />
+            )}
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx"
+              style={{ display: 'none' }}
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              disabled={uploading || polling}
+            />
+            {Object.entries(sectionTitles).map(([key, label]) => (
+              <Box key={key} mb={6}>
+                <HStack justify="space-between" align="center" mb={2}>
+                  <Text fontWeight="bold" fontSize="lg" color="brand.500">{label}</Text>
+                  <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" onClick={() => setSelectedIdx(null)} />
                 </HStack>
-              </VStack>
-            </Box>
-          ) : (
-            <Box as="form" w="100%" maxW="500px" mx="auto"
-              onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-                e.preventDefault();
-                setAddLoading(true);
-                setAddError('');
-                try {
-                  // Only handle work_experience for now
-                  if (selectedSection === 'work_experience') {
-                    await addWorkExperience({
-                      title: addTitle,
-                      company: addCompany,
-                      start_date: addStartDate,
-                      end_date: addEndDate || null,
-                      details: addDetails.split('\n').map(s => s.trim()).filter(Boolean),
+                <VStack spacing={1} align="stretch">
+                  {grouped[key]?.length > 0 ? grouped[key].map((item: any, idx: number) => (
+                    <Box
+                      key={item.id || idx}
+                      p={2}
+                      borderRadius="md"
+                      bg={selectedSection === key && selectedIdx === idx ? 'brand.100' : 'gray.50'}
+                      _hover={{ bg: 'brand.50', cursor: 'pointer' }}
+                      onClick={() => handleListItemClick(key, idx)}
+                    >
+                      <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
+                      <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
+                      <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
+                    </Box>
+                  )) : (
+                    <Text fontSize="sm" color="gray.400">No entries</Text>
+                  )}
+                </VStack>
+              </Box>
+            ))}
+          </Box>
+        )}
+        {/* Detail View */}
+        {(!isMobile || mobileDetailMode) && (
+          <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={8} minH={0} h="100%" overflowY="auto">
+            {/* Back button for mobile */}
+            {isMobile && (
+              <Button leftIcon={<ArrowBackIcon />} mb={4} variant="ghost" onClick={handleBack}>Back</Button>
+            )}
+            {loading ? (
+              <Spinner />
+            ) : error ? (
+              <Alert status="error"><AlertIcon />{error}</Alert>
+            ) : selectedIdx !== null && grouped[selectedSection][selectedIdx] ? (
+              <Box>
+                <HStack justify="space-between" align="center" mb={2}>
+                  <Heading size="lg" mb={1}>{grouped[selectedSection][selectedIdx].title || grouped[selectedSection][selectedIdx].positionTitle || grouped[selectedSection][selectedIdx].degree || grouped[selectedSection][selectedIdx].name}</Heading>
+                  <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => setEditMode(true)} />
+                </HStack>
+                {grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org ? (
+                  <Text fontWeight="semibold" color="gray.700" mb={1}>{grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org}</Text>
+                ) : null}
+                <Text fontSize="sm" color="gray.500" mb={4}>{grouped[selectedSection][selectedIdx].start_date || grouped[selectedSection][selectedIdx].startDate || ''} - {grouped[selectedSection][selectedIdx].end_date || grouped[selectedSection][selectedIdx].endDate || ''}</Text>
+                <Divider mb={4} />
+                <VStack align="start" spacing={3}>
+                  {grouped[selectedSection][selectedIdx].details && grouped[selectedSection][selectedIdx].details.length > 0 ? (
+                    grouped[selectedSection][selectedIdx].details.map((d: string, i: number) => (
+                      <Text as="li" key={i} ml={4} fontSize="md">{d}</Text>
+                    ))
+                  ) : grouped[selectedSection][selectedIdx].description ? (
+                    <Text fontSize="md">{grouped[selectedSection][selectedIdx].description}</Text>
+                  ) : (
+                    <Text fontSize="sm" color="gray.400">No details available.</Text>
+                  )}
+                </VStack>
+              </Box>
+            ) : selectedIdx !== null && editMode && selectedSection === 'work_experience' ? (
+              <Box as="form" w="100%" maxW="500px" mx="auto"
+                onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+                  e.preventDefault();
+                  setEditLoading(true);
+                  setEditError('');
+                  try {
+                    const entry = grouped[selectedSection][selectedIdx];
+                    await updateWorkExperience(entry.id, {
+                      title: editTitle,
+                      company: editCompany,
+                      start_date: editStartDate,
+                      end_date: editEndDate || null,
+                      details: editDetails.split('\n').map(s => s.trim()).filter(Boolean),
                     });
-                    // Refresh data
                     const arcData = await getArcData();
                     setArcData(arcData);
-                    // Reset form
-                    setAddTitle('');
-                    setAddCompany('');
-                    setAddStartDate('');
-                    setAddEndDate('');
-                    setAddDetails('');
-                    setSelectedIdx(arcData.work_experience.length); // select the new entry
-                    toast({ status: 'success', title: 'Work experience added!' });
+                    setEditMode(false);
+                    toast({ status: 'success', title: 'Work experience updated!' });
+                  } catch (err: any) {
+                    setEditError(err?.message || 'Failed to update work experience');
+                  } finally {
+                    setEditLoading(false);
                   }
-                } catch (err: any) {
-                  setAddError(err?.message || 'Failed to add work experience');
-                } finally {
-                  setAddLoading(false);
-                }
-              }}
-            >
-              <Heading size="md" mb={4}>New Entry</Heading>
-              <VStack spacing={4} align="stretch">
-                <Box>
-                  <Text mb={1} fontWeight={600}>Title</Text>
-                  <input
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="Title"
-                    value={addTitle}
-                    onChange={e => setAddTitle(e.target.value)}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Text mb={1} fontWeight={600}>Company</Text>
-                  <input
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="Company"
-                    value={addCompany}
-                    onChange={e => setAddCompany(e.target.value)}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Text mb={1} fontWeight={600}>Start Date</Text>
-                  <input
-                    type="date"
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="Start Date"
-                    value={addStartDate}
-                    onChange={e => setAddStartDate(e.target.value)}
-                    required
-                  />
-                </Box>
-                <Box>
-                  <Text mb={1} fontWeight={600}>End Date</Text>
-                  <input
-                    type="date"
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="End Date (leave blank if current)"
-                    value={addEndDate}
-                    onChange={e => setAddEndDate(e.target.value)}
-                  />
-                </Box>
-                <Box>
-                  <Text mb={1} fontWeight={600}>Details</Text>
-                  <textarea
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }}
-                    placeholder="Details (one per line)"
-                    value={addDetails}
-                    onChange={e => setAddDetails(e.target.value)}
-                  />
-                </Box>
-                {addError && <Text color="red.500">{addError}</Text>}
-                <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle || !addCompany || !addStartDate}>
-                  Save
-                </Button>
-              </VStack>
-            </Box>
-          )}
-        </Box>
+                }}
+              >
+                <Heading size="md" mb={4}>Edit Work Experience</Heading>
+                <VStack spacing={4} align="stretch">
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Title</Text>
+                    <input
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="Title"
+                      value={editTitle}
+                      onChange={e => setEditTitle(e.target.value)}
+                      required
+                    />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Company</Text>
+                    <input
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="Company"
+                      value={editCompany}
+                      onChange={e => setEditCompany(e.target.value)}
+                      required
+                    />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Start Date</Text>
+                    <input
+                      type="date"
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="Start Date"
+                      value={editStartDate}
+                      onChange={e => setEditStartDate(e.target.value)}
+                      required
+                    />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>End Date</Text>
+                    <input
+                      type="date"
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="End Date (leave blank if current)"
+                      value={editEndDate}
+                      onChange={e => setEditEndDate(e.target.value)}
+                    />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Details</Text>
+                    <textarea
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }}
+                      placeholder="Details (one per line)"
+                      value={editDetails}
+                      onChange={e => setEditDetails(e.target.value)}
+                    />
+                  </Box>
+                  {editError && <Text color="red.500">{editError}</Text>}
+                  <HStack>
+                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle || !editCompany || !editStartDate}>
+                      Save
+                    </Button>
+                    <Button onClick={() => setEditMode(false)} isDisabled={editLoading} variant="ghost">Cancel</Button>
+                  </HStack>
+                </VStack>
+              </Box>
+            ) : (
+              <Box as="form" w="100%" maxW="500px" mx="auto"
+                onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+                  e.preventDefault();
+                  setAddLoading(true);
+                  setAddError('');
+                  try {
+                    // Only handle work_experience for now
+                    if (selectedSection === 'work_experience') {
+                      await addWorkExperience({
+                        title: addTitle,
+                        company: addCompany,
+                        start_date: addStartDate,
+                        end_date: addEndDate || null,
+                        details: addDetails.split('\n').map(s => s.trim()).filter(Boolean),
+                      });
+                      // Refresh data
+                      const arcData = await getArcData();
+                      setArcData(arcData);
+                      // Reset form
+                      setAddTitle('');
+                      setAddCompany('');
+                      setAddStartDate('');
+                      setAddEndDate('');
+                      setAddDetails('');
+                      setSelectedIdx(arcData.work_experience.length); // select the new entry
+                      toast({ status: 'success', title: 'Work experience added!' });
+                    }
+                  } catch (err: any) {
+                    setAddError(err?.message || 'Failed to add work experience');
+                  } finally {
+                    setAddLoading(false);
+                  }
+                }}
+              >
+                <Heading size="md" mb={4}>New Entry</Heading>
+                <VStack spacing={4} align="stretch">
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Title</Text>
+                    <input
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="Title"
+                      value={addTitle}
+                      onChange={e => setAddTitle(e.target.value)}
+                      required
+                    />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Company</Text>
+                    <input
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="Company"
+                      value={addCompany}
+                      onChange={e => setAddCompany(e.target.value)}
+                      required
+                    />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Start Date</Text>
+                    <input
+                      type="date"
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="Start Date"
+                      value={addStartDate}
+                      onChange={e => setAddStartDate(e.target.value)}
+                      required
+                    />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>End Date</Text>
+                    <input
+                      type="date"
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="End Date (leave blank if current)"
+                      value={addEndDate}
+                      onChange={e => setAddEndDate(e.target.value)}
+                    />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Details</Text>
+                    <textarea
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }}
+                      placeholder="Details (one per line)"
+                      value={addDetails}
+                      onChange={e => setAddDetails(e.target.value)}
+                    />
+                  </Box>
+                  {addError && <Text color="red.500">{addError}</Text>}
+                  <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle || !addCompany || !addStartDate}>
+                    Save
+                  </Button>
+                </VStack>
+              </Box>
+            )}
+          </Box>
+        )}
       </Flex>
     </Box>
   );
