@@ -414,6 +414,9 @@ const Application: React.FC = () => {
               <Text whiteSpace="pre-wrap">{optimizedCL}</Text>
             </Box>
             <Button variant="ghost" mt={2} onClick={() => { setStep(0); setJobDesc(''); setArcData(null); setOptimizedCV(''); setOptimizedCL(''); }}>Optimise for Another Job</Button>
+            <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download')}>
+              Go to Download Application Page
+            </Button>
           </Stack>
         )}
         {error && <Alert status="error" mt={2}><AlertIcon />{error}</Alert>}
