@@ -21,7 +21,7 @@ const DownloadCVs: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     setError('');
-    fetch('/api/cv?limit=5&source=wizard', {
+    fetch('/api/cvs?limit=5&source=wizard', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then(res => res.ok ? res.json() : res.json().then(e => Promise.reject(e)))
@@ -31,7 +31,7 @@ const DownloadCVs: React.FC = () => {
   }, [token]);
 
   const handleDownload = (cvId: string) => {
-    window.open(`/api/cv/${cvId}/download`, '_blank');
+    window.open(`/api/cvs/${cvId}/download?format=rtf`, '_blank');
   };
 
   return (
