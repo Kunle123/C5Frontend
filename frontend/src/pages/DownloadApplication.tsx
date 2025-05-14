@@ -149,11 +149,11 @@ const DownloadApplication: React.FC = () => {
                   {genResult.coverLetter}
                 </Box>
               </Box>
-              <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download-cvs')}>
-                Go to Download Page
-              </Button>
             </Stack>
           )}
+          <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download-cvs')}>
+            Go to Download Page
+          </Button>
         </Stack>
         <Divider my={4} />
         <Stack spacing={3}>
