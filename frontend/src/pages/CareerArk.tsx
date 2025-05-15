@@ -297,29 +297,6 @@ const CareerArk: React.FC = () => {
               <Spinner />
             ) : error ? (
               <Alert status="error"><AlertIcon />{error}</Alert>
-            ) : selectedIdx !== null && grouped[selectedSection][selectedIdx] ? (
-              <Box>
-                <HStack justify="space-between" align="center" mb={2}>
-                  <Heading size="lg" mb={1}>{grouped[selectedSection][selectedIdx].title || grouped[selectedSection][selectedIdx].positionTitle || grouped[selectedSection][selectedIdx].degree || grouped[selectedSection][selectedIdx].name}</Heading>
-                  <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => setEditMode(true)} />
-                </HStack>
-                {grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org ? (
-                  <Text fontWeight="semibold" color="gray.700" mb={1}>{grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org}</Text>
-                ) : null}
-                <Text fontSize="sm" color="gray.500" mb={4}>{grouped[selectedSection][selectedIdx].start_date || grouped[selectedSection][selectedIdx].startDate || ''} - {grouped[selectedSection][selectedIdx].end_date || grouped[selectedSection][selectedIdx].endDate || ''}</Text>
-                <Divider mb={4} />
-                <VStack align="start" spacing={3}>
-                  {grouped[selectedSection][selectedIdx].details && grouped[selectedSection][selectedIdx].details.length > 0 ? (
-                    grouped[selectedSection][selectedIdx].details.map((d: string, i: number) => (
-                      <Text as="li" key={i} ml={4} fontSize="md">{d}</Text>
-                    ))
-                  ) : grouped[selectedSection][selectedIdx].description ? (
-                    <Text fontSize="md">{grouped[selectedSection][selectedIdx].description}</Text>
-                  ) : (
-                    <Text fontSize="sm" color="gray.400">No details available.</Text>
-                  )}
-                </VStack>
-              </Box>
             ) : selectedIdx !== null && editMode && selectedSection === 'work_experience' ? (
               <Box as="form" w="100%" maxW="500px" mx="auto"
                 onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
@@ -405,6 +382,29 @@ const CareerArk: React.FC = () => {
                     </Button>
                     <Button onClick={() => setEditMode(false)} isDisabled={editLoading} variant="ghost">Cancel</Button>
                   </HStack>
+                </VStack>
+              </Box>
+            ) : selectedIdx !== null && grouped[selectedSection][selectedIdx] ? (
+              <Box>
+                <HStack justify="space-between" align="center" mb={2}>
+                  <Heading size="lg" mb={1}>{grouped[selectedSection][selectedIdx].title || grouped[selectedSection][selectedIdx].positionTitle || grouped[selectedSection][selectedIdx].degree || grouped[selectedSection][selectedIdx].name}</Heading>
+                  <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => setEditMode(true)} />
+                </HStack>
+                {grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org ? (
+                  <Text fontWeight="semibold" color="gray.700" mb={1}>{grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org}</Text>
+                ) : null}
+                <Text fontSize="sm" color="gray.500" mb={4}>{grouped[selectedSection][selectedIdx].start_date || grouped[selectedSection][selectedIdx].startDate || ''} - {grouped[selectedSection][selectedIdx].end_date || grouped[selectedSection][selectedIdx].endDate || ''}</Text>
+                <Divider mb={4} />
+                <VStack align="start" spacing={3}>
+                  {grouped[selectedSection][selectedIdx].details && grouped[selectedSection][selectedIdx].details.length > 0 ? (
+                    grouped[selectedSection][selectedIdx].details.map((d: string, i: number) => (
+                      <Text as="li" key={i} ml={4} fontSize="md">{d}</Text>
+                    ))
+                  ) : grouped[selectedSection][selectedIdx].description ? (
+                    <Text fontSize="md">{grouped[selectedSection][selectedIdx].description}</Text>
+                  ) : (
+                    <Text fontSize="sm" color="gray.400">No details available.</Text>
+                  )}
                 </VStack>
               </Box>
             ) : (
