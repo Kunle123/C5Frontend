@@ -403,12 +403,11 @@ const Application: React.FC = () => {
                 </Alert>
               )}
               <Button variant="outline" colorScheme="gray" onClick={() => {
-                // Store missing keywords in localStorage before opening Ark
                 if (Array.isArray(keywordAnalysis)) {
                   const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
                   localStorage.setItem('ark-missing-keywords', JSON.stringify(missing));
                 }
-                window.open('/career-ark', '_blank');
+                navigate('/career-ark');
               }}>
                 Edit Ark Data
               </Button>
@@ -461,12 +460,11 @@ const Application: React.FC = () => {
               <Text whiteSpace="pre-wrap">{optimizedCL}</Text>
             </Box>
             <Button variant="outline" colorScheme="gray" onClick={() => {
-              // Store missing keywords in localStorage before opening Ark
               if (Array.isArray(keywordAnalysis)) {
                 const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
                 localStorage.setItem('ark-missing-keywords', JSON.stringify(missing));
               }
-              window.open('/career-ark', '_blank');
+              navigate('/career-ark');
             }}>
               Edit Ark Data
             </Button>
