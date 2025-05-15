@@ -175,15 +175,20 @@ const CareerArk: React.FC = () => {
     }
   };
 
+  // Add a helper to set edit form state from an entry
+  const setEditFormFromEntry = (entry: any) => {
+    setEditTitle(entry.title || entry.positionTitle || '');
+    setEditCompany(entry.company || '');
+    setEditStartDate(entry.start_date || entry.startDate || '');
+    setEditEndDate(entry.end_date || entry.endDate || '');
+    setEditDetails((entry.details || []).join('\n'));
+  };
+
   // When selectedIdx changes, reset edit state
   useEffect(() => {
     if (selectedIdx !== null && grouped[selectedSection][selectedIdx]) {
       const entry = grouped[selectedSection][selectedIdx];
-      setEditTitle(entry.title || entry.positionTitle || '');
-      setEditCompany(entry.company || '');
-      setEditStartDate(entry.start_date || entry.startDate || '');
-      setEditEndDate(entry.end_date || entry.endDate || '');
-      setEditDetails((entry.details || []).join('\n'));
+      setEditFormFromEntry(entry);
       setEditError('');
       setEditLoading(false);
     } else {
@@ -388,7 +393,11 @@ const CareerArk: React.FC = () => {
               <Box>
                 <HStack justify="space-between" align="center" mb={2}>
                   <Heading size="lg" mb={1}>{grouped[selectedSection][selectedIdx].title || grouped[selectedSection][selectedIdx].positionTitle || grouped[selectedSection][selectedIdx].degree || grouped[selectedSection][selectedIdx].name}</Heading>
-                  <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => setEditMode(true)} />
+                  <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => {
+                    const entry = grouped[selectedSection][selectedIdx];
+                    setEditFormFromEntry(entry);
+                    setEditMode(true);
+                  }} />
                 </HStack>
                 {grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org ? (
                   <Text fontWeight="semibold" color="gray.700" mb={1}>{grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org}</Text>
