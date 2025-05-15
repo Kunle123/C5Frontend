@@ -402,7 +402,14 @@ const Application: React.FC = () => {
                   <AlertIcon />Your Career Ark profile is empty. Please upload a CV or add data in Career Ark before proceeding.
                 </Alert>
               )}
-              <Button variant="outline" colorScheme="gray" onClick={() => window.open('/career-ark', '_blank')}>
+              <Button variant="outline" colorScheme="gray" onClick={() => {
+                // Store missing keywords in localStorage before opening Ark
+                if (Array.isArray(keywordAnalysis)) {
+                  const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
+                  localStorage.setItem('ark-missing-keywords', JSON.stringify(missing));
+                }
+                window.open('/career-ark', '_blank');
+              }}>
                 Edit Ark Data
               </Button>
               <Button colorScheme="blue" onClick={async () => {
@@ -453,7 +460,14 @@ const Application: React.FC = () => {
             <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
               <Text whiteSpace="pre-wrap">{optimizedCL}</Text>
             </Box>
-            <Button variant="outline" colorScheme="gray" onClick={() => window.open('/career-ark', '_blank')}>
+            <Button variant="outline" colorScheme="gray" onClick={() => {
+              // Store missing keywords in localStorage before opening Ark
+              if (Array.isArray(keywordAnalysis)) {
+                const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
+                localStorage.setItem('ark-missing-keywords', JSON.stringify(missing));
+              }
+              window.open('/career-ark', '_blank');
+            }}>
               Edit Ark Data
             </Button>
             <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download-cvs')}>
@@ -463,46 +477,6 @@ const Application: React.FC = () => {
         )}
         {error && <Alert status="error" mt={2}><AlertIcon />{error}</Alert>}
       </Box>
-      {/* Keywords Modal (contextual, only if missing keywords in step 1) */}
-      {step === 1 && Array.isArray(keywordAnalysis) && keywordAnalysis.some(k => k.status === 'red') && (
-        <>
-          <Modal isOpen={isOpen} onClose={onClose} isCentered size={modalSize} motionPreset="slideInBottom">
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>Missing Keywords</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <Text mb={2}>The following important keywords from the job description are missing from your Career Ark profile. Consider editing your Ark data to include them for a better match.</Text>
-                <HStack wrap="wrap" gap={2} mb={4}>
-                  {keywordAnalysis.filter(k => k.status === 'red').map((k, idx) => (
-                    <Badge key={k.keyword + idx} colorScheme="red" px={3} py={1} borderRadius="md" fontSize="md" fontWeight={600}>{k.keyword}</Badge>
-                  ))}
-                </HStack>
-                <Button colorScheme="blue" w="100%" mb={2} onClick={() => { window.open('/career-ark', '_blank'); }}>Missing Keywords? - Edit Ark data</Button>
-                <Text fontSize="sm" color="gray.500">After editing, return here and click 'Generate CV & Cover Letter' to continue.</Text>
-              </ModalBody>
-            </ModalContent>
-          </Modal>
-          {/* Floating recall button, mobile-friendly */}
-          {!isOpen && (
-            <IconButton
-              aria-label="Show missing keywords"
-              icon={<FiKey />}
-              colorScheme="red"
-              size="lg"
-              position="fixed"
-              bottom={recallBtnBottom}
-              right={recallBtnRight}
-              zIndex={1500}
-              borderRadius="full"
-              boxShadow="lg"
-              onClick={onOpen}
-              _hover={{ bg: 'red.400' }}
-              _active={{ bg: 'red.500' }}
-            />
-          )}
-        </>
-      )}
     </Box>
   );
 };

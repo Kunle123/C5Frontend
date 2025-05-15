@@ -15,10 +15,18 @@ import {
   Progress,
   useToast,
   useBreakpointValue,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, ArrowBackIcon } from '@chakra-ui/icons';
 import { getUser, uploadCV } from '../api';
 import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience } from '../api/careerArkApi';
+import { useDisclosure } from '@chakra-ui/react';
+import { FiKey } from 'react-icons/fi';
 
 const sectionTitles = {
   work_experience: 'Career History',
@@ -60,6 +68,10 @@ const CareerArk: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [mobileDetailMode, setMobileDetailMode] = useState(false);
+  const [missingKeywords, setMissingKeywords] = useState<string[]>([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const recallBtnBottom = useBreakpointValue({ base: '80px', md: '40px' });
+  const recallBtnRight = useBreakpointValue({ base: '16px', md: '40px' });
 
   useEffect(() => {
     setLoading(true);
@@ -192,6 +204,22 @@ const CareerArk: React.FC = () => {
     setMobileDetailMode(false);
     setEditMode(false);
   };
+
+  // On mount, check for missing keywords in localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('ark-missing-keywords');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMissingKeywords(parsed);
+          onOpen();
+        }
+        localStorage.removeItem('ark-missing-keywords');
+      }
+    } catch {}
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <Box minH="100vh" bg="gray.50">
@@ -475,6 +503,44 @@ const CareerArk: React.FC = () => {
           </Box>
         )}
       </Flex>
+      {missingKeywords.length > 0 && (
+        <>
+          <Modal isOpen={isOpen} onClose={onClose} isCentered size={useBreakpointValue({ base: 'xs', md: 'md' })} motionPreset="slideInBottom">
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Missing Keywords from Job Description</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text mb={2}>The following keywords were missing from your Ark profile for the last job you applied to. Consider adding them for a better match.</Text>
+                <HStack wrap="wrap" gap={2} mb={4}>
+                  {missingKeywords.map((k, idx) => (
+                    <Box as="span" key={k + idx} px={3} py={1} borderRadius="md" bg="red.100" color="red.700" fontWeight={600} fontSize="md">{k}</Box>
+                  ))}
+                </HStack>
+                <Text fontSize="sm" color="gray.500">Edit your Ark data to include these keywords if relevant.</Text>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+          {/* Floating recall button, mobile-friendly */}
+          {!isOpen && (
+            <IconButton
+              aria-label="Show missing keywords"
+              icon={<FiKey />}
+              colorScheme="red"
+              size="lg"
+              position="fixed"
+              bottom={recallBtnBottom}
+              right={recallBtnRight}
+              zIndex={1500}
+              borderRadius="full"
+              boxShadow="lg"
+              onClick={onOpen}
+              _hover={{ bg: 'red.400' }}
+              _active={{ bg: 'red.500' }}
+            />
+          )}
+        </>
+      )}
     </Box>
   );
 };
