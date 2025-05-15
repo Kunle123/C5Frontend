@@ -310,6 +310,11 @@ const CareerArk: React.FC = () => {
                   setEditError('');
                   try {
                     const entry = grouped[selectedSection][selectedIdx];
+                    if (!entry.id) {
+                      setEditError('This entry is missing an ID and cannot be updated.');
+                      setEditLoading(false);
+                      return;
+                    }
                     await updateWorkExperience(entry.id, {
                       title: editTitle,
                       company: editCompany,
