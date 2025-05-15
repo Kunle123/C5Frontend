@@ -186,9 +186,8 @@ const CareerArk: React.FC = () => {
       setEditDetails((entry.details || []).join('\n'));
       setEditError('');
       setEditLoading(false);
-      setEditMode(false);
     } else {
-      setEditMode(false);
+      // setEditMode(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIdx, selectedSection]);
@@ -197,6 +196,7 @@ const CareerArk: React.FC = () => {
   const handleListItemClick = (section: any, idx: number) => {
     setSelectedSection(section);
     setSelectedIdx(idx);
+    setEditMode(false);
     if (isMobile) setMobileDetailMode(true);
   };
 
@@ -434,6 +434,7 @@ const CareerArk: React.FC = () => {
                       setAddDetails('');
                       setSelectedIdx(arcData.work_experience.length); // select the new entry
                       toast({ status: 'success', title: 'Work experience added!' });
+                      setEditMode(false);
                     }
                   } catch (err: any) {
                     setAddError(err?.message || 'Failed to add work experience');
