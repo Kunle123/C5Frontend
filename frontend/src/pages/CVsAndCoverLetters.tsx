@@ -344,7 +344,7 @@ const Application: React.FC = () => {
               </Box>
               {keywordAnalysis.length > 0 && (
                 <Box>
-                  <Text fontWeight="semibold">Keyword Match Analysis</Text>
+                  <Text fontWeight="semibold" mb={1}>Keyword Match Analysis</Text>
                   <HStack wrap="wrap" gap={2} mb={2}>
                     {keywordAnalysis.map((k, idx) => (
                       <Badge
@@ -372,11 +372,24 @@ const Application: React.FC = () => {
                   <AlertIcon />Your Career Ark profile is empty. Please upload a CV or add data in Career Ark before proceeding.
                 </Alert>
               )}
-              <Button colorScheme="blue" onClick={() => setStep(2)} isLoading={loading}>
-                Next: Analyse & Optimise
-              </Button>
               <Button variant="outline" colorScheme="gray" onClick={() => window.open('/career-ark', '_blank')}>
-                Edit in Career Ark
+                Edit Ark Data
+              </Button>
+              <Button colorScheme="blue" onClick={async () => {
+                setOptimizing(true);
+                setError('');
+                try {
+                  const result = await generateApplicationMaterials(jobDesc, arcData);
+                  setOptimizedCV(result.cv || '');
+                  setOptimizedCL(result.coverLetter || '');
+                  setStep(3);
+                } catch (err: any) {
+                  setError(err.message || 'AI optimization failed');
+                } finally {
+                  setOptimizing(false);
+                }
+              }} isLoading={optimizing}>
+                Generate CV & Cover Letter
               </Button>
             </Stack>
           ) : (
@@ -397,9 +410,6 @@ const Application: React.FC = () => {
         {step === 2 && arcData && (
           <Stack spacing={3}>
             <Text fontWeight="semibold">Ready to generate your optimised CV and cover letter using your Career Ark profile and the job description?</Text>
-            <Button colorScheme="purple" onClick={handleAnalyzeAndOptimize} isLoading={optimizing}>
-              Optimise with AI
-            </Button>
           </Stack>
         )}
         {step === 3 && (
@@ -413,9 +423,11 @@ const Application: React.FC = () => {
             <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
               <Text whiteSpace="pre-wrap">{optimizedCL}</Text>
             </Box>
-            <Button variant="ghost" mt={2} onClick={() => { setStep(0); setJobDesc(''); setArcData(null); setOptimizedCV(''); setOptimizedCL(''); }}>Optimise for Another Job</Button>
-            <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download')}>
-              Go to Download Application Page
+            <Button variant="outline" colorScheme="gray" onClick={() => window.open('/career-ark', '_blank')}>
+              Edit Ark Data
+            </Button>
+            <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download-cvs')}>
+              Go to Download CVs Page
             </Button>
           </Stack>
         )}
