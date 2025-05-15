@@ -72,6 +72,7 @@ const CareerArk: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const recallBtnBottom = useBreakpointValue({ base: '80px', md: '40px' });
   const recallBtnRight = useBreakpointValue({ base: '16px', md: '40px' });
+  const modalSize = useBreakpointValue({ base: 'xs', md: 'md' });
 
   useEffect(() => {
     setLoading(true);
@@ -505,7 +506,7 @@ const CareerArk: React.FC = () => {
       </Flex>
       {missingKeywords.length > 0 && (
         <>
-          <Modal isOpen={isOpen} onClose={onClose} isCentered size={useBreakpointValue({ base: 'xs', md: 'md' })} motionPreset="slideInBottom">
+          <Modal isOpen={isOpen} onClose={onClose} isCentered size={modalSize} motionPreset="slideInBottom">
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Missing Keywords from Job Description</ModalHeader>
