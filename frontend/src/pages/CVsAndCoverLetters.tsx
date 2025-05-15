@@ -16,11 +16,21 @@ import {
   Badge,
   useColorModeValue,
   Progress,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  IconButton,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import { listCVs, uploadCV, deleteCV, downloadCV, getCurrentUser } from '../api';
 import { optimizeCV as aiOptimizeCV, extractKeywords, analyzeCV as aiAnalyzeCV } from '../api/aiApi';
 import { useNavigate } from 'react-router-dom';
 import { getArcData, generateApplicationMaterials } from '../api/careerArkApi';
+import { FiKey } from 'react-icons/fi';
 
 const steps = [
   'Paste Job Description',
@@ -58,6 +68,8 @@ const Application: React.FC = () => {
   const [arcData, setArcData] = useState<any>(null);
   const [keywordAnalysis, setKeywordAnalysis] = useState<KeywordAnalysisEntry[]>([]);
   const [matchScore, setMatchScore] = useState<number | null>(null);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     setLoading(true);
@@ -293,6 +305,22 @@ const Application: React.FC = () => {
     }
   };
 
+  // Show modal automatically if there are missing keywords and user hasn't dismissed it
+  useEffect(() => {
+    if (
+      step === 1 &&
+      keywordAnalysis.some(k => k.status === 'red') &&
+      !isOpen
+    ) {
+      onOpen();
+    }
+    // eslint-disable-next-line
+  }, [step, keywordAnalysis]);
+
+  // Responsive placement for recall button
+  const recallBtnBottom = useBreakpointValue({ base: '80px', md: '40px' });
+  const recallBtnRight = useBreakpointValue({ base: '16px', md: '40px' });
+
   return (
     <Box py={6} maxW="900px" mx="auto">
       <Heading as="h2" size="lg" fontWeight={700} textAlign="center" mb={4}>
@@ -433,6 +461,46 @@ const Application: React.FC = () => {
         )}
         {error && <Alert status="error" mt={2}><AlertIcon />{error}</Alert>}
       </Box>
+      {/* Keywords Modal (contextual, only if missing keywords in step 1) */}
+      {step === 1 && keywordAnalysis.some(k => k.status === 'red') && (
+        <>
+          <Modal isOpen={isOpen} onClose={onClose} isCentered size={useBreakpointValue({ base: 'xs', md: 'md' })} motionPreset="slideInBottom">
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Missing Keywords</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text mb={2}>The following important keywords from the job description are missing from your Career Ark profile. Consider editing your Ark data to include them for a better match.</Text>
+                <HStack wrap="wrap" gap={2} mb={4}>
+                  {keywordAnalysis.filter(k => k.status === 'red').map((k, idx) => (
+                    <Badge key={k.keyword + idx} colorScheme="red" px={3} py={1} borderRadius="md" fontSize="md" fontWeight={600}>{k.keyword}</Badge>
+                  ))}
+                </HStack>
+                <Button colorScheme="blue" w="100%" mb={2} onClick={() => { window.open('/career-ark', '_blank'); }}>Missing Keywords? - Edit Ark data</Button>
+                <Text fontSize="sm" color="gray.500">After editing, return here and click 'Generate CV & Cover Letter' to continue.</Text>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+          {/* Floating recall button, mobile-friendly */}
+          {!isOpen && (
+            <IconButton
+              aria-label="Show missing keywords"
+              icon={<FiKey />}
+              colorScheme="red"
+              size="lg"
+              position="fixed"
+              bottom={recallBtnBottom}
+              right={recallBtnRight}
+              zIndex={1500}
+              borderRadius="full"
+              boxShadow="lg"
+              onClick={onOpen}
+              _hover={{ bg: 'red.400' }}
+              _active={{ bg: 'red.500' }}
+            />
+          )}
+        </>
+      )}
     </Box>
   );
 };
