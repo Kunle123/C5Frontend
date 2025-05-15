@@ -65,7 +65,7 @@ const Application: React.FC = () => {
   const [uploadSuccess, setUploadSuccess] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
-  const [arcData, setArcData] = useState<any>(null);
+  const [arcData, setArcData] = useState<any>({});
   const [keywordAnalysis, setKeywordAnalysis] = useState<KeywordAnalysisEntry[]>([]);
   const [matchScore, setMatchScore] = useState<number | null>(null);
 
@@ -365,13 +365,13 @@ const Application: React.FC = () => {
           </Stack>
         )}
         {step === 1 && (
-          arcData && Object.keys(arcData).length > 0 ? (
+          !!arcData && typeof arcData === 'object' && Object.keys(arcData).length > 0 ? (
             <Stack spacing={3}>
               <Heading as="h3" size="md">Your Career Ark Data (Profile)</Heading>
               <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} maxH={300} overflowY="auto" borderRadius="md">
                 <pre style={{ fontSize: 14 }}>{JSON.stringify(arcData, null, 2)}</pre>
               </Box>
-              {keywordAnalysis.length > 0 && (
+              {Array.isArray(keywordAnalysis) && keywordAnalysis.length > 0 && (
                 <Box>
                   <Text fontWeight="semibold" mb={1}>Keyword Match Analysis</Text>
                   <HStack wrap="wrap" gap={2} mb={2}>
