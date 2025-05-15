@@ -353,9 +353,9 @@ const CareerArk: React.FC = () => {
                   <Box>
                     <Text mb={1} fontWeight={600}>Start Date</Text>
                     <input
-                      type="date"
+                      type="text"
                       style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="Start Date"
+                      placeholder="e.g. Mar 2020"
                       value={editStartDate}
                       onChange={e => setEditStartDate(e.target.value)}
                       required
@@ -364,9 +364,9 @@ const CareerArk: React.FC = () => {
                   <Box>
                     <Text mb={1} fontWeight={600}>End Date</Text>
                     <input
-                      type="date"
+                      type="text"
                       style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="End Date (leave blank if current)"
+                      placeholder="e.g. Dec 2020 or Present"
                       value={editEndDate}
                       onChange={e => setEditEndDate(e.target.value)}
                     />
@@ -477,9 +477,9 @@ const CareerArk: React.FC = () => {
                   <Box>
                     <Text mb={1} fontWeight={600}>Start Date</Text>
                     <input
-                      type="date"
+                      type="text"
                       style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="Start Date"
+                      placeholder="e.g. Mar 2020"
                       value={addStartDate}
                       onChange={e => setAddStartDate(e.target.value)}
                       required
@@ -488,9 +488,9 @@ const CareerArk: React.FC = () => {
                   <Box>
                     <Text mb={1} fontWeight={600}>End Date</Text>
                     <input
-                      type="date"
+                      type="text"
                       style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="End Date (leave blank if current)"
+                      placeholder="e.g. Dec 2020 or Present"
                       value={addEndDate}
                       onChange={e => setAddEndDate(e.target.value)}
                     />
