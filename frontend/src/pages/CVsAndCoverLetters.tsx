@@ -71,6 +71,11 @@ const Application: React.FC = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // Responsive placement for recall button
+  const recallBtnBottom = useBreakpointValue({ base: '80px', md: '40px' });
+  const recallBtnRight = useBreakpointValue({ base: '16px', md: '40px' });
+  const modalSize = useBreakpointValue({ base: 'xs', md: 'md' });
+
   useEffect(() => {
     setLoading(true);
     setError('');
@@ -318,10 +323,6 @@ const Application: React.FC = () => {
     // eslint-disable-next-line
   }, [step, keywordAnalysis]);
 
-  // Responsive placement for recall button
-  const recallBtnBottom = useBreakpointValue({ base: '80px', md: '40px' });
-  const recallBtnRight = useBreakpointValue({ base: '16px', md: '40px' });
-
   return (
     <Box py={6} maxW="900px" mx="auto">
       <Heading as="h2" size="lg" fontWeight={700} textAlign="center" mb={4}>
@@ -465,7 +466,7 @@ const Application: React.FC = () => {
       {/* Keywords Modal (contextual, only if missing keywords in step 1) */}
       {step === 1 && Array.isArray(keywordAnalysis) && keywordAnalysis.some(k => k.status === 'red') && (
         <>
-          <Modal isOpen={isOpen} onClose={onClose} isCentered size={useBreakpointValue({ base: 'xs', md: 'md' })} motionPreset="slideInBottom">
+          <Modal isOpen={isOpen} onClose={onClose} isCentered size={modalSize} motionPreset="slideInBottom">
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Missing Keywords</ModalHeader>
