@@ -309,6 +309,7 @@ const Application: React.FC = () => {
   useEffect(() => {
     if (
       step === 1 &&
+      Array.isArray(keywordAnalysis) &&
       keywordAnalysis.some(k => k.status === 'red') &&
       !isOpen
     ) {
@@ -462,7 +463,7 @@ const Application: React.FC = () => {
         {error && <Alert status="error" mt={2}><AlertIcon />{error}</Alert>}
       </Box>
       {/* Keywords Modal (contextual, only if missing keywords in step 1) */}
-      {step === 1 && keywordAnalysis.some(k => k.status === 'red') && (
+      {step === 1 && Array.isArray(keywordAnalysis) && keywordAnalysis.some(k => k.status === 'red') && (
         <>
           <Modal isOpen={isOpen} onClose={onClose} isCentered size={useBreakpointValue({ base: 'xs', md: 'md' })} motionPreset="slideInBottom">
             <ModalOverlay />
