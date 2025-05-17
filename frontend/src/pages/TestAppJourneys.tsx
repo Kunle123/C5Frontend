@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { login, register } from '../api';
 import { uploadCV, getArcData, generateApplicationMaterials } from '../api/careerArkApi';
+import { Link as RouterLink } from 'react-router-dom';
 
 const TestAppJourneys: React.FC = () => {
   // Auth
@@ -100,6 +101,11 @@ const TestAppJourneys: React.FC = () => {
 
   return (
     <Box py={6} maxW="700px" mx="auto">
+      <Box mb={4}>
+        <Button as={RouterLink} to="/debug-cv-ai" colorScheme="purple" variant="outline">
+          Debug CV AI Service Response
+        </Button>
+      </Box>
       <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="lg" p={8} borderRadius="lg" mb={6}>
         <Heading as="h2" size="lg" fontWeight={700} mb={4} textAlign="center">
           Test Application Journeys

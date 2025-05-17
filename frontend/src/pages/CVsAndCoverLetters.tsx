@@ -368,10 +368,7 @@ const Application: React.FC = () => {
         {step === 1 && (
           !!arcData && typeof arcData === 'object' && Object.keys(arcData).length > 0 ? (
             <Stack spacing={3}>
-              <Heading as="h3" size="md">Your Career Ark Data (Profile)</Heading>
-              <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} maxH={300} overflowY="auto" borderRadius="md">
-                <pre style={{ fontSize: 14 }}>{JSON.stringify(arcData, null, 2)}</pre>
-              </Box>
+              <Heading as="h3" size="md">Keyword Match Analysis</Heading>
               {Array.isArray(keywordAnalysis) && keywordAnalysis.length > 0 && (
                 <Box>
                   <Text fontWeight="semibold" mb={1}>Keyword Match Analysis</Text>

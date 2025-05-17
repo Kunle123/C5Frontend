@@ -24,7 +24,7 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, ArrowBackIcon } from '@chakra-ui/icons';
 import { getUser, uploadCV } from '../api';
-import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience } from '../api/careerArkApi';
+import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience, addEducation, updateEducation, addTraining, updateTraining } from '../api/careerArkApi';
 import { useDisclosure } from '@chakra-ui/react';
 import { FiKey } from 'react-icons/fi';
 
@@ -73,6 +73,28 @@ const CareerArk: React.FC = () => {
   const recallBtnBottom = useBreakpointValue({ base: '80px', md: '40px' });
   const recallBtnRight = useBreakpointValue({ base: '16px', md: '40px' });
   const modalSize = useBreakpointValue({ base: 'xs', md: 'md' });
+  // Add state for education
+  const [addInstitution, setAddInstitution] = useState('');
+  const [addDegree, setAddDegree] = useState('');
+  const [addEduStartDate, setAddEduStartDate] = useState('');
+  const [addEduEndDate, setAddEduEndDate] = useState('');
+  const [addEduDetails, setAddEduDetails] = useState('');
+  // Add state for training
+  const [addTrainingName, setAddTrainingName] = useState('');
+  const [addProvider, setAddProvider] = useState('');
+  const [addTrainingDate, setAddTrainingDate] = useState('');
+  const [addTrainingDetails, setAddTrainingDetails] = useState('');
+  // Edit state for education
+  const [editInstitution, setEditInstitution] = useState('');
+  const [editDegree, setEditDegree] = useState('');
+  const [editEduStartDate, setEditEduStartDate] = useState('');
+  const [editEduEndDate, setEditEduEndDate] = useState('');
+  const [editEduDetails, setEditEduDetails] = useState('');
+  // Edit state for training
+  const [editTrainingName, setEditTrainingName] = useState('');
+  const [editProvider, setEditProvider] = useState('');
+  const [editTrainingDate, setEditTrainingDate] = useState('');
+  const [editTrainingDetails, setEditTrainingDetails] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -90,10 +112,14 @@ const CareerArk: React.FC = () => {
   }, [token]);
 
   // Group items by type for left pane
+  const normalizeId = (entry: any) => ({
+    ...entry,
+    id: entry.id || entry._id || entry.uuid || entry.ID || null,
+  });
   const grouped: Record<string, any[]> = {
-    work_experience: arcData?.work_experience || [],
-    education: arcData?.education || [],
-    training: arcData?.training || [],
+    work_experience: (arcData?.work_experience || []).map(normalizeId),
+    education: (arcData?.education || []).map(normalizeId),
+    training: (arcData?.training || []).map(normalizeId),
   };
 
   const handleUploadClick = () => {
@@ -175,13 +201,26 @@ const CareerArk: React.FC = () => {
     }
   };
 
-  // Add a helper to set edit form state from an entry
+  // Update setEditFormFromEntry to handle all sections
   const setEditFormFromEntry = (entry: any) => {
-    setEditTitle(entry.title || entry.positionTitle || '');
-    setEditCompany(entry.company || '');
-    setEditStartDate(entry.start_date || entry.startDate || '');
-    setEditEndDate(entry.end_date || entry.endDate || '');
-    setEditDetails((entry.details || []).join('\n'));
+    if (selectedSection === 'work_experience') {
+      setEditTitle(entry.title || entry.positionTitle || '');
+      setEditCompany(entry.company || '');
+      setEditStartDate(entry.start_date || entry.startDate || '');
+      setEditEndDate(entry.end_date || entry.endDate || '');
+      setEditDetails((entry.details || []).join('\n'));
+    } else if (selectedSection === 'education') {
+      setEditInstitution(entry.institution || entry.institutionName || '');
+      setEditDegree(entry.degree || '');
+      setEditEduStartDate(entry.start_date || entry.startDate || '');
+      setEditEduEndDate(entry.end_date || entry.endDate || '');
+      setEditEduDetails((entry.details || entry.relevantCoursework || []).join('\n'));
+    } else if (selectedSection === 'training') {
+      setEditTrainingName(entry.name || '');
+      setEditProvider(entry.provider || '');
+      setEditTrainingDate(entry.date || '');
+      setEditTrainingDetails((entry.details || []).join('\n'));
+    }
   };
 
   // When selectedIdx changes, reset edit state
@@ -394,6 +433,121 @@ const CareerArk: React.FC = () => {
                   </HStack>
                 </VStack>
               </Box>
+            ) : selectedIdx !== null && editMode && selectedSection === 'education' ? (
+              <Box as="form" w="100%" maxW="500px" mx="auto"
+                onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+                  e.preventDefault();
+                  setEditLoading(true);
+                  setEditError('');
+                  try {
+                    const entry = grouped[selectedSection][selectedIdx];
+                    if (!entry.id) {
+                      setEditError('This entry is missing an ID and cannot be updated.');
+                      setEditLoading(false);
+                      return;
+                    }
+                    await updateEducation(entry.id, {
+                      institution: editInstitution,
+                      degree: editDegree,
+                      start_date: editEduStartDate,
+                      end_date: editEduEndDate || null,
+                      details: editEduDetails.split('\n').map(s => s.trim()).filter(Boolean),
+                    });
+                    const arcData = await getArcData();
+                    setArcData(arcData);
+                    setEditMode(false);
+                    toast({ status: 'success', title: 'Education updated!' });
+                  } catch (err: any) {
+                    setEditError(err?.message || 'Failed to update education');
+                  } finally {
+                    setEditLoading(false);
+                  }
+                }}
+              >
+                <Heading size="md" mb={4}>Edit Education</Heading>
+                <VStack spacing={4} align="stretch">
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Institution</Text>
+                    <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Institution" value={editInstitution} onChange={e => setEditInstitution(e.target.value)} required />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Degree</Text>
+                    <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Degree" value={editDegree} onChange={e => setEditDegree(e.target.value)} required />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Start Date</Text>
+                    <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2018-09-01" value={editEduStartDate} onChange={e => setEditEduStartDate(e.target.value)} required />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>End Date</Text>
+                    <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2022-06-30 or Present" value={editEduEndDate} onChange={e => setEditEduEndDate(e.target.value)} />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Details</Text>
+                    <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={editEduDetails} onChange={e => setEditEduDetails(e.target.value)} />
+                  </Box>
+                  {editError && <Text color="red.500">{editError}</Text>}
+                  <HStack>
+                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editInstitution || !editDegree || !editEduStartDate}>Save</Button>
+                    <Button onClick={() => setEditMode(false)} isDisabled={editLoading} variant="ghost">Cancel</Button>
+                  </HStack>
+                </VStack>
+              </Box>
+            ) : selectedIdx !== null && editMode && selectedSection === 'training' ? (
+              <Box as="form" w="100%" maxW="500px" mx="auto"
+                onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+                  e.preventDefault();
+                  setEditLoading(true);
+                  setEditError('');
+                  try {
+                    const entry = grouped[selectedSection][selectedIdx];
+                    if (!entry.id) {
+                      setEditError('This entry is missing an ID and cannot be updated.');
+                      setEditLoading(false);
+                      return;
+                    }
+                    await updateTraining(entry.id, {
+                      name: editTrainingName,
+                      provider: editProvider,
+                      date: editTrainingDate,
+                      details: editTrainingDetails.split('\n').map(s => s.trim()).filter(Boolean),
+                    });
+                    const arcData = await getArcData();
+                    setArcData(arcData);
+                    setEditMode(false);
+                    toast({ status: 'success', title: 'Training updated!' });
+                  } catch (err: any) {
+                    setEditError(err?.message || 'Failed to update training');
+                  } finally {
+                    setEditLoading(false);
+                  }
+                }}
+              >
+                <Heading size="md" mb={4}>Edit Training</Heading>
+                <VStack spacing={4} align="stretch">
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Name</Text>
+                    <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Training Name" value={editTrainingName} onChange={e => setEditTrainingName(e.target.value)} required />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Provider</Text>
+                    <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Provider" value={editProvider} onChange={e => setEditProvider(e.target.value)} required />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Date</Text>
+                    <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2023-04-15" value={editTrainingDate} onChange={e => setEditTrainingDate(e.target.value)} required />
+                  </Box>
+                  <Box>
+                    <Text mb={1} fontWeight={600}>Details</Text>
+                    <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={editTrainingDetails} onChange={e => setEditTrainingDetails(e.target.value)} />
+                  </Box>
+                  {editError && <Text color="red.500">{editError}</Text>}
+                  <HStack>
+                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTrainingName || !editProvider || !editTrainingDate}>Save</Button>
+                    <Button onClick={() => setEditMode(false)} isDisabled={editLoading} variant="ghost">Cancel</Button>
+                  </HStack>
+                </VStack>
+              </Box>
             ) : selectedIdx !== null && grouped[selectedSection][selectedIdx] ? (
               <Box>
                 <HStack justify="space-between" align="center" mb={2}>
@@ -428,7 +582,6 @@ const CareerArk: React.FC = () => {
                   setAddLoading(true);
                   setAddError('');
                   try {
-                    // Only handle work_experience for now
                     if (selectedSection === 'work_experience') {
                       await addWorkExperience({
                         title: addTitle,
@@ -437,21 +590,37 @@ const CareerArk: React.FC = () => {
                         end_date: addEndDate || null,
                         details: addDetails.split('\n').map(s => s.trim()).filter(Boolean),
                       });
-                      // Refresh data
-                      const arcData = await getArcData();
-                      setArcData(arcData);
-                      // Reset form
-                      setAddTitle('');
-                      setAddCompany('');
-                      setAddStartDate('');
-                      setAddEndDate('');
-                      setAddDetails('');
-                      setSelectedIdx(arcData.work_experience.length); // select the new entry
-                      toast({ status: 'success', title: 'Work experience added!' });
-                      setEditMode(false);
+                    } else if (selectedSection === 'education') {
+                      await addEducation({
+                        institution: addInstitution,
+                        degree: addDegree,
+                        start_date: addEduStartDate,
+                        end_date: addEduEndDate || null,
+                        details: addEduDetails.split('\n').map(s => s.trim()).filter(Boolean),
+                      });
+                    } else if (selectedSection === 'training') {
+                      await addTraining({
+                        name: addTrainingName,
+                        provider: addProvider,
+                        date: addTrainingDate,
+                        details: addTrainingDetails.split('\n').map(s => s.trim()).filter(Boolean),
+                      });
                     }
+                    // Refresh data
+                    const arcData = await getArcData();
+                    setArcData(arcData);
+                    // Reset all add form state
+                    setAddTitle(''); setAddCompany(''); setAddStartDate(''); setAddEndDate(''); setAddDetails('');
+                    setAddInstitution(''); setAddDegree(''); setAddEduStartDate(''); setAddEduEndDate(''); setAddEduDetails('');
+                    setAddTrainingName(''); setAddProvider(''); setAddTrainingDate(''); setAddTrainingDetails('');
+                    // Select the new entry
+                    if (selectedSection === 'work_experience') setSelectedIdx(arcData.work_experience.length);
+                    if (selectedSection === 'education') setSelectedIdx(arcData.education.length);
+                    if (selectedSection === 'training') setSelectedIdx(arcData.training.length);
+                    toast({ status: 'success', title: `${sectionTitles[selectedSection]} added!` });
+                    setEditMode(false);
                   } catch (err: any) {
-                    setAddError(err?.message || 'Failed to add work experience');
+                    setAddError(err?.message || `Failed to add ${sectionTitles[selectedSection]}`);
                   } finally {
                     setAddLoading(false);
                   }
@@ -459,58 +628,80 @@ const CareerArk: React.FC = () => {
               >
                 <Heading size="md" mb={4}>New Entry</Heading>
                 <VStack spacing={4} align="stretch">
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Title</Text>
-                    <input
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="Title"
-                      value={addTitle}
-                      onChange={e => setAddTitle(e.target.value)}
-                      required
-                    />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Company</Text>
-                    <input
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="Company"
-                      value={addCompany}
-                      onChange={e => setAddCompany(e.target.value)}
-                      required
-                    />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Start Date</Text>
-                    <input
-                      type="text"
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="e.g. Mar 2020"
-                      value={addStartDate}
-                      onChange={e => setAddStartDate(e.target.value)}
-                      required
-                    />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>End Date</Text>
-                    <input
-                      type="text"
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="e.g. Dec 2020 or Present"
-                      value={addEndDate}
-                      onChange={e => setAddEndDate(e.target.value)}
-                    />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Details</Text>
-                    <textarea
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }}
-                      placeholder="Details (one per line)"
-                      value={addDetails}
-                      onChange={e => setAddDetails(e.target.value)}
-                    />
-                  </Box>
+                  {selectedSection === 'work_experience' && (
+                    <>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Title</Text>
+                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Title" value={addTitle} onChange={e => setAddTitle(e.target.value)} required />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Company</Text>
+                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Company" value={addCompany} onChange={e => setAddCompany(e.target.value)} required />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Start Date</Text>
+                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. Mar 2020" value={addStartDate} onChange={e => setAddStartDate(e.target.value)} required />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>End Date</Text>
+                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. Dec 2020 or Present" value={addEndDate} onChange={e => setAddEndDate(e.target.value)} />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Details</Text>
+                        <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={addDetails} onChange={e => setAddDetails(e.target.value)} />
+                      </Box>
+                    </>
+                  )}
+                  {selectedSection === 'education' && (
+                    <>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Institution</Text>
+                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Institution" value={addInstitution} onChange={e => setAddInstitution(e.target.value)} required />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Degree</Text>
+                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Degree" value={addDegree} onChange={e => setAddDegree(e.target.value)} required />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Start Date</Text>
+                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2018-09-01" value={addEduStartDate} onChange={e => setAddEduStartDate(e.target.value)} required />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>End Date</Text>
+                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2022-06-30 or Present" value={addEduEndDate} onChange={e => setAddEduEndDate(e.target.value)} />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Details</Text>
+                        <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={addEduDetails} onChange={e => setAddEduDetails(e.target.value)} />
+                      </Box>
+                    </>
+                  )}
+                  {selectedSection === 'training' && (
+                    <>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Name</Text>
+                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Training Name" value={addTrainingName} onChange={e => setAddTrainingName(e.target.value)} required />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Provider</Text>
+                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Provider" value={addProvider} onChange={e => setAddProvider(e.target.value)} required />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Date</Text>
+                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2023-04-15" value={addTrainingDate} onChange={e => setAddTrainingDate(e.target.value)} required />
+                      </Box>
+                      <Box>
+                        <Text mb={1} fontWeight={600}>Details</Text>
+                        <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={addTrainingDetails} onChange={e => setAddTrainingDetails(e.target.value)} />
+                      </Box>
+                    </>
+                  )}
                   {addError && <Text color="red.500">{addError}</Text>}
-                  <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle || !addCompany || !addStartDate}>
+                  <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={
+                    (selectedSection === 'work_experience' && (!addTitle || !addCompany || !addStartDate)) ||
+                    (selectedSection === 'education' && (!addInstitution || !addDegree || !addEduStartDate)) ||
+                    (selectedSection === 'training' && (!addTrainingName || !addProvider || !addTrainingDate))
+                  }>
                     Save
                   </Button>
                 </VStack>
