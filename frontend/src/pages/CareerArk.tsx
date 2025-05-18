@@ -339,8 +339,18 @@ const CareerArk: React.FC = () => {
             )}
             {loading ? (
               <Spinner />
-            ) : error ? (
-              <Alert status="error"><AlertIcon />{error}</Alert>
+            ) : error && !arcData ? (
+              <Alert status="error" mb={4}>
+                <AlertIcon />
+                {error}
+              </Alert>
+            ) : !error && arcData && Object.values(arcData).every(
+              arr => Array.isArray(arr) && arr.length === 0
+            ) ? (
+              <Alert status="info" mb={4}>
+                <AlertIcon />
+                No entries yet. Import a CV to get started!
+              </Alert>
             ) : selectedIdx !== null && editMode && selectedSection === 'work_experience' ? (
               <Box as="form" w="100%" maxW="500px" mx="auto"
                 onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {

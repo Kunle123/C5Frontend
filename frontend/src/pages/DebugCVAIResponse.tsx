@@ -12,17 +12,12 @@ import {
   useToast,
   Select,
   Input,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
   HStack,
   Textarea,
   Radio,
   RadioGroup,
 } from '@chakra-ui/react';
-import { uploadCV, getCVStatus, getArcData } from '../api/careerArkApi';
+import { uploadCV, getCVStatus } from '../api/careerArkApi';
 
 const DEBUG_STAGES = [
   { key: 'text', label: 'Raw Extracted Text', endpoint: '/api/arc/cv/text/' },
@@ -47,13 +42,13 @@ const DebugCVAIResponse: React.FC = () => {
   const [selectedStage, setSelectedStage] = useState(DEBUG_STAGES[0].key);
   const [stageResult, setStageResult] = useState<any>(null);
   const [stageLoading, setStageLoading] = useState(false);
-  const toast = useToast();
   const [chunkText, setChunkText] = useState('');
   const [chunkTestLoading, setChunkTestLoading] = useState(false);
   const [chunkTestResult, setChunkTestResult] = useState<any>(null);
   const [chunkTestRaw, setChunkTestRaw] = useState<any>(null);
   const [chunkTestFullResponse, setChunkTestFullResponse] = useState<any>(null);
   const [mode, setMode] = useState<'cv' | 'chunk'>('cv');
+  const toast = useToast();
 
   const effectiveTaskId = manualTaskId || taskId;
 
