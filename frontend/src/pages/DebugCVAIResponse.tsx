@@ -19,6 +19,8 @@ import {
   TabPanel,
   HStack,
   Textarea,
+  Radio,
+  RadioGroup,
 } from '@chakra-ui/react';
 import { uploadCV, getCVStatus, getArcData } from '../api/careerArkApi';
 
@@ -51,6 +53,7 @@ const DebugCVAIResponse: React.FC = () => {
   const [chunkTestResult, setChunkTestResult] = useState<any>(null);
   const [chunkTestRaw, setChunkTestRaw] = useState<any>(null);
   const [chunkTestFullResponse, setChunkTestFullResponse] = useState<any>(null);
+  const [mode, setMode] = useState<'cv' | 'chunk'>('cv');
 
   const effectiveTaskId = manualTaskId || taskId;
 
@@ -178,68 +181,78 @@ const DebugCVAIResponse: React.FC = () => {
   return (
     <Box maxW="700px" mx="auto" py={10}>
       <Heading size="lg" mb={6}>Debug: CV AI Service Pipeline</Heading>
-      <VStack spacing={4} align="stretch">
-        <Button onClick={handleUploadClick} colorScheme="blue" isLoading={uploading || polling}>
-          Upload CV File
-        </Button>
-        <input
-          type="file"
-          accept=".pdf,.doc,.docx"
-          style={{ display: 'none' }}
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          disabled={uploading || polling}
-        />
-        {(uploading || polling) && <Progress value={progress} size="sm" colorScheme="blue" />}
-        {uploadError && <Alert status="error"><AlertIcon />{uploadError}</Alert>}
-        {taskId && (
+      <RadioGroup value={mode} onChange={val => setMode(val as 'cv' | 'chunk')} mb={6}>
+        <HStack spacing={8}>
+          <Radio value="cv">Upload CV File</Radio>
+          <Radio value="chunk">Test AI Chunk Parsing</Radio>
+        </HStack>
+      </RadioGroup>
+      {mode === 'cv' && (
+        <VStack spacing={4} align="stretch">
+          <Button onClick={handleUploadClick} colorScheme="blue" isLoading={uploading || polling}>
+            Upload CV File
+          </Button>
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx"
+            style={{ display: 'none' }}
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            disabled={uploading || polling}
+          />
+          {(uploading || polling) && <Progress value={progress} size="sm" colorScheme="blue" />}
+          {uploadError && <Alert status="error"><AlertIcon />{uploadError}</Alert>}
+          {taskId && (
+            <Box>
+              <Text fontWeight="bold">Last Uploaded Task ID:</Text>
+              <Code>{taskId}</Code>
+              <Text>Status: <b>{status}</b></Text>
+              {summary && (
+                <Box mt={2}>
+                  <Text fontWeight="bold">Extracted Data Summary:</Text>
+                  <Code whiteSpace="pre" display="block">{JSON.stringify(summary, null, 2)}</Code>
+                </Box>
+              )}
+            </Box>
+          )}
           <Box>
-            <Text fontWeight="bold">Last Uploaded Task ID:</Text>
-            <Code>{taskId}</Code>
-            <Text>Status: <b>{status}</b></Text>
-            {summary && (
+            <HStack mb={2}>
+              <Input
+                placeholder="Enter taskId (or use last uploaded)"
+                value={manualTaskId}
+                onChange={e => setManualTaskId(e.target.value)}
+                width="350px"
+              />
+              <Select
+                value={selectedStage}
+                onChange={e => setSelectedStage(e.target.value)}
+                width="250px"
+              >
+                {DEBUG_STAGES.map(stage => (
+                  <option key={stage.key} value={stage.key}>{stage.label}</option>
+                ))}
+              </Select>
+              <Button colorScheme="teal" onClick={handleFetchStage} isLoading={stageLoading}>
+                Fetch Stage Data
+              </Button>
+            </HStack>
+            {stageResult && (
               <Box mt={2}>
-                <Text fontWeight="bold">Extracted Data Summary:</Text>
-                <Code whiteSpace="pre" display="block">{JSON.stringify(summary, null, 2)}</Code>
+                <Text fontWeight="bold" mb={2}>{DEBUG_STAGES.find(s => s.key === selectedStage)?.label}:</Text>
+                <Box maxH="400px" overflowY="auto" borderWidth={1} borderRadius="md" p={3} bg="gray.50">
+                  {typeof stageResult === 'string' ? (
+                    <Code whiteSpace="pre" display="block">{stageResult}</Code>
+                  ) : (
+                    <Code whiteSpace="pre" display="block">{JSON.stringify(stageResult, null, 2)}</Code>
+                  )}
+                </Box>
               </Box>
             )}
           </Box>
-        )}
-        <Box>
-          <HStack mb={2}>
-            <Input
-              placeholder="Enter taskId (or use last uploaded)"
-              value={manualTaskId}
-              onChange={e => setManualTaskId(e.target.value)}
-              width="350px"
-            />
-            <Select
-              value={selectedStage}
-              onChange={e => setSelectedStage(e.target.value)}
-              width="250px"
-            >
-              {DEBUG_STAGES.map(stage => (
-                <option key={stage.key} value={stage.key}>{stage.label}</option>
-              ))}
-            </Select>
-            <Button colorScheme="teal" onClick={handleFetchStage} isLoading={stageLoading}>
-              Fetch Stage Data
-            </Button>
-          </HStack>
-          {stageResult && (
-            <Box mt={2}>
-              <Text fontWeight="bold" mb={2}>{DEBUG_STAGES.find(s => s.key === selectedStage)?.label}:</Text>
-              <Box maxH="400px" overflowY="auto" borderWidth={1} borderRadius="md" p={3} bg="gray.50">
-                {typeof stageResult === 'string' ? (
-                  <Code whiteSpace="pre" display="block">{stageResult}</Code>
-                ) : (
-                  <Code whiteSpace="pre" display="block">{JSON.stringify(stageResult, null, 2)}</Code>
-                )}
-              </Box>
-            </Box>
-          )}
-        </Box>
-        <Box mt={10} p={6} borderWidth={1} borderRadius="lg" bg="gray.50">
+        </VStack>
+      )}
+      {mode === 'chunk' && (
+        <Box p={6} borderWidth={1} borderRadius="lg" bg="gray.50">
           <Heading as="h3" size="md" mb={4}>Test AI Chunk Parsing</Heading>
           <Textarea
             placeholder="Paste a chunk of CV text to test AI extraction..."
@@ -276,7 +289,7 @@ const DebugCVAIResponse: React.FC = () => {
             </Box>
           )}
         </Box>
-      </VStack>
+      )}
     </Box>
   );
 };
