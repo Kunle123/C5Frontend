@@ -286,10 +286,10 @@ const CareerArk: React.FC = () => {
         </Flex>
       </Box>
       {/* Responsive Layout */}
-      <Flex maxW="1200px" mx="auto" flex={1} minH="calc(100vh - 120px)" gap={6} direction={{ base: 'column', md: 'row' }}>
+      <Flex maxW="1200px" mx="auto" flex={1} h="calc(100vh - 80px)" minH="calc(100vh - 80px)" gap={6} direction={{ base: 'column', md: 'row' }}>
         {/* List/Sidebar View */}
         {(!isMobile || !mobileDetailMode) && (
-          <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} display="flex" flexDirection="column">
+          <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} display="flex" flexDirection="column" maxH="100%">
             <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
             {uploading && (
               <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />
@@ -302,7 +302,7 @@ const CareerArk: React.FC = () => {
               onChange={handleFileChange}
               disabled={uploading || polling}
             />
-            <Box flex={1} overflowY="auto">
+            <Box flex={1} minH={0} overflowY="auto">
               {Object.entries(sectionTitles).map(([key, label]) => (
                 <Box key={key} mb={6}>
                   <HStack justify="space-between" align="center" mb={2}>
