@@ -289,7 +289,7 @@ const CareerArk: React.FC = () => {
       <Flex maxW="1200px" mx="auto" flex={1} minH="calc(100vh - 120px)" gap={6} direction={{ base: 'column', md: 'row' }}>
         {/* List/Sidebar View */}
         {(!isMobile || !mobileDetailMode) && (
-          <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} overflowY="auto">
+          <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} display="flex" flexDirection="column">
             <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
             {uploading && (
               <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />
@@ -302,32 +302,34 @@ const CareerArk: React.FC = () => {
               onChange={handleFileChange}
               disabled={uploading || polling}
             />
-            {Object.entries(sectionTitles).map(([key, label]) => (
-              <Box key={key} mb={6}>
-                <HStack justify="space-between" align="center" mb={2}>
-                  <Text fontWeight="bold" fontSize="lg" color="brand.500">{label}</Text>
-                  <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" onClick={() => setSelectedIdx(null)} />
-                </HStack>
-                <VStack spacing={1} align="stretch">
-                  {grouped[key]?.length > 0 ? grouped[key].map((item: any, idx: number) => (
-                    <Box
-                      key={item.id || idx}
-                      p={2}
-                      borderRadius="md"
-                      bg={selectedSection === key && selectedIdx === idx ? 'brand.100' : 'gray.50'}
-                      _hover={{ bg: 'brand.50', cursor: 'pointer' }}
-                      onClick={() => handleListItemClick(key, idx)}
-                    >
-                      <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
-                      <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
-                      <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
-                    </Box>
-                  )) : (
-                    <Text fontSize="sm" color="gray.400">No entries</Text>
-                  )}
-                </VStack>
-              </Box>
-            ))}
+            <Box flex={1} overflowY="auto">
+              {Object.entries(sectionTitles).map(([key, label]) => (
+                <Box key={key} mb={6}>
+                  <HStack justify="space-between" align="center" mb={2}>
+                    <Text fontWeight="bold" fontSize="lg" color="brand.500">{label}</Text>
+                    <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" onClick={() => setSelectedIdx(null)} />
+                  </HStack>
+                  <VStack spacing={1} align="stretch">
+                    {grouped[key]?.length > 0 ? grouped[key].map((item: any, idx: number) => (
+                      <Box
+                        key={item.id || idx}
+                        p={2}
+                        borderRadius="md"
+                        bg={selectedSection === key && selectedIdx === idx ? 'brand.100' : 'gray.50'}
+                        _hover={{ bg: 'brand.50', cursor: 'pointer' }}
+                        onClick={() => handleListItemClick(key, idx)}
+                      >
+                        <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
+                        <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
+                        <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
+                      </Box>
+                    )) : (
+                      <Text fontSize="sm" color="gray.400">No entries</Text>
+                    )}
+                  </VStack>
+                </Box>
+              ))}
+            </Box>
           </Box>
         )}
         {/* Detail View */}
