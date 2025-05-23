@@ -27,11 +27,26 @@ import { getUser, uploadCV } from '../api';
 import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience, addEducation, updateEducation, addTraining, updateTraining } from '../api/careerArkApi';
 import { useDisclosure } from '@chakra-ui/react';
 import { FiKey } from 'react-icons/fi';
+import dayjs from 'dayjs';
 
 const sectionTitles = {
   work_experience: 'Career History',
   education: 'Education',
   training: 'Training',
+};
+
+// Helper to parse dates for sorting
+const parseDate = (dateStr) => {
+  if (!dateStr) return dayjs(0);
+  // Try YYYY-MM-DD
+  let d = dayjs(dateStr, 'YYYY-MM-DD', true);
+  if (d.isValid()) return d;
+  // Try MMM YYYY
+  d = dayjs(dateStr, 'MMM YYYY', true);
+  if (d.isValid()) return d;
+  // Try fallback
+  d = dayjs(dateStr);
+  return d.isValid() ? d : dayjs(0);
 };
 
 const CareerArk: React.FC = () => {
@@ -266,6 +281,15 @@ const CareerArk: React.FC = () => {
     // eslint-disable-next-line
   }, []);
 
+  // Helper function to sort arrays by end_date
+  const sortByEndDate = (arr) => {
+    return [...arr].sort((a, b) => {
+      const aDate = parseDate(a.end_date || a.start_date);
+      const bDate = parseDate(b.end_date || b.start_date);
+      return bDate.valueOf() - aDate.valueOf();
+    });
+  };
+
   return (
     <Box minH="100vh" bg="gray.50">
       {/* User Info Header */}
@@ -310,7 +334,7 @@ const CareerArk: React.FC = () => {
                     <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" onClick={() => setSelectedIdx(null)} />
                   </HStack>
                   <VStack spacing={1} align="stretch">
-                    {grouped[key]?.length > 0 ? grouped[key].map((item: any, idx: number) => (
+                    {sortByEndDate(grouped[key]).map((item: any, idx: number) => (
                       <Box
                         key={item.id || idx}
                         p={2}
@@ -323,9 +347,7 @@ const CareerArk: React.FC = () => {
                         <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
                         <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
                       </Box>
-                    )) : (
-                      <Text fontSize="sm" color="gray.400">No entries</Text>
-                    )}
+                    ))}
                   </VStack>
                 </Box>
               ))}

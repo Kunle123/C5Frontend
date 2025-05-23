@@ -11,6 +11,7 @@ import {
   Alert,
   AlertIcon,
 } from '@chakra-ui/react';
+import dayjs from 'dayjs';
 
 const CareerArkV2: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -127,12 +128,22 @@ const CareerArkV2: React.FC = () => {
     fetchArcData();
   }, [token]);
 
-  // Helper to sort work experience by end_date (reverse chronological)
+  // Helper to parse dates for sorting
+  const parseDate = (dateStr: string) => {
+    if (!dateStr) return dayjs(0);
+    let d = dayjs(dateStr, 'YYYY-MM-DD', true);
+    if (d.isValid()) return d;
+    d = dayjs(dateStr, 'MMM YYYY', true);
+    if (d.isValid()) return d;
+    d = dayjs(dateStr);
+    return d.isValid() ? d : dayjs(0);
+  };
+
   const sortByEndDate = (arr: any[]) => {
     return [...arr].sort((a, b) => {
-      const aDate = a.end_date || a.start_date || '';
-      const bDate = b.end_date || b.start_date || '';
-      return bDate.localeCompare(aDate);
+      const aDate = parseDate(a.end_date || a.start_date);
+      const bDate = parseDate(b.end_date || b.start_date);
+      return bDate.valueOf() - aDate.valueOf();
     });
   };
 
@@ -201,7 +212,7 @@ const CareerArkV2: React.FC = () => {
             <Box mb={6}>
               <Heading size="sm" mb={2}>Education</Heading>
               {Array.isArray(arcData.education) && arcData.education.length > 0 ? (
-                arcData.education.map((item: any, idx: number) => (
+                sortByEndDate(arcData.education).map((item: any, idx: number) => (
                   <Box key={idx} mb={3} p={3} borderRadius="md" bg="gray.50">
                     <Text fontWeight="bold">{item.degree} @ {item.institution}</Text>
                     <Text fontSize="sm" color="gray.600">{item.start_date} - {item.end_date || 'Present'}</Text>
@@ -222,7 +233,7 @@ const CareerArkV2: React.FC = () => {
             <Box mb={6}>
               <Heading size="sm" mb={2}>Training</Heading>
               {Array.isArray(arcData.training) && arcData.training.length > 0 ? (
-                arcData.training.map((item: any, idx: number) => (
+                sortByEndDate(arcData.training).map((item: any, idx: number) => (
                   <Box key={idx} mb={3} p={3} borderRadius="md" bg="gray.50">
                     <Text fontWeight="bold">{item.name} @ {item.provider}</Text>
                     <Text fontSize="sm" color="gray.600">{item.date}</Text>
