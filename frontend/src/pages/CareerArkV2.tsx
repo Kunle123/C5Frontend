@@ -11,7 +11,6 @@ import {
   Alert,
   AlertIcon,
 } from '@chakra-ui/react';
-import dayjs from 'dayjs';
 
 const CareerArkV2: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -128,25 +127,6 @@ const CareerArkV2: React.FC = () => {
     fetchArcData();
   }, [token]);
 
-  // Helper to parse dates for sorting
-  const parseDate = (dateStr: string): dayjs.Dayjs => {
-    if (!dateStr) return dayjs(0);
-    let d = dayjs(dateStr, 'YYYY-MM-DD', true);
-    if (d.isValid()) return d;
-    d = dayjs(dateStr, 'MMM YYYY', true);
-    if (d.isValid()) return d;
-    d = dayjs(dateStr);
-    return d.isValid() ? d : dayjs(0);
-  };
-
-  const sortByEndDate = (arr: any[]): any[] => {
-    return [...arr].sort((a, b) => {
-      const aDate = parseDate(a.end_date || a.start_date);
-      const bDate = parseDate(b.end_date || b.start_date);
-      return bDate.valueOf() - aDate.valueOf();
-    });
-  };
-
   // Helper to get details array from item
   const getDetails = (item: any) => {
     if (Array.isArray(item.details) && item.details.length > 0) return item.details;
@@ -154,6 +134,14 @@ const CareerArkV2: React.FC = () => {
       return item.description.split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean);
     }
     return [];
+  };
+
+  const sortByEndDate = (arr: any[]): any[] => {
+    return [...arr].sort((a, b) => {
+      const aDate = a.end_date || a.start_date || '';
+      const bDate = b.end_date || b.start_date || '';
+      return bDate.localeCompare(aDate);
+    });
   };
 
   return (

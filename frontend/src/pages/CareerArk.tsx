@@ -27,26 +27,11 @@ import { getUser, uploadCV } from '../api';
 import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience, addEducation, updateEducation, addTraining, updateTraining } from '../api/careerArkApi';
 import { useDisclosure } from '@chakra-ui/react';
 import { FiKey } from 'react-icons/fi';
-import dayjs from 'dayjs';
 
 const sectionTitles = {
   work_experience: 'Career History',
   education: 'Education',
   training: 'Training',
-};
-
-// Helper to parse dates for sorting
-const parseDate = (dateStr: string): dayjs.Dayjs => {
-  if (!dateStr) return dayjs(0);
-  // Try YYYY-MM-DD
-  let d = dayjs(dateStr, 'YYYY-MM-DD', true);
-  if (d.isValid()) return d;
-  // Try MMM YYYY
-  d = dayjs(dateStr, 'MMM YYYY', true);
-  if (d.isValid()) return d;
-  // Try fallback
-  d = dayjs(dateStr);
-  return d.isValid() ? d : dayjs(0);
 };
 
 const CareerArk: React.FC = () => {
@@ -284,9 +269,9 @@ const CareerArk: React.FC = () => {
   // Helper function to sort arrays by end_date
   const sortByEndDate = (arr: any[]): any[] => {
     return [...arr].sort((a, b) => {
-      const aDate = parseDate(a.end_date || a.start_date);
-      const bDate = parseDate(b.end_date || b.start_date);
-      return bDate.valueOf() - aDate.valueOf();
+      const aDate = a.end_date || a.start_date || '';
+      const bDate = b.end_date || b.start_date || '';
+      return bDate.localeCompare(aDate);
     });
   };
 
