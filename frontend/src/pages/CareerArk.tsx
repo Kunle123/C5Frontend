@@ -36,7 +36,7 @@ const sectionTitles = {
 };
 
 // Helper to parse dates for sorting
-const parseDate = (dateStr) => {
+const parseDate = (dateStr: string): dayjs.Dayjs => {
   if (!dateStr) return dayjs(0);
   // Try YYYY-MM-DD
   let d = dayjs(dateStr, 'YYYY-MM-DD', true);
@@ -282,7 +282,7 @@ const CareerArk: React.FC = () => {
   }, []);
 
   // Helper function to sort arrays by end_date
-  const sortByEndDate = (arr) => {
+  const sortByEndDate = (arr: any[]): any[] => {
     return [...arr].sort((a, b) => {
       const aDate = parseDate(a.end_date || a.start_date);
       const bDate = parseDate(b.end_date || b.start_date);

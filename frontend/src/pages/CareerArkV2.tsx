@@ -129,7 +129,7 @@ const CareerArkV2: React.FC = () => {
   }, [token]);
 
   // Helper to parse dates for sorting
-  const parseDate = (dateStr: string) => {
+  const parseDate = (dateStr: string): dayjs.Dayjs => {
     if (!dateStr) return dayjs(0);
     let d = dayjs(dateStr, 'YYYY-MM-DD', true);
     if (d.isValid()) return d;
@@ -139,7 +139,7 @@ const CareerArkV2: React.FC = () => {
     return d.isValid() ? d : dayjs(0);
   };
 
-  const sortByEndDate = (arr: any[]) => {
+  const sortByEndDate = (arr: any[]): any[] => {
     return [...arr].sort((a, b) => {
       const aDate = parseDate(a.end_date || a.start_date);
       const bDate = parseDate(b.end_date || b.start_date);
