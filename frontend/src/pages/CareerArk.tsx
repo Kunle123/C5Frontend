@@ -593,6 +593,13 @@ const CareerArk: React.FC = () => {
                     <Text fontSize="sm" color="gray.400">No details available.</Text>
                   )}
                 </VStack>
+                {Array.isArray(arcData?.skills) && arcData.skills.length > 0 ? (
+                  <Box as="ul" pl={4} mb={4}>
+                    {arcData.skills.map((s: string, i: number) => (
+                      <li key={i}><Text as="span">{s}</Text></li>
+                    ))}
+                  </Box>
+                ) : <Text color="gray.400">No skills found.</Text>}
               </Box>
             ) : (
               <Box as="form" w="100%" maxW="500px" mx="auto"
