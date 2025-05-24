@@ -147,6 +147,15 @@ const CareerArkV2: React.FC = () => {
     });
   };
 
+  // Helper to get details array from item
+  const getDetails = (item: any) => {
+    if (Array.isArray(item.details) && item.details.length > 0) return item.details;
+    if (typeof item.description === 'string' && item.description.trim().length > 0) {
+      return item.description.split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
   return (
     <Box minH="100vh" bg="gray.50" p={8}>
       <Box maxW="600px" mx="auto" bg="white" p={8} borderRadius="lg" boxShadow="md" mb={8}>
@@ -192,18 +201,16 @@ const CareerArkV2: React.FC = () => {
               <Heading size="sm" mb={2}>Work Experience</Heading>
               {Array.isArray(arcData.work_experience) && arcData.work_experience.length > 0 ? (
                 sortByEndDate(arcData.work_experience).map((item, idx) => (
-                  <Box key={idx} mb={3} p={3} borderRadius="md" bg="gray.50">
+                  <Box key={item.id || idx} mb={3} p={3} borderRadius="md" bg="gray.50">
                     <Text fontWeight="bold">{item.title} @ {item.company}</Text>
                     <Text fontSize="sm" color="gray.600">{item.start_date} - {item.end_date || 'Present'}</Text>
-                    {item.details && item.details.length > 0 ? (
+                    {getDetails(item).length > 0 && (
                       <ul style={{ marginLeft: 16 }}>
-                        {item.details.map((d: string, i: number) => (
+                        {getDetails(item).map((d: string, i: number) => (
                           <li key={i}><Text fontSize="sm">{d}</Text></li>
                         ))}
                       </ul>
-                    ) : item.description ? (
-                      <Text fontSize="sm">{item.description}</Text>
-                    ) : null}
+                    )}
                   </Box>
                 ))
               ) : <Text color="gray.400">No work experience found.</Text>}
@@ -213,18 +220,17 @@ const CareerArkV2: React.FC = () => {
               <Heading size="sm" mb={2}>Education</Heading>
               {Array.isArray(arcData.education) && arcData.education.length > 0 ? (
                 sortByEndDate(arcData.education).map((item: any, idx: number) => (
-                  <Box key={idx} mb={3} p={3} borderRadius="md" bg="gray.50">
+                  <Box key={item.id || idx} mb={3} p={3} borderRadius="md" bg="gray.50">
                     <Text fontWeight="bold">{item.degree} @ {item.institution}</Text>
                     <Text fontSize="sm" color="gray.600">{item.start_date} - {item.end_date || 'Present'}</Text>
-                    {item.details && item.details.length > 0 ? (
+                    {item.field && <Text fontSize="sm" color="gray.500">Field: {item.field}</Text>}
+                    {getDetails(item).length > 0 && (
                       <ul style={{ marginLeft: 16 }}>
-                        {item.details.map((d: string, i: number) => (
+                        {getDetails(item).map((d: string, i: number) => (
                           <li key={i}><Text fontSize="sm">{d}</Text></li>
                         ))}
                       </ul>
-                    ) : item.description ? (
-                      <Text fontSize="sm">{item.description}</Text>
-                    ) : null}
+                    )}
                   </Box>
                 ))
               ) : <Text color="gray.400">No education found.</Text>}
@@ -260,8 +266,8 @@ const CareerArkV2: React.FC = () => {
               <Heading size="sm" mb={2}>Projects</Heading>
               {Array.isArray(arcData.projects) && arcData.projects.length > 0 ? (
                 arcData.projects.map((item: any, idx: number) => (
-                  <Box key={idx} mb={3} p={3} borderRadius="md" bg="gray.50">
-                    <Text fontWeight="bold">{item.title}</Text>
+                  <Box key={item.id || idx} mb={3} p={3} borderRadius="md" bg="gray.50">
+                    <Text fontWeight="bold">{item.name || item.title}</Text>
                     <Text fontSize="sm" color="gray.600">{item.description}</Text>
                   </Box>
                 ))
@@ -272,9 +278,9 @@ const CareerArkV2: React.FC = () => {
               <Heading size="sm" mb={2}>Certifications</Heading>
               {Array.isArray(arcData.certifications) && arcData.certifications.length > 0 ? (
                 arcData.certifications.map((item: any, idx: number) => (
-                  <Box key={idx} mb={3} p={3} borderRadius="md" bg="gray.50">
-                    <Text fontWeight="bold">{item.name}</Text>
-                    <Text fontSize="sm" color="gray.600">{item.issuer} {item.date ? `(${item.date})` : ''}</Text>
+                  <Box key={item.id || idx} mb={3} p={3} borderRadius="md" bg="gray.50">
+                    <Text fontWeight="bold">{item.name || item.title}</Text>
+                    <Text fontSize="sm" color="gray.600">{item.issuer} {item.year ? `(${item.year})` : item.date ? `(${item.date})` : ''}</Text>
                   </Box>
                 ))
               ) : <Text color="gray.400">No certifications found.</Text>}
