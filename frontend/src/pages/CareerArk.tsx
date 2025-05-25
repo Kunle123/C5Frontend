@@ -215,14 +215,21 @@ const CareerArk: React.FC = () => {
     }
   };
 
-  // Update setEditFormFromEntry to handle all sections
+  // Update setEditFormFromEntry to robustly handle details for work experience
   const setEditFormFromEntry = (entry: any) => {
     if (selectedSection === 'work_experience') {
       setEditTitle(entry.title || entry.positionTitle || '');
       setEditCompany(entry.company || '');
       setEditStartDate(entry.start_date || entry.startDate || '');
       setEditEndDate(entry.end_date || entry.endDate || '');
-      setEditDetails((entry.details || []).join('\n'));
+      // Fix: join details array or fallback to description string
+      if (Array.isArray(entry.details)) {
+        setEditDetails(entry.details.join('\n'));
+      } else if (typeof entry.description === 'string') {
+        setEditDetails(entry.description);
+      } else {
+        setEditDetails('');
+      }
     } else if (selectedSection === 'education') {
       setEditInstitution(entry.institution || entry.institutionName || '');
       setEditDegree(entry.degree || '');
