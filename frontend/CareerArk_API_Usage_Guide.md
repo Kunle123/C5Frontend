@@ -61,6 +61,21 @@ All section endpoints follow this pattern:
 
 **Request/Response bodies** follow the section's schema (see OpenAPI docs or backend models).
 
+## Section Update/CRUD Endpoints
+- **PUT** `/section/{id}` — Full update (all fields required)
+- **PATCH** `/section/{id}` — Partial update (only changed fields required)
+- **PATCH** `/section/{id}/reorder` — Reorder operation
+
+### Example: Partial Update (PATCH)
+- **PATCH** `/work_experience/{id}`
+- **Body:**
+```json
+{
+  "title": "New Title"
+}
+```
+- Only the `title` field will be updated; all other fields remain unchanged.
+
 ---
 
 ## 3. Skills
