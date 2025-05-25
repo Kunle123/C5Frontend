@@ -324,20 +324,24 @@ const CareerArk: React.FC = () => {
                     <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" onClick={() => setSelectedIdx(null)} />
                   </HStack>
                   <VStack spacing={1} align="stretch">
-                    {sortByEndDateDesc(allSections[key]).map((item: any, idx: number) => (
-                      <Box
-                        key={item.id || idx}
-                        p={2}
-                        borderRadius="md"
-                        bg={selectedSection === key && selectedIdx === idx ? 'brand.100' : 'gray.50'}
-                        _hover={{ bg: 'brand.50', cursor: 'pointer' }}
-                        onClick={() => handleListItemClick(key, idx)}
-                      >
-                        <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
-                        <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
-                        <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
-                      </Box>
-                    ))}
+                    {allSections && Array.isArray(allSections[key]) && allSections[key].length > 0 ? (
+                      sortByEndDateDesc(allSections[key]).map((item: any, idx: number) => (
+                        <Box
+                          key={item.id || idx}
+                          p={2}
+                          borderRadius="md"
+                          bg={selectedSection === key && selectedIdx === idx ? 'brand.100' : 'gray.50'}
+                          _hover={{ bg: 'brand.50', cursor: 'pointer' }}
+                          onClick={() => handleListItemClick(key, idx)}
+                        >
+                          <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
+                          <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
+                          <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
+                        </Box>
+                      ))
+                    ) : (
+                      <Text color="gray.400">No entries yet. Import a CV to get started!</Text>
+                    )}
                   </VStack>
                 </Box>
               ))}
