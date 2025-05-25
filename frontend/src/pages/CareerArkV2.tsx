@@ -111,14 +111,22 @@ const CareerArkV2: React.FC = () => {
     setArcLoading(true);
     setArcError('');
     try {
-      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/data', {
+      const token = (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '';
+      // Fetch the user's profile
+      const profileRes = await fetch('/api/career-ark/profiles/me', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Failed to fetch Arc data');
+      if (!profileRes.ok) throw new Error('Failed to fetch profile');
+      const profile = await profileRes.json();
+      // Fetch all sections using the profileId
+      const res = await fetch(`/api/career-ark/profiles/${profile.id}/all_sections`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to fetch Ark data');
       const data = await res.json();
       setArcData(data);
     } catch (err: any) {
-      setArcError(err?.message || 'Failed to fetch Arc data');
+      setArcError(err?.message || 'Failed to fetch Ark data');
     } finally {
       setArcLoading(false);
     }
