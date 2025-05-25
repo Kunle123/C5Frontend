@@ -21,12 +21,18 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, ArrowBackIcon } from '@chakra-ui/icons';
 import { getUser, uploadCV } from '../api';
 import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience, addEducation, updateEducation, addTraining, updateTraining } from '../api/careerArkApi';
 import { useDisclosure } from '@chakra-ui/react';
 import { FiKey } from 'react-icons/fi';
+import { format, parse, isValid, compareDesc } from 'date-fns';
 
 const sectionTitles = {
   work_experience: 'Career History',
@@ -37,7 +43,7 @@ const sectionTitles = {
 const CareerArk: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<any>(null);
-  const [arcData, setArcData] = useState<any>(null);
+  const [allSections, setAllSections] = useState<any>(null);
   const [selectedSection, setSelectedSection] = useState<'work_experience' | 'education' | 'training'>('work_experience');
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -95,32 +101,40 @@ const CareerArk: React.FC = () => {
   const [editProvider, setEditProvider] = useState('');
   const [editTrainingDate, setEditTrainingDate] = useState('');
   const [editTrainingDetails, setEditTrainingDetails] = useState('');
+  const [profileId, setProfileId] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      getUser(token),
-      getArcData(),
-    ])
-      .then(([userData, arcData]) => {
+    getUser(token)
+      .then(userData => {
         setUser(userData);
-        setArcData(arcData);
+        // Assume userData.profile_id is available, otherwise fetch or set
+        setProfileId(userData.profile_id);
+        return fetch(`/api/career-ark/profiles/${userData.profile_id}/all_sections`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      })
+      .then(res => res.json())
+      .then(data => {
+        setAllSections(data);
         setError('');
       })
       .catch(() => setError('Failed to load data'))
       .finally(() => setLoading(false));
   }, [token]);
 
-  // Group items by type for left pane
-  const normalizeId = (entry: any) => ({
-    ...entry,
-    id: entry.id || entry._id || entry.uuid || entry.ID || null,
-  });
-  const grouped: Record<string, any[]> = {
-    work_experience: (arcData?.work_experience || []).map(normalizeId),
-    education: (arcData?.education || []).map(normalizeId),
-    training: (arcData?.training || []).map(normalizeId),
+  // Helper: robust date sort for work experience and education
+  const parseDate = (d: string) => {
+    if (!d) return new Date(0);
+    if (d === 'Present') return new Date(3000, 0, 1);
+    // Try MMM YYYY, YYYY, fallback
+    let parsed = parse(d, 'MMM yyyy', new Date());
+    if (!isValid(parsed)) parsed = parse(d, 'yyyy', new Date());
+    if (!isValid(parsed)) parsed = new Date(d);
+    return isValid(parsed) ? parsed : new Date(0);
   };
+  const sortByEndDateDesc = (arr: any[]) =>
+    [...arr].sort((a, b) => compareDesc(parseDate(a.end_date), parseDate(b.end_date)));
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -167,7 +181,7 @@ const CareerArk: React.FC = () => {
                   setSummary(statusData.extractedDataSummary || null);
                   // Refresh Ark data
                   const arcData = await getArcData();
-                  setArcData(arcData);
+                  setAllSections(arcData);
                   toast({ status: 'success', title: 'CV imported and Ark updated!' });
                 } else if (statusData.status === 'failed') {
                   setPolling(false);
@@ -225,8 +239,8 @@ const CareerArk: React.FC = () => {
 
   // When selectedIdx changes, reset edit state
   useEffect(() => {
-    if (selectedIdx !== null && grouped[selectedSection][selectedIdx]) {
-      const entry = grouped[selectedSection][selectedIdx];
+    if (selectedIdx !== null && allSections[selectedSection][selectedIdx]) {
+      const entry = allSections[selectedSection][selectedIdx];
       setEditFormFromEntry(entry);
       setEditError('');
       setEditLoading(false);
@@ -265,15 +279,6 @@ const CareerArk: React.FC = () => {
     } catch {}
     // eslint-disable-next-line
   }, []);
-
-  // Helper function to sort arrays by end_date
-  const sortByEndDate = (arr: any[]): any[] => {
-    return [...arr].sort((a, b) => {
-      const aDate = a.end_date || a.start_date || '';
-      const bDate = b.end_date || b.start_date || '';
-      return bDate.localeCompare(aDate);
-    });
-  };
 
   return (
     <Box minH="100vh" bg="gray.50">
@@ -319,7 +324,7 @@ const CareerArk: React.FC = () => {
                     <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" onClick={() => setSelectedIdx(null)} />
                   </HStack>
                   <VStack spacing={1} align="stretch">
-                    {sortByEndDate(grouped[key]).map((item: any, idx: number) => (
+                    {sortByEndDateDesc(allSections[key]).map((item: any, idx: number) => (
                       <Box
                         key={item.id || idx}
                         p={2}
@@ -348,12 +353,12 @@ const CareerArk: React.FC = () => {
             )}
             {loading ? (
               <Spinner />
-            ) : error && !arcData ? (
+            ) : error && !allSections ? (
               <Alert status="error" mb={4}>
                 <AlertIcon />
                 {error}
               </Alert>
-            ) : !error && arcData && Object.values(arcData).every(
+            ) : !error && allSections && Object.values(allSections).every(
               arr => Array.isArray(arr) && arr.length === 0
             ) ? (
               <Alert status="info" mb={4}>
@@ -367,7 +372,7 @@ const CareerArk: React.FC = () => {
                   setEditLoading(true);
                   setEditError('');
                   try {
-                    const entry = grouped[selectedSection][selectedIdx];
+                    const entry = allSections[selectedSection][selectedIdx];
                     if (!entry.id) {
                       setEditError('This entry is missing an ID and cannot be updated.');
                       setEditLoading(false);
@@ -381,7 +386,7 @@ const CareerArk: React.FC = () => {
                       details: editDetails.split('\n').map(s => s.trim()).filter(Boolean),
                     });
                     const arcData = await getArcData();
-                    setArcData(arcData);
+                    setAllSections(arcData);
                     setEditMode(false);
                     toast({ status: 'success', title: 'Work experience updated!' });
                   } catch (err: any) {
@@ -459,7 +464,7 @@ const CareerArk: React.FC = () => {
                   setEditLoading(true);
                   setEditError('');
                   try {
-                    const entry = grouped[selectedSection][selectedIdx];
+                    const entry = allSections[selectedSection][selectedIdx];
                     if (!entry.id) {
                       setEditError('This entry is missing an ID and cannot be updated.');
                       setEditLoading(false);
@@ -473,7 +478,7 @@ const CareerArk: React.FC = () => {
                       details: editEduDetails.split('\n').map(s => s.trim()).filter(Boolean),
                     });
                     const arcData = await getArcData();
-                    setArcData(arcData);
+                    setAllSections(arcData);
                     setEditMode(false);
                     toast({ status: 'success', title: 'Education updated!' });
                   } catch (err: any) {
@@ -519,7 +524,7 @@ const CareerArk: React.FC = () => {
                   setEditLoading(true);
                   setEditError('');
                   try {
-                    const entry = grouped[selectedSection][selectedIdx];
+                    const entry = allSections[selectedSection][selectedIdx];
                     if (!entry.id) {
                       setEditError('This entry is missing an ID and cannot be updated.');
                       setEditLoading(false);
@@ -532,7 +537,7 @@ const CareerArk: React.FC = () => {
                       details: editTrainingDetails.split('\n').map(s => s.trim()).filter(Boolean),
                     });
                     const arcData = await getArcData();
-                    setArcData(arcData);
+                    setAllSections(arcData);
                     setEditMode(false);
                     toast({ status: 'success', title: 'Training updated!' });
                   } catch (err: any) {
@@ -567,35 +572,35 @@ const CareerArk: React.FC = () => {
                   </HStack>
                 </VStack>
               </Box>
-            ) : selectedIdx !== null && grouped[selectedSection][selectedIdx] ? (
+            ) : selectedIdx !== null && allSections[selectedSection][selectedIdx] ? (
               <Box>
                 <HStack justify="space-between" align="center" mb={2}>
-                  <Heading size="lg" mb={1}>{grouped[selectedSection][selectedIdx].title || grouped[selectedSection][selectedIdx].positionTitle || grouped[selectedSection][selectedIdx].degree || grouped[selectedSection][selectedIdx].name}</Heading>
+                  <Heading size="lg" mb={1}>{allSections[selectedSection][selectedIdx].title || allSections[selectedSection][selectedIdx].positionTitle || allSections[selectedSection][selectedIdx].degree || allSections[selectedSection][selectedIdx].name}</Heading>
                   <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => {
-                    const entry = grouped[selectedSection][selectedIdx];
+                    const entry = allSections[selectedSection][selectedIdx];
                     setEditFormFromEntry(entry);
                     setEditMode(true);
                   }} />
                 </HStack>
-                {grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org ? (
-                  <Text fontWeight="semibold" color="gray.700" mb={1}>{grouped[selectedSection][selectedIdx].company || grouped[selectedSection][selectedIdx].institution || grouped[selectedSection][selectedIdx].org}</Text>
+                {allSections[selectedSection][selectedIdx].company || allSections[selectedSection][selectedIdx].institution || allSections[selectedSection][selectedIdx].org ? (
+                  <Text fontWeight="semibold" color="gray.700" mb={1}>{allSections[selectedSection][selectedIdx].company || allSections[selectedSection][selectedIdx].institution || allSections[selectedSection][selectedIdx].org}</Text>
                 ) : null}
-                <Text fontSize="sm" color="gray.500" mb={4}>{grouped[selectedSection][selectedIdx].start_date || grouped[selectedSection][selectedIdx].startDate || ''} - {grouped[selectedSection][selectedIdx].end_date || grouped[selectedSection][selectedIdx].endDate || ''}</Text>
+                <Text fontSize="sm" color="gray.500" mb={4}>{allSections[selectedSection][selectedIdx].start_date || allSections[selectedSection][selectedIdx].startDate || ''} - {allSections[selectedSection][selectedIdx].end_date || allSections[selectedSection][selectedIdx].endDate || ''}</Text>
                 <Divider mb={4} />
                 <VStack align="start" spacing={3}>
-                  {grouped[selectedSection][selectedIdx].details && grouped[selectedSection][selectedIdx].details.length > 0 ? (
-                    grouped[selectedSection][selectedIdx].details.map((d: string, i: number) => (
+                  {allSections[selectedSection][selectedIdx].details && allSections[selectedSection][selectedIdx].details.length > 0 ? (
+                    allSections[selectedSection][selectedIdx].details.map((d: string, i: number) => (
                       <Text as="li" key={i} ml={4} fontSize="md">{d}</Text>
                     ))
-                  ) : grouped[selectedSection][selectedIdx].description ? (
-                    <Text fontSize="md">{grouped[selectedSection][selectedIdx].description}</Text>
+                  ) : allSections[selectedSection][selectedIdx].description ? (
+                    <Text fontSize="md">{allSections[selectedSection][selectedIdx].description}</Text>
                   ) : (
                     <Text fontSize="sm" color="gray.400">No details available.</Text>
                   )}
                 </VStack>
-                {Array.isArray(arcData?.skills) && arcData.skills.length > 0 ? (
+                {Array.isArray(allSections.skills) && allSections.skills.length > 0 ? (
                   <Box as="ul" pl={4} mb={4}>
-                    {arcData.skills.map((s: string, i: number) => (
+                    {allSections.skills.map((s: string, i: number) => (
                       <li key={i}><Text as="span">{s}</Text></li>
                     ))}
                   </Box>
@@ -634,7 +639,7 @@ const CareerArk: React.FC = () => {
                     }
                     // Refresh data
                     const arcData = await getArcData();
-                    setArcData(arcData);
+                    setAllSections(arcData);
                     // Reset all add form state
                     setAddTitle(''); setAddCompany(''); setAddStartDate(''); setAddEndDate(''); setAddDetails('');
                     setAddInstitution(''); setAddDegree(''); setAddEduStartDate(''); setAddEduEndDate(''); setAddEduDetails('');
