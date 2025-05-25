@@ -358,9 +358,9 @@ const CareerArk: React.FC = () => {
             {loading ? (
               <Spinner />
             ) : error && !allSections ? (
-              <Alert status="error" mb={4}>
+              <Alert status="info" mb={4}>
                 <AlertIcon />
-                {error}
+                Your Career Ark is empty. Import a CV or add entries to get started!
               </Alert>
             ) : !error && allSections && Object.values(allSections).every(
               arr => Array.isArray(arr) && arr.length === 0
@@ -602,13 +602,6 @@ const CareerArk: React.FC = () => {
                     <Text fontSize="sm" color="gray.400">No details available.</Text>
                   )}
                 </VStack>
-                {Array.isArray(allSections.skills) && allSections.skills.length > 0 ? (
-                  <Box as="ul" pl={4} mb={4}>
-                    {allSections.skills.map((s: string, i: number) => (
-                      <li key={i}><Text as="span">{s}</Text></li>
-                    ))}
-                  </Box>
-                ) : <Text color="gray.400">No skills found.</Text>}
               </Box>
             ) : (
               <Box as="form" w="100%" maxW="500px" mx="auto"
