@@ -19,13 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { uploadCV, getCVStatus } from '../api/careerArkApi';
 
-const DEBUG_STAGES = [
-  { key: 'text', label: 'Raw Extracted Text', endpoint: '/api/arc/cv/text/' },
-  { key: 'ai-raw', label: 'Raw AI Output', endpoint: '/api/arc/cv/ai-raw/' },
-  { key: 'ai-combined', label: 'Combined AI Output', endpoint: '/api/arc/cv/ai-combined/' },
-  { key: 'ai-filtered', label: 'Filtered AI Output', endpoint: '/api/arc/cv/ai-filtered/' },
-  { key: 'arcdata', label: 'Final ArcData', endpoint: '/api/arc/cv/arcdata/' },
-];
+const DEBUG_STAGES: any[] = [];
 
 const API_BASE = 'https://api-gw-production.up.railway.app';
 
@@ -146,25 +140,26 @@ const DebugCVAIResponse: React.FC = () => {
     setChunkTestRaw(null);
     setChunkTestFullResponse(null);
     try {
-      const token = localStorage.getItem('token') || '';
-      const res = await fetch(`${API_BASE}/api/arc/chunk`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text: chunkText }),
-      });
-      if (!res.ok) {
-        let errMsg = await res.text();
-        setChunkTestResult({ error: errMsg });
-        setChunkTestFullResponse({ error: errMsg });
-      } else {
-        const data = await res.json();
-        setChunkTestResult(data.parsed || data.parsed_json || null);
-        setChunkTestRaw(data.raw || data.raw_ai_response || null);
-        setChunkTestFullResponse(data);
-      }
+      // Remove or comment out fetch calls to /api/arc/chunk and any other /api/arc/ endpoints
+      // const token = localStorage.getItem('token') || '';
+      // const res = await fetch(`${API_BASE}/api/arc/chunk`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Authorization': `Bearer ${token}`,
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ text: chunkText }),
+      // });
+      // if (!res.ok) {
+      //   let errMsg = await res.text();
+      //   setChunkTestResult({ error: errMsg });
+      //   setChunkTestFullResponse({ error: errMsg });
+      // } else {
+      //   const data = await res.json();
+      //   setChunkTestResult(data.parsed || data.parsed_json || null);
+      //   setChunkTestRaw(data.raw || data.raw_ai_response || null);
+      //   setChunkTestFullResponse(data);
+      // }
     } catch (err: any) {
       setChunkTestResult({ error: err?.message || 'Failed to test chunk.' });
       setChunkTestFullResponse({ error: err?.message || 'Failed to test chunk.' });

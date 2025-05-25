@@ -44,7 +44,7 @@ const CareerArkV2: React.FC = () => {
       const formData = new FormData();
       formData.append('file', file);
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'https://api-gw-production.up.railway.app/api/arc/cv', true);
+      xhr.open('POST', 'https://api-gw-production.up.railway.app/api/career-ark/cv', true);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
@@ -63,7 +63,7 @@ const CareerArkV2: React.FC = () => {
             let pollCount = 0;
             const poll = async () => {
               try {
-                const res = await fetch(`https://api-gw-production.up.railway.app/api/arc/cv/status/${data.taskId}`, {
+                const res = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/cv/status/${data.taskId}`, {
                   headers: { Authorization: `Bearer ${token}` },
                 });
                 const statusData = await res.json();
@@ -111,7 +111,7 @@ const CareerArkV2: React.FC = () => {
     setArcLoading(true);
     setArcError('');
     try {
-      const res = await fetch('https://api-gw-production.up.railway.app/api/arc/data', {
+      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/data', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch Arc data');
