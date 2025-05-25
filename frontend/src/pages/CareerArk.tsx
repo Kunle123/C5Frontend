@@ -776,161 +776,318 @@ const CareerArk: React.FC = () => {
           )}
         </>
       )}
-      <AccordionItem>
-        <AccordionButton>
-          <Box flex="1" textAlign="left">Projects</Box>
-          <AccordionIcon />
-        </AccordionButton>
-        <AccordionPanel pb={4}>
-          {/* Add Project Form */}
-          <Box mb={4}>
-            <form onSubmit={async (e) => {
-              e.preventDefault();
-              if (!profileId || !addTitle.trim()) return;
-              setAddLoading(true);
-              setAddError('');
-              try {
-                const res = await fetch(`/api/career-ark/profiles/${profileId}/projects`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                  },
-                  body: JSON.stringify({ name: addTitle.trim(), description: addDetails.trim() }),
-                });
-                if (!res.ok) throw new Error('Failed to add project');
-                // Refresh projects
-                const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
-                  headers: { Authorization: `Bearer ${token}` },
-                }).then(r => r.json());
-                setAllSections(updated);
-                setAddTitle('');
-                setAddDetails('');
-                toast({ status: 'success', title: 'Project added!' });
-              } catch (err: any) {
-                setAddError(err?.message || 'Failed to add project');
-              } finally {
-                setAddLoading(false);
-              }
-            }}>
-              <VStack align="start" spacing={2}>
-                <input
-                  style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                  placeholder="Project name"
-                  value={addTitle}
-                  onChange={e => setAddTitle(e.target.value)}
-                  required
-                />
-                <textarea
-                  style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 60 }}
-                  placeholder="Description"
-                  value={addDetails}
-                  onChange={e => setAddDetails(e.target.value)}
-                />
-                <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle.trim()}>Add</Button>
-                {addError && <Text color="red.500">{addError}</Text>}
-              </VStack>
-            </form>
-          </Box>
-          {/* Projects List */}
-          {allSections && Array.isArray(allSections.projects) && allSections.projects.length > 0 ? (
-            <VStack align="start" spacing={2}>
-              {allSections.projects.map((project: any, idx: number) => (
-                <HStack key={project.id || idx} w="100%">
-                  <Box flex={1}>
-                    <Text fontWeight="semibold">{project.name}</Text>
-                    <Text fontSize="sm" color="gray.600">{project.description}</Text>
-                  </Box>
-                  <Button size="xs" onClick={() => {
-                    setEditMode(true);
-                    setEditTitle(project.name);
-                    setEditDetails(project.description);
-                    setSelectedIdx(idx);
-                  }}>Edit</Button>
-                  <Button size="xs" colorScheme="red" onClick={async () => {
-                    if (!project.id) return;
-                    setEditLoading(true);
-                    try {
-                      const res = await fetch(`/api/career-ark/projects/${project.id}`, {
-                        method: 'DELETE',
-                        headers: { Authorization: `Bearer ${token}` },
-                      });
-                      if (!res.ok) throw new Error('Failed to delete project');
-                      // Refresh projects
-                      const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                      }).then(r => r.json());
-                      setAllSections(updated);
-                      toast({ status: 'success', title: 'Project deleted!' });
-                    } catch (err: any) {
-                      toast({ status: 'error', title: err?.message || 'Failed to delete project' });
-                    } finally {
-                      setEditLoading(false);
-                    }
-                  }}>Delete</Button>
-                </HStack>
-              ))}
-            </VStack>
-          ) : (
-            <Text color="gray.400">No projects yet. You can add projects above.</Text>
-          )}
-          {/* Edit Project Inline */}
-          {editMode && selectedIdx !== null && allSections && allSections.projects[selectedIdx] && (
-            <Box mt={4}>
+      <Accordion allowMultiple>
+        <AccordionItem>
+          <AccordionButton>
+            <Box flex="1" textAlign="left">Skills</Box>
+            <AccordionIcon />
+          </AccordionButton>
+          <AccordionPanel pb={4}>
+            {/* Add Skill Form */}
+            <Box mb={4}>
               <form onSubmit={async (e) => {
                 e.preventDefault();
-                if (!allSections.projects[selectedIdx].id || !editTitle.trim()) return;
-                setEditLoading(true);
-                setEditError('');
+                if (!profileId || !addTitle.trim()) return;
+                setAddLoading(true);
+                setAddError('');
                 try {
-                  const res = await fetch(`/api/career-ark/projects/${allSections.projects[selectedIdx].id}`, {
-                    method: 'PUT',
+                  const res = await fetch(`/api/career-ark/profiles/${profileId}/skills`, {
+                    method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
                       'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ name: editTitle.trim(), description: editDetails.trim() }),
+                    body: JSON.stringify({ name: addTitle.trim(), description: addDetails.trim() }),
                   });
-                  if (!res.ok) throw new Error('Failed to update project');
-                  // Refresh projects
+                  if (!res.ok) throw new Error('Failed to add skill');
+                  // Refresh skills
                   const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
                     headers: { Authorization: `Bearer ${token}` },
                   }).then(r => r.json());
                   setAllSections(updated);
-                  setEditMode(false);
-                  setEditTitle('');
-                  setEditDetails('');
-                  setSelectedIdx(null);
-                  toast({ status: 'success', title: 'Project updated!' });
+                  setAddTitle('');
+                  setAddDetails('');
+                  toast({ status: 'success', title: 'Skill added!' });
                 } catch (err: any) {
-                  setEditError(err?.message || 'Failed to update project');
+                  setAddError(err?.message || 'Failed to add skill');
                 } finally {
-                  setEditLoading(false);
+                  setAddLoading(false);
                 }
               }}>
                 <VStack align="start" spacing={2}>
                   <input
                     style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="Edit project name"
-                    value={editTitle}
-                    onChange={e => setEditTitle(e.target.value)}
+                    placeholder="Skill name"
+                    value={addTitle}
+                    onChange={e => setAddTitle(e.target.value)}
                     required
                   />
                   <textarea
                     style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 60 }}
-                    placeholder="Edit description"
-                    value={editDetails}
-                    onChange={e => setEditDetails(e.target.value)}
+                    placeholder="Description"
+                    value={addDetails}
+                    onChange={e => setAddDetails(e.target.value)}
                   />
-                  <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle.trim()}>Save</Button>
-                  <Button onClick={() => { setEditMode(false); setEditTitle(''); setEditDetails(''); setSelectedIdx(null); }} isDisabled={editLoading}>Cancel</Button>
-                  {editError && <Text color="red.500">{editError}</Text>}
+                  <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle.trim()}>Add</Button>
+                  {addError && <Text color="red.500">{addError}</Text>}
                 </VStack>
               </form>
             </Box>
-          )}
-        </AccordionPanel>
-      </AccordionItem>
+            {/* Skills List and Edit Skill Inline */}
+            {allSections && Array.isArray(allSections.skills) && allSections.skills.length > 0 ? (
+              <VStack align="start" spacing={2}>
+                {allSections.skills.map((skill: any, idx: number) => (
+                  <HStack key={skill.id || idx} w="100%">
+                    <Box flex={1}>
+                      <Text fontWeight="semibold">{skill.name}</Text>
+                      <Text fontSize="sm" color="gray.600">{skill.description}</Text>
+                    </Box>
+                    <Button size="xs" onClick={() => {
+                      setEditMode(true);
+                      setEditTitle(skill.name);
+                      setEditDetails(skill.description);
+                      setSelectedIdx(idx);
+                    }}>Edit</Button>
+                    <Button size="xs" colorScheme="red" onClick={async () => {
+                      if (!skill.id) return;
+                      setEditLoading(true);
+                      try {
+                        const res = await fetch(`/api/career-ark/skills/${skill.id}`, {
+                          method: 'DELETE',
+                          headers: { Authorization: `Bearer ${token}` },
+                        });
+                        if (!res.ok) throw new Error('Failed to delete skill');
+                        // Refresh skills
+                        const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                          headers: { Authorization: `Bearer ${token}` },
+                        }).then(r => r.json());
+                        setAllSections(updated);
+                        toast({ status: 'success', title: 'Skill deleted!' });
+                      } catch (err: any) {
+                        toast({ status: 'error', title: err?.message || 'Failed to delete skill' });
+                      } finally {
+                        setEditLoading(false);
+                      }
+                    }}>Delete</Button>
+                  </HStack>
+                ))}
+              </VStack>
+            ) : (
+              <Text color="gray.400">No skills yet. You can add skills above.</Text>
+            )}
+            {/* Edit Skill Inline */}
+            {editMode && selectedIdx !== null && allSections && allSections.skills[selectedIdx] && (
+              <Box mt={4}>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!allSections.skills[selectedIdx].id || !editTitle.trim()) return;
+                  setEditLoading(true);
+                  setEditError('');
+                  try {
+                    const res = await fetch(`/api/career-ark/skills/${allSections.skills[selectedIdx].id}`, {
+                      method: 'PUT',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ name: editTitle.trim(), description: editDetails.trim() }),
+                    });
+                    if (!res.ok) throw new Error('Failed to update skill');
+                    // Refresh skills
+                    const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                      headers: { Authorization: `Bearer ${token}` },
+                    }).then(r => r.json());
+                    setAllSections(updated);
+                    setEditMode(false);
+                    setEditTitle('');
+                    setEditDetails('');
+                    setSelectedIdx(null);
+                    toast({ status: 'success', title: 'Skill updated!' });
+                  } catch (err: any) {
+                    setEditError(err?.message || 'Failed to update skill');
+                  } finally {
+                    setEditLoading(false);
+                  }
+                }}>
+                  <VStack align="start" spacing={2}>
+                    <input
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="Edit skill name"
+                      value={editTitle}
+                      onChange={e => setEditTitle(e.target.value)}
+                      required
+                    />
+                    <textarea
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 60 }}
+                      placeholder="Edit description"
+                      value={editDetails}
+                      onChange={e => setEditDetails(e.target.value)}
+                    />
+                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle.trim()}>Save</Button>
+                    <Button onClick={() => { setEditMode(false); setEditTitle(''); setEditDetails(''); setSelectedIdx(null); }} isDisabled={editLoading}>Cancel</Button>
+                    {editError && <Text color="red.500">{editError}</Text>}
+                  </VStack>
+                </form>
+              </Box>
+            )}
+          </AccordionPanel>
+        </AccordionItem>
+        <AccordionItem>
+          <AccordionButton>
+            <Box flex="1" textAlign="left">Projects</Box>
+            <AccordionIcon />
+          </AccordionButton>
+          <AccordionPanel pb={4}>
+            {/* Add Project Form */}
+            <Box mb={4}>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                if (!profileId || !addTitle.trim()) return;
+                setAddLoading(true);
+                setAddError('');
+                try {
+                  const res = await fetch(`/api/career-ark/profiles/${profileId}/projects`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ name: addTitle.trim(), description: addDetails.trim() }),
+                  });
+                  if (!res.ok) throw new Error('Failed to add project');
+                  // Refresh projects
+                  const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }).then(r => r.json());
+                  setAllSections(updated);
+                  setAddTitle('');
+                  setAddDetails('');
+                  toast({ status: 'success', title: 'Project added!' });
+                } catch (err: any) {
+                  setAddError(err?.message || 'Failed to add project');
+                } finally {
+                  setAddLoading(false);
+                }
+              }}>
+                <VStack align="start" spacing={2}>
+                  <input
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="Project name"
+                    value={addTitle}
+                    onChange={e => setAddTitle(e.target.value)}
+                    required
+                  />
+                  <textarea
+                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 60 }}
+                    placeholder="Description"
+                    value={addDetails}
+                    onChange={e => setAddDetails(e.target.value)}
+                  />
+                  <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle.trim()}>Add</Button>
+                  {addError && <Text color="red.500">{addError}</Text>}
+                </VStack>
+              </form>
+            </Box>
+            {/* Projects List and Edit Project Inline */}
+            {allSections && Array.isArray(allSections.projects) && allSections.projects.length > 0 ? (
+              <VStack align="start" spacing={2}>
+                {allSections.projects.map((project: any, idx: number) => (
+                  <HStack key={project.id || idx} w="100%">
+                    <Box flex={1}>
+                      <Text fontWeight="semibold">{project.name}</Text>
+                      <Text fontSize="sm" color="gray.600">{project.description}</Text>
+                    </Box>
+                    <Button size="xs" onClick={() => {
+                      setEditMode(true);
+                      setEditTitle(project.name);
+                      setEditDetails(project.description);
+                      setSelectedIdx(idx);
+                    }}>Edit</Button>
+                    <Button size="xs" colorScheme="red" onClick={async () => {
+                      if (!project.id) return;
+                      setEditLoading(true);
+                      try {
+                        const res = await fetch(`/api/career-ark/projects/${project.id}`, {
+                          method: 'DELETE',
+                          headers: { Authorization: `Bearer ${token}` },
+                        });
+                        if (!res.ok) throw new Error('Failed to delete project');
+                        // Refresh projects
+                        const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                          headers: { Authorization: `Bearer ${token}` },
+                        }).then(r => r.json());
+                        setAllSections(updated);
+                        toast({ status: 'success', title: 'Project deleted!' });
+                      } catch (err: any) {
+                        toast({ status: 'error', title: err?.message || 'Failed to delete project' });
+                      } finally {
+                        setEditLoading(false);
+                      }
+                    }}>Delete</Button>
+                  </HStack>
+                ))}
+              </VStack>
+            ) : (
+              <Text color="gray.400">No projects yet. You can add projects above.</Text>
+            )}
+            {/* Edit Project Inline */}
+            {editMode && selectedIdx !== null && allSections && allSections.projects[selectedIdx] && (
+              <Box mt={4}>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!allSections.projects[selectedIdx].id || !editTitle.trim()) return;
+                  setEditLoading(true);
+                  setEditError('');
+                  try {
+                    const res = await fetch(`/api/career-ark/projects/${allSections.projects[selectedIdx].id}`, {
+                      method: 'PUT',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ name: editTitle.trim(), description: editDetails.trim() }),
+                    });
+                    if (!res.ok) throw new Error('Failed to update project');
+                    // Refresh projects
+                    const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                      headers: { Authorization: `Bearer ${token}` },
+                    }).then(r => r.json());
+                    setAllSections(updated);
+                    setEditMode(false);
+                    setEditTitle('');
+                    setEditDetails('');
+                    setSelectedIdx(null);
+                    toast({ status: 'success', title: 'Project updated!' });
+                  } catch (err: any) {
+                    setEditError(err?.message || 'Failed to update project');
+                  } finally {
+                    setEditLoading(false);
+                  }
+                }}>
+                  <VStack align="start" spacing={2}>
+                    <input
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                      placeholder="Edit project name"
+                      value={editTitle}
+                      onChange={e => setEditTitle(e.target.value)}
+                      required
+                    />
+                    <textarea
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 60 }}
+                      placeholder="Edit description"
+                      value={editDetails}
+                      onChange={e => setEditDetails(e.target.value)}
+                    />
+                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle.trim()}>Save</Button>
+                    <Button onClick={() => { setEditMode(false); setEditTitle(''); setEditDetails(''); setSelectedIdx(null); }} isDisabled={editLoading}>Cancel</Button>
+                    {editError && <Text color="red.500">{editError}</Text>}
+                  </VStack>
+                </form>
+              </Box>
+            )}
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
     </Box>
   );
 };
