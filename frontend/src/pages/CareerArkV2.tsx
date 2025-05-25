@@ -44,7 +44,9 @@ const CareerArkV2: React.FC = () => {
       const formData = new FormData();
       formData.append('file', file);
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'https://api-gw-production.up.railway.app/api/career-ark/cv', true);
+      const profileRes = await fetch('/api/career-ark/profiles/me', { headers: { Authorization: `Bearer ${token}` } });
+      const profile = await profileRes.json();
+      xhr.open('POST', `/api/career-ark/profiles/${profile.id}/cv`, true);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {

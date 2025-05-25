@@ -15,11 +15,18 @@ export async function healthCheck() {
 
 // 2. Upload CV
 export async function uploadCV(file: File) {
+  const token = localStorage.getItem('token') || '';
+  // Fetch the user's profile to get profileId
+  const profileRes = await fetch('/api/career-ark/profiles/me', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!profileRes.ok) throw new Error('Failed to fetch profile');
+  const profile = await profileRes.json();
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/cv`, {
+  const res = await fetch(`/api/career-ark/profiles/${profile.id}/cv`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
   if (!res.ok) throw await res.json().catch(() => new Error('Upload failed'));
