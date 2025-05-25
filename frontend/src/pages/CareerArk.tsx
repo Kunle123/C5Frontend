@@ -40,6 +40,8 @@ const sectionTitles = {
   training: 'Training',
 };
 
+const API_GATEWAY_BASE = 'https://api-gw-production.up.railway.app';
+
 const CareerArk: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<any>(null);
@@ -166,15 +168,22 @@ const CareerArk: React.FC = () => {
     setSummary(null);
     setUploadProgress(10);
     try {
-      // Use XMLHttpRequest for progress
+      const token = localStorage.getItem('token') || '';
+      // Always fetch the profile just before upload
+      const profileRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!profileRes.ok) throw new Error('Failed to fetch profile');
+      const profile = await profileRes.json();
+      if (!profile.id) throw new Error('Profile ID missing');
       const formData = new FormData();
       formData.append('file', file);
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', `/api/career-ark/profiles/${profileId}/cv`, true);
+      xhr.open('POST', `${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/cv`, true);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
-          setUploadProgress(Math.round((event.loaded / event.total) * 60)); // up to 60%
+          setUploadProgress(Math.round((event.loaded / event.total) * 60));
         }
       };
       xhr.onreadystatechange = async () => {
@@ -202,7 +211,7 @@ const CareerArk: React.FC = () => {
                 } else if (statusData.status === 'failed') {
                   setPolling(false);
                   setUploadError('CV extraction failed.');
-                } else if (pollCount < 30) { // poll up to 1 minute
+                } else if (pollCount < 30) {
                   setTimeout(poll, 2000);
                   pollCount++;
                   setUploadProgress(70 + Math.min(30, pollCount));
@@ -820,7 +829,7 @@ const CareerArk: React.FC = () => {
                 setAddLoading(true);
                 setAddError('');
                 try {
-                  const res = await fetch(`/api/career-ark/profiles/${profileId}/skills`, {
+                  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/skills`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -830,7 +839,7 @@ const CareerArk: React.FC = () => {
                   });
                   if (!res.ok) throw new Error('Failed to add skill');
                   // Refresh skills
-                  const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                  const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
                     headers: { Authorization: `Bearer ${token}` },
                   }).then(r => r.json());
                   setAllSections(updated);
@@ -881,13 +890,13 @@ const CareerArk: React.FC = () => {
                       if (!skill.id) return;
                       setEditLoading(true);
                       try {
-                        const res = await fetch(`/api/career-ark/skills/${skill.id}`, {
+                        const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/skills/${skill.id}`, {
                           method: 'DELETE',
                           headers: { Authorization: `Bearer ${token}` },
                         });
                         if (!res.ok) throw new Error('Failed to delete skill');
                         // Refresh skills
-                        const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                        const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
                           headers: { Authorization: `Bearer ${token}` },
                         }).then(r => r.json());
                         setAllSections(updated);
@@ -913,7 +922,7 @@ const CareerArk: React.FC = () => {
                   setEditLoading(true);
                   setEditError('');
                   try {
-                    const res = await fetch(`/api/career-ark/skills/${allSections.skills[selectedIdx].id}`, {
+                    const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/skills/${allSections.skills[selectedIdx].id}`, {
                       method: 'PUT',
                       headers: {
                         'Content-Type': 'application/json',
@@ -923,7 +932,7 @@ const CareerArk: React.FC = () => {
                     });
                     if (!res.ok) throw new Error('Failed to update skill');
                     // Refresh skills
-                    const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                    const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
                       headers: { Authorization: `Bearer ${token}` },
                     }).then(r => r.json());
                     setAllSections(updated);
@@ -975,7 +984,7 @@ const CareerArk: React.FC = () => {
                 setAddLoading(true);
                 setAddError('');
                 try {
-                  const res = await fetch(`/api/career-ark/profiles/${profileId}/projects`, {
+                  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/projects`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -985,7 +994,7 @@ const CareerArk: React.FC = () => {
                   });
                   if (!res.ok) throw new Error('Failed to add project');
                   // Refresh projects
-                  const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                  const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
                     headers: { Authorization: `Bearer ${token}` },
                   }).then(r => r.json());
                   setAllSections(updated);
@@ -1036,13 +1045,13 @@ const CareerArk: React.FC = () => {
                       if (!project.id) return;
                       setEditLoading(true);
                       try {
-                        const res = await fetch(`/api/career-ark/projects/${project.id}`, {
+                        const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/projects/${project.id}`, {
                           method: 'DELETE',
                           headers: { Authorization: `Bearer ${token}` },
                         });
                         if (!res.ok) throw new Error('Failed to delete project');
                         // Refresh projects
-                        const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                        const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
                           headers: { Authorization: `Bearer ${token}` },
                         }).then(r => r.json());
                         setAllSections(updated);
@@ -1068,7 +1077,7 @@ const CareerArk: React.FC = () => {
                   setEditLoading(true);
                   setEditError('');
                   try {
-                    const res = await fetch(`/api/career-ark/projects/${allSections.projects[selectedIdx].id}`, {
+                    const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/projects/${allSections.projects[selectedIdx].id}`, {
                       method: 'PUT',
                       headers: {
                         'Content-Type': 'application/json',
@@ -1078,7 +1087,7 @@ const CareerArk: React.FC = () => {
                     });
                     if (!res.ok) throw new Error('Failed to update project');
                     // Refresh projects
-                    const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                    const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
                       headers: { Authorization: `Bearer ${token}` },
                     }).then(r => r.json());
                     setAllSections(updated);
