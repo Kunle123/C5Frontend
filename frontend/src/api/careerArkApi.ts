@@ -37,26 +37,34 @@ export async function getCVStatus(taskId: string) {
 
 // 4. Get Arc Data
 export async function getArcData() {
-  const res = await fetch(`${API_BASE}/data`, {
-    headers: getAuthHeaders(),
+  const token = localStorage.getItem('token') || '';
+  // Fetch the user's profile
+  const profileRes = await fetch('/api/career-ark/profiles/me', {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to fetch Arc data'));
+  if (!profileRes.ok) throw new Error('Failed to fetch profile');
+  const profile = await profileRes.json();
+  // Fetch all sections using the profileId
+  const res = await fetch(`/api/career-ark/profiles/${profile.id}/all_sections`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to fetch Ark data');
   return res.json();
 }
 
 // 5. Update Arc Data
-export async function updateArcData(data: any) {
-  const res = await fetch(`${API_BASE}/data`, {
-    method: 'PUT',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update Arc data'));
-  return res.json();
-}
+// export async function updateArcData(data: any) {
+//   const res = await fetch(`${API_BASE}/data`, {
+//     method: 'PUT',
+//     headers: {
+//       ...getAuthHeaders(),
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify(data),
+//   });
+//   if (!res.ok) throw await res.json().catch(() => new Error('Failed to update Arc data'));
+//   return res.json();
+// }
 
 // 6. Generate Application Materials
 export async function generateApplicationMaterials(jobAdvert: string, arcData: any) {
