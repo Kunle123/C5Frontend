@@ -45,7 +45,7 @@ const CareerArk: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [allSections, setAllSections] = useState<any>(null);
   const [selectedSection, setSelectedSection] = useState<'work_experience' | 'education' | 'training'>('work_experience');
-  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [selectedIdx, setSelectedIdx] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -246,11 +246,15 @@ const CareerArk: React.FC = () => {
 
   // When selectedIdx changes, reset edit state
   useEffect(() => {
-    if (selectedIdx !== null && allSections[selectedSection][selectedIdx]) {
-      const entry = allSections[selectedSection][selectedIdx];
-      setEditFormFromEntry(entry);
-      setEditError('');
-      setEditLoading(false);
+    if (selectedIdx !== null && allSections[selectedSection]) {
+      const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
+      if (entry) {
+        setEditFormFromEntry(entry);
+        setEditError('');
+        setEditLoading(false);
+      } else {
+        // setEditMode(false);
+      }
     } else {
       // setEditMode(false);
     }
@@ -258,9 +262,9 @@ const CareerArk: React.FC = () => {
   }, [selectedIdx, selectedSection]);
 
   // When a list item is tapped on mobile, show detail view
-  const handleListItemClick = (section: any, idx: number) => {
+  const handleListItemClick = (section: any, entryId: string | number) => {
     setSelectedSection(section);
-    setSelectedIdx(idx);
+    setSelectedIdx(entryId);
     setEditMode(false);
     if (isMobile) setMobileDetailMode(true);
   };
@@ -337,9 +341,9 @@ const CareerArk: React.FC = () => {
                           key={item.id || idx}
                           p={2}
                           borderRadius="md"
-                          bg={selectedSection === key && selectedIdx === idx ? 'brand.100' : 'gray.50'}
+                          bg={selectedSection === key && selectedIdx === (item.id || idx) ? 'brand.100' : 'gray.50'}
                           _hover={{ bg: 'brand.50', cursor: 'pointer' }}
-                          onClick={() => handleListItemClick(key, idx)}
+                          onClick={() => handleListItemClick(key, item.id || idx)}
                         >
                           <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
                           <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
@@ -383,8 +387,8 @@ const CareerArk: React.FC = () => {
                   setEditLoading(true);
                   setEditError('');
                   try {
-                    const entry = allSections[selectedSection][selectedIdx];
-                    if (!entry.id) {
+                    const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
+                    if (!entry) {
                       setEditError('This entry is missing an ID and cannot be updated.');
                       setEditLoading(false);
                       return;
@@ -475,8 +479,8 @@ const CareerArk: React.FC = () => {
                   setEditLoading(true);
                   setEditError('');
                   try {
-                    const entry = allSections[selectedSection][selectedIdx];
-                    if (!entry.id) {
+                    const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
+                    if (!entry) {
                       setEditError('This entry is missing an ID and cannot be updated.');
                       setEditLoading(false);
                       return;
@@ -535,8 +539,8 @@ const CareerArk: React.FC = () => {
                   setEditLoading(true);
                   setEditError('');
                   try {
-                    const entry = allSections[selectedSection][selectedIdx];
-                    if (!entry.id) {
+                    const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
+                    if (!entry) {
                       setEditError('This entry is missing an ID and cannot be updated.');
                       setEditLoading(false);
                       return;
@@ -583,28 +587,30 @@ const CareerArk: React.FC = () => {
                   </HStack>
                 </VStack>
               </Box>
-            ) : selectedIdx !== null && allSections[selectedSection][selectedIdx] ? (
+            ) : selectedIdx !== null && allSections[selectedSection] ? (
               <Box>
                 <HStack justify="space-between" align="center" mb={2}>
-                  <Heading size="lg" mb={1}>{allSections[selectedSection][selectedIdx].title || allSections[selectedSection][selectedIdx].positionTitle || allSections[selectedSection][selectedIdx].degree || allSections[selectedSection][selectedIdx].name}</Heading>
+                  <Heading size="lg" mb={1}>{allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.title || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.positionTitle || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.degree || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.name}</Heading>
                   <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => {
-                    const entry = allSections[selectedSection][selectedIdx];
-                    setEditFormFromEntry(entry);
-                    setEditMode(true);
+                    const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
+                    if (entry) {
+                      setEditFormFromEntry(entry);
+                      setEditMode(true);
+                    }
                   }} />
                 </HStack>
-                {allSections[selectedSection][selectedIdx].company || allSections[selectedSection][selectedIdx].institution || allSections[selectedSection][selectedIdx].org ? (
-                  <Text fontWeight="semibold" color="gray.700" mb={1}>{allSections[selectedSection][selectedIdx].company || allSections[selectedSection][selectedIdx].institution || allSections[selectedSection][selectedIdx].org}</Text>
+                {allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.company || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.institution || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.org ? (
+                  <Text fontWeight="semibold" color="gray.700" mb={1}>{allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.company || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.institution || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.org}</Text>
                 ) : null}
-                <Text fontSize="sm" color="gray.500" mb={4}>{allSections[selectedSection][selectedIdx].start_date || allSections[selectedSection][selectedIdx].startDate || ''} - {allSections[selectedSection][selectedIdx].end_date || allSections[selectedSection][selectedIdx].endDate || ''}</Text>
+                <Text fontSize="sm" color="gray.500" mb={4}>{allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.start_date || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.startDate || ''} - {allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.end_date || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.endDate || ''}</Text>
                 <Divider mb={4} />
                 <VStack align="start" spacing={3}>
-                  {allSections[selectedSection][selectedIdx].details && allSections[selectedSection][selectedIdx].details.length > 0 ? (
-                    allSections[selectedSection][selectedIdx].details.map((d: string, i: number) => (
+                  {allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.details && allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.details.length > 0 ? (
+                    allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.details.map((d: string, i: number) => (
                       <Text as="li" key={i} ml={4} fontSize="md">{d}</Text>
                     ))
-                  ) : allSections[selectedSection][selectedIdx].description ? (
-                    <Text fontSize="md">{allSections[selectedSection][selectedIdx].description}</Text>
+                  ) : allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.description ? (
+                    <Text fontSize="md">{allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.description}</Text>
                   ) : (
                     <Text fontSize="sm" color="gray.400">No details available.</Text>
                   )}
@@ -649,9 +655,9 @@ const CareerArk: React.FC = () => {
                     setAddInstitution(''); setAddDegree(''); setAddEduStartDate(''); setAddEduEndDate(''); setAddEduDetails('');
                     setAddTrainingName(''); setAddProvider(''); setAddTrainingDate(''); setAddTrainingDetails('');
                     // Select the new entry
-                    if (selectedSection === 'work_experience') setSelectedIdx(arcData.work_experience.length);
-                    if (selectedSection === 'education') setSelectedIdx(arcData.education.length);
-                    if (selectedSection === 'training') setSelectedIdx(arcData.training.length);
+                    if (selectedSection === 'work_experience') setSelectedIdx(arcData.work_experience.length.toString());
+                    if (selectedSection === 'education') setSelectedIdx(arcData.education.length.toString());
+                    if (selectedSection === 'training') setSelectedIdx(arcData.training.length.toString());
                     toast({ status: 'success', title: `${sectionTitles[selectedSection]} added!` });
                     setEditMode(false);
                   } catch (err: any) {
@@ -853,7 +859,7 @@ const CareerArk: React.FC = () => {
                       setEditMode(true);
                       setEditTitle(skill.name);
                       setEditDetails(skill.description);
-                      setSelectedIdx(idx);
+                      setSelectedIdx(skill.id);
                     }}>Edit</Button>
                     <Button size="xs" colorScheme="red" onClick={async () => {
                       if (!skill.id) return;
@@ -1008,7 +1014,7 @@ const CareerArk: React.FC = () => {
                       setEditMode(true);
                       setEditTitle(project.name);
                       setEditDetails(project.description);
-                      setSelectedIdx(idx);
+                      setSelectedIdx(project.id);
                     }}>Edit</Button>
                     <Button size="xs" colorScheme="red" onClick={async () => {
                       if (!project.id) return;
