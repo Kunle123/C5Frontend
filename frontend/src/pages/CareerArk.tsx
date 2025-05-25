@@ -105,23 +105,39 @@ const CareerArk: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    getUser(token)
-      .then(userData => {
-        setUser(userData);
-        // Assume userData.profile_id is available, otherwise fetch or set
-        setProfileId(userData.profile_id);
-        return fetch(`/api/career-ark/profiles/${userData.profile_id}/all_sections`, {
+    const token = (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '';
+    if (!token) {
+      setError('Not authenticated');
+      setLoading(false);
+      return;
+    }
+    // Fetch the user's profile using the correct endpoint
+    fetch('/api/career-ark/profiles/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        return res.json();
+      })
+      .then(profile => {
+        setUser(profile); // Store the profile object
+        setProfileId(profile.id);
+        // Now fetch all sections using the profileId
+        return fetch(`/api/career-ark/profiles/${profile.id}/all_sections`, {
           headers: { Authorization: `Bearer ${token}` },
         });
       })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch sections');
+        return res.json();
+      })
       .then(data => {
         setAllSections(data);
         setError('');
       })
       .catch(() => setError('Failed to load data'))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, []);
 
   // Helper: robust date sort for work experience and education
   const parseDate = (d: string) => {
