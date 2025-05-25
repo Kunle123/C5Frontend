@@ -776,6 +776,149 @@ const CareerArk: React.FC = () => {
           )}
         </>
       )}
+      <AccordionItem>
+        <AccordionButton>
+          <Box flex="1" textAlign="left">Skills</Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <AccordionPanel pb={4}>
+          {/* Add Skill Form */}
+          <Box mb={4}>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!profileId || !addTitle.trim()) return;
+              setAddLoading(true);
+              setAddError('');
+              try {
+                const res = await fetch(`/api/career-ark/profiles/${profileId}/skills`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({ skill: addTitle.trim() }),
+                });
+                if (!res.ok) throw new Error('Failed to add skill');
+                // Refresh skills
+                const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                  headers: { Authorization: `Bearer ${token}` },
+                }).then(r => r.json());
+                setAllSections(updated);
+                setAddTitle('');
+                toast({ status: 'success', title: 'Skill added!' });
+              } catch (err: any) {
+                setAddError(err?.message || 'Failed to add skill');
+              } finally {
+                setAddLoading(false);
+              }
+            }}>
+              <HStack>
+                <input
+                  style={{ flex: 1, padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                  placeholder="Add a skill"
+                  value={addTitle}
+                  onChange={e => setAddTitle(e.target.value)}
+                  required
+                />
+                <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle.trim()}>Add</Button>
+              </HStack>
+              {addError && <Text color="red.500">{addError}</Text>}
+            </form>
+          </Box>
+          {/* Skills List */}
+          {allSections && Array.isArray(allSections.skills) && allSections.skills.length > 0 ? (
+            <VStack align="start" spacing={2}>
+              {allSections.skills.map((skill: any, idx: number) => (
+                <HStack key={skill.id || idx} w="100%">
+                  <Text flex={1}>{skill.skill || skill.name}</Text>
+                  {/* Edit Skill (inline edit) */}
+                  <Button size="xs" onClick={() => {
+                    setEditMode(true);
+                    setEditTitle(skill.skill || skill.name);
+                    setSelectedIdx(idx);
+                  }}>Edit</Button>
+                  <Button size="xs" colorScheme="red" onClick={async () => {
+                    if (!skill.id) return;
+                    setEditLoading(true);
+                    try {
+                      const res = await fetch(`/api/career-ark/skills/${skill.id}`, {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bearer ${token}` },
+                      });
+                      if (!res.ok) throw new Error('Failed to delete skill');
+                      // Refresh skills
+                      const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                      }).then(r => r.json());
+                      setAllSections(updated);
+                      toast({ status: 'success', title: 'Skill deleted!' });
+                    } catch (err: any) {
+                      toast({ status: 'error', title: err?.message || 'Failed to delete skill' });
+                    } finally {
+                      setEditLoading(false);
+                    }
+                  }}>Delete</Button>
+                </HStack>
+              ))}
+            </VStack>
+          ) : (
+            <Text color="gray.400">No skills yet. You can add skills above.</Text>
+          )}
+          {/* Edit Skill Inline */}
+          {editMode && selectedIdx !== null && allSections && allSections.skills[selectedIdx] && (
+            <Box mt={4}>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                if (!profileId || !editTitle.trim()) return;
+                setEditLoading(true);
+                setEditError('');
+                try {
+                  // No direct edit endpoint for skills, so delete and re-add
+                  const skill = allSections.skills[selectedIdx];
+                  await fetch(`/api/career-ark/skills/${skill.id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  await fetch(`/api/career-ark/profiles/${profileId}/skills`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ skill: editTitle.trim() }),
+                  });
+                  // Refresh skills
+                  const updated = await fetch(`/api/career-ark/profiles/${profileId}/all_sections`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }).then(r => r.json());
+                  setAllSections(updated);
+                  setEditMode(false);
+                  setEditTitle('');
+                  setSelectedIdx(null);
+                  toast({ status: 'success', title: 'Skill updated!' });
+                } catch (err: any) {
+                  setEditError(err?.message || 'Failed to update skill');
+                } finally {
+                  setEditLoading(false);
+                }
+              }}>
+                <HStack>
+                  <input
+                    style={{ flex: 1, padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
+                    placeholder="Edit skill"
+                    value={editTitle}
+                    onChange={e => setEditTitle(e.target.value)}
+                    required
+                  />
+                  <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle.trim()}>Save</Button>
+                  <Button onClick={() => { setEditMode(false); setEditTitle(''); setSelectedIdx(null); }} isDisabled={editLoading}>Cancel</Button>
+                </HStack>
+                {editError && <Text color="red.500">{editError}</Text>}
+              </form>
+            </Box>
+          )}
+        </AccordionPanel>
+      </AccordionItem>
     </Box>
   );
 };
