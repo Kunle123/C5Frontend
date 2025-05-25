@@ -264,7 +264,7 @@ const CareerArk: React.FC = () => {
   // When a list item is tapped on mobile, show detail view
   const handleListItemClick = (section: any, entryId: string | number) => {
     setSelectedSection(section);
-    setSelectedIdx(entryId);
+    setSelectedIdx(String(entryId));
     setEditMode(false);
     if (isMobile) setMobileDetailMode(true);
   };
@@ -655,9 +655,9 @@ const CareerArk: React.FC = () => {
                     setAddInstitution(''); setAddDegree(''); setAddEduStartDate(''); setAddEduEndDate(''); setAddEduDetails('');
                     setAddTrainingName(''); setAddProvider(''); setAddTrainingDate(''); setAddTrainingDetails('');
                     // Select the new entry
-                    if (selectedSection === 'work_experience') setSelectedIdx(arcData.work_experience.length.toString());
-                    if (selectedSection === 'education') setSelectedIdx(arcData.education.length.toString());
-                    if (selectedSection === 'training') setSelectedIdx(arcData.training.length.toString());
+                    if (selectedSection === 'work_experience') setSelectedIdx(String(arcData.work_experience[arcData.work_experience.length - 1]?.id));
+                    if (selectedSection === 'education') setSelectedIdx(String(arcData.education[arcData.education.length - 1]?.id));
+                    if (selectedSection === 'training') setSelectedIdx(String(arcData.training[arcData.training.length - 1]?.id));
                     toast({ status: 'success', title: `${sectionTitles[selectedSection]} added!` });
                     setEditMode(false);
                   } catch (err: any) {
@@ -859,7 +859,7 @@ const CareerArk: React.FC = () => {
                       setEditMode(true);
                       setEditTitle(skill.name);
                       setEditDetails(skill.description);
-                      setSelectedIdx(skill.id);
+                      setSelectedIdx(String(skill.id));
                     }}>Edit</Button>
                     <Button size="xs" colorScheme="red" onClick={async () => {
                       if (!skill.id) return;
@@ -1014,7 +1014,7 @@ const CareerArk: React.FC = () => {
                       setEditMode(true);
                       setEditTitle(project.name);
                       setEditDetails(project.description);
-                      setSelectedIdx(project.id);
+                      setSelectedIdx(String(project.id));
                     }}>Edit</Button>
                     <Button size="xs" colorScheme="red" onClick={async () => {
                       if (!project.id) return;
