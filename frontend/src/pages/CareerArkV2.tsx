@@ -65,7 +65,7 @@ const CareerArkV2: React.FC = () => {
             let pollCount = 0;
             const poll = async () => {
               try {
-                const res = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/cv/status/${data.taskId}`, {
+                const res = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/cv/task-status/${data.taskId}`, {
                   headers: { Authorization: `Bearer ${token}` },
                 });
                 const statusData = await res.json();
@@ -79,6 +79,9 @@ const CareerArkV2: React.FC = () => {
                 } else if (statusData.status === 'failed') {
                   setPolling(false);
                   setUploadError(statusData.error || 'CV extraction failed.');
+                } else if (statusData.detail === 'Task not found') {
+                  setPolling(false);
+                  setUploadError('CV processing task not found.');
                 } else if (pollCount < 30) {
                   setTimeout(poll, 2000);
                   pollCount++;

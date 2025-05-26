@@ -35,7 +35,7 @@ export async function uploadCV(file: File) {
 
 // 3. Poll CV Processing Status
 export async function getCVStatus(taskId: string) {
-  const res = await fetch(`${API_BASE}/cv/status/${taskId}`, {
+  const res = await fetch(`${API_BASE}/cv/task-status/${taskId}`, {
     headers: getAuthHeaders(),
   });
   if (!res.ok) throw await res.json().catch(() => new Error('Status check failed'));

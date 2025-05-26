@@ -204,13 +204,24 @@ const CareerArk: React.FC = () => {
                   setUploadProgress(100);
                   setPolling(false);
                   setSummary(statusData.extractedDataSummary || null);
-                  // Refresh Ark data
-                  const arcData = await getArcData();
-                  setAllSections(arcData);
+                  // Refresh Ark data, bypassing cache
+                  const arcRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      'Cache-Control': 'no-cache',
+                    },
+                  });
+                  if (arcRes.ok) {
+                    const arcData = await arcRes.json();
+                    setAllSections(arcData);
+                  }
                   toast({ status: 'success', title: 'CV imported and Ark updated!' });
                 } else if (statusData.status === 'failed') {
                   setPolling(false);
-                  setUploadError('CV extraction failed.');
+                  setUploadError(statusData.error || 'CV extraction failed.');
+                } else if (statusData.detail === 'Task not found') {
+                  setPolling(false);
+                  setUploadError('CV processing task not found.');
                 } else if (pollCount < 30) {
                   setTimeout(poll, 2000);
                   pollCount++;
