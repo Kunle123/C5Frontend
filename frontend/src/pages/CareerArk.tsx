@@ -373,6 +373,13 @@ const CareerArk: React.FC = () => {
                           <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
                           <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
                           <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
+                          {/* Details Coming Soon Indicator */}
+                          {(!item.details || item.details.length === 0) && (!item.description || item.description.trim() === '') && (
+                            <HStack mt={1} spacing={2}>
+                              <Spinner size="xs" color="gray.400" />
+                              <Text color="gray.400" fontSize="sm">Details coming soon…</Text>
+                            </HStack>
+                          )}
                         </Box>
                       ))
                     ) : (
