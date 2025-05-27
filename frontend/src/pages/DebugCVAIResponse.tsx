@@ -80,9 +80,6 @@ const DebugCVAIResponse: React.FC = () => {
           } else if (statusData.status === 'failed') {
             setPolling(false);
             setUploadError(statusData.error || 'CV extraction failed.');
-          } else if (statusData.detail === 'Task not found') {
-            setPolling(false);
-            setUploadError('CV processing task not found.');
           } else if (pollCount < 30) { // poll up to 1 minute
             setTimeout(poll, 2000);
             pollCount++;
