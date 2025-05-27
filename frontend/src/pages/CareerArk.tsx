@@ -46,7 +46,7 @@ const CareerArk: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<any>(null);
   const [allSections, setAllSections] = useState<any>(null);
-  const [selectedSection, setSelectedSection] = useState<'work_experience' | 'education' | 'training'>('work_experience');
+  const [selectedSection, setSelectedSection] = useState<string>('work_experience');
   const [selectedIdx, setSelectedIdx] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -104,55 +104,70 @@ const CareerArk: React.FC = () => {
   const [editTrainingDate, setEditTrainingDate] = useState('');
   const [editTrainingDetails, setEditTrainingDetails] = useState('');
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [workExperience, setWorkExperience] = useState<any[]>([]);
+  const [education, setEducation] = useState<any[]>([]);
+  const [skills, setSkills] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [certifications, setCertifications] = useState<any[]>([]);
+  const [sectionError, setSectionError] = useState<string>('');
+  const [training, setTraining] = useState<any[]>([]);
+
+  // Move this block:
+  // const sectionDataMap: Record<string, any[]> = { ... };
+  // to after the sortWorkExp and sortEducation function declarations.
 
   useEffect(() => {
-    setLoading(true);
-    const token = (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '';
-    if (!token) {
-      setError('Not authenticated');
-      setLoading(false);
-      return;
-    }
-    // Fetch the user's profile using the correct endpoint
-    fetch('/api/career-ark/profiles/me', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch profile');
-        return res.json();
-      })
-      .then(profile => {
-        setUser(profile); // Store the profile object
-        setProfileId(profile.id);
-        // Now fetch all sections using the profileId
-        return fetch(`/api/career-ark/profiles/${profile.id}/all_sections`, {
+    async function fetchSections() {
+      setLoading(true);
+      setSectionError('');
+      try {
+        const token = localStorage.getItem('token') || '';
+        const profileRes = await fetch('/api/career-ark/profiles/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch sections');
-        return res.json();
-      })
-      .then(data => {
-        setAllSections(data);
+        if (!profileRes.ok) throw new Error('Failed to fetch profile');
+        const profile = await profileRes.json();
+        setUser(profile);
+        setProfileId(profile.id);
+        // Fetch each section
+        const [we, edu, trn, skl, prj, cert] = await Promise.all([
+          fetch(`/api/career-ark/profiles/${profile.id}/work_experience`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+          fetch(`/api/career-ark/profiles/${profile.id}/education`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+          fetch(`/api/career-ark/profiles/${profile.id}/training`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+          fetch(`/api/career-ark/profiles/${profile.id}/skills`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+          fetch(`/api/career-ark/profiles/${profile.id}/projects`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+          fetch(`/api/career-ark/profiles/${profile.id}/certifications`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+        ]);
+        setWorkExperience(Array.isArray(we) ? we : []);
+        setEducation(Array.isArray(edu) ? edu : []);
+        setTraining(Array.isArray(trn) ? trn : []);
+        setSkills(Array.isArray(skl) ? skl : []);
+        setProjects(Array.isArray(prj) ? prj : []);
+        setCertifications(Array.isArray(cert) ? cert : []);
         setError('');
-      })
-      .catch(() => setError('Failed to load data'))
-      .finally(() => setLoading(false));
+      } catch (err: any) {
+        setSectionError(err?.message || 'Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSections();
   }, []);
 
-  // Helper: robust date sort for work experience and education
-  const parseDate = (d: string) => {
-    if (!d) return new Date(0);
-    if (d === 'Present') return new Date(3000, 0, 1);
-    // Try MMM YYYY, YYYY, fallback
-    let parsed = parse(d, 'MMM yyyy', new Date());
-    if (!isValid(parsed)) parsed = parse(d, 'yyyy', new Date());
-    if (!isValid(parsed)) parsed = new Date(d);
-    return isValid(parsed) ? parsed : new Date(0);
+  const sortWorkExp = (arr: any[]) => {
+    return [...arr].sort((a, b) => {
+      if (a.end_date === 'Present') return -1;
+      if (b.end_date === 'Present') return 1;
+      const parse = (d: string) => Date.parse(d + '-01') || 0;
+      return parse(b.end_date) - parse(a.end_date);
+    });
   };
-  const sortByEndDateDesc = (arr: any[]) =>
-    [...arr].sort((a, b) => compareDesc(parseDate(a.end_date), parseDate(b.end_date)));
+  const sortEducation = (arr: any[]) => {
+    return [...arr].sort((a, b) => {
+      const parse = (d: string) => Date.parse((d || '') + '-01') || 0;
+      return parse(b.end_date) - parse(a.end_date);
+    });
+  };
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -248,14 +263,12 @@ const CareerArk: React.FC = () => {
     }
   };
 
-  // Update setEditFormFromEntry to robustly handle details for work experience
   const setEditFormFromEntry = (entry: any) => {
     if (selectedSection === 'work_experience') {
       setEditTitle(entry.title || entry.positionTitle || '');
       setEditCompany(entry.company || '');
       setEditStartDate(entry.start_date || entry.startDate || '');
       setEditEndDate(entry.end_date || entry.endDate || '');
-      // Fix: join details array or fallback to description string
       if (Array.isArray(entry.details)) {
         setEditDetails(entry.details.join('\n'));
       } else if (typeof entry.description === 'string') {
@@ -277,7 +290,6 @@ const CareerArk: React.FC = () => {
     }
   };
 
-  // When selectedIdx changes, reset edit state
   useEffect(() => {
     if (selectedIdx !== null && allSections[selectedSection]) {
       const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
@@ -294,7 +306,6 @@ const CareerArk: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIdx, selectedSection]);
 
-  // When a list item is tapped on mobile, show detail view
   const handleListItemClick = (section: any, entryId: string | number) => {
     setSelectedSection(section);
     setSelectedIdx(String(entryId));
@@ -302,13 +313,11 @@ const CareerArk: React.FC = () => {
     if (isMobile) setMobileDetailMode(true);
   };
 
-  // When back is pressed on mobile, return to list view
   const handleBack = () => {
     setMobileDetailMode(false);
     setEditMode(false);
   };
 
-  // On mount, check for missing keywords in localStorage
   useEffect(() => {
     try {
       const stored = localStorage.getItem('ark-missing-keywords');
@@ -323,6 +332,16 @@ const CareerArk: React.FC = () => {
     } catch {}
     // eslint-disable-next-line
   }, []);
+
+  // ... after sortWorkExp and sortEducation ...
+  const sectionDataMap: Record<string, any[]> = {
+    work_experience: sortWorkExp(workExperience),
+    education: sortEducation(education),
+    training: training,
+    skills: skills,
+    projects: projects,
+    certifications: certifications,
+  };
 
   return (
     <Box minH="100vh" bg="gray.50">
@@ -343,806 +362,163 @@ const CareerArk: React.FC = () => {
           </Box>
         </Flex>
       </Box>
-      {/* Responsive Layout */}
       <Flex maxW="1200px" mx="auto" flex={1} h="calc(100vh - 80px)" minH="calc(100vh - 80px)" gap={6} direction={{ base: 'column', md: 'row' }}>
-        {/* List/Sidebar View */}
-        {(!isMobile || !mobileDetailMode) && (
-          <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} display="flex" flexDirection="column" maxH="100%">
-            <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
-            {uploading && (
-              <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />
-            )}
-            <input
-              type="file"
-              accept=".pdf,.doc,.docx"
-              style={{ display: 'none' }}
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              disabled={uploading || polling}
-            />
-            <Box flex={1} minH={0} overflowY="auto">
-              {Object.entries(sectionTitles).map(([key, label]) => (
-                <Box key={key} mb={6}>
-                  <HStack justify="space-between" align="center" mb={2}>
-                    <Text fontWeight="bold" fontSize="lg" color="brand.500">{label}</Text>
-                    <IconButton aria-label={`Add ${label}`} icon={<AddIcon />} size="sm" variant="ghost" onClick={() => setSelectedIdx(null)} />
-                  </HStack>
-                  <VStack spacing={1} align="stretch">
-                    {allSections && Array.isArray(allSections[key]) && allSections[key].length > 0 ? (
-                      sortByEndDateDesc(allSections[key]).map((item: any, idx: number) => (
-                        <Box
-                          key={item.id || idx}
-                          p={2}
-                          borderRadius="md"
-                          bg={selectedSection === key && selectedIdx === (item.id || idx) ? 'brand.100' : 'gray.50'}
-                          _hover={{ bg: 'brand.50', cursor: 'pointer' }}
-                          onClick={() => handleListItemClick(key, item.id || idx)}
-                        >
-                          <Text fontWeight="semibold">{item.title || item.positionTitle || item.degree || item.name}</Text>
-                          <Text fontSize="sm" color="gray.600">{item.company || item.institution || item.org || ''}</Text>
-                          <Text fontSize="xs" color="gray.500">{item.start_date || item.startDate || ''} - {item.end_date || item.endDate || ''}</Text>
-                          {/* Details Coming Soon Indicator */}
-                          {(!item.details || item.details.length === 0) && (!item.description || item.description.trim() === '') && (
-                            <HStack mt={1} spacing={2}>
-                              <Spinner size="xs" color="gray.400" />
-                              <Text color="gray.400" fontSize="sm">Details coming soon…</Text>
-                            </HStack>
-                          )}
-                        </Box>
-                      ))
-                    ) : (
-                      <Text color="gray.400">No entries yet. Import a CV to get started!</Text>
-                    )}
-                  </VStack>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        )}
-        {/* Detail View */}
-        {(!isMobile || mobileDetailMode) && (
-          <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={8} minH={0} h="100%" overflowY="auto">
-            {/* Back button for mobile */}
-            {isMobile && (
-              <Button leftIcon={<ArrowBackIcon />} mb={4} variant="ghost" onClick={handleBack}>Back</Button>
-            )}
-            {loading ? (
-              <Spinner />
-            ) : error && !allSections ? (
-              <Alert status="info" mb={4}>
-                <AlertIcon />
-                Your Career Ark is empty. Import a CV or add entries to get started!
-              </Alert>
-            ) : !error && allSections && Object.values(allSections).every(
-              arr => Array.isArray(arr) && arr.length === 0
-            ) ? (
-              <Alert status="info" mb={4}>
-                <AlertIcon />
-                No entries yet. Import a CV to get started!
-              </Alert>
-            ) : selectedIdx !== null && editMode && selectedSection === 'work_experience' ? (
-              <Box as="form" w="100%" maxW="500px" mx="auto"
-                onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-                  e.preventDefault();
-                  setEditLoading(true);
-                  setEditError('');
-                  try {
-                    const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
-                    if (!entry) {
-                      setEditError('This entry is missing an ID and cannot be updated.');
-                      setEditLoading(false);
-                      return;
-                    }
-                    await updateWorkExperience(entry.id, {
-                      title: editTitle,
-                      company: editCompany,
-                      start_date: editStartDate,
-                      end_date: editEndDate || null,
-                      details: editDetails.split('\n').map(s => s.trim()).filter(Boolean),
-                    });
-                    const arcData = await getArcData();
-                    setAllSections(arcData);
-                    setEditMode(false);
-                    toast({ status: 'success', title: 'Work experience updated!' });
-                  } catch (err: any) {
-                    setEditError(err?.message || 'Failed to update work experience');
-                  } finally {
-                    setEditLoading(false);
-                  }
-                }}
-              >
-                <Heading size="md" mb={4}>Edit Work Experience</Heading>
-                <VStack spacing={4} align="stretch">
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Title</Text>
-                    <input
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="Title"
-                      value={editTitle}
-                      onChange={e => setEditTitle(e.target.value)}
-                      required
-                    />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Company</Text>
-                    <input
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="Company"
-                      value={editCompany}
-                      onChange={e => setEditCompany(e.target.value)}
-                      required
-                    />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Start Date</Text>
-                    <input
-                      type="text"
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="e.g. Mar 2020"
-                      value={editStartDate}
-                      onChange={e => setEditStartDate(e.target.value)}
-                      required
-                    />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>End Date</Text>
-                    <input
-                      type="text"
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="e.g. Dec 2020 or Present"
-                      value={editEndDate}
-                      onChange={e => setEditEndDate(e.target.value)}
-                    />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Details</Text>
-                    <textarea
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }}
-                      placeholder="Details (one per line)"
-                      value={editDetails}
-                      onChange={e => setEditDetails(e.target.value)}
-                    />
-                  </Box>
-                  {editError && <Text color="red.500">{editError}</Text>}
-                  <HStack>
-                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle || !editCompany || !editStartDate}>
-                      Save
-                    </Button>
-                    <Button onClick={() => setEditMode(false)} isDisabled={editLoading} variant="ghost">Cancel</Button>
-                  </HStack>
-                </VStack>
-              </Box>
-            ) : selectedIdx !== null && editMode && selectedSection === 'education' ? (
-              <Box as="form" w="100%" maxW="500px" mx="auto"
-                onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-                  e.preventDefault();
-                  setEditLoading(true);
-                  setEditError('');
-                  try {
-                    const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
-                    if (!entry) {
-                      setEditError('This entry is missing an ID and cannot be updated.');
-                      setEditLoading(false);
-                      return;
-                    }
-                    await updateEducation(entry.id, {
-                      institution: editInstitution,
-                      degree: editDegree,
-                      start_date: editEduStartDate,
-                      end_date: editEduEndDate || null,
-                      details: editEduDetails.split('\n').map(s => s.trim()).filter(Boolean),
-                    });
-                    const arcData = await getArcData();
-                    setAllSections(arcData);
-                    setEditMode(false);
-                    toast({ status: 'success', title: 'Education updated!' });
-                  } catch (err: any) {
-                    setEditError(err?.message || 'Failed to update education');
-                  } finally {
-                    setEditLoading(false);
-                  }
-                }}
-              >
-                <Heading size="md" mb={4}>Edit Education</Heading>
-                <VStack spacing={4} align="stretch">
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Institution</Text>
-                    <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Institution" value={editInstitution} onChange={e => setEditInstitution(e.target.value)} required />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Degree</Text>
-                    <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Degree" value={editDegree} onChange={e => setEditDegree(e.target.value)} required />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Start Date</Text>
-                    <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2018-09-01" value={editEduStartDate} onChange={e => setEditEduStartDate(e.target.value)} required />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>End Date</Text>
-                    <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2022-06-30 or Present" value={editEduEndDate} onChange={e => setEditEduEndDate(e.target.value)} />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Details</Text>
-                    <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={editEduDetails} onChange={e => setEditEduDetails(e.target.value)} />
-                  </Box>
-                  {editError && <Text color="red.500">{editError}</Text>}
-                  <HStack>
-                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editInstitution || !editDegree || !editEduStartDate}>Save</Button>
-                    <Button onClick={() => setEditMode(false)} isDisabled={editLoading} variant="ghost">Cancel</Button>
-                  </HStack>
-                </VStack>
-              </Box>
-            ) : selectedIdx !== null && editMode && selectedSection === 'training' ? (
-              <Box as="form" w="100%" maxW="500px" mx="auto"
-                onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-                  e.preventDefault();
-                  setEditLoading(true);
-                  setEditError('');
-                  try {
-                    const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
-                    if (!entry) {
-                      setEditError('This entry is missing an ID and cannot be updated.');
-                      setEditLoading(false);
-                      return;
-                    }
-                    await updateTraining(entry.id, {
-                      name: editTrainingName,
-                      provider: editProvider,
-                      date: editTrainingDate,
-                      details: editTrainingDetails.split('\n').map(s => s.trim()).filter(Boolean),
-                    });
-                    const arcData = await getArcData();
-                    setAllSections(arcData);
-                    setEditMode(false);
-                    toast({ status: 'success', title: 'Training updated!' });
-                  } catch (err: any) {
-                    setEditError(err?.message || 'Failed to update training');
-                  } finally {
-                    setEditLoading(false);
-                  }
-                }}
-              >
-                <Heading size="md" mb={4}>Edit Training</Heading>
-                <VStack spacing={4} align="stretch">
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Name</Text>
-                    <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Training Name" value={editTrainingName} onChange={e => setEditTrainingName(e.target.value)} required />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Provider</Text>
-                    <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Provider" value={editProvider} onChange={e => setEditProvider(e.target.value)} required />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Date</Text>
-                    <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2023-04-15" value={editTrainingDate} onChange={e => setEditTrainingDate(e.target.value)} required />
-                  </Box>
-                  <Box>
-                    <Text mb={1} fontWeight={600}>Details</Text>
-                    <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={editTrainingDetails} onChange={e => setEditTrainingDetails(e.target.value)} />
-                  </Box>
-                  {editError && <Text color="red.500">{editError}</Text>}
-                  <HStack>
-                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTrainingName || !editProvider || !editTrainingDate}>Save</Button>
-                    <Button onClick={() => setEditMode(false)} isDisabled={editLoading} variant="ghost">Cancel</Button>
-                  </HStack>
-                </VStack>
-              </Box>
-            ) : selectedIdx !== null && allSections[selectedSection] ? (
-              <Box>
+        {/* Sidebar */}
+        <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} display="flex" flexDirection="column" maxH="100%">
+          <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
+          {uploading && <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />}
+          <input type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} disabled={uploading || polling} />
+          <Box flex={1} minH={0} overflowY="auto">
+            {/* Section Navigation and List */}
+            {['work_experience', 'education', 'training', 'skills', 'projects', 'certifications'].map(section => (
+              <Box key={section} mb={6}>
                 <HStack justify="space-between" align="center" mb={2}>
-                  <Heading size="lg" mb={1}>{allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.title || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.positionTitle || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.degree || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.name}</Heading>
-                  <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" variant="ghost" onClick={() => {
-                    const entry = allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx));
-                    if (entry) {
-                      setEditFormFromEntry(entry);
-                      setEditMode(true);
-                    }
-                  }} />
+                  <Text fontWeight="bold" fontSize="lg" color="brand.500" onClick={() => setSelectedSection(section as string)} style={{ cursor: 'pointer' }}>
+                    {section.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </Text>
                 </HStack>
-                {allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.company || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.institution || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.org ? (
-                  <Text fontWeight="semibold" color="gray.700" mb={1}>{allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.company || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.institution || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.org}</Text>
-                ) : null}
-                <Text fontSize="sm" color="gray.500" mb={4}>{allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.start_date || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.startDate || ''} - {allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.end_date || allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.endDate || ''}</Text>
-                <Divider mb={4} />
-                <VStack align="start" spacing={3}>
-                  {allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.details && allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.details.length > 0 ? (
-                    allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.details.map((d: string, i: number) => (
-                      <Text as="li" key={i} ml={4} fontSize="md">{d}</Text>
-                    ))
-                  ) : allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.description ? (
-                    <Text fontSize="md">{allSections[selectedSection].find((e: any) => e.id === selectedIdx || String(e.id) === String(selectedIdx))?.description}</Text>
-                  ) : (
-                    <Text fontSize="sm" color="gray.400">No details available.</Text>
-                  )}
+                <VStack spacing={1} align="stretch">
+                  {(() => {
+                    const data = sectionDataMap[section as string];
+                    if (!data || data.length === 0) return <Text color="gray.400">No {section.replace('_', ' ')} found.</Text>;
+                    return data.map((item: any, idx: number) => (
+                      <Box
+                        key={item.id || idx}
+                        p={2}
+                        borderRadius="md"
+                        bg={selectedSection === section && selectedIdx === (item.id || idx) ? 'brand.100' : 'gray.50'}
+                        _hover={{ bg: 'brand.50', cursor: 'pointer' }}
+                        onClick={() => { setSelectedSection(section as string); setSelectedIdx(item.id || idx); }}
+                      >
+                        {/* Render summary for each section */}
+                        {section === 'work_experience' && (
+                          <>
+                            <Text fontWeight="semibold">{item.company}</Text>
+                            <Text fontSize="sm" color="gray.600">{item.title}</Text>
+                            <Text fontSize="xs" color="gray.500">{item.start_date} - {item.end_date}</Text>
+                          </>
+                        )}
+                        {section === 'education' && (
+                          <>
+                            <Text fontWeight="semibold">{item.institution}</Text>
+                            <Text fontSize="sm" color="gray.600">{item.degree}</Text>
+                            <Text fontSize="xs" color="gray.500">{item.start_date} - {item.end_date}</Text>
+                          </>
+                        )}
+                        {section === 'skills' && (
+                          <Box px={2} py={1} borderRadius="md" bg="blue.50" color="blue.700" fontWeight={600} fontSize="md">{item.skill || item.name}</Box>
+                        )}
+                        {section === 'projects' && (
+                          <Text fontWeight="semibold">{item.name}</Text>
+                        )}
+                        {section === 'certifications' && (
+                          <Text fontWeight="semibold">{item.name}</Text>
+                        )}
+                        {section === 'training' && (
+                          <Text fontWeight="semibold">{item.name}</Text>
+                        )}
+                      </Box>
+                    ));
+                  })()}
                 </VStack>
               </Box>
-            ) : (
-              <Box as="form" w="100%" maxW="500px" mx="auto"
-                onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-                  e.preventDefault();
-                  setAddLoading(true);
-                  setAddError('');
-                  try {
-                    if (selectedSection === 'work_experience') {
-                      await addWorkExperience({
-                        title: addTitle,
-                        company: addCompany,
-                        start_date: addStartDate,
-                        end_date: addEndDate || null,
-                        details: addDetails.split('\n').map(s => s.trim()).filter(Boolean),
-                      });
-                    } else if (selectedSection === 'education') {
-                      await addEducation({
-                        institution: addInstitution,
-                        degree: addDegree,
-                        start_date: addEduStartDate,
-                        end_date: addEduEndDate || null,
-                        details: addEduDetails.split('\n').map(s => s.trim()).filter(Boolean),
-                      });
-                    } else if (selectedSection === 'training') {
-                      await addTraining({
-                        name: addTrainingName,
-                        provider: addProvider,
-                        date: addTrainingDate,
-                        details: addTrainingDetails.split('\n').map(s => s.trim()).filter(Boolean),
-                      });
-                    }
-                    // Refresh data
-                    const arcData = await getArcData();
-                    setAllSections(arcData);
-                    // Reset all add form state
-                    setAddTitle(''); setAddCompany(''); setAddStartDate(''); setAddEndDate(''); setAddDetails('');
-                    setAddInstitution(''); setAddDegree(''); setAddEduStartDate(''); setAddEduEndDate(''); setAddEduDetails('');
-                    setAddTrainingName(''); setAddProvider(''); setAddTrainingDate(''); setAddTrainingDetails('');
-                    // Select the new entry
-                    if (selectedSection === 'work_experience') setSelectedIdx(String(arcData.work_experience[arcData.work_experience.length - 1]?.id));
-                    if (selectedSection === 'education') setSelectedIdx(String(arcData.education[arcData.education.length - 1]?.id));
-                    if (selectedSection === 'training') setSelectedIdx(String(arcData.training[arcData.training.length - 1]?.id));
-                    toast({ status: 'success', title: `${sectionTitles[selectedSection]} added!` });
-                    setEditMode(false);
-                  } catch (err: any) {
-                    setAddError(err?.message || `Failed to add ${sectionTitles[selectedSection]}`);
-                  } finally {
-                    setAddLoading(false);
-                  }
-                }}
-              >
-                <Heading size="md" mb={4}>New Entry</Heading>
-                <VStack spacing={4} align="stretch">
-                  {selectedSection === 'work_experience' && (
-                    <>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Title</Text>
-                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Title" value={addTitle} onChange={e => setAddTitle(e.target.value)} required />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Company</Text>
-                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Company" value={addCompany} onChange={e => setAddCompany(e.target.value)} required />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Start Date</Text>
-                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. Mar 2020" value={addStartDate} onChange={e => setAddStartDate(e.target.value)} required />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>End Date</Text>
-                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. Dec 2020 or Present" value={addEndDate} onChange={e => setAddEndDate(e.target.value)} />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Details</Text>
-                        <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={addDetails} onChange={e => setAddDetails(e.target.value)} />
-                      </Box>
-                    </>
-                  )}
-                  {selectedSection === 'education' && (
-                    <>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Institution</Text>
-                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Institution" value={addInstitution} onChange={e => setAddInstitution(e.target.value)} required />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Degree</Text>
-                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Degree" value={addDegree} onChange={e => setAddDegree(e.target.value)} required />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Start Date</Text>
-                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2018-09-01" value={addEduStartDate} onChange={e => setAddEduStartDate(e.target.value)} required />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>End Date</Text>
-                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2022-06-30 or Present" value={addEduEndDate} onChange={e => setAddEduEndDate(e.target.value)} />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Details</Text>
-                        <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={addEduDetails} onChange={e => setAddEduDetails(e.target.value)} />
-                      </Box>
-                    </>
-                  )}
-                  {selectedSection === 'training' && (
-                    <>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Name</Text>
-                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Training Name" value={addTrainingName} onChange={e => setAddTrainingName(e.target.value)} required />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Provider</Text>
-                        <input style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="Provider" value={addProvider} onChange={e => setAddProvider(e.target.value)} required />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Date</Text>
-                        <input type="text" style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }} placeholder="e.g. 2023-04-15" value={addTrainingDate} onChange={e => setAddTrainingDate(e.target.value)} required />
-                      </Box>
-                      <Box>
-                        <Text mb={1} fontWeight={600}>Details</Text>
-                        <textarea style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 80 }} placeholder="Details (one per line)" value={addTrainingDetails} onChange={e => setAddTrainingDetails(e.target.value)} />
-                      </Box>
-                    </>
-                  )}
-                  {addError && <Text color="red.500">{addError}</Text>}
-                  <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={
-                    (selectedSection === 'work_experience' && (!addTitle || !addCompany || !addStartDate)) ||
-                    (selectedSection === 'education' && (!addInstitution || !addDegree || !addEduStartDate)) ||
-                    (selectedSection === 'training' && (!addTrainingName || !addProvider || !addTrainingDate))
-                  }>
-                    Save
-                  </Button>
-                </VStack>
-              </Box>
-            )}
+            ))}
           </Box>
-        )}
-      </Flex>
-      {missingKeywords.length > 0 && (
-        <>
-          <Modal isOpen={isOpen} onClose={onClose} isCentered size={modalSize} motionPreset="slideInBottom">
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>Missing Keywords from Job Description</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <Text mb={2}>The following keywords were missing from your Ark profile for the last job you applied to. Consider adding them for a better match.</Text>
-                <HStack wrap="wrap" gap={2} mb={4}>
-                  {missingKeywords.map((k, idx) => (
-                    <Box as="span" key={k + idx} px={3} py={1} borderRadius="md" bg="red.100" color="red.700" fontWeight={600} fontSize="md">{k}</Box>
-                  ))}
-                </HStack>
-                <Text fontSize="sm" color="gray.500">Edit your Ark data to include these keywords if relevant.</Text>
-              </ModalBody>
-            </ModalContent>
-          </Modal>
-          {/* Floating recall button, mobile-friendly */}
-          {!isOpen && (
-            <IconButton
-              aria-label="Show missing keywords"
-              icon={<FiKey />}
-              colorScheme="red"
-              size="lg"
-              position="fixed"
-              bottom={recallBtnBottom}
-              right={recallBtnRight}
-              zIndex={1500}
-              borderRadius="full"
-              boxShadow="lg"
-              onClick={onOpen}
-              _hover={{ bg: 'red.400' }}
-              _active={{ bg: 'red.500' }}
-            />
+        </Box>
+        {/* Detail View */}
+        <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={8} minH={0} h="100%" overflowY="auto">
+          {sectionError && <Alert status="error" mb={4}><AlertIcon />{sectionError}</Alert>}
+          {loading ? <Spinner /> : (
+            selectedIdx && (() => {
+              const section = selectedSection as string;
+              const data = sectionDataMap[section];
+              const item = data.find((e: any) => e.id === selectedIdx);
+              if (!item) return <Text color="gray.400">No details available.</Text>;
+              switch (section) {
+                case 'work_experience':
+                  return (
+                    <>
+                      <Heading size="lg">{item.company}</Heading>
+                      <Text fontWeight="semibold" fontSize="lg">{item.title}</Text>
+                      <Text color="gray.600" fontSize="sm" mb={1}>{item.start_date} – {item.end_date}</Text>
+                      <Text whiteSpace="pre-line" fontSize="md">
+                        {item.description && item.description.length > 300 ? <ShowMoreText text={item.description} /> : item.description}
+                      </Text>
+                    </>
+                  );
+                case 'education':
+                  return (
+                    <>
+                      <Heading size="lg">{item.institution}</Heading>
+                      <Text fontWeight="semibold" fontSize="lg">{item.degree}</Text>
+                      {item.field && <Text color="gray.500" fontSize="sm">{item.field}</Text>}
+                      <Text color="gray.600" fontSize="sm" mb={1}>{item.start_date} – {item.end_date}</Text>
+                      {item.description && (
+                        <Text whiteSpace="pre-line" fontSize="md">
+                          {item.description.length > 300 ? <ShowMoreText text={item.description} /> : item.description}
+                        </Text>
+                      )}
+                    </>
+                  );
+                case 'skills':
+                  return (
+                    <HStack wrap="wrap" spacing={2} mb={6}>
+                      <Box px={3} py={1} borderRadius="md" bg="blue.50" color="blue.700" fontWeight={600} fontSize="md">{item.skill || item.name}</Box>
+                    </HStack>
+                  );
+                case 'projects':
+                  return (
+                    <>
+                      <Heading size="lg">{item.name}</Heading>
+                      <Text fontSize="md" whiteSpace="pre-line">{item.description}</Text>
+                    </>
+                  );
+                case 'certifications':
+                  return (
+                    <>
+                      <Heading size="lg">{item.name}</Heading>
+                      <Text fontSize="sm" color="gray.600">
+                        {item.issuer && <span>{item.issuer} </span>}
+                        {item.year && <span>({item.year})</span>}
+                      </Text>
+                    </>
+                  );
+                case 'training':
+                  return (
+                    <>
+                      <Heading size="lg">{item.name}</Heading>
+                      <Text fontWeight="semibold" fontSize="lg">{item.provider}</Text>
+                      <Text color="gray.600" fontSize="sm" mb={1}>{item.date}</Text>
+                      {item.details && (
+                        <Text whiteSpace="pre-line" fontSize="md">
+                          {Array.isArray(item.details) ? item.details.join('\n') : item.details}
+                        </Text>
+                      )}
+                    </>
+                  );
+                default:
+                  return null;
+              }
+            })()
           )}
-        </>
-      )}
-      <Accordion allowMultiple>
-        <AccordionItem>
-          <AccordionButton>
-            <Box flex="1" textAlign="left">Skills</Box>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel pb={4}>
-            {/* Add Skill Form */}
-            <Box mb={4}>
-              <form onSubmit={async (e) => {
-                e.preventDefault();
-                if (!profileId || !addTitle.trim()) return;
-                setAddLoading(true);
-                setAddError('');
-                try {
-                  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/skills`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ name: addTitle.trim(), description: addDetails.trim() }),
-                  });
-                  if (!res.ok) throw new Error('Failed to add skill');
-                  // Refresh skills
-                  const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                  }).then(r => r.json());
-                  setAllSections(updated);
-                  setAddTitle('');
-                  setAddDetails('');
-                  toast({ status: 'success', title: 'Skill added!' });
-                } catch (err: any) {
-                  setAddError(err?.message || 'Failed to add skill');
-                } finally {
-                  setAddLoading(false);
-                }
-              }}>
-                <VStack align="start" spacing={2}>
-                  <input
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="Skill name"
-                    value={addTitle}
-                    onChange={e => setAddTitle(e.target.value)}
-                    required
-                  />
-                  <textarea
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 60 }}
-                    placeholder="Description"
-                    value={addDetails}
-                    onChange={e => setAddDetails(e.target.value)}
-                  />
-                  <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle.trim()}>Add</Button>
-                  {addError && <Text color="red.500">{addError}</Text>}
-                </VStack>
-              </form>
-            </Box>
-            {/* Skills List and Edit Skill Inline */}
-            {allSections && Array.isArray(allSections.skills) && allSections.skills.length > 0 ? (
-              <VStack align="start" spacing={2}>
-                {allSections.skills.map((skill: any, idx: number) => (
-                  <HStack key={skill.id || idx} w="100%">
-                    <Box flex={1}>
-                      <Text fontWeight="semibold">{skill.name}</Text>
-                      <Text fontSize="sm" color="gray.600">{skill.description}</Text>
-                    </Box>
-                    <Button size="xs" onClick={() => {
-                      setEditMode(true);
-                      setEditTitle(skill.name);
-                      setEditDetails(skill.description);
-                      setSelectedIdx(String(skill.id));
-                    }}>Edit</Button>
-                    <Button size="xs" colorScheme="red" onClick={async () => {
-                      if (!skill.id) return;
-                      setEditLoading(true);
-                      try {
-                        const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/skills/${skill.id}`, {
-                          method: 'DELETE',
-                          headers: { Authorization: `Bearer ${token}` },
-                        });
-                        if (!res.ok) throw new Error('Failed to delete skill');
-                        // Refresh skills
-                        const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
-                          headers: { Authorization: `Bearer ${token}` },
-                        }).then(r => r.json());
-                        setAllSections(updated);
-                        toast({ status: 'success', title: 'Skill deleted!' });
-                      } catch (err: any) {
-                        toast({ status: 'error', title: err?.message || 'Failed to delete skill' });
-                      } finally {
-                        setEditLoading(false);
-                      }
-                    }}>Delete</Button>
-                  </HStack>
-                ))}
-              </VStack>
-            ) : (
-              <Text color="gray.400">No skills yet. You can add skills above.</Text>
-            )}
-            {/* Edit Skill Inline */}
-            {editMode && selectedIdx !== null && allSections && allSections.skills[selectedIdx] && (
-              <Box mt={4}>
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (!allSections.skills[selectedIdx].id || !editTitle.trim()) return;
-                  setEditLoading(true);
-                  setEditError('');
-                  try {
-                    const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/skills/${allSections.skills[selectedIdx].id}`, {
-                      method: 'PUT',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                      },
-                      body: JSON.stringify({ name: editTitle.trim(), description: editDetails.trim() }),
-                    });
-                    if (!res.ok) throw new Error('Failed to update skill');
-                    // Refresh skills
-                    const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
-                      headers: { Authorization: `Bearer ${token}` },
-                    }).then(r => r.json());
-                    setAllSections(updated);
-                    setEditMode(false);
-                    setEditTitle('');
-                    setEditDetails('');
-                    setSelectedIdx(null);
-                    toast({ status: 'success', title: 'Skill updated!' });
-                  } catch (err: any) {
-                    setEditError(err?.message || 'Failed to update skill');
-                  } finally {
-                    setEditLoading(false);
-                  }
-                }}>
-                  <VStack align="start" spacing={2}>
-                    <input
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="Edit skill name"
-                      value={editTitle}
-                      onChange={e => setEditTitle(e.target.value)}
-                      required
-                    />
-                    <textarea
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 60 }}
-                      placeholder="Edit description"
-                      value={editDetails}
-                      onChange={e => setEditDetails(e.target.value)}
-                    />
-                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle.trim()}>Save</Button>
-                    <Button onClick={() => { setEditMode(false); setEditTitle(''); setEditDetails(''); setSelectedIdx(null); }} isDisabled={editLoading}>Cancel</Button>
-                    {editError && <Text color="red.500">{editError}</Text>}
-                  </VStack>
-                </form>
-              </Box>
-            )}
-          </AccordionPanel>
-        </AccordionItem>
-        <AccordionItem>
-          <AccordionButton>
-            <Box flex="1" textAlign="left">Projects</Box>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel pb={4}>
-            {/* Add Project Form */}
-            <Box mb={4}>
-              <form onSubmit={async (e) => {
-                e.preventDefault();
-                if (!profileId || !addTitle.trim()) return;
-                setAddLoading(true);
-                setAddError('');
-                try {
-                  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/projects`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ name: addTitle.trim(), description: addDetails.trim() }),
-                  });
-                  if (!res.ok) throw new Error('Failed to add project');
-                  // Refresh projects
-                  const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                  }).then(r => r.json());
-                  setAllSections(updated);
-                  setAddTitle('');
-                  setAddDetails('');
-                  toast({ status: 'success', title: 'Project added!' });
-                } catch (err: any) {
-                  setAddError(err?.message || 'Failed to add project');
-                } finally {
-                  setAddLoading(false);
-                }
-              }}>
-                <VStack align="start" spacing={2}>
-                  <input
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                    placeholder="Project name"
-                    value={addTitle}
-                    onChange={e => setAddTitle(e.target.value)}
-                    required
-                  />
-                  <textarea
-                    style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 60 }}
-                    placeholder="Description"
-                    value={addDetails}
-                    onChange={e => setAddDetails(e.target.value)}
-                  />
-                  <Button colorScheme="blue" type="submit" isLoading={addLoading} isDisabled={!addTitle.trim()}>Add</Button>
-                  {addError && <Text color="red.500">{addError}</Text>}
-                </VStack>
-              </form>
-            </Box>
-            {/* Projects List and Edit Project Inline */}
-            {allSections && Array.isArray(allSections.projects) && allSections.projects.length > 0 ? (
-              <VStack align="start" spacing={2}>
-                {allSections.projects.map((project: any, idx: number) => (
-                  <HStack key={project.id || idx} w="100%">
-                    <Box flex={1}>
-                      <Text fontWeight="semibold">{project.name}</Text>
-                      <Text fontSize="sm" color="gray.600">{project.description}</Text>
-                    </Box>
-                    <Button size="xs" onClick={() => {
-                      setEditMode(true);
-                      setEditTitle(project.name);
-                      setEditDetails(project.description);
-                      setSelectedIdx(String(project.id));
-                    }}>Edit</Button>
-                    <Button size="xs" colorScheme="red" onClick={async () => {
-                      if (!project.id) return;
-                      setEditLoading(true);
-                      try {
-                        const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/projects/${project.id}`, {
-                          method: 'DELETE',
-                          headers: { Authorization: `Bearer ${token}` },
-                        });
-                        if (!res.ok) throw new Error('Failed to delete project');
-                        // Refresh projects
-                        const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
-                          headers: { Authorization: `Bearer ${token}` },
-                        }).then(r => r.json());
-                        setAllSections(updated);
-                        toast({ status: 'success', title: 'Project deleted!' });
-                      } catch (err: any) {
-                        toast({ status: 'error', title: err?.message || 'Failed to delete project' });
-                      } finally {
-                        setEditLoading(false);
-                      }
-                    }}>Delete</Button>
-                  </HStack>
-                ))}
-              </VStack>
-            ) : (
-              <Text color="gray.400">No projects yet. You can add projects above.</Text>
-            )}
-            {/* Edit Project Inline */}
-            {editMode && selectedIdx !== null && allSections && allSections.projects[selectedIdx] && (
-              <Box mt={4}>
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (!allSections.projects[selectedIdx].id || !editTitle.trim()) return;
-                  setEditLoading(true);
-                  setEditError('');
-                  try {
-                    const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/projects/${allSections.projects[selectedIdx].id}`, {
-                      method: 'PUT',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                      },
-                      body: JSON.stringify({ name: editTitle.trim(), description: editDetails.trim() }),
-                    });
-                    if (!res.ok) throw new Error('Failed to update project');
-                    // Refresh projects
-                    const updated = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
-                      headers: { Authorization: `Bearer ${token}` },
-                    }).then(r => r.json());
-                    setAllSections(updated);
-                    setEditMode(false);
-                    setEditTitle('');
-                    setEditDetails('');
-                    setSelectedIdx(null);
-                    toast({ status: 'success', title: 'Project updated!' });
-                  } catch (err: any) {
-                    setEditError(err?.message || 'Failed to update project');
-                  } finally {
-                    setEditLoading(false);
-                  }
-                }}>
-                  <VStack align="start" spacing={2}>
-                    <input
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0' }}
-                      placeholder="Edit project name"
-                      value={editTitle}
-                      onChange={e => setEditTitle(e.target.value)}
-                      required
-                    />
-                    <textarea
-                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #CBD5E0', minHeight: 60 }}
-                      placeholder="Edit description"
-                      value={editDetails}
-                      onChange={e => setEditDetails(e.target.value)}
-                    />
-                    <Button colorScheme="blue" type="submit" isLoading={editLoading} isDisabled={!editTitle.trim()}>Save</Button>
-                    <Button onClick={() => { setEditMode(false); setEditTitle(''); setEditDetails(''); setSelectedIdx(null); }} isDisabled={editLoading}>Cancel</Button>
-                    {editError && <Text color="red.500">{editError}</Text>}
-                  </VStack>
-                </form>
-              </Box>
-            )}
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
+        </Box>
+      </Flex>
     </Box>
   );
 };
+
+// ShowMoreText component for truncating long descriptions
+function ShowMoreText({ text }: { text: string }) {
+  const [showMore, setShowMore] = useState(false);
+  if (text.length <= 300) return <>{text}</>;
+  return (
+    <span>
+      {showMore ? text : text.slice(0, 300) + '...'}{' '}
+      <Button variant="link" size="sm" colorScheme="blue" onClick={() => setShowMore(v => !v)}>
+        {showMore ? 'Show less' : 'Show more'}
+      </Button>
+    </span>
+  );
+}
 
 export default CareerArk; 
