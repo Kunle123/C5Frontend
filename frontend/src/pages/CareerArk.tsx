@@ -28,6 +28,8 @@ import {
   AccordionIcon,
   Center,
   Image,
+  Input,
+  Textarea,
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, ArrowBackIcon } from '@chakra-ui/icons';
 import { getUser, uploadCV } from '../api';
@@ -452,21 +454,134 @@ const CareerArk: React.FC = () => {
               const data = sectionDataMap[section];
               const item = data.find((e: any) => e.id === selectedIdx);
               if (!item) return <Text color="gray.400">No details available.</Text>;
+              if (editMode) {
+                // Editable form for each section
+                switch (section) {
+                  case 'work_experience':
+                    return (
+                      <Box>
+                        <Heading size="lg" mb={2}>Edit Work Experience</Heading>
+                        <Input placeholder="Company" value={editCompany} onChange={e => setEditCompany(e.target.value)} mb={2} />
+                        <Input placeholder="Title" value={editTitle} onChange={e => setEditTitle(e.target.value)} mb={2} />
+                        <Input placeholder="Start Date" value={editStartDate} onChange={e => setEditStartDate(e.target.value)} mb={2} />
+                        <Input placeholder="End Date" value={editEndDate} onChange={e => setEditEndDate(e.target.value)} mb={2} />
+                        <Textarea placeholder="Description" value={editDetails} onChange={e => setEditDetails(e.target.value)} mb={2} minH={100} />
+                        {editError && <Alert status="error" mb={2}><AlertIcon />{editError}</Alert>}
+                        <HStack mt={2}>
+                          <Button colorScheme="green" isLoading={editLoading} onClick={async () => {
+                            setEditLoading(true);
+                            setEditError('');
+                            try {
+                              await updateWorkExperience(item.id, {
+                                company: editCompany,
+                                title: editTitle,
+                                start_date: editStartDate,
+                                end_date: editEndDate,
+                                description: editDetails,
+                              });
+                              setEditMode(false);
+                              // Update local state
+                              setWorkExperience(prev => prev.map(w => w.id === item.id ? { ...w, company: editCompany, title: editTitle, start_date: editStartDate, end_date: editEndDate, description: editDetails } : w));
+                              toast({ status: 'success', title: 'Work experience updated' });
+                            } catch (err: any) {
+                              setEditError(err?.error || err?.message || 'Update failed');
+                            } finally {
+                              setEditLoading(false);
+                            }
+                          }}>Save</Button>
+                          <Button onClick={() => setEditMode(false)}>Cancel</Button>
+                        </HStack>
+                      </Box>
+                    );
+                  case 'education':
+                    return (
+                      <Box>
+                        <Heading size="lg" mb={2}>Edit Education</Heading>
+                        <Input placeholder="Institution" value={editInstitution} onChange={e => setEditInstitution(e.target.value)} mb={2} />
+                        <Input placeholder="Degree" value={editDegree} onChange={e => setEditDegree(e.target.value)} mb={2} />
+                        <Input placeholder="Start Date" value={editEduStartDate} onChange={e => setEditEduStartDate(e.target.value)} mb={2} />
+                        <Input placeholder="End Date" value={editEduEndDate} onChange={e => setEditEduEndDate(e.target.value)} mb={2} />
+                        <Textarea placeholder="Description" value={editEduDetails} onChange={e => setEditEduDetails(e.target.value)} mb={2} minH={100} />
+                        {editError && <Alert status="error" mb={2}><AlertIcon />{editError}</Alert>}
+                        <HStack mt={2}>
+                          <Button colorScheme="green" isLoading={editLoading} onClick={async () => {
+                            setEditLoading(true);
+                            setEditError('');
+                            try {
+                              await updateEducation(item.id, {
+                                institution: editInstitution,
+                                degree: editDegree,
+                                start_date: editEduStartDate,
+                                end_date: editEduEndDate,
+                                description: editEduDetails,
+                              });
+                              setEditMode(false);
+                              setEducation(prev => prev.map(e => e.id === item.id ? { ...e, institution: editInstitution, degree: editDegree, start_date: editEduStartDate, end_date: editEduEndDate, description: editEduDetails } : e));
+                              toast({ status: 'success', title: 'Education updated' });
+                            } catch (err: any) {
+                              setEditError(err?.error || err?.message || 'Update failed');
+                            } finally {
+                              setEditLoading(false);
+                            }
+                          }}>Save</Button>
+                          <Button onClick={() => setEditMode(false)}>Cancel</Button>
+                        </HStack>
+                      </Box>
+                    );
+                  case 'training':
+                    return (
+                      <Box>
+                        <Heading size="lg" mb={2}>Edit Training</Heading>
+                        <Input placeholder="Name" value={editTrainingName} onChange={e => setEditTrainingName(e.target.value)} mb={2} />
+                        <Input placeholder="Provider" value={editProvider} onChange={e => setEditProvider(e.target.value)} mb={2} />
+                        <Input placeholder="Date" value={editTrainingDate} onChange={e => setEditTrainingDate(e.target.value)} mb={2} />
+                        <Textarea placeholder="Details" value={editTrainingDetails} onChange={e => setEditTrainingDetails(e.target.value)} mb={2} minH={100} />
+                        {editError && <Alert status="error" mb={2}><AlertIcon />{editError}</Alert>}
+                        <HStack mt={2}>
+                          <Button colorScheme="green" isLoading={editLoading} onClick={async () => {
+                            setEditLoading(true);
+                            setEditError('');
+                            try {
+                              await updateTraining(item.id, {
+                                name: editTrainingName,
+                                provider: editProvider,
+                                date: editTrainingDate,
+                                details: editTrainingDetails,
+                              });
+                              setEditMode(false);
+                              setTraining(prev => prev.map(t => t.id === item.id ? { ...t, name: editTrainingName, provider: editProvider, date: editTrainingDate, details: editTrainingDetails } : t));
+                              toast({ status: 'success', title: 'Training updated' });
+                            } catch (err: any) {
+                              setEditError(err?.error || err?.message || 'Update failed');
+                            } finally {
+                              setEditLoading(false);
+                            }
+                          }}>Save</Button>
+                          <Button onClick={() => setEditMode(false)}>Cancel</Button>
+                        </HStack>
+                      </Box>
+                    );
+                  default:
+                    return <Text>Edit not supported for this section yet.</Text>;
+                }
+              }
+              // Non-edit mode (view)
               switch (section) {
                 case 'work_experience':
                   return (
-                    <>
+                    <Box>
                       <Heading size="lg">{item.company}</Heading>
                       <Text fontWeight="semibold" fontSize="lg">{item.title}</Text>
                       <Text color="gray.600" fontSize="sm" mb={1}>{item.start_date} – {item.end_date}</Text>
                       <Text whiteSpace="pre-line" fontSize="md">
                         {item.description && item.description.length > 300 ? <ShowMoreText text={item.description} /> : item.description}
                       </Text>
-                    </>
+                      <Button mt={4} onClick={() => setEditMode(true)} colorScheme="blue">Edit</Button>
+                    </Box>
                   );
                 case 'education':
                   return (
-                    <>
+                    <Box>
                       <Heading size="lg">{item.institution}</Heading>
                       <Text fontWeight="semibold" fontSize="lg">{item.degree}</Text>
                       {item.field && <Text color="gray.500" fontSize="sm">{item.field}</Text>}
@@ -476,7 +591,8 @@ const CareerArk: React.FC = () => {
                           {item.description.length > 300 ? <ShowMoreText text={item.description} /> : item.description}
                         </Text>
                       )}
-                    </>
+                      <Button mt={4} onClick={() => setEditMode(true)} colorScheme="blue">Edit</Button>
+                    </Box>
                   );
                 case 'skills':
                   return (
@@ -503,7 +619,7 @@ const CareerArk: React.FC = () => {
                   );
                 case 'training':
                   return (
-                    <>
+                    <Box>
                       <Heading size="lg">{item.name}</Heading>
                       <Text fontWeight="semibold" fontSize="lg">{item.provider}</Text>
                       <Text color="gray.600" fontSize="sm" mb={1}>{item.date}</Text>
@@ -512,7 +628,8 @@ const CareerArk: React.FC = () => {
                           {Array.isArray(item.details) ? item.details.join('\n') : item.details}
                         </Text>
                       )}
-                    </>
+                      <Button mt={4} onClick={() => setEditMode(true)} colorScheme="blue">Edit</Button>
+                    </Box>
                   );
                 default:
                   return null;
