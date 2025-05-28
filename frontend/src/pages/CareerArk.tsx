@@ -53,11 +53,9 @@ function EmptyState({ section, onUpload }: { section: string, onUpload?: () => v
     certifications: 'certifications',
     training: 'training',
   };
-  const imgSrc = `/empty-${section}.svg`;
   return (
     <Center flexDir="column" py={8} color="gray.400">
-      <Image src={imgSrc} alt={`No ${sectionNames[section]} illustration`} boxSize="120px" mb={2} fallback={<span style={{fontSize: 64}}>📄</span>} />
-      <Text mb={2}>No {sectionNames[section]} found.</Text>
+      <Text mb={2}>No entries yet.</Text>
       {onUpload && <Button colorScheme="blue" onClick={onUpload}>Upload CV</Button>}
     </Center>
   );
