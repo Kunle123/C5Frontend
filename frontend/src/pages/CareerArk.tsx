@@ -163,6 +163,12 @@ const CareerArk: React.FC = () => {
       })
       .then(data => {
         setAllSections(data);
+        setWorkExperience(Array.isArray(data.work_experience) ? data.work_experience : []);
+        setEducation(Array.isArray(data.education) ? data.education : []);
+        setTraining(Array.isArray(data.training) ? data.training : []);
+        setSkills(Array.isArray(data.skills) ? data.skills : []);
+        setProjects(Array.isArray(data.projects) ? data.projects : []);
+        setCertifications(Array.isArray(data.certifications) ? data.certifications : []);
         setError('');
       })
       .catch(() => setError('Failed to load data'))
@@ -237,6 +243,12 @@ const CareerArk: React.FC = () => {
                   if (arcRes.ok) {
                     const arcData = await arcRes.json();
                     setAllSections(arcData);
+                    setWorkExperience(Array.isArray(arcData.work_experience) ? arcData.work_experience : []);
+                    setEducation(Array.isArray(arcData.education) ? arcData.education : []);
+                    setTraining(Array.isArray(arcData.training) ? arcData.training : []);
+                    setSkills(Array.isArray(arcData.skills) ? arcData.skills : []);
+                    setProjects(Array.isArray(arcData.projects) ? arcData.projects : []);
+                    setCertifications(Array.isArray(arcData.certifications) ? arcData.certifications : []);
                   }
                   toast({ status: 'success', title: 'CV imported and Ark updated!' });
                 } else if (statusData.status === 'failed') {
