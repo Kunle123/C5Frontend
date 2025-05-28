@@ -133,46 +133,40 @@ const CareerArk: React.FC = () => {
   const [sectionError, setSectionError] = useState<string>('');
   const [training, setTraining] = useState<any[]>([]);
 
-  // Move this block:
-  // const sectionDataMap: Record<string, any[]> = { ... };
-  // to after the sortWorkExp and sortEducation function declarations.
-
   useEffect(() => {
-    async function fetchSections() {
-      setLoading(true);
-      setSectionError('');
-      try {
-        const token = localStorage.getItem('token') || '';
-        const profileRes = await fetch('/api/career-ark/profiles/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!profileRes.ok) throw new Error('Failed to fetch profile');
-        const profile = await profileRes.json();
-        setUser(profile);
-        setProfileId(profile.id);
-        // Fetch each section
-        const [we, edu, trn, skl, prj, cert] = await Promise.all([
-          fetch(`/api/career-ark/profiles/${profile.id}/work_experience`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
-          fetch(`/api/career-ark/profiles/${profile.id}/education`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
-          fetch(`/api/career-ark/profiles/${profile.id}/training`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
-          fetch(`/api/career-ark/profiles/${profile.id}/skills`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
-          fetch(`/api/career-ark/profiles/${profile.id}/projects`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
-          fetch(`/api/career-ark/profiles/${profile.id}/certifications`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
-        ]);
-        setWorkExperience(Array.isArray(we) ? we : []);
-        setEducation(Array.isArray(edu) ? edu : []);
-        setTraining(Array.isArray(trn) ? trn : []);
-        setSkills(Array.isArray(skl) ? skl : []);
-        setProjects(Array.isArray(prj) ? prj : []);
-        setCertifications(Array.isArray(cert) ? cert : []);
-        setError('');
-      } catch (err: any) {
-        setSectionError(err?.message || 'Failed to load data');
-      } finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    const token = (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '';
+    if (!token) {
+      setError('Not authenticated');
+      setLoading(false);
+      return;
     }
-    fetchSections();
+    // Fetch the user's profile using the correct endpoint, always bypassing cache
+    fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
+      headers: { Authorization: `Bearer ${token}`, 'Cache-Control': 'no-cache' },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        return res.json();
+      })
+      .then(profile => {
+        setUser(profile); // Store the profile object
+        setProfileId(profile.id);
+        // Now fetch all sections using the profileId, always bypassing cache
+        return fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
+          headers: { Authorization: `Bearer ${token}`, 'Cache-Control': 'no-cache' },
+        });
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch sections');
+        return res.json();
+      })
+      .then(data => {
+        setAllSections(data);
+        setError('');
+      })
+      .catch(() => setError('Failed to load data'))
+      .finally(() => setLoading(false));
   }, []);
 
   const sortWorkExp = (arr: any[]) => {
@@ -234,7 +228,7 @@ const CareerArk: React.FC = () => {
                   setPolling(false);
                   setSummary(statusData.extractedDataSummary || null);
                   // Refresh Ark data, bypassing cache
-                  const arcRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me/all_sections`, {
+                  const arcRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
                     headers: {
                       Authorization: `Bearer ${token}`,
                       'Cache-Control': 'no-cache',
