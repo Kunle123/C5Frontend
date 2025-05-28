@@ -184,17 +184,10 @@ const CareerArk: React.FC = () => {
     setUploadProgress(10);
     try {
       const token = localStorage.getItem('token') || '';
-      // Always fetch the profile just before upload
-      const profileRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!profileRes.ok) throw new Error('Failed to fetch profile');
-      const profile = await profileRes.json();
-      if (!profile.id) throw new Error('Profile ID missing');
       const formData = new FormData();
       formData.append('file', file);
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/cv`, true);
+      xhr.open('POST', `${API_GATEWAY_BASE}/api/career-ark/cv`, true);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
@@ -220,7 +213,7 @@ const CareerArk: React.FC = () => {
                   setPolling(false);
                   setSummary(statusData.extractedDataSummary || null);
                   // Refresh Ark data, bypassing cache
-                  const arcRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
+                  const arcRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me/all_sections`, {
                     headers: {
                       Authorization: `Bearer ${token}`,
                       'Cache-Control': 'no-cache',
