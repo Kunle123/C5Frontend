@@ -10,7 +10,28 @@ import {
   Spinner,
   Alert,
   AlertIcon,
+  Center,
+  Image,
 } from '@chakra-ui/react';
+
+function EmptyState({ section, onUpload }: { section: string, onUpload?: () => void }) {
+  const sectionNames: Record<string, string> = {
+    work_experience: 'work experience',
+    education: 'education',
+    skills: 'skills',
+    projects: 'projects',
+    certifications: 'certifications',
+    training: 'training',
+  };
+  const imgSrc = `/empty-${section}.svg`;
+  return (
+    <Center flexDir="column" py={8} color="gray.400">
+      <Image src={imgSrc} alt={`No ${sectionNames[section]} illustration`} boxSize="120px" mb={2} fallback={<span style={{fontSize: 64}}>📄</span>} />
+      <Text mb={2}>No {sectionNames[section]} found.</Text>
+      {onUpload && <Button colorScheme="blue" onClick={onUpload}>Upload CV</Button>}
+    </Center>
+  );
+}
 
 const CareerArkV2: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -209,7 +230,9 @@ const CareerArkV2: React.FC = () => {
                     )}
                   </Box>
                 ))
-              ) : <Text color="gray.400">No work experience found.</Text>}
+              ) : (
+                <EmptyState section="work_experience" onUpload={handleUploadClick} />
+              )}
             </Box>
             {/* Education */}
             <Box mb={6}>
@@ -229,7 +252,9 @@ const CareerArkV2: React.FC = () => {
                     )}
                   </Box>
                 ))
-              ) : <Text color="gray.400">No education found.</Text>}
+              ) : (
+                <EmptyState section="education" onUpload={handleUploadClick} />
+              )}
             </Box>
             {/* Training */}
             <Box mb={6}>
@@ -248,14 +273,18 @@ const CareerArkV2: React.FC = () => {
                     ) : null}
                   </Box>
                 ))
-              ) : <Text color="gray.400">No training found.</Text>}
+              ) : (
+                <EmptyState section="training" onUpload={handleUploadClick} />
+              )}
             </Box>
             {/* Skills */}
             <Box mb={6}>
               <Heading size="sm" mb={2}>Skills</Heading>
               {Array.isArray(arcData.skills) && arcData.skills.length > 0 ? (
                 <Box>{arcData.skills.map((s: string, i: number) => <Text as="span" key={i} mr={2} bg="blue.50" px={2} py={1} borderRadius="md">{s}</Text>)}</Box>
-              ) : <Text color="gray.400">No skills found.</Text>}
+              ) : (
+                <EmptyState section="skills" onUpload={handleUploadClick} />
+              )}
             </Box>
             {/* Projects */}
             <Box mb={6}>
@@ -267,7 +296,9 @@ const CareerArkV2: React.FC = () => {
                     <Text fontSize="sm" color="gray.600">{item.description}</Text>
                   </Box>
                 ))
-              ) : <Text color="gray.400">No projects found.</Text>}
+              ) : (
+                <EmptyState section="projects" onUpload={handleUploadClick} />
+              )}
             </Box>
             {/* Certifications */}
             <Box mb={6}>
@@ -279,7 +310,9 @@ const CareerArkV2: React.FC = () => {
                     <Text fontSize="sm" color="gray.600">{item.issuer} {item.year ? `(${item.year})` : item.date ? `(${item.date})` : ''}</Text>
                   </Box>
                 ))
-              ) : <Text color="gray.400">No certifications found.</Text>}
+              ) : (
+                <EmptyState section="certifications" onUpload={handleUploadClick} />
+              )}
             </Box>
           </>
         ) : null}

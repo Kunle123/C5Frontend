@@ -26,6 +26,8 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Center,
+  Image,
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, ArrowBackIcon } from '@chakra-ui/icons';
 import { getUser, uploadCV } from '../api';
@@ -41,6 +43,25 @@ const sectionTitles = {
 };
 
 const API_GATEWAY_BASE = 'https://api-gw-production.up.railway.app';
+
+function EmptyState({ section, onUpload }: { section: string, onUpload?: () => void }) {
+  const sectionNames: Record<string, string> = {
+    work_experience: 'work experience',
+    education: 'education',
+    skills: 'skills',
+    projects: 'projects',
+    certifications: 'certifications',
+    training: 'training',
+  };
+  const imgSrc = `/empty-${section}.svg`;
+  return (
+    <Center flexDir="column" py={8} color="gray.400">
+      <Image src={imgSrc} alt={`No ${sectionNames[section]} illustration`} boxSize="120px" mb={2} fallback={<span style={{fontSize: 64}}>📄</span>} />
+      <Text mb={2}>No {sectionNames[section]} found.</Text>
+      {onUpload && <Button colorScheme="blue" onClick={onUpload}>Upload CV</Button>}
+    </Center>
+  );
+}
 
 const CareerArk: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -373,7 +394,7 @@ const CareerArk: React.FC = () => {
                 <VStack spacing={1} align="stretch">
                   {(() => {
                     const data = sectionDataMap[section as string];
-                    if (!data || data.length === 0) return <Text color="gray.400">No {section.replace('_', ' ')} found.</Text>;
+                    if (!data || data.length === 0) return <EmptyState section={section} onUpload={section === 'work_experience' ? handleUploadClick : undefined} />;
                     return data.map((item: any, idx: number) => (
                       <Box
                         key={item.id || idx}
