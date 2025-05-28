@@ -570,19 +570,24 @@ const CareerArk: React.FC = () => {
                 case 'work_experience':
                   return (
                     <Box>
-                      <Heading size="lg">{item.company}</Heading>
+                      <Flex justify="space-between" align="center" mb={2}>
+                        <Heading size="lg">{item.company}</Heading>
+                        <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
+                      </Flex>
                       <Text fontWeight="semibold" fontSize="lg">{item.title}</Text>
                       <Text color="gray.600" fontSize="sm" mb={1}>{item.start_date} – {item.end_date}</Text>
                       <Text whiteSpace="pre-line" fontSize="md">
                         {item.description && item.description.length > 300 ? <ShowMoreText text={item.description} /> : item.description}
                       </Text>
-                      <Button mt={4} onClick={() => setEditMode(true)} colorScheme="blue">Edit</Button>
                     </Box>
                   );
                 case 'education':
                   return (
                     <Box>
-                      <Heading size="lg">{item.institution}</Heading>
+                      <Flex justify="space-between" align="center" mb={2}>
+                        <Heading size="lg">{item.institution}</Heading>
+                        <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
+                      </Flex>
                       <Text fontWeight="semibold" fontSize="lg">{item.degree}</Text>
                       {item.field && <Text color="gray.500" fontSize="sm">{item.field}</Text>}
                       <Text color="gray.600" fontSize="sm" mb={1}>{item.start_date} – {item.end_date}</Text>
@@ -591,7 +596,6 @@ const CareerArk: React.FC = () => {
                           {item.description.length > 300 ? <ShowMoreText text={item.description} /> : item.description}
                         </Text>
                       )}
-                      <Button mt={4} onClick={() => setEditMode(true)} colorScheme="blue">Edit</Button>
                     </Box>
                   );
                 case 'skills':
@@ -620,7 +624,10 @@ const CareerArk: React.FC = () => {
                 case 'training':
                   return (
                     <Box>
-                      <Heading size="lg">{item.name}</Heading>
+                      <Flex justify="space-between" align="center" mb={2}>
+                        <Heading size="lg">{item.name}</Heading>
+                        <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
+                      </Flex>
                       <Text fontWeight="semibold" fontSize="lg">{item.provider}</Text>
                       <Text color="gray.600" fontSize="sm" mb={1}>{item.date}</Text>
                       {item.details && (
@@ -628,7 +635,6 @@ const CareerArk: React.FC = () => {
                           {Array.isArray(item.details) ? item.details.join('\n') : item.details}
                         </Text>
                       )}
-                      <Button mt={4} onClick={() => setEditMode(true)} colorScheme="blue">Edit</Button>
                     </Box>
                   );
                 default:
