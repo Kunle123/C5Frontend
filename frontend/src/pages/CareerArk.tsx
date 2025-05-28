@@ -497,12 +497,27 @@ const CareerArk: React.FC = () => {
                                 end_date: editEndDate,
                                 description: editDetails,
                               });
+                              // Always re-fetch latest work experience after update
+                              const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/work_experience`, {
+                                headers: { Authorization: `Bearer ${token}` },
+                              });
+                              const latest = await res.json();
+                              setWorkExperience(Array.isArray(latest) ? latest : []);
                               setEditMode(false);
-                              // Update local state
-                              setWorkExperience(prev => prev.map(w => w.id === item.id ? { ...w, company: editCompany, title: editTitle, start_date: editStartDate, end_date: editEndDate, description: editDetails } : w));
                               toast({ status: 'success', title: 'Work experience updated' });
                             } catch (err: any) {
-                              setEditError(err?.error || err?.message || 'Update failed');
+                              if (err?.status === 404 || err?.message?.includes('404')) {
+                                toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
+                                // Auto-refresh
+                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/work_experience`, {
+                                  headers: { Authorization: `Bearer ${token}` },
+                                });
+                                const latest = await res.json();
+                                setWorkExperience(Array.isArray(latest) ? latest : []);
+                                setEditMode(false);
+                              } else {
+                                setEditError(err?.error || err?.message || 'Update failed');
+                              }
                             } finally {
                               setEditLoading(false);
                             }
@@ -533,11 +548,27 @@ const CareerArk: React.FC = () => {
                                 end_date: editEduEndDate,
                                 description: editEduDetails,
                               });
+                              // Always re-fetch latest education after update
+                              const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/education`, {
+                                headers: { Authorization: `Bearer ${token}` },
+                              });
+                              const latest = await res.json();
+                              setEducation(Array.isArray(latest) ? latest : []);
                               setEditMode(false);
-                              setEducation(prev => prev.map(e => e.id === item.id ? { ...e, institution: editInstitution, degree: editDegree, start_date: editEduStartDate, end_date: editEduEndDate, description: editEduDetails } : e));
                               toast({ status: 'success', title: 'Education updated' });
                             } catch (err: any) {
-                              setEditError(err?.error || err?.message || 'Update failed');
+                              if (err?.status === 404 || err?.message?.includes('404')) {
+                                toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
+                                // Auto-refresh
+                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/education`, {
+                                  headers: { Authorization: `Bearer ${token}` },
+                                });
+                                const latest = await res.json();
+                                setEducation(Array.isArray(latest) ? latest : []);
+                                setEditMode(false);
+                              } else {
+                                setEditError(err?.error || err?.message || 'Update failed');
+                              }
                             } finally {
                               setEditLoading(false);
                             }
@@ -566,11 +597,27 @@ const CareerArk: React.FC = () => {
                                 date: editTrainingDate,
                                 details: editTrainingDetails,
                               });
+                              // Always re-fetch latest training after update
+                              const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/training`, {
+                                headers: { Authorization: `Bearer ${token}` },
+                              });
+                              const latest = await res.json();
+                              setTraining(Array.isArray(latest) ? latest : []);
                               setEditMode(false);
-                              setTraining(prev => prev.map(t => t.id === item.id ? { ...t, name: editTrainingName, provider: editProvider, date: editTrainingDate, details: editTrainingDetails } : t));
                               toast({ status: 'success', title: 'Training updated' });
                             } catch (err: any) {
-                              setEditError(err?.error || err?.message || 'Update failed');
+                              if (err?.status === 404 || err?.message?.includes('404')) {
+                                toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
+                                // Auto-refresh
+                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/training`, {
+                                  headers: { Authorization: `Bearer ${token}` },
+                                });
+                                const latest = await res.json();
+                                setTraining(Array.isArray(latest) ? latest : []);
+                                setEditMode(false);
+                              } else {
+                                setEditError(err?.error || err?.message || 'Update failed');
+                              }
                             } finally {
                               setEditLoading(false);
                             }
