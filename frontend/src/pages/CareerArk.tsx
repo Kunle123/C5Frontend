@@ -249,8 +249,20 @@ const CareerArk: React.FC = () => {
                     setSkills(Array.isArray(arcData.skills) ? arcData.skills : []);
                     setProjects(Array.isArray(arcData.projects) ? arcData.projects : []);
                     setCertifications(Array.isArray(arcData.certifications) ? arcData.certifications : []);
+                    // Auto-select first available entry
+                    const sectionOrder = ['work_experience', 'education', 'training', 'skills', 'projects', 'certifications'];
+                    for (const sec of sectionOrder) {
+                      const arr = arcData[sec];
+                      if (Array.isArray(arr) && arr.length > 0) {
+                        setSelectedSection(sec);
+                        setSelectedIdx(arr[0].id || '0');
+                        break;
+                      }
+                    }
+                    toast({ status: 'success', title: 'CV imported and Ark updated!' });
+                  } else {
+                    setUploadError('Failed to update Ark');
                   }
-                  toast({ status: 'success', title: 'CV imported and Ark updated!' });
                 } else if (statusData.status === 'failed') {
                   setPolling(false);
                   setUploadError(statusData.error || 'CV extraction failed.');
@@ -387,6 +399,12 @@ const CareerArk: React.FC = () => {
         <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} display="flex" flexDirection="column" maxH="100%">
           <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
           {uploading && <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />}
+          {polling && (
+            <Box mb={2} textAlign="center">
+              <Spinner size="sm" color="blue.500" mr={2} />
+              <Text as="span" fontSize="sm" color="blue.600">Processing more data…</Text>
+            </Box>
+          )}
           <input type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} disabled={uploading || polling} />
           <Box flex={1} minH={0} overflowY="auto">
             {/* Section Navigation and List */}
