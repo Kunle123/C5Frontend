@@ -13,6 +13,7 @@ import {
   Center,
   Image,
 } from '@chakra-ui/react';
+import { API_GATEWAY_BASE } from '../api/careerArkApi';
 
 function EmptyState({ section, onUpload }: { section: string, onUpload?: () => void }) {
   const sectionNames: Record<string, string> = {
@@ -134,13 +135,13 @@ const CareerArkV2: React.FC = () => {
     try {
       const token = (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '';
       // Fetch the user's profile
-      const profileRes = await fetch('/api/career-ark/profiles/me', {
+      const profileRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!profileRes.ok) throw new Error('Failed to fetch profile');
       const profile = await profileRes.json();
       // Fetch all sections using the profileId
-      const res = await fetch(`/api/career-ark/profiles/${profile.id}/all_sections`, {
+      const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch Ark data');

@@ -1,4 +1,5 @@
 const API_BASE = 'https://api-gw-production.up.railway.app/api/arc';
+export const API_GATEWAY_BASE = 'https://api-gw-production.up.railway.app';
 
 function getAuthHeaders() {
   return {
@@ -40,13 +41,13 @@ export async function getCVStatus(taskId: string) {
 export async function getArcData() {
   const token = localStorage.getItem('token') || '';
   // Fetch the user's profile
-  const profileRes = await fetch('/api/career-ark/profiles/me', {
+  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!profileRes.ok) throw new Error('Failed to fetch profile');
   const profile = await profileRes.json();
   // Fetch all sections using the profileId
-  const res = await fetch(`/api/career-ark/profiles/${profile.id}/all_sections`, {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error('Failed to fetch Ark data');
