@@ -30,10 +30,11 @@ import {
   Image,
   Input,
   Textarea,
+  Badge,
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, ArrowBackIcon } from '@chakra-ui/icons';
 import { getUser, uploadCV } from '../api';
-import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience, addEducation, updateEducation, addTraining, updateTraining } from '../api/careerArkApi';
+import { getArcData, getCVStatus, addWorkExperience, updateWorkExperience, addEducation, updateEducation, addTraining, updateTraining, deleteWorkExperience, deleteEducation, deleteTraining, deleteSkill, deleteProject, deleteCertification } from '../api/careerArkApi';
 import { useDisclosure } from '@chakra-ui/react';
 import { FiKey } from 'react-icons/fi';
 import { format, parse, isValid, compareDesc } from 'date-fns';
@@ -637,7 +638,31 @@ const CareerArk: React.FC = () => {
                     <Box>
                       <Flex justify="space-between" align="center" mb={2}>
                         <Heading size="lg">{item.company}</Heading>
-                        <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
+                        <HStack>
+                          <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
+                          <Button onClick={async () => {
+                            try {
+                              console.log('Deleting work experience', item.id);
+                              await deleteWorkExperience(item.id);
+                              const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
+                              const latest = await res.json();
+                              setWorkExperience(Array.isArray(latest) ? latest : []);
+                              setSelectedIdx(latest[0]?.id || null);
+                              toast({ status: 'success', title: 'Work experience deleted' });
+                            } catch (err: any) {
+                              console.log('Delete error', err);
+                              if (err?.status === 404 || err?.message?.includes('404')) {
+                                toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
+                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
+                                const latest = await res.json();
+                                setWorkExperience(Array.isArray(latest) ? latest : []);
+                                setSelectedIdx(latest[0]?.id || null);
+                              } else {
+                                toast({ status: 'error', title: err?.error || err?.message || 'Delete failed' });
+                              }
+                            }
+                          }} colorScheme="red" size="sm">Delete</Button>
+                        </HStack>
                       </Flex>
                       <Text fontWeight="semibold" fontSize="lg">{item.title}</Text>
                       <Text color="gray.600" fontSize="sm" mb={1}>{item.start_date} – {item.end_date}</Text>
@@ -651,7 +676,31 @@ const CareerArk: React.FC = () => {
                     <Box>
                       <Flex justify="space-between" align="center" mb={2}>
                         <Heading size="lg">{item.institution}</Heading>
-                        <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
+                        <HStack>
+                          <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
+                          <Button onClick={async () => {
+                            try {
+                              console.log('Deleting education', item.id);
+                              await deleteEducation(item.id);
+                              const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/education`, { headers: { Authorization: `Bearer ${token}` } });
+                              const latest = await res.json();
+                              setEducation(Array.isArray(latest) ? latest : []);
+                              setSelectedIdx(latest[0]?.id || null);
+                              toast({ status: 'success', title: 'Education deleted' });
+                            } catch (err: any) {
+                              console.log('Delete error', err);
+                              if (err?.status === 404 || err?.message?.includes('404')) {
+                                toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
+                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/education`, { headers: { Authorization: `Bearer ${token}` } });
+                                const latest = await res.json();
+                                setEducation(Array.isArray(latest) ? latest : []);
+                                setSelectedIdx(latest[0]?.id || null);
+                              } else {
+                                toast({ status: 'error', title: err?.error || err?.message || 'Delete failed' });
+                              }
+                            }
+                          }} colorScheme="red" size="sm">Delete</Button>
+                        </HStack>
                       </Flex>
                       <Text fontWeight="semibold" fontSize="lg">{item.degree}</Text>
                       {item.field && <Text color="gray.500" fontSize="sm">{item.field}</Text>}
@@ -691,7 +740,31 @@ const CareerArk: React.FC = () => {
                     <Box>
                       <Flex justify="space-between" align="center" mb={2}>
                         <Heading size="lg">{item.name}</Heading>
-                        <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
+                        <HStack>
+                          <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
+                          <Button onClick={async () => {
+                            try {
+                              console.log('Deleting training', item.id);
+                              await deleteTraining(item.id);
+                              const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/training`, { headers: { Authorization: `Bearer ${token}` } });
+                              const latest = await res.json();
+                              setTraining(Array.isArray(latest) ? latest : []);
+                              setSelectedIdx(latest[0]?.id || null);
+                              toast({ status: 'success', title: 'Training deleted' });
+                            } catch (err: any) {
+                              console.log('Delete error', err);
+                              if (err?.status === 404 || err?.message?.includes('404')) {
+                                toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
+                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/training`, { headers: { Authorization: `Bearer ${token}` } });
+                                const latest = await res.json();
+                                setTraining(Array.isArray(latest) ? latest : []);
+                                setSelectedIdx(latest[0]?.id || null);
+                              } else {
+                                toast({ status: 'error', title: err?.error || err?.message || 'Delete failed' });
+                              }
+                            }
+                          }} colorScheme="red" size="sm">Delete</Button>
+                        </HStack>
                       </Flex>
                       <Text fontWeight="semibold" fontSize="lg">{item.provider}</Text>
                       <Text color="gray.600" fontSize="sm" mb={1}>{item.date}</Text>
@@ -709,6 +782,28 @@ const CareerArk: React.FC = () => {
           )}
         </Box>
       </Flex>
+      {/* Modal overlay for missing keywords */}
+      <Modal isOpen={isOpen} onClose={onClose} size={modalSize} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Missing Keywords for This Job</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {missingKeywords.length > 0 ? (
+              <VStack spacing={2} align="stretch">
+                <Text mb={2}>Add these keywords to your Ark profile to improve your match score:</Text>
+                <HStack wrap="wrap" gap={2} mb={2}>
+                  {missingKeywords.map((kw, idx) => (
+                    <Badge key={kw + idx} colorScheme="red" px={3} py={1} borderRadius="md" fontSize="md" fontWeight={600}>{kw}</Badge>
+                  ))}
+                </HStack>
+              </VStack>
+            ) : (
+              <Text>No missing keywords found.</Text>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
