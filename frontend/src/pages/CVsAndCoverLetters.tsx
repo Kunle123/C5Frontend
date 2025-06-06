@@ -254,12 +254,13 @@ const Application: React.FC = () => {
         return;
       }
       setArcData(data);
-      // 3. Analyze keywords against Arc data
+      // 3. Analyze keywords against ALL Arc data sections
       const arcText = JSON.stringify(data).toLowerCase();
       const now = new Date();
       const keywordStatuses = keywords.map((kw: string) => {
         const kwLower = kw.toLowerCase();
         let green = false, amber = false;
+        // Work Experience
         if (data.work_experience) {
           for (const exp of data.work_experience) {
             const end = exp.end_date || exp.endDate || '';
@@ -272,6 +273,7 @@ const Application: React.FC = () => {
             }
           }
         }
+        // Skills
         if (!green && data.skills && data.skills.length > 0) {
           for (const skill of data.skills) {
             if ((typeof skill === 'string' && skill.toLowerCase().includes(kwLower)) ||
@@ -280,6 +282,7 @@ const Application: React.FC = () => {
             }
           }
         }
+        // Education, Projects, Certifications, Training, etc.
         if (!green && !amber && arcText.includes(kwLower)) amber = true;
         return { keyword: kw, status: green ? 'green' : amber ? 'amber' : 'red' };
       });
