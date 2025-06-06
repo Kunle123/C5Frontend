@@ -133,6 +133,7 @@ const CareerArk: React.FC = () => {
   const [certifications, setCertifications] = useState<any[]>([]);
   const [sectionError, setSectionError] = useState<string>('');
   const [training, setTraining] = useState<any[]>([]);
+  const [showRecallBtn, setShowRecallBtn] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -175,6 +176,14 @@ const CareerArk: React.FC = () => {
       .catch(() => setError('Failed to load data'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!loading && workExperience && workExperience.length > 0 && (!selectedIdx || selectedSection !== 'work_experience')) {
+      setSelectedSection('work_experience');
+      setSelectedIdx(workExperience[0].id || '0');
+    }
+    // eslint-disable-next-line
+  }, [loading, workExperience]);
 
   const sortWorkExp = (arr: any[]) => {
     return [...arr].sort((a, b) => {
@@ -359,12 +368,22 @@ const CareerArk: React.FC = () => {
         if (Array.isArray(parsed) && parsed.length > 0) {
           setMissingKeywords(parsed);
           onOpen();
+          setShowRecallBtn(false);
         }
         localStorage.removeItem('ark-missing-keywords');
       }
     } catch {}
     // eslint-disable-next-line
   }, []);
+
+  // Show recall button when modal is closed and there are missing keywords
+  useEffect(() => {
+    if (!isOpen && missingKeywords.length > 0) {
+      setShowRecallBtn(true);
+    } else {
+      setShowRecallBtn(false);
+    }
+  }, [isOpen, missingKeywords]);
 
   // ... after sortWorkExp and sortEducation ...
   const sectionDataMap: Record<string, any[]> = {
@@ -804,6 +823,24 @@ const CareerArk: React.FC = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
+      {/* Floating recall button */}
+      {showRecallBtn && (
+        <Button
+          position="fixed"
+          bottom={recallBtnBottom}
+          right={recallBtnRight}
+          zIndex={2000}
+          colorScheme="blue"
+          borderRadius="full"
+          boxShadow="lg"
+          size="lg"
+          onClick={onOpen}
+          leftIcon={<FiKey />}
+          aria-label="Show missing keywords"
+        >
+          Show Keywords
+        </Button>
+      )}
     </Box>
   );
 };
