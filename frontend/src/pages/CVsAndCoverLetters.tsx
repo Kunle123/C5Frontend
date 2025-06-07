@@ -76,6 +76,9 @@ const Application: React.FC = () => {
   const recallBtnRight = useBreakpointValue({ base: '16px', md: '40px' });
   const modalSize = useBreakpointValue({ base: 'xs', md: 'md' });
 
+  // Add a ref to prevent double re-analysis
+  const hasReanalyzedRef = useRef(false);
+
   useEffect(() => {
     setLoading(true);
     setError('');
@@ -284,7 +287,10 @@ const Application: React.FC = () => {
         }
         // Education, Projects, Certifications, Training, etc.
         if (!green && !amber && arcText.includes(kwLower)) amber = true;
-        return { keyword: kw, status: green ? 'green' : amber ? 'amber' : 'red' };
+        let status: 'green' | 'amber' | 'red' = 'red';
+        if (green) status = 'green';
+        else if (amber) status = 'amber';
+        return { keyword: kw, status };
       });
       setKeywordAnalysis(keywordStatuses);
       // 4. Calculate match score
@@ -326,6 +332,73 @@ const Application: React.FC = () => {
     }
     // eslint-disable-next-line
   }, [step, keywordAnalysis]);
+
+  // Auto re-analyze if Ark was updated in Career Ark page
+  useEffect(() => {
+    if (step === 1 && localStorage.getItem('ark-updated') === 'true' && !hasReanalyzedRef.current) {
+      // Only re-analyze once per update
+      hasReanalyzedRef.current = true;
+      localStorage.removeItem('ark-updated');
+      // Re-run the keyword analysis logic
+      (async () => {
+        setLoading(true);
+        setError('');
+        try {
+          // 1. Use existing keywords and jobDesc
+          // 2. Fetch latest Ark data
+          const data = await getArcData();
+          setArcData(data);
+          // 3. Analyze keywords against ALL Arc data sections
+          const arcText = JSON.stringify(data).toLowerCase();
+          const now = new Date();
+          const keywordStatuses = keywords.map((kw: string) => {
+            const kwLower = kw.toLowerCase();
+            let green = false, amber = false;
+            // Work Experience
+            if (data.work_experience) {
+              for (const exp of data.work_experience) {
+                const end = exp.end_date || exp.endDate || '';
+                const endYear = end ? parseInt((end + '').slice(0, 4)) : now.getFullYear();
+                if ((exp.description && exp.description.toLowerCase().includes(kwLower)) ||
+                    (exp.title && exp.title.toLowerCase().includes(kwLower)) ||
+                    (exp.skills && exp.skills.join(' ').toLowerCase().includes(kwLower))) {
+                  if (now.getFullYear() - endYear <= 5) green = true;
+                  else amber = true;
+                }
+              }
+            }
+            // Skills
+            if (!green && data.skills && data.skills.length > 0) {
+              for (const skill of data.skills) {
+                if ((typeof skill === 'string' && skill.toLowerCase().includes(kwLower)) ||
+                    (skill.skillName && skill.skillName.toLowerCase().includes(kwLower))) {
+                  green = true;
+                }
+              }
+            }
+            // Education, Projects, Certifications, Training, etc.
+            if (!green && !amber && arcText.includes(kwLower)) amber = true;
+            let status: 'green' | 'amber' | 'red' = 'red';
+            if (green) status = 'green';
+            else if (amber) status = 'amber';
+            return { keyword: kw, status };
+          });
+          setKeywordAnalysis(keywordStatuses);
+          // 4. Calculate match score
+          const greenCount = keywordStatuses.filter((k: KeywordAnalysisEntry) => k.status === 'green').length;
+          const match = keywords.length > 0 ? Math.round((greenCount / keywords.length) * 100) : null;
+          setMatchScore(match);
+        } catch (err: any) {
+          setError('Sorry, something went wrong. Please try again or contact support.');
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
+    // Reset ref if user goes back to step 0
+    if (step === 0) hasReanalyzedRef.current = false;
+    // eslint-disable-next-line
+  }, [step]);
 
   return (
     <Box py={6} maxW="900px" mx="auto">
