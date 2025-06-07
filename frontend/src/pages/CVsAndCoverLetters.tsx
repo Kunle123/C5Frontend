@@ -480,6 +480,8 @@ const Application: React.FC = () => {
                 if (Array.isArray(keywordAnalysis)) {
                   const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
                   localStorage.setItem('ark-missing-keywords', JSON.stringify(missing));
+                  // Store all keywords for CareerArk modal
+                  localStorage.setItem('ark-keywords', JSON.stringify(keywordAnalysis.map(k => k.keyword)));
                 }
                 navigate('/career-ark');
               }}>
@@ -537,6 +539,8 @@ const Application: React.FC = () => {
               if (Array.isArray(keywordAnalysis)) {
                 const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
                 localStorage.setItem('ark-missing-keywords', JSON.stringify(missing));
+                // Store all keywords for CareerArk modal
+                localStorage.setItem('ark-keywords', JSON.stringify(keywordAnalysis.map(k => k.keyword)));
               }
               navigate('/career-ark');
             }}>

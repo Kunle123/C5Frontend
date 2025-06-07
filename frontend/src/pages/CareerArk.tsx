@@ -47,6 +47,8 @@ const sectionTitles = {
 
 const API_GATEWAY_BASE = 'https://api-gw-production.up.railway.app';
 
+type KeywordStatus = { keyword: string, status: 'green' | 'amber' | 'red' };
+
 function EmptyState({ section, onUpload }: { section: string, onUpload?: () => void }) {
   const sectionNames: Record<string, string> = {
     work_experience: 'work experience',
@@ -134,6 +136,7 @@ const CareerArk: React.FC = () => {
   const [sectionError, setSectionError] = useState<string>('');
   const [training, setTraining] = useState<any[]>([]);
   const [showRecallBtn, setShowRecallBtn] = useState(false);
+  const [keywordStatuses, setKeywordStatuses] = useState<KeywordStatus[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -394,6 +397,79 @@ const CareerArk: React.FC = () => {
     projects: projects,
     certifications: certifications,
   };
+
+  // Helper to analyze keywords against Ark data
+  const analyzeKeywords = (keywords: string[], arkData: any): KeywordStatus[] => {
+    const arcText = JSON.stringify(arkData).toLowerCase();
+    const now = new Date();
+    return keywords.map((kw: string) => {
+      const kwLower = kw.toLowerCase();
+      let green = false, amber = false;
+      // Work Experience
+      if (arkData.work_experience) {
+        for (const exp of arkData.work_experience) {
+          const end = exp.end_date || exp.endDate || '';
+          const endYear = end ? parseInt((end + '').slice(0, 4)) : now.getFullYear();
+          if ((exp.description && exp.description.toLowerCase().includes(kwLower)) ||
+              (exp.title && exp.title.toLowerCase().includes(kwLower)) ||
+              (exp.skills && exp.skills.join(' ').toLowerCase().includes(kwLower))) {
+            if (now.getFullYear() - endYear <= 5) green = true;
+            else amber = true;
+          }
+        }
+      }
+      // Skills
+      if (!green && arkData.skills && arkData.skills.length > 0) {
+        for (const skill of arkData.skills) {
+          if ((typeof skill === 'string' && skill.toLowerCase().includes(kwLower)) ||
+              (skill.skillName && skill.skillName.toLowerCase().includes(kwLower))) {
+            green = true;
+          }
+        }
+      }
+      // Education, Projects, Certifications, Training, etc.
+      if (!green && !amber && arcText.includes(kwLower)) amber = true;
+      let status: 'green' | 'amber' | 'red' = 'red';
+      if (green) status = 'green';
+      else if (amber) status = 'amber';
+      return { keyword: kw, status };
+    });
+  };
+
+  // Function to reload and analyze keywords when modal is opened
+  const reloadKeywordStatuses = async () => {
+    try {
+      const storedKeywords = localStorage.getItem('ark-keywords');
+      if (!storedKeywords) {
+        setKeywordStatuses([]);
+        return;
+      }
+      const keywords: string[] = JSON.parse(storedKeywords);
+      // Fetch latest Ark data
+      const token = localStorage.getItem('token') || '';
+      const profileRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!profileRes.ok) throw new Error('Failed to fetch profile');
+      const profile = await profileRes.json();
+      const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to fetch Ark data');
+      const arkData = await res.json();
+      setKeywordStatuses(analyzeKeywords(keywords, arkData));
+    } catch {
+      setKeywordStatuses([]);
+    }
+  };
+
+  // When modal is opened, reload and analyze keywords
+  useEffect(() => {
+    if (isOpen) {
+      reloadKeywordStatuses();
+    }
+    // eslint-disable-next-line
+  }, [isOpen]);
 
   return (
     <Box minH="100vh" bg="gray.50">
@@ -806,20 +882,20 @@ const CareerArk: React.FC = () => {
       <Modal isOpen={isOpen} onClose={onClose} size={modalSize} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Missing Keywords for This Job</ModalHeader>
+          <ModalHeader>Keyword Status for This Job</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {missingKeywords.length > 0 ? (
+            {keywordStatuses.length > 0 ? (
               <VStack spacing={2} align="stretch">
-                <Text mb={2}>Add these keywords to your Ark profile to improve your match score:</Text>
+                <Text mb={2}>Status of all keywords from the job description:</Text>
                 <HStack wrap="wrap" gap={2} mb={2}>
-                  {missingKeywords.map((kw, idx) => (
-                    <Badge key={kw + idx} colorScheme="red" px={3} py={1} borderRadius="md" fontSize="md" fontWeight={600}>{kw}</Badge>
+                  {keywordStatuses.map((kw, idx) => (
+                    <Badge key={kw.keyword + idx} colorScheme={kw.status === 'green' ? 'green' : kw.status === 'amber' ? 'yellow' : 'red'} px={3} py={1} borderRadius="md" fontSize="md" fontWeight={600}>{kw.keyword}</Badge>
                   ))}
                 </HStack>
               </VStack>
             ) : (
-              <Text>No missing keywords found.</Text>
+              <Text>No keywords found for this job. Start from the Application Wizard to analyze keywords.</Text>
             )}
           </ModalBody>
         </ModalContent>
