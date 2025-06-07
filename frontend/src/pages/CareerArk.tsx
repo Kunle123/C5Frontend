@@ -523,6 +523,7 @@ const CareerArk: React.FC = () => {
                               });
                               const latest = await res.json();
                               setWorkExperience(Array.isArray(latest) ? latest : []);
+                              localStorage.setItem('ark-updated', 'true');
                               setEditMode(false);
                               toast({ status: 'success', title: 'Work experience updated' });
                             } catch (err: any) {
@@ -574,6 +575,7 @@ const CareerArk: React.FC = () => {
                               });
                               const latest = await res.json();
                               setEducation(Array.isArray(latest) ? latest : []);
+                              localStorage.setItem('ark-updated', 'true');
                               setEditMode(false);
                               toast({ status: 'success', title: 'Education updated' });
                             } catch (err: any) {
@@ -623,6 +625,7 @@ const CareerArk: React.FC = () => {
                               });
                               const latest = await res.json();
                               setTraining(Array.isArray(latest) ? latest : []);
+                              localStorage.setItem('ark-updated', 'true');
                               setEditMode(false);
                               toast({ status: 'success', title: 'Training updated' });
                             } catch (err: any) {
