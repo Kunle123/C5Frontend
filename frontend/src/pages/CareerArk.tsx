@@ -421,16 +421,16 @@ const CareerArk: React.FC = () => {
           }
         }
       }
-      // Skills
+      // Skills (only amber if not already green/amber)
       if (!green && arkData.skills && arkData.skills.length > 0) {
         for (const skill of arkData.skills) {
           if ((typeof skill === 'string' && skill.toLowerCase().includes(kwLower)) ||
               (skill.skillName && skill.skillName.toLowerCase().includes(kwLower))) {
-            green = true;
+            amber = true;
           }
         }
       }
-      // Education, Projects, Certifications, Training, etc.
+      // Education, Projects, Certifications, Training, etc. (amber if not green)
       if (!green && !amber && arcText.includes(kwLower)) amber = true;
       let status: 'green' | 'amber' | 'red' = 'red';
       if (green) status = 'green';
