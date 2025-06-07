@@ -825,21 +825,22 @@ const CareerArk: React.FC = () => {
       </Modal>
       {/* Floating recall button */}
       {showRecallBtn && (
-        <Button
+        <IconButton
+          icon={<FiKey size={28} />}
+          aria-label="Show missing keywords"
           position="fixed"
           bottom={recallBtnBottom}
           right={recallBtnRight}
           zIndex={2000}
-          colorScheme="blue"
+          colorScheme="red"
+          bg="red.500"
+          color="white"
           borderRadius="full"
           boxShadow="lg"
-          size="lg"
+          size="xl"
           onClick={onOpen}
-          leftIcon={<FiKey />}
-          aria-label="Show missing keywords"
-        >
-          Show Keywords
-        </Button>
+          _hover={{ bg: 'red.600' }}
+        />
       )}
     </Box>
   );
