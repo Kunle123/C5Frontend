@@ -510,7 +510,7 @@ const CareerArk: React.FC = () => {
                             setEditLoading(true);
                             setEditError('');
                             try {
-                              await updateWorkExperience(item.id, {
+                              await updateWorkExperience(parseInt(item.id, 10), {
                                 company: editCompany,
                                 title: editTitle,
                                 start_date: editStartDate,
@@ -561,7 +561,7 @@ const CareerArk: React.FC = () => {
                             setEditLoading(true);
                             setEditError('');
                             try {
-                              await updateEducation(item.id, {
+                              await updateEducation(parseInt(item.id, 10), {
                                 institution: editInstitution,
                                 degree: editDegree,
                                 start_date: editEduStartDate,
@@ -611,7 +611,7 @@ const CareerArk: React.FC = () => {
                             setEditLoading(true);
                             setEditError('');
                             try {
-                              await updateTraining(item.id, {
+                              await updateTraining(parseInt(item.id, 10), {
                                 name: editTrainingName,
                                 provider: editProvider,
                                 date: editTrainingDate,
@@ -662,7 +662,7 @@ const CareerArk: React.FC = () => {
                           <Button onClick={async () => {
                             try {
                               console.log('Deleting work experience', item.id);
-                              await deleteWorkExperience(item.id);
+                              await deleteWorkExperience(parseInt(item.id, 10));
                               const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
                               const latest = await res.json();
                               setWorkExperience(Array.isArray(latest) ? latest : []);
@@ -700,7 +700,7 @@ const CareerArk: React.FC = () => {
                           <Button onClick={async () => {
                             try {
                               console.log('Deleting education', item.id);
-                              await deleteEducation(item.id);
+                              await deleteEducation(parseInt(item.id, 10));
                               const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/education`, { headers: { Authorization: `Bearer ${token}` } });
                               const latest = await res.json();
                               setEducation(Array.isArray(latest) ? latest : []);
@@ -764,7 +764,7 @@ const CareerArk: React.FC = () => {
                           <Button onClick={async () => {
                             try {
                               console.log('Deleting training', item.id);
-                              await deleteTraining(item.id);
+                              await deleteTraining(parseInt(item.id, 10));
                               const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/training`, { headers: { Authorization: `Bearer ${token}` } });
                               const latest = await res.json();
                               setTraining(Array.isArray(latest) ? latest : []);

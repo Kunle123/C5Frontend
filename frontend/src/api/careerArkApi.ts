@@ -126,9 +126,9 @@ export async function addWorkExperience(data: any) {
 }
 
 // Update Work Experience (Career Ark)
-export async function updateWorkExperience(id: string, data: any) {
+export async function updateWorkExperience(id: string | number, data: any) {
   const token = localStorage.getItem('token') || '';
-  const res = await fetch(`${API_CAREER_ARK}/work_experience/${id}`, {
+  const res = await fetch(`${API_CAREER_ARK}/work_experience/${id.toString()}`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -141,8 +141,8 @@ export async function updateWorkExperience(id: string, data: any) {
 }
 
 // Work Experience
-export async function deleteWorkExperience(id: string) {
-  const res = await fetch(`${API_BASE}/work_experience/${id}`, {
+export async function deleteWorkExperience(id: string | number) {
+  const res = await fetch(`${API_BASE}/work_experience/${id.toString()}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -165,9 +165,9 @@ export async function addEducation(data: any) {
 }
 
 // Update Education (Career Ark)
-export async function updateEducation(id: string, data: any) {
+export async function updateEducation(id: string | number, data: any) {
   const token = localStorage.getItem('token') || '';
-  const res = await fetch(`${API_CAREER_ARK}/education/${id}`, {
+  const res = await fetch(`${API_CAREER_ARK}/education/${id.toString()}`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -180,8 +180,8 @@ export async function updateEducation(id: string, data: any) {
 }
 
 // Education
-export async function deleteEducation(id: string) {
-  const res = await fetch(`${API_BASE}/education/${id}`, {
+export async function deleteEducation(id: string | number) {
+  const res = await fetch(`${API_BASE}/education/${id.toString()}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -204,9 +204,9 @@ export async function addTraining(data: any) {
 }
 
 // Update Training (Career Ark)
-export async function updateTraining(id: string, data: any) {
+export async function updateTraining(id: string | number, data: any) {
   const token = localStorage.getItem('token') || '';
-  const res = await fetch(`${API_CAREER_ARK}/training/${id}`, {
+  const res = await fetch(`${API_CAREER_ARK}/training/${id.toString()}`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -219,8 +219,8 @@ export async function updateTraining(id: string, data: any) {
 }
 
 // Training
-export async function deleteTraining(id: string) {
-  const res = await fetch(`${API_BASE}/training/${id}`, {
+export async function deleteTraining(id: string | number) {
+  const res = await fetch(`${API_BASE}/training/${id.toString()}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
