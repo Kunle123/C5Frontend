@@ -1,5 +1,6 @@
 const API_BASE = 'https://api-gw-production.up.railway.app/api/arc';
 export const API_GATEWAY_BASE = 'https://api-gw-production.up.railway.app';
+const API_CAREER_ARK = 'https://api-gw-production.up.railway.app/api/career-ark';
 
 function getAuthHeaders() {
   return {
@@ -124,12 +125,13 @@ export async function addWorkExperience(data: any) {
   return res.json();
 }
 
-// Update Work Experience
+// Update Work Experience (Career Ark)
 export async function updateWorkExperience(id: string, data: any) {
-  const res = await fetch(`${API_BASE}/work_experience/${id}`, {
-    method: 'PATCH',
+  const token = localStorage.getItem('token') || '';
+  const res = await fetch(`${API_CAREER_ARK}/work_experience/${id}`, {
+    method: 'PUT',
     headers: {
-      ...getAuthHeaders(),
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
@@ -162,12 +164,13 @@ export async function addEducation(data: any) {
   return res.json();
 }
 
-// Update Education
+// Update Education (Career Ark)
 export async function updateEducation(id: string, data: any) {
-  const res = await fetch(`${API_BASE}/education/${id}`, {
-    method: 'PATCH',
+  const token = localStorage.getItem('token') || '';
+  const res = await fetch(`${API_CAREER_ARK}/education/${id}`, {
+    method: 'PUT',
     headers: {
-      ...getAuthHeaders(),
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
@@ -200,12 +203,13 @@ export async function addTraining(data: any) {
   return res.json();
 }
 
-// Update Training
+// Update Training (Career Ark)
 export async function updateTraining(id: string, data: any) {
-  const res = await fetch(`${API_BASE}/training/${id}`, {
-    method: 'PATCH',
+  const token = localStorage.getItem('token') || '';
+  const res = await fetch(`${API_CAREER_ARK}/training/${id}`, {
+    method: 'PUT',
     headers: {
-      ...getAuthHeaders(),
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
