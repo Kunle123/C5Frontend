@@ -263,40 +263,46 @@ const Application: React.FC = () => {
       const now = new Date();
       const keywordStatuses = keywords.map((kw: string) => {
         const kwLower = kw.toLowerCase();
-        let green = false, amber = false;
-        // Work Experience
+        let status: 'green' | 'amber' | 'red' = 'red';
+        // 1. Work Experience
         if (data.work_experience) {
           for (const exp of data.work_experience) {
-            let endYear = now.getFullYear();
+            let isRecent = false;
             if (exp.end_date || exp.endDate) {
               const end = exp.end_date || exp.endDate;
-              if (!/^present$/i.test(end.trim())) {
+              if (/^present$/i.test((end || '').trim())) {
+                isRecent = true;
+              } else {
                 const parsed = parseInt((end + '').slice(0, 4));
-                if (!isNaN(parsed)) endYear = parsed;
+                if (!isNaN(parsed) && (new Date().getFullYear() - parsed <= 5)) {
+                  isRecent = true;
+                }
               }
             }
+            // If end_date is missing or invalid, treat as old (not recent)
             if ((exp.description && exp.description.toLowerCase().includes(kwLower)) ||
                 (exp.title && exp.title.toLowerCase().includes(kwLower)) ||
                 (exp.skills && exp.skills.join(' ').toLowerCase().includes(kwLower))) {
-              if (now.getFullYear() - endYear <= 5) green = true;
-              else amber = true;
+              if (isRecent) {
+                status = 'green';
+                break;
+              } else {
+                status = 'amber';
+              }
             }
           }
         }
-        // Skills (only amber if not already green/amber)
-        if (!green && data.skills && data.skills.length > 0) {
+        // 2. Skills (amber if not green)
+        if (status !== 'green' && data.skills && data.skills.length > 0) {
           for (const skill of data.skills) {
             if ((typeof skill === 'string' && skill.toLowerCase().includes(kwLower)) ||
                 (skill.skillName && skill.skillName.toLowerCase().includes(kwLower))) {
-              amber = true;
+              status = 'amber';
             }
           }
         }
-        // Education, Projects, Certifications, Training, etc. (amber if not green)
-        if (!green && !amber && arcText.includes(kwLower)) amber = true;
-        let status: 'green' | 'amber' | 'red' = 'red';
-        if (green) status = 'green';
-        else if (amber) status = 'amber';
+        // 3. Other sections (amber if not green)
+        if (status !== 'green' && status !== 'amber' && arcText.includes(kwLower)) status = 'amber';
         return { keyword: kw, status };
       });
       setKeywordAnalysis(keywordStatuses);
@@ -360,40 +366,46 @@ const Application: React.FC = () => {
           const now = new Date();
           const keywordStatuses = keywords.map((kw: string) => {
             const kwLower = kw.toLowerCase();
-            let green = false, amber = false;
-            // Work Experience
+            let status: 'green' | 'amber' | 'red' = 'red';
+            // 1. Work Experience
             if (data.work_experience) {
               for (const exp of data.work_experience) {
-                let endYear = now.getFullYear();
+                let isRecent = false;
                 if (exp.end_date || exp.endDate) {
                   const end = exp.end_date || exp.endDate;
-                  if (!/^present$/i.test(end.trim())) {
+                  if (/^present$/i.test((end || '').trim())) {
+                    isRecent = true;
+                  } else {
                     const parsed = parseInt((end + '').slice(0, 4));
-                    if (!isNaN(parsed)) endYear = parsed;
+                    if (!isNaN(parsed) && (new Date().getFullYear() - parsed <= 5)) {
+                      isRecent = true;
+                    }
                   }
                 }
+                // If end_date is missing or invalid, treat as old (not recent)
                 if ((exp.description && exp.description.toLowerCase().includes(kwLower)) ||
                     (exp.title && exp.title.toLowerCase().includes(kwLower)) ||
                     (exp.skills && exp.skills.join(' ').toLowerCase().includes(kwLower))) {
-                  if (now.getFullYear() - endYear <= 5) green = true;
-                  else amber = true;
+                  if (isRecent) {
+                    status = 'green';
+                    break;
+                  } else {
+                    status = 'amber';
+                  }
                 }
               }
             }
-            // Skills (only amber if not already green/amber)
-            if (!green && data.skills && data.skills.length > 0) {
+            // 2. Skills (amber if not green)
+            if (status !== 'green' && data.skills && data.skills.length > 0) {
               for (const skill of data.skills) {
                 if ((typeof skill === 'string' && skill.toLowerCase().includes(kwLower)) ||
                     (skill.skillName && skill.skillName.toLowerCase().includes(kwLower))) {
-                  amber = true;
+                  status = 'amber';
                 }
               }
             }
-            // Education, Projects, Certifications, Training, etc. (amber if not green)
-            if (!green && !amber && arcText.includes(kwLower)) amber = true;
-            let status: 'green' | 'amber' | 'red' = 'red';
-            if (green) status = 'green';
-            else if (amber) status = 'amber';
+            // 3. Other sections (amber if not green)
+            if (status !== 'green' && status !== 'amber' && arcText.includes(kwLower)) status = 'amber';
             return { keyword: kw, status };
           });
           setKeywordAnalysis(keywordStatuses);
