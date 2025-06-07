@@ -246,6 +246,7 @@ const Application: React.FC = () => {
       }
       // Patch: handle both array and object return from extractKeywords
       const keywords = (Array.isArray(kwResult) ? kwResult : kwResult.keywords || []).slice(0, 20); // Limit to 20 keywords for user-friendliness
+      setKeywords(keywords);
       // 2. Fetch Arc data
       let data;
       try {
