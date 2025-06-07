@@ -266,8 +266,14 @@ const Application: React.FC = () => {
         // Work Experience
         if (data.work_experience) {
           for (const exp of data.work_experience) {
-            const end = exp.end_date || exp.endDate || '';
-            const endYear = end ? parseInt((end + '').slice(0, 4)) : now.getFullYear();
+            let endYear = now.getFullYear();
+            if (exp.end_date || exp.endDate) {
+              const end = exp.end_date || exp.endDate;
+              if (!/^present$/i.test(end.trim())) {
+                const parsed = parseInt((end + '').slice(0, 4));
+                if (!isNaN(parsed)) endYear = parsed;
+              }
+            }
             if ((exp.description && exp.description.toLowerCase().includes(kwLower)) ||
                 (exp.title && exp.title.toLowerCase().includes(kwLower)) ||
                 (exp.skills && exp.skills.join(' ').toLowerCase().includes(kwLower))) {
@@ -357,8 +363,14 @@ const Application: React.FC = () => {
             // Work Experience
             if (data.work_experience) {
               for (const exp of data.work_experience) {
-                const end = exp.end_date || exp.endDate || '';
-                const endYear = end ? parseInt((end + '').slice(0, 4)) : now.getFullYear();
+                let endYear = now.getFullYear();
+                if (exp.end_date || exp.endDate) {
+                  const end = exp.end_date || exp.endDate;
+                  if (!/^present$/i.test(end.trim())) {
+                    const parsed = parseInt((end + '').slice(0, 4));
+                    if (!isNaN(parsed)) endYear = parsed;
+                  }
+                }
                 if ((exp.description && exp.description.toLowerCase().includes(kwLower)) ||
                     (exp.title && exp.title.toLowerCase().includes(kwLower)) ||
                     (exp.skills && exp.skills.join(' ').toLowerCase().includes(kwLower))) {

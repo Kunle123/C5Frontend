@@ -408,8 +408,11 @@ const CareerArk: React.FC = () => {
       // Work Experience
       if (arkData.work_experience) {
         for (const exp of arkData.work_experience) {
-          const end = exp.end_date || exp.endDate || '';
-          const endYear = end ? parseInt((end + '').slice(0, 4)) : now.getFullYear();
+          let endYear = now.getFullYear();
+          if (exp.end_date && !/^present$/i.test(exp.end_date.trim())) {
+            const parsed = parseInt((exp.end_date + '').slice(0, 4));
+            if (!isNaN(parsed)) endYear = parsed;
+          }
           if ((exp.description && exp.description.toLowerCase().includes(kwLower)) ||
               (exp.title && exp.title.toLowerCase().includes(kwLower)) ||
               (exp.skills && exp.skills.join(' ').toLowerCase().includes(kwLower))) {
