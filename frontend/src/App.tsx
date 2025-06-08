@@ -25,6 +25,7 @@ import Terms from './pages/Terms';
 import FAQ from './pages/FAQ';
 import DebugCVAIResponse from './pages/DebugCVAIResponse';
 import CareerArkV2 from './pages/CareerArkV2';
+import SearchJobs from './pages/SearchJobs';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -85,6 +86,7 @@ function App() {
               <Route path="/career-ark-demo" element={<CareerArkDemo />} />
               <Route path="/debug-cv-ai" element={<DebugCVAIResponse />} />
               <Route path="/career-ark-v2" element={<ProtectedRoute><CareerArkV2 /></ProtectedRoute>} />
+              <Route path="/search-jobs" element={<SearchJobs />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Box>
