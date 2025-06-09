@@ -27,7 +27,27 @@ const DownloadCVs: React.FC = () => {
     fetch('/api/cvs?limit=5&source=wizard', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
-      .then(res => res.ok ? res.json() : res.json().then(e => Promise.reject(e)))
+      .then(async res => {
+        if (!res.ok) {
+          let errMsg = 'Failed to load CVs';
+          try {
+            const err = await res.json();
+            errMsg = err.message || err.error || errMsg;
+          } catch {
+            // If not JSON, try to get text or fallback
+            try {
+              const text = await res.text();
+              if (text && text.startsWith('<!DOCTYPE')) {
+                errMsg = 'No CVs found or server returned an unexpected response.';
+              } else {
+                errMsg = text || errMsg;
+              }
+            } catch {}
+          }
+          return Promise.reject(new Error(errMsg));
+        }
+        return res.json();
+      })
       .then(data => setCVs(data))
       .catch(err => setError(err.message || 'Failed to load CVs'))
       .finally(() => setLoading(false));
