@@ -501,11 +501,21 @@ const Application: React.FC = () => {
                   )}
                 </Box>
               )}
-              {Object.values(arcData).every(v => v == null || (Array.isArray(v) && v.length === 0)) && (
-                <Alert status="warning">
-                  <AlertIcon />Your Career Ark profile is empty. Please upload a CV or add data in Career Ark before proceeding.
-                </Alert>
-              )}
+              <Heading as="h4" size="sm">CV Options</Heading>
+              <Stack direction="row" spacing={4} align="center">
+                <Text>Pages:</Text>
+                <Button colorScheme={numPages === 2 ? 'blue' : 'gray'} onClick={() => setNumPages(2)}>2</Button>
+                <Button colorScheme={numPages === 3 ? 'blue' : 'gray'} onClick={() => setNumPages(3)}>3</Button>
+                <Button colorScheme={numPages === 4 ? 'blue' : 'gray'} onClick={() => setNumPages(4)}>4</Button>
+              </Stack>
+              <HStack>
+                <Text>Include Keywords:</Text>
+                <Button colorScheme={includeKeywords ? 'blue' : 'gray'} onClick={() => setIncludeKeywords(!includeKeywords)}>{includeKeywords ? 'Yes' : 'No'}</Button>
+              </HStack>
+              <HStack>
+                <Text>Include Relevant Experience:</Text>
+                <Button colorScheme={includeRelevantExperience ? 'blue' : 'gray'} onClick={() => setIncludeRelevantExperience(!includeRelevantExperience)}>{includeRelevantExperience ? 'Yes' : 'No'}</Button>
+              </HStack>
               <Button variant="outline" colorScheme="gray" onClick={() => {
                 if (Array.isArray(keywordAnalysis)) {
                   const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
@@ -517,21 +527,39 @@ const Application: React.FC = () => {
               }}>
                 Edit Ark Data
               </Button>
-              <Button colorScheme="blue" onClick={async () => {
+              <Button colorScheme="blue" isDisabled={optimizing} onClick={async () => {
                 setOptimizing(true);
                 setError('');
                 try {
-                  const result = await generateApplicationMaterials(jobDesc, arcData);
-                  setOptimizedCV(result.cv || '');
-                  setOptimizedCL(result.coverLetter || '');
+                  // POST options to /api/cv to generate the CV
+                  const createRes = await fetch('/api/cv', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                      name: 'My Optimized CV',
+                      description: jobDesc,
+                      is_default: true,
+                      template_id: 'default',
+                      num_pages: numPages,
+                      include_keywords: includeKeywords,
+                      include_relevant_experience: includeRelevantExperience,
+                    }),
+                  });
+                  if (!createRes.ok) throw await createRes.json();
+                  const created = await createRes.json();
+                  // Optionally, fetch the generated content if returned
+                  // For now, just proceed to step 3
                   setStep(3);
-                } catch (err: any) {
-                  setError(err.message || 'AI optimization failed');
+                } catch (err) {
+                  setError('Failed to generate CV. Please try again.');
                 } finally {
                   setOptimizing(false);
                 }
-              }} isLoading={optimizing}>
-                Generate CV & Cover Letter
+              }}>
+                {optimizing ? <Spinner size="sm" mr={2} /> : null}Generate CV & Cover Letter
               </Button>
             </Stack>
           ) : (
@@ -565,22 +593,6 @@ const Application: React.FC = () => {
             <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
               <Text whiteSpace="pre-wrap">{optimizedCL}</Text>
             </Box>
-            {/* New options for CV creation */}
-            <Heading as="h4" size="sm">CV Options</Heading>
-            <Stack direction="row" spacing={4} align="center">
-              <Text>Pages:</Text>
-              <Button colorScheme={numPages === 2 ? 'blue' : 'gray'} onClick={() => setNumPages(2)}>2</Button>
-              <Button colorScheme={numPages === 3 ? 'blue' : 'gray'} onClick={() => setNumPages(3)}>3</Button>
-              <Button colorScheme={numPages === 4 ? 'blue' : 'gray'} onClick={() => setNumPages(4)}>4</Button>
-            </Stack>
-            <HStack>
-              <Text>Include Keywords:</Text>
-              <Button colorScheme={includeKeywords ? 'blue' : 'gray'} onClick={() => setIncludeKeywords(!includeKeywords)}>{includeKeywords ? 'Yes' : 'No'}</Button>
-            </HStack>
-            <HStack>
-              <Text>Include Relevant Experience:</Text>
-              <Button colorScheme={includeRelevantExperience ? 'blue' : 'gray'} onClick={() => setIncludeRelevantExperience(!includeRelevantExperience)}>{includeRelevantExperience ? 'Yes' : 'No'}</Button>
-            </HStack>
             <Button variant="outline" colorScheme="gray" onClick={() => {
               if (Array.isArray(keywordAnalysis)) {
                 const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
@@ -592,34 +604,7 @@ const Application: React.FC = () => {
             }}>
               Edit Ark Data
             </Button>
-            <Button colorScheme="green" size="lg" mt={2} onClick={async () => {
-              // Save the generated CV options to the backend before navigating
-              try {
-                // 1. Create the CV with options
-                const createRes = await fetch('/api/cv', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                  },
-                  body: JSON.stringify({
-                    name: 'My Optimized CV',
-                    description: jobDesc,
-                    is_default: true,
-                    template_id: 'default',
-                    num_pages: numPages,
-                    include_keywords: includeKeywords,
-                    include_relevant_experience: includeRelevantExperience,
-                  }),
-                });
-                if (!createRes.ok) throw await createRes.json();
-                const created = await createRes.json();
-                // 2. Navigate to download page (optionally pass CV ID)
-                navigate('/download-cvs');
-              } catch (err) {
-                // Optionally handle error (e.g., show notification)
-              }
-            }}>
+            <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download-cvs')}>
               Go to Download CVs Page
             </Button>
           </Stack>
