@@ -543,6 +543,7 @@ const Application: React.FC = () => {
                       description: jobDesc,
                       is_default: true,
                       template_id: 'default',
+                      base_cv_id: null,
                       num_pages: numPages,
                       include_keywords: includeKeywords,
                       include_relevant_experience: includeRelevantExperience,
