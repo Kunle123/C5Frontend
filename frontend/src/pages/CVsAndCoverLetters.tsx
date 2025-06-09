@@ -532,7 +532,7 @@ const Application: React.FC = () => {
                 setError('');
                 try {
                   // POST options to /api/cv to generate the CV
-                  const createRes = await fetch('/api/cv', {
+                  const createRes = await fetch('https://api-gw-production.up.railway.app/api/cv', {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
