@@ -342,9 +342,16 @@ const Application: React.FC = () => {
       setOptimizedCV(result.cv || '');
       setOptimizedCL(result.cover_letter || result.coverLetter || '');
       setStep(3);
-      // Save generated CV and cover letter
+      // Ensure result.cv is a non-empty string before saving
+      if (!result.cv || typeof result.cv !== 'string' || !result.cv.trim()) {
+        setSaveError('Generated CV is empty. Please try again.');
+        return;
+      }
+      // Log outgoing payload for debugging
+      const payload = { cv: result.cv, cover_letter: result.cover_letter || result.coverLetter || '' };
+      console.log('Saving generated CV to /api/cv with payload:', payload);
       try {
-        await saveGeneratedCV(result.cv || '', result.cover_letter || result.coverLetter || '');
+        await saveGeneratedCV(payload.cv, payload.cover_letter);
         setSaveSuccess('Generated CV and cover letter saved successfully!');
       } catch (saveErr: any) {
         setSaveError(saveErr.message || 'Failed to save generated CV and cover letter');
