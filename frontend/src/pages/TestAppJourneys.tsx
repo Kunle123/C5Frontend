@@ -33,6 +33,10 @@ const TestAppJourneys: React.FC = () => {
   const [genResult, setGenResult] = useState<any>(null);
   // General
   const [error, setError] = useState('');
+  // Add state for options
+  const [numPages, setNumPages] = useState(2);
+  const [includeKeywords, setIncludeKeywords] = useState(true);
+  const [includeRelevantExperience, setIncludeRelevantExperience] = useState(true);
 
   // Auth handlers
   const handleSignup = async () => {
@@ -92,7 +96,7 @@ const TestAppJourneys: React.FC = () => {
     setError(''); setGenResult(null);
     try {
       const arc = arcData || await getArcData();
-      const res = await generateApplicationMaterials(jobAdvert, arc);
+      const res = await generateApplicationMaterials(jobAdvert, arc, numPages, includeKeywords, includeRelevantExperience);
       setGenResult(res);
     } catch (err: any) {
       setError(err?.error || err?.message || 'Failed to generate application');
@@ -144,6 +148,20 @@ const TestAppJourneys: React.FC = () => {
         <Stack spacing={3}>
           <Heading as="h3" size="md">4. Generate Application Materials</Heading>
           <Textarea placeholder="Job Advert" value={jobAdvert} onChange={e => setJobAdvert(e.target.value)} minH={100} />
+          <Stack direction="row" spacing={4} align="center">
+            <Text>Pages:</Text>
+            <Button colorScheme={numPages === 2 ? 'blue' : 'gray'} onClick={() => setNumPages(2)}>2</Button>
+            <Button colorScheme={numPages === 3 ? 'blue' : 'gray'} onClick={() => setNumPages(3)}>3</Button>
+            <Button colorScheme={numPages === 4 ? 'blue' : 'gray'} onClick={() => setNumPages(4)}>4</Button>
+          </Stack>
+          <Stack direction="row" spacing={4} align="center">
+            <Text>Include Keywords:</Text>
+            <Button colorScheme={includeKeywords ? 'blue' : 'gray'} onClick={() => setIncludeKeywords(!includeKeywords)}>{includeKeywords ? 'Yes' : 'No'}</Button>
+          </Stack>
+          <Stack direction="row" spacing={4} align="center">
+            <Text>Include Relevant Experience:</Text>
+            <Button colorScheme={includeRelevantExperience ? 'blue' : 'gray'} onClick={() => setIncludeRelevantExperience(!includeRelevantExperience)}>{includeRelevantExperience ? 'Yes' : 'No'}</Button>
+          </Stack>
           <Button colorScheme="blue" onClick={handleGenerate}>Generate CV & Cover Letter</Button>
           {genResult && <Alert status="success" whiteSpace="pre-wrap" maxH={200} overflowY="auto"><AlertIcon />{JSON.stringify(genResult, null, 2)}</Alert>}
         </Stack>
