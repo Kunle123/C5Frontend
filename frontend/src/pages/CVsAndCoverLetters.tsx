@@ -29,7 +29,7 @@ import {
 import { listCVs, uploadCV, deleteCV, downloadCV, getCurrentUser } from '../api';
 import { optimizeCV as aiOptimizeCV, extractKeywords, analyzeCV as aiAnalyzeCV } from '../api/aiApi';
 import { useNavigate } from 'react-router-dom';
-import { getArcData, generateApplicationMaterials } from '../api/careerArkApi';
+import { getArcData, generateApplicationMaterials, saveGeneratedCV } from '../api/careerArkApi';
 import { FiKey } from 'react-icons/fi';
 
 const steps = [
@@ -83,6 +83,9 @@ const Application: React.FC = () => {
 
   // Add a ref to prevent double re-analysis
   const hasReanalyzedRef = useRef(false);
+
+  const [saveSuccess, setSaveSuccess] = useState('');
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -326,6 +329,8 @@ const Application: React.FC = () => {
   const handleAnalyzeAndOptimize = async () => {
     setOptimizing(true);
     setError('');
+    setSaveSuccess('');
+    setSaveError('');
     try {
       const result = await generateApplicationMaterials(
         jobDesc,
@@ -337,6 +342,13 @@ const Application: React.FC = () => {
       setOptimizedCV(result.cv || '');
       setOptimizedCL(result.cover_letter || result.coverLetter || '');
       setStep(3);
+      // Save generated CV and cover letter
+      try {
+        await saveGeneratedCV(result.cv || '', result.cover_letter || result.coverLetter || '');
+        setSaveSuccess('Generated CV and cover letter saved successfully!');
+      } catch (saveErr: any) {
+        setSaveError(saveErr.message || 'Failed to save generated CV and cover letter');
+      }
     } catch (err: any) {
       setError(err.message || 'AI optimization failed');
     } finally {
@@ -533,27 +545,7 @@ const Application: React.FC = () => {
               }}>
                 Edit Ark Data
               </Button>
-              <Button colorScheme="blue" isDisabled={optimizing} onClick={async () => {
-                setOptimizing(true);
-                setError('');
-                try {
-                  // Call generateApplicationMaterials with all required options
-                  const result = await generateApplicationMaterials(
-                    jobDesc,
-                    arcData,
-                    numPages,
-                    includeKeywords,
-                    includeRelevantExperience
-                  );
-                  setOptimizedCV(result.cv || '');
-                  setOptimizedCL(result.cover_letter || result.coverLetter || '');
-                  setStep(3);
-                } catch (err) {
-                  setError('Failed to generate CV. Please try again.');
-                } finally {
-                  setOptimizing(false);
-                }
-              }}>
+              <Button colorScheme="blue" isDisabled={optimizing} onClick={handleAnalyzeAndOptimize}>
                 {optimizing ? <Spinner size="sm" mr={2} /> : null}Generate CV & Cover Letter
               </Button>
             </Stack>
@@ -612,6 +604,8 @@ const Application: React.FC = () => {
             </Button>
           </Stack>
         )}
+        {saveSuccess && <Alert status="success" mt={2}><AlertIcon />{saveSuccess}</Alert>}
+        {saveError && <Alert status="error" mt={2}><AlertIcon />{saveError}</Alert>}
         {error && <Alert status="error" mt={2}><AlertIcon />{error}</Alert>}
       </Box>
     </Box>

@@ -256,4 +256,47 @@ export async function deleteCertification(id: string) {
   });
   if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete certification'));
   return res.json();
+}
+
+// Save generated CV and cover letter, and trigger DOCX download if response is a DOCX file
+export async function saveGeneratedCV(cv: string, coverLetter?: string) {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/cv`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ cv, cover_letter: coverLetter }),
+  });
+  if (res.ok) {
+    const contentType = res.headers.get('Content-Type');
+    if (contentType && contentType.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cv.docx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      return true;
+    } else {
+      // Not a DOCX, try to parse as JSON (error or fallback)
+      try {
+        const data = await res.json();
+        if (data && data.success) return true;
+        throw new Error(data.detail || 'Unexpected response');
+      } catch (e) {
+        throw new Error('Unexpected response format');
+      }
+    }
+  } else {
+    let errorMsg = 'Failed to generate DOCX';
+    try {
+      const error = await res.json();
+      errorMsg = error.detail || errorMsg;
+    } catch {}
+    throw new Error(errorMsg);
+  }
 } 
