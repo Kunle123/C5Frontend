@@ -272,7 +272,7 @@ const CareerArk: React.FC = () => {
                         break;
                       }
                     }
-                    toast({ status: 'success', title: 'CV imported and Ark updated!' });
+                    toast({ status: 'success', title: 'CV imported and Ark updated! Your data is now available.' });
                   } else {
                     setUploadError('Failed to update Ark');
                   }
@@ -617,9 +617,7 @@ const CareerArk: React.FC = () => {
                               if (err?.status === 404 || err?.message?.includes('404')) {
                                 toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
                                 // Auto-refresh
-                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/work_experience`, {
-                                  headers: { Authorization: `Bearer ${token}` },
-                                });
+                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
                                 const latest = await res.json();
                                 setWorkExperience(Array.isArray(latest) ? latest : []);
                                 setEditMode(false);

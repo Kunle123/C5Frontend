@@ -1,0 +1,60 @@
+%PDF-1.4
+% Test CV PDF for upload
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << >> >>
+endobj
+4 0 obj
+<< /Length 5 0 R >>
+stream
+BT
+/F1 24 Tf
+100 700 Td
+(Test User CV) Tj
+/F1 12 Tf
+100 670 Td
+(Name: Test User) Tj
+100 650 Td
+(Email: testuser@example.com) Tj
+100 630 Td
+(Phone: 123-456-7890) Tj
+100 600 Td
+(Work Experience:) Tj
+100 580 Td
+(Software Engineer, ExampleCorp, 2020-2022) Tj
+100 560 Td
+( - Developed web applications) Tj
+100 540 Td
+( - Improved system performance) Tj
+100 510 Td
+(Education:) Tj
+100 490 Td
+(BSc Computer Science, Example University, 2016-2020) Tj
+100 460 Td
+(Skills:) Tj
+100 440 Td
+(Python, JavaScript, React, SQL) Tj
+ET
+endstream
+endobj
+5 0 obj
+1442
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000010 00000 n 
+0000000061 00000 n 
+0000000116 00000 n 
+0000000277 00000 n 
+0000000737 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+800
+%%EOF 
