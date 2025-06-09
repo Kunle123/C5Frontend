@@ -24,7 +24,7 @@ const DownloadCVs: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     setError('');
-    fetch('/api/cvs?limit=5&source=wizard', {
+    fetch('/api/cv?limit=5&source=wizard', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then(async res => {
