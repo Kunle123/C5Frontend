@@ -571,7 +571,29 @@ const Application: React.FC = () => {
             }}>
               Edit Ark Data
             </Button>
-            <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download-cvs')}>
+            <Button colorScheme="green" size="lg" mt={2} onClick={async () => {
+              // Save the generated CV and cover letter to the backend before navigating
+              try {
+                const res = await fetch('https://api-gw-production.up.railway.app/cvs', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({
+                    title: 'Optimized CV',
+                    content: optimizedCV,
+                    coverLetter: optimizedCL,
+                    jobDescription: jobDesc,
+                    source: 'wizard',
+                  }),
+                });
+                if (!res.ok) throw await res.json();
+              } catch (err) {
+                // Optionally handle error (e.g., show notification)
+              }
+              navigate('/download-cvs');
+            }}>
               Go to Download CVs Page
             </Button>
           </Stack>
