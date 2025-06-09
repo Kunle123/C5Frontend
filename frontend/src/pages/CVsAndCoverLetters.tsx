@@ -69,6 +69,11 @@ const Application: React.FC = () => {
   const [keywordAnalysis, setKeywordAnalysis] = useState<KeywordAnalysisEntry[]>([]);
   const [matchScore, setMatchScore] = useState<number | null>(null);
 
+  // New options for CV creation
+  const [numPages, setNumPages] = useState(2);
+  const [includeKeywords, setIncludeKeywords] = useState(true);
+  const [includeRelevantExperience, setIncludeRelevantExperience] = useState(true);
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Responsive placement for recall button
@@ -560,6 +565,22 @@ const Application: React.FC = () => {
             <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
               <Text whiteSpace="pre-wrap">{optimizedCL}</Text>
             </Box>
+            {/* New options for CV creation */}
+            <Heading as="h4" size="sm">CV Options</Heading>
+            <Stack direction="row" spacing={4} align="center">
+              <Text>Pages:</Text>
+              <Button colorScheme={numPages === 2 ? 'blue' : 'gray'} onClick={() => setNumPages(2)}>2</Button>
+              <Button colorScheme={numPages === 3 ? 'blue' : 'gray'} onClick={() => setNumPages(3)}>3</Button>
+              <Button colorScheme={numPages === 4 ? 'blue' : 'gray'} onClick={() => setNumPages(4)}>4</Button>
+            </Stack>
+            <HStack>
+              <Text>Include Keywords:</Text>
+              <Button colorScheme={includeKeywords ? 'blue' : 'gray'} onClick={() => setIncludeKeywords(!includeKeywords)}>{includeKeywords ? 'Yes' : 'No'}</Button>
+            </HStack>
+            <HStack>
+              <Text>Include Relevant Experience:</Text>
+              <Button colorScheme={includeRelevantExperience ? 'blue' : 'gray'} onClick={() => setIncludeRelevantExperience(!includeRelevantExperience)}>{includeRelevantExperience ? 'Yes' : 'No'}</Button>
+            </HStack>
             <Button variant="outline" colorScheme="gray" onClick={() => {
               if (Array.isArray(keywordAnalysis)) {
                 const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
@@ -574,21 +595,39 @@ const Application: React.FC = () => {
             <Button colorScheme="green" size="lg" mt={2} onClick={async () => {
               // Save the generated CV and cover letter to the backend before navigating
               try {
-                const res = await fetch('https://api-gw-production.up.railway.app/cvs', {
+                // 1. Create the CV with options
+                const createRes = await fetch('/api/cv', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                   },
                   body: JSON.stringify({
-                    title: 'Optimized CV',
-                    content: optimizedCV,
-                    coverLetter: optimizedCL,
-                    jobDescription: jobDesc,
-                    source: 'wizard',
+                    name: 'My Optimized CV',
+                    description: jobDesc,
+                    is_default: true,
+                    template_id: 'default',
+                    num_pages: numPages,
+                    include_keywords: includeKeywords,
+                    include_relevant_experience: includeRelevantExperience,
                   }),
                 });
-                if (!res.ok) throw await res.json();
+                if (!createRes.ok) throw await createRes.json();
+                const created = await createRes.json();
+                // 2. Update the CV content
+                const updateRes = await fetch(`/api/cv/${created.id}/content`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({
+                    summary: optimizedCV,
+                    coverLetter: optimizedCL,
+                    // Add other fields as needed
+                  }),
+                });
+                if (!updateRes.ok) throw await updateRes.json();
               } catch (err) {
                 // Optionally handle error (e.g., show notification)
               }
