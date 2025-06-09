@@ -327,9 +327,15 @@ const Application: React.FC = () => {
     setOptimizing(true);
     setError('');
     try {
-      const result = await generateApplicationMaterials(jobDesc, arcData);
+      const result = await generateApplicationMaterials(
+        jobDesc,
+        arcData,
+        numPages,
+        includeKeywords,
+        includeRelevantExperience
+      );
       setOptimizedCV(result.cv || '');
-      setOptimizedCL(result.coverLetter || '');
+      setOptimizedCL(result.cover_letter || result.coverLetter || '');
       setStep(3);
     } catch (err: any) {
       setError(err.message || 'AI optimization failed');
@@ -531,28 +537,16 @@ const Application: React.FC = () => {
                 setOptimizing(true);
                 setError('');
                 try {
-                  // POST options to /api/cv to generate the CV
-                  const createRes = await fetch('https://api-gw-production.up.railway.app/api/cv', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                      name: 'My Optimized CV',
-                      description: jobDesc,
-                      is_default: true,
-                      template_id: 'default',
-                      base_cv_id: null,
-                      num_pages: numPages,
-                      include_keywords: includeKeywords,
-                      include_relevant_experience: includeRelevantExperience,
-                    }),
-                  });
-                  if (!createRes.ok) throw await createRes.json();
-                  const created = await createRes.json();
-                  // Optionally, fetch the generated content if returned
-                  // For now, just proceed to step 3
+                  // Call generateApplicationMaterials with all required options
+                  const result = await generateApplicationMaterials(
+                    jobDesc,
+                    arcData,
+                    numPages,
+                    includeKeywords,
+                    includeRelevantExperience
+                  );
+                  setOptimizedCV(result.cv || '');
+                  setOptimizedCL(result.cover_letter || result.coverLetter || '');
                   setStep(3);
                 } catch (err) {
                   setError('Failed to generate CV. Please try again.');

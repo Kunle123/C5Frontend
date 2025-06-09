@@ -70,14 +70,14 @@ export async function getArcData() {
 // }
 
 // 6. Generate Application Materials
-export async function generateApplicationMaterials(jobAdvert: string, arcData: any) {
+export async function generateApplicationMaterials(jobAdvert: string, arcData: any, num_pages: number, include_keywords: boolean, include_relevant_experience: boolean) {
   const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/generate`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ jobAdvert, arcData }),
+    body: JSON.stringify({ jobAdvert, arcData, num_pages, include_keywords, include_relevant_experience }),
   });
   if (!res.ok) throw await res.json().catch(() => new Error('Failed to generate application materials'));
   return res.json();
