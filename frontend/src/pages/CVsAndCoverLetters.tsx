@@ -593,7 +593,7 @@ const Application: React.FC = () => {
               Edit Ark Data
             </Button>
             <Button colorScheme="green" size="lg" mt={2} onClick={async () => {
-              // Save the generated CV and cover letter to the backend before navigating
+              // Save the generated CV options to the backend before navigating
               try {
                 // 1. Create the CV with options
                 const createRes = await fetch('/api/cv', {
@@ -614,24 +614,11 @@ const Application: React.FC = () => {
                 });
                 if (!createRes.ok) throw await createRes.json();
                 const created = await createRes.json();
-                // 2. Update the CV content
-                const updateRes = await fetch(`/api/cv/${created.id}/content`, {
-                  method: 'PUT',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                  },
-                  body: JSON.stringify({
-                    summary: optimizedCV,
-                    coverLetter: optimizedCL,
-                    // Add other fields as needed
-                  }),
-                });
-                if (!updateRes.ok) throw await updateRes.json();
+                // 2. Navigate to download page (optionally pass CV ID)
+                navigate('/download-cvs');
               } catch (err) {
                 // Optionally handle error (e.g., show notification)
               }
-              navigate('/download-cvs');
             }}>
               Go to Download CVs Page
             </Button>
