@@ -581,13 +581,21 @@ const Application: React.FC = () => {
           <Stack spacing={3}>
             <Alert status="success"><AlertIcon />Optimized CV and cover letter generated!</Alert>
             <Heading as="h4" size="md">Optimized CV</Heading>
-            <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
-              <Text whiteSpace="pre-wrap">{optimizedCV}</Text>
-            </Box>
+            <Textarea
+              value={optimizedCV}
+              onChange={e => setOptimizedCV(e.target.value)}
+              minH={200}
+              bg={useColorModeValue('gray.50', 'gray.700')}
+              borderRadius="md"
+            />
             <Heading as="h4" size="md">Optimized Cover Letter</Heading>
-            <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
-              <Text whiteSpace="pre-wrap">{optimizedCL}</Text>
-            </Box>
+            <Textarea
+              value={optimizedCL}
+              onChange={e => setOptimizedCL(e.target.value)}
+              minH={150}
+              bg={useColorModeValue('gray.50', 'gray.700')}
+              borderRadius="md"
+            />
             <Button variant="outline" colorScheme="gray" onClick={() => {
               if (Array.isArray(keywordAnalysis)) {
                 const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
