@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 interface CV {
-  cv_id?: string;
-  id?: string;
+  id: string;
   filename: string;
   created_at?: string;
   createdAt?: string;
@@ -18,12 +17,31 @@ interface PreviousDocumentsListProps {
   token: string;
 }
 
+// Token expiry check (JWT)
+function isTokenExpired(token: string): boolean {
+  try {
+    const [, payload] = token.split('.');
+    const decoded = JSON.parse(atob(payload));
+    if (!decoded.exp) return false;
+    return Date.now() >= decoded.exp * 1000;
+  } catch {
+    return true;
+  }
+}
+
 function downloadBase64Docx(endpoint: string, token: string) {
   return fetch(endpoint, {
     headers: { Authorization: `Bearer ${token}` },
   })
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to fetch document");
+    .then(async res => {
+      if (!res.ok) {
+        let errMsg = `Failed to fetch document (${res.status})`;
+        try {
+          const err = await res.json();
+          errMsg = err.message || err.error || errMsg;
+        } catch {}
+        throw new Error(errMsg);
+      }
       return res.json();
     })
     .then(data => {
@@ -56,35 +74,51 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
   const [coverLetterError, setCoverLetterError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Token expiry check
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+      return;
+    }
     setLoading(true);
     setError(null);
     setCoverLetterError(null);
-    // Try /cvs for listing CVs, fallback to /api/cv if needed
-    fetch("/cvs", { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch CVs"))
+    // Use /api/cv for listing CVs (align with working script)
+    fetch("/api/cv", { headers: { Authorization: `Bearer ${token}` } })
+      .then(async res => {
+        if (!res.ok) {
+          let errMsg = `Failed to fetch CVs (${res.status})`;
+          try {
+            const err = await res.json();
+            errMsg = err.message || err.error || errMsg;
+          } catch {}
+          throw new Error(errMsg);
+        }
+        return res.json();
+      })
       .then(cvsData => setCvs(cvsData))
-      .catch(() => {
-        // fallback to /api/cv
-        fetch("/api/cv", { headers: { Authorization: `Bearer ${token}` } })
-          .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch CVs"))
-          .then(cvsData => setCvs(cvsData))
-          .catch(() => setError("Failed to fetch CVs"));
-      });
+      .catch(err => setError(err.message || 'Failed to fetch CVs'));
     // Try to fetch cover letters, but handle if endpoint is missing
     fetch("/api/cover-letter", { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch cover letters");
+      .then(async res => {
+        if (!res.ok) {
+          let errMsg = `Failed to fetch cover letters (${res.status})`;
+          try {
+            const err = await res.json();
+            errMsg = err.message || err.error || errMsg;
+          } catch {}
+          throw new Error(errMsg);
+        }
         return res.json();
       })
       .then(coverLettersData => setCoverLetters(coverLettersData))
-      .catch(() => setCoverLetterError("Cover letter download not available."));
+      .catch(err => setCoverLetterError(err.message || "Cover letter download not available."));
     setLoading(false);
   }, [token]);
 
   const handleDownloadCV = (cv: CV) => {
-    const id = cv.cv_id || cv.id;
-    if (!id) return alert("No CV ID found");
-    downloadBase64Docx(`/api/cv/${id}/download`, token).catch(err => alert(err.message || err));
+    if (!cv.id) return alert("No CV ID found");
+    downloadBase64Docx(`/api/cv/${cv.id}/download`, token).catch(err => alert(err.message || err));
   };
 
   const handleDownloadCoverLetter = (cover_letter_id: string) => {
@@ -100,7 +134,7 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
       {cvs.length === 0 ? <p>No CVs found.</p> : (
         <ul>
           {cvs.map(cv => (
-            <li key={cv.cv_id || cv.id}>
+            <li key={cv.id}>
               {cv.filename} {(cv.created_at || cv.createdAt) && <span>({cv.created_at || cv.createdAt})</span>}
               <button onClick={() => handleDownloadCV(cv)}>Download</button>
             </li>
