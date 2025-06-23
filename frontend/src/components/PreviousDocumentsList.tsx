@@ -1,4 +1,21 @@
 import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Heading,
+  Text,
+  Button,
+  Stack,
+  HStack,
+  VStack,
+  Icon,
+  Alert,
+  AlertIcon,
+  useColorModeValue,
+  SimpleGrid,
+  Divider,
+  Spinner,
+} from '@chakra-ui/react';
+import { FaFileWord, FaDownload } from 'react-icons/fa';
 
 interface CV {
   id: string;
@@ -66,6 +83,20 @@ function downloadBase64Docx(endpoint: string, token: string) {
     });
 }
 
+const Card = ({ children }: { children: React.ReactNode }) => (
+  <Box
+    p={5}
+    borderWidth={1}
+    borderRadius="lg"
+    boxShadow="md"
+    bg={useColorModeValue('white', 'gray.800')}
+    mb={4}
+    w="100%"
+  >
+    {children}
+  </Box>
+);
+
 const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) => {
   const [cvs, setCvs] = useState<CV[]>([]);
   const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
@@ -125,36 +156,71 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
     downloadBase64Docx(`/api/cover-letter/${cover_letter_id}/download`, token).catch(err => alert(err.message || err));
   };
 
-  if (loading) return <div>Loading documents...</div>;
-  if (error) return <div style={{ color: 'red' }}>{error}</div>;
+  if (loading) return <Box textAlign="center" py={8}><Spinner size="lg" /></Box>;
+  if (error) return <Alert status="error" my={4}><AlertIcon />{error}</Alert>;
 
   return (
-    <div>
-      <h3>Previously Generated CVs</h3>
-      {cvs.length === 0 ? <p>No CVs found.</p> : (
-        <ul>
+    <Box>
+      <Heading as="h3" size="lg" mb={4} color="brand.700">Previously Generated CVs</Heading>
+      {cvs.length === 0 ? (
+        <Text color="gray.500" mb={6}>No CVs found.</Text>
+      ) : (
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={8}>
           {cvs.map(cv => (
-            <li key={cv.id}>
-              {cv.filename} {(cv.created_at || cv.createdAt) && <span>({cv.created_at || cv.createdAt})</span>}
-              <button onClick={() => handleDownloadCV(cv)}>Download</button>
-            </li>
+            <Card key={cv.id}>
+              <HStack spacing={4} align="center">
+                <Icon as={FaFileWord} boxSize={8} color="blue.500" />
+                <VStack align="start" spacing={1} flex={1}>
+                  <Text fontWeight={700} fontSize="lg">{cv.filename}</Text>
+                  <Text fontSize="sm" color="gray.500">
+                    {cv.created_at || cv.createdAt ? `Created: ${new Date(cv.created_at || cv.createdAt!).toLocaleString()}` : ''}
+                  </Text>
+                </VStack>
+                <Button
+                  leftIcon={<FaDownload />}
+                  colorScheme="blue"
+                  variant="solid"
+                  onClick={() => handleDownloadCV(cv)}
+                >
+                  Download
+                </Button>
+              </HStack>
+            </Card>
           ))}
-        </ul>
+        </SimpleGrid>
       )}
-      <h3>Previously Generated Cover Letters</h3>
+      <Divider my={6} />
+      <Heading as="h3" size="lg" mb={4} color="brand.700">Previously Generated Cover Letters</Heading>
       {coverLetterError ? (
-        <p style={{ color: 'gray' }}>{coverLetterError}</p>
-      ) : coverLetters.length === 0 ? <p>No cover letters found.</p> : (
-        <ul>
+        <Text color="gray.500" mb={6}>{coverLetterError}</Text>
+      ) : coverLetters.length === 0 ? (
+        <Text color="gray.500" mb={6}>No cover letters found.</Text>
+      ) : (
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
           {coverLetters.map(cl => (
-            <li key={cl.cover_letter_id}>
-              {cl.filename} {cl.created_at && <span>({cl.created_at})</span>}
-              <button onClick={() => handleDownloadCoverLetter(cl.cover_letter_id)}>Download</button>
-            </li>
+            <Card key={cl.cover_letter_id}>
+              <HStack spacing={4} align="center">
+                <Icon as={FaFileWord} boxSize={8} color="green.500" />
+                <VStack align="start" spacing={1} flex={1}>
+                  <Text fontWeight={700} fontSize="lg">{cl.filename}</Text>
+                  <Text fontSize="sm" color="gray.500">
+                    {cl.created_at ? `Created: ${new Date(cl.created_at).toLocaleString()}` : ''}
+                  </Text>
+                </VStack>
+                <Button
+                  leftIcon={<FaDownload />}
+                  colorScheme="green"
+                  variant="solid"
+                  onClick={() => handleDownloadCoverLetter(cl.cover_letter_id)}
+                >
+                  Download
+                </Button>
+              </HStack>
+            </Card>
           ))}
-        </ul>
+        </SimpleGrid>
       )}
-    </div>
+    </Box>
   );
 };
 
