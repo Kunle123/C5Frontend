@@ -17,17 +17,10 @@ import {
 } from '@chakra-ui/react';
 import { FaFileWord, FaDownload } from 'react-icons/fa';
 
-interface CV {
+interface Application {
   id: string;
-  filename: string;
-  created_at?: string;
-  createdAt?: string;
-}
-
-interface CoverLetter {
-  cover_letter_id: string;
-  filename: string;
-  created_at?: string;
+  role_title: string;
+  created_at: string;
 }
 
 interface PreviousDocumentsListProps {
@@ -98,14 +91,11 @@ const Card = ({ children }: { children: React.ReactNode }) => (
 );
 
 const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) => {
-  const [cvs, setCvs] = useState<CV[]>([]);
-  const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [coverLetterError, setCoverLetterError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Token expiry check
     if (!token || isTokenExpired(token)) {
       localStorage.removeItem('token');
       window.location.href = '/login';
@@ -113,12 +103,10 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
     }
     setLoading(true);
     setError(null);
-    setCoverLetterError(null);
-    // Use /api/cv for listing CVs (align with working script)
-    fetch("/api/cv", { headers: { Authorization: `Bearer ${token}` } })
+    fetch("/api/applications", { headers: { Authorization: `Bearer ${token}` } })
       .then(async res => {
         if (!res.ok) {
-          let errMsg = `Failed to fetch CVs (${res.status})`;
+          let errMsg = `Failed to fetch applications (${res.status})`;
           try {
             const err = await res.json();
             errMsg = err.message || err.error || errMsg;
@@ -127,33 +115,14 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
         }
         return res.json();
       })
-      .then(cvsData => setCvs(cvsData))
-      .catch(err => setError(err.message || 'Failed to fetch CVs'));
-    // Try to fetch cover letters, but handle if endpoint is missing
-    fetch("/api/cover-letter", { headers: { Authorization: `Bearer ${token}` } })
-      .then(async res => {
-        if (!res.ok) {
-          let errMsg = `Failed to fetch cover letters (${res.status})`;
-          try {
-            const err = await res.json();
-            errMsg = err.message || err.error || errMsg;
-          } catch {}
-          throw new Error(errMsg);
-        }
-        return res.json();
-      })
-      .then(coverLettersData => setCoverLetters(coverLettersData))
-      .catch(err => setCoverLetterError(err.message || "Cover letter download not available."));
-    setLoading(false);
+      .then(apps => setApplications(apps))
+      .catch(err => setError(err.message || 'Failed to fetch applications'))
+      .finally(() => setLoading(false));
   }, [token]);
 
-  const handleDownloadCV = (cv: CV) => {
-    if (!cv.id) return alert("No CV ID found");
-    downloadBase64Docx(`/api/cv/${cv.id}/download`, token).catch(err => alert(err.message || err));
-  };
-
-  const handleDownloadCoverLetter = (cover_letter_id: string) => {
-    downloadBase64Docx(`/api/cover-letter/${cover_letter_id}/download`, token).catch(err => alert(err.message || err));
+  const handleDownload = (id: string, type: 'cv' | 'cover-letter') => {
+    const endpoint = `/api/applications/${id}/${type}`;
+    downloadBase64Docx(endpoint, token).catch(err => alert(err.message || err));
   };
 
   if (loading) return <Box textAlign="center" py={8}><Spinner size="lg" /></Box>;
@@ -161,61 +130,37 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
 
   return (
     <Box>
-      <Heading as="h3" size="lg" mb={4} color="brand.700">Previously Generated CVs</Heading>
-      {cvs.length === 0 ? (
-        <Text color="gray.500" mb={6}>No CVs found.</Text>
+      <Heading as="h3" size="lg" mb={4} color="brand.700">Previously Generated Applications</Heading>
+      {applications.length === 0 ? (
+        <Text color="gray.500" mb={6}>No applications found.</Text>
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={8}>
-          {cvs.map(cv => (
-            <Card key={cv.id}>
-              <HStack spacing={4} align="center">
-                <Icon as={FaFileWord} boxSize={8} color="blue.500" />
-                <VStack align="start" spacing={1} flex={1}>
-                  <Text fontWeight={700} fontSize="lg">{cv.filename}</Text>
-                  <Text fontSize="sm" color="gray.500">
-                    {cv.created_at || cv.createdAt ? `Created: ${new Date(cv.created_at || cv.createdAt!).toLocaleString()}` : ''}
-                  </Text>
-                </VStack>
-                <Button
-                  leftIcon={<FaDownload />}
-                  colorScheme="blue"
-                  variant="solid"
-                  onClick={() => handleDownloadCV(cv)}
-                >
-                  Download
-                </Button>
-              </HStack>
-            </Card>
-          ))}
-        </SimpleGrid>
-      )}
-      <Divider my={6} />
-      <Heading as="h3" size="lg" mb={4} color="brand.700">Previously Generated Cover Letters</Heading>
-      {coverLetterError ? (
-        <Text color="gray.500" mb={6}>{coverLetterError}</Text>
-      ) : coverLetters.length === 0 ? (
-        <Text color="gray.500" mb={6}>No cover letters found.</Text>
-      ) : (
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-          {coverLetters.map(cl => (
-            <Card key={cl.cover_letter_id}>
-              <HStack spacing={4} align="center">
-                <Icon as={FaFileWord} boxSize={8} color="green.500" />
-                <VStack align="start" spacing={1} flex={1}>
-                  <Text fontWeight={700} fontSize="lg">{cl.filename}</Text>
-                  <Text fontSize="sm" color="gray.500">
-                    {cl.created_at ? `Created: ${new Date(cl.created_at).toLocaleString()}` : ''}
-                  </Text>
-                </VStack>
-                <Button
-                  leftIcon={<FaDownload />}
-                  colorScheme="green"
-                  variant="solid"
-                  onClick={() => handleDownloadCoverLetter(cl.cover_letter_id)}
-                >
-                  Download
-                </Button>
-              </HStack>
+          {applications.map(app => (
+            <Card key={app.id}>
+              <VStack align="start" spacing={2} w="100%">
+                <Text fontWeight={700} fontSize="lg">{app.role_title}</Text>
+                <Text fontSize="sm" color="gray.500">
+                  {app.created_at ? `Created: ${new Date(app.created_at).toLocaleString()}` : ''}
+                </Text>
+                <HStack spacing={4} mt={2}>
+                  <Button
+                    leftIcon={<FaDownload />}
+                    colorScheme="blue"
+                    variant="solid"
+                    onClick={() => handleDownload(app.id, 'cv')}
+                  >
+                    Download CV
+                  </Button>
+                  <Button
+                    leftIcon={<FaDownload />}
+                    colorScheme="purple"
+                    variant="solid"
+                    onClick={() => handleDownload(app.id, 'cover-letter')}
+                  >
+                    Download Cover Letter
+                  </Button>
+                </HStack>
+              </VStack>
             </Card>
           ))}
         </SimpleGrid>
