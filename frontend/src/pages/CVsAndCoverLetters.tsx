@@ -26,6 +26,11 @@ import {
   useDisclosure,
   IconButton,
   useBreakpointValue,
+  Tabs,
+  TabList,
+  TabPanels,
+  TabPanel,
+  Tab,
 } from '@chakra-ui/react';
 import { listCVs, uploadCV, deleteCV, downloadCV, getCurrentUser } from '../api';
 import { optimizeCV as aiOptimizeCV, extractKeywords, analyzeCV as aiAnalyzeCV } from '../api/aiApi';
@@ -36,7 +41,7 @@ import { FiKey } from 'react-icons/fi';
 const steps = [
   'Paste Job Description',
   'Review Arc Data',
-  'Analyse & Optimise',
+  'Simple review CV and cover letter',
 ];
 
 type KeywordAnalysisEntry = { keyword: string, status: 'green' | 'amber' | 'red' };
@@ -540,21 +545,6 @@ const Application: React.FC = () => {
                   )}
                 </Box>
               )}
-              <Heading as="h4" size="sm">CV Options</Heading>
-              <Stack direction="row" spacing={4} align="center">
-                <Text>Pages:</Text>
-                <Button colorScheme={numPages === 2 ? 'blue' : 'gray'} onClick={() => setNumPages(2)}>2</Button>
-                <Button colorScheme={numPages === 3 ? 'blue' : 'gray'} onClick={() => setNumPages(3)}>3</Button>
-                <Button colorScheme={numPages === 4 ? 'blue' : 'gray'} onClick={() => setNumPages(4)}>4</Button>
-              </Stack>
-              <HStack>
-                <Text>Include Keywords:</Text>
-                <Button colorScheme={includeKeywords ? 'blue' : 'gray'} onClick={() => setIncludeKeywords(!includeKeywords)}>{includeKeywords ? 'Yes' : 'No'}</Button>
-              </HStack>
-              <HStack>
-                <Text>Include Relevant Experience:</Text>
-                <Button colorScheme={includeRelevantExperience ? 'blue' : 'gray'} onClick={() => setIncludeRelevantExperience(!includeRelevantExperience)}>{includeRelevantExperience ? 'Yes' : 'No'}</Button>
-              </HStack>
               <Button variant="outline" colorScheme="gray" onClick={() => {
                 if (Array.isArray(keywordAnalysis)) {
                   const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
@@ -598,22 +588,36 @@ const Application: React.FC = () => {
         {step === 3 && (
           <Stack spacing={3}>
             <Alert status="success"><AlertIcon />Optimized CV and cover letter generated!</Alert>
-            <Heading as="h4" size="md">Optimized CV</Heading>
-            <Textarea
-              value={optimizedCV}
-              onChange={e => setOptimizedCV(e.target.value)}
-              minH={200}
-              bg={useColorModeValue('gray.50', 'gray.700')}
-              borderRadius="md"
-            />
-            <Heading as="h4" size="md">Optimized Cover Letter</Heading>
-            <Textarea
-              value={optimizedCL}
-              onChange={e => setOptimizedCL(e.target.value)}
-              minH={150}
-              bg={useColorModeValue('gray.50', 'gray.700')}
-              borderRadius="md"
-            />
+            <Box>
+              <Tabs colorScheme="purple" variant="line" isFitted>
+                <TabList mb={4}>
+                  <Tab fontWeight="bold">CV</Tab>
+                  <Tab fontWeight="bold">Cover Letter</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    <Heading as="h4" size="md" mb={2}>Optimized CV</Heading>
+                    <Textarea
+                      value={optimizedCV}
+                      onChange={e => setOptimizedCV(e.target.value)}
+                      minH={200}
+                      bg={useColorModeValue('gray.50', 'gray.700')}
+                      borderRadius="md"
+                    />
+                  </TabPanel>
+                  <TabPanel>
+                    <Heading as="h4" size="md" mb={2}>Optimized Cover Letter</Heading>
+                    <Textarea
+                      value={optimizedCL}
+                      onChange={e => setOptimizedCL(e.target.value)}
+                      minH={150}
+                      bg={useColorModeValue('gray.50', 'gray.700')}
+                      borderRadius="md"
+                    />
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </Box>
             <Button variant="outline" colorScheme="gray" onClick={() => {
               if (Array.isArray(keywordAnalysis)) {
                 const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
@@ -648,18 +652,20 @@ const Application: React.FC = () => {
                 <Button colorScheme={modalNumPages === 3 ? 'blue' : 'gray'} onClick={() => setModalNumPages(3)}>3</Button>
                 <Button colorScheme={modalNumPages === 4 ? 'blue' : 'gray'} onClick={() => setModalNumPages(4)}>4</Button>
               </Stack>
-              <HStack>
+              <Stack direction="row" spacing={4} align="center">
                 <Text>Include Keywords:</Text>
-                <Button colorScheme={modalIncludeKeywords ? 'blue' : 'gray'} onClick={() => setModalIncludeKeywords(!modalIncludeKeywords)}>{modalIncludeKeywords ? 'Yes' : 'No'}</Button>
-              </HStack>
-              <HStack>
+                <Button colorScheme={modalIncludeKeywords ? 'blue' : 'gray'} variant={modalIncludeKeywords ? 'solid' : 'outline'} onClick={() => setModalIncludeKeywords(true)}>Yes</Button>
+                <Button colorScheme={!modalIncludeKeywords ? 'blue' : 'gray'} variant={!modalIncludeKeywords ? 'solid' : 'outline'} onClick={() => setModalIncludeKeywords(false)}>No</Button>
+              </Stack>
+              <Stack direction="row" spacing={4} align="center">
                 <Text>Include Relevant Experience:</Text>
-                <Button colorScheme={modalIncludeRelevantExperience ? 'blue' : 'gray'} onClick={() => setModalIncludeRelevantExperience(!modalIncludeRelevantExperience)}>{modalIncludeRelevantExperience ? 'Yes' : 'No'}</Button>
-              </HStack>
+                <Button colorScheme={modalIncludeRelevantExperience ? 'blue' : 'gray'} variant={modalIncludeRelevantExperience ? 'solid' : 'outline'} onClick={() => setModalIncludeRelevantExperience(true)}>Yes</Button>
+                <Button colorScheme={!modalIncludeRelevantExperience ? 'blue' : 'gray'} variant={!modalIncludeRelevantExperience ? 'solid' : 'outline'} onClick={() => setModalIncludeRelevantExperience(false)}>No</Button>
+              </Stack>
             </Stack>
           </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleModalOk}>
+          <ModalFooter justifyContent="center">
+            <Button colorScheme="blue" onClick={handleModalOk}>
               OK
             </Button>
           </ModalFooter>
