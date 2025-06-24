@@ -480,26 +480,31 @@ const Application: React.FC = () => {
         CVs & Cover Letters
       </Heading>
       <Box bg={useColorModeValue('white', 'gray.800')} boxShadow="lg" p={8} borderRadius="lg" mb={6} maxW={700} mx="auto">
-        <HStack justify="center" mb={6} spacing={4}>
-          {steps.map((label, idx) => (
-            <VStack key={label} spacing={1} align="center">
-              <Box
-                w={8}
-                h={8}
-                borderRadius="full"
-                bg={step === idx ? 'blue.500' : 'gray.300'}
-                color={step === idx ? 'white' : 'gray.700'}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                fontWeight="bold"
-                fontSize="lg"
-              >
-                {idx + 1}
-              </Box>
-              <Text fontSize="sm" color={step === idx ? 'blue.500' : 'gray.500'}>{label}</Text>
-            </VStack>
-          ))}
+        <HStack justify="center" mb={6} spacing={12}>
+          {steps.map((label, idx) => {
+            const isActive = step === idx;
+            return (
+              <VStack key={label} spacing={1} align="center">
+                <Box
+                  w={8}
+                  h={8}
+                  borderRadius="full"
+                  bg={isActive ? 'blue.800' : 'gray.300'}
+                  color={isActive ? 'white' : 'gray.700'}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  fontWeight="bold"
+                  fontSize="lg"
+                >
+                  {idx + 1}
+                </Box>
+                <Text fontSize="sm" color={isActive ? 'blue.800' : 'gray.500'} fontWeight={isActive ? 700 : 400}>
+                  {label}
+                </Text>
+              </VStack>
+            );
+          })}
         </HStack>
         {step === 0 && (
           <Stack spacing={3}>
@@ -588,6 +593,7 @@ const Application: React.FC = () => {
         {step === 3 && (
           <Stack spacing={3}>
             <Alert status="success"><AlertIcon />Optimized CV and cover letter generated!</Alert>
+            <Text fontWeight="semibold">View CV and Cover Letter</Text>
             <Box>
               <Tabs colorScheme="purple" variant="line" isFitted>
                 <TabList mb={4}>
@@ -618,17 +624,6 @@ const Application: React.FC = () => {
                 </TabPanels>
               </Tabs>
             </Box>
-            <Button variant="outline" colorScheme="gray" onClick={() => {
-              if (Array.isArray(keywordAnalysis)) {
-                const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
-                localStorage.setItem('ark-missing-keywords', JSON.stringify(missing));
-                // Store all keywords for CareerArk modal
-                localStorage.setItem('ark-keywords', JSON.stringify(keywordAnalysis.map(k => k.keyword)));
-              }
-              navigate('/career-ark');
-            }}>
-              Edit Ark Data
-            </Button>
             <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download-cvs')}>
               Go to Download CVs Page
             </Button>
