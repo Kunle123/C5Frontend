@@ -48,7 +48,7 @@ type KeywordAnalysisEntry = { keyword: string, status: 'green' | 'amber' | 'red'
 
 const Application: React.FC = () => {
   const [cvs, setCVs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState<any>(null);
   const token = localStorage.getItem('token') || '';
@@ -510,7 +510,7 @@ const Application: React.FC = () => {
               minH={100}
               required
             />
-            <Button colorScheme="blue" onClick={handleNextFromJobDesc} isDisabled={!jobDesc || loading || extracting}>
+            <Button colorScheme="blue" onClick={handleNextFromJobDesc} isDisabled={!jobDesc.trim() || loading || extracting}>
               {(loading || extracting) && <Spinner size="sm" mr={2} />}Next: Review Arc Data
             </Button>
           </Stack>
