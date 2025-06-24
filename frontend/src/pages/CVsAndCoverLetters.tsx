@@ -352,10 +352,16 @@ const Application: React.FC = () => {
         return;
       }
       // Log outgoing payload for debugging
-      const payload = { cv: result.cv, cover_letter: result.cover_letter || result.coverLetter || '' };
-      console.log('Saving generated CV to /api/cv with payload:', payload);
+      const roleTitle = jobDesc.split('\n')[0].slice(0, 80) || 'Untitled Role';
+      const payload = {
+        role_title: roleTitle,
+        job_description: jobDesc,
+        cv_text: result.cv,
+        cover_letter_text: result.cover_letter || result.coverLetter || ''
+      };
+      console.log('Saving generated application to /api/applications with payload:', payload);
       try {
-        await saveGeneratedCV(payload.cv, payload.cover_letter);
+        await saveGeneratedCV(payload);
         setSaveSuccess('Generated CV and cover letter saved successfully!');
       } catch (saveErr: any) {
         setSaveError(saveErr.message || 'Failed to save generated CV and cover letter');
