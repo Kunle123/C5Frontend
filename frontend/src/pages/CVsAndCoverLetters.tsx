@@ -98,12 +98,6 @@ const Application: React.FC = () => {
   const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    listCVs(token)
-      .then(data => setCVs(data))
-      .catch(err => setError(err.message || 'Failed to load CVs'))
-      .finally(() => setLoading(false));
     getCurrentUser(token).then(setUser).catch(() => setUser(null));
   }, [token]);
 
