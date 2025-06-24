@@ -21,6 +21,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
+  ModalFooter,
   ModalCloseButton,
   useDisclosure,
   IconButton,
@@ -75,6 +76,10 @@ const Application: React.FC = () => {
   const [includeRelevantExperience, setIncludeRelevantExperience] = useState(true);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [modalNumPages, setModalNumPages] = useState(numPages);
+  const [modalIncludeKeywords, setModalIncludeKeywords] = useState(includeKeywords);
+  const [modalIncludeRelevantExperience, setModalIncludeRelevantExperience] = useState(includeRelevantExperience);
+  const [pendingGenerate, setPendingGenerate] = useState(false);
 
   // Responsive placement for recall button
   const recallBtnBottom = useBreakpointValue({ base: '80px', md: '40px' });
@@ -455,6 +460,15 @@ const Application: React.FC = () => {
     // eslint-disable-next-line
   }, [step]);
 
+  // When modal is confirmed, update main options and proceed
+  const handleModalOk = () => {
+    setNumPages(modalNumPages);
+    setIncludeKeywords(modalIncludeKeywords);
+    setIncludeRelevantExperience(modalIncludeRelevantExperience);
+    onClose();
+    setTimeout(() => handleAnalyzeAndOptimize(), 0); // Proceed with generation
+  };
+
   return (
     <Box py={6} maxW="900px" mx="auto">
       <Heading as="h2" size="lg" fontWeight={700} textAlign="center" mb={4}>
@@ -552,7 +566,12 @@ const Application: React.FC = () => {
               }}>
                 Edit Ark Data
               </Button>
-              <Button colorScheme="blue" isDisabled={optimizing} onClick={handleAnalyzeAndOptimize}>
+              <Button colorScheme="blue" isDisabled={optimizing} onClick={() => {
+                setModalNumPages(numPages);
+                setModalIncludeKeywords(includeKeywords);
+                setModalIncludeRelevantExperience(includeRelevantExperience);
+                onOpen();
+              }}>
                 {optimizing ? <Spinner size="sm" mr={2} /> : null}Generate CV & Cover Letter
               </Button>
             </Stack>
@@ -615,6 +634,37 @@ const Application: React.FC = () => {
         {saveError && <Alert status="error" mt={2}><AlertIcon />{saveError}</Alert>}
         {error && <Alert status="error" mt={2}><AlertIcon />{error}</Alert>}
       </Box>
+      {/* CV Options Modal */}
+      <Modal isOpen={isOpen} onClose={onClose} isCentered closeOnOverlayClick={false}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>CV Options</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Stack spacing={4}>
+              <Stack direction="row" spacing={4} align="center">
+                <Text>Pages:</Text>
+                <Button colorScheme={modalNumPages === 2 ? 'blue' : 'gray'} onClick={() => setModalNumPages(2)}>2</Button>
+                <Button colorScheme={modalNumPages === 3 ? 'blue' : 'gray'} onClick={() => setModalNumPages(3)}>3</Button>
+                <Button colorScheme={modalNumPages === 4 ? 'blue' : 'gray'} onClick={() => setModalNumPages(4)}>4</Button>
+              </Stack>
+              <HStack>
+                <Text>Include Keywords:</Text>
+                <Button colorScheme={modalIncludeKeywords ? 'blue' : 'gray'} onClick={() => setModalIncludeKeywords(!modalIncludeKeywords)}>{modalIncludeKeywords ? 'Yes' : 'No'}</Button>
+              </HStack>
+              <HStack>
+                <Text>Include Relevant Experience:</Text>
+                <Button colorScheme={modalIncludeRelevantExperience ? 'blue' : 'gray'} onClick={() => setModalIncludeRelevantExperience(!modalIncludeRelevantExperience)}>{modalIncludeRelevantExperience ? 'Yes' : 'No'}</Button>
+              </HStack>
+            </Stack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleModalOk}>
+              OK
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
