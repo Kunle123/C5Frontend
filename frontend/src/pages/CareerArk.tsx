@@ -61,7 +61,6 @@ function EmptyState({ section, onUpload }: { section: string, onUpload?: () => v
   return (
     <Center flexDir="column" py={8} color="gray.400">
       <Text mb={2}>No entries yet.</Text>
-      {onUpload && <Button colorScheme="blue" onClick={onUpload}>Upload CV</Button>}
     </Center>
   );
 }
