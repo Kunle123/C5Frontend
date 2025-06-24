@@ -5,6 +5,8 @@
     { "source": "/api/cover-letter", "destination": "https://api-gw-production.up.railway.app/api/cover-letter" },
     { "source": "/api/cover-letter/:id/download", "destination": "https://api-gw-production.up.railway.app/api/cover-letter/:id/download" },
     { "source": "/api/career-ark/generate", "destination": "https://api-gw-production.up.railway.app/api/career-ark/generate" },
+    { "source": "/api/applications", "destination": "https://api-gw-production.up.railway.app/api/applications" },
+    { "source": "/api/applications/(.*)", "destination": "https://api-gw-production.up.railway.app/api/applications/$1" },
     { "source": "/(.*)", "destination": "/" }
   ]
 } 
