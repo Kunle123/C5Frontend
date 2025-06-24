@@ -115,7 +115,10 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
         }
         return res.json();
       })
-      .then(apps => setApplications(apps))
+      .then(apps => {
+        console.log('Fetched applications:', apps);
+        setApplications(apps);
+      })
       .catch(err => setError(err.message || 'Failed to fetch applications'))
       .finally(() => setLoading(false));
   }, [token]);
@@ -136,30 +139,34 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={8}>
           {applications.map(app => (
-            <Card key={app.id}>
+            <Card key={app.id || app.role_title}>
               <VStack align="start" spacing={2} w="100%">
                 <Text fontWeight={700} fontSize="lg">{app.role_title}</Text>
                 <Text fontSize="sm" color="gray.500">
                   {app.created_at ? `Created: ${new Date(app.created_at).toLocaleString()}` : ''}
                 </Text>
-                <HStack spacing={4} mt={2}>
-                  <Button
-                    leftIcon={<FaDownload />}
-                    colorScheme="blue"
-                    variant="solid"
-                    onClick={() => handleDownload(app.id, 'cv')}
-                  >
-                    Download CV
-                  </Button>
-                  <Button
-                    leftIcon={<FaDownload />}
-                    colorScheme="purple"
-                    variant="solid"
-                    onClick={() => handleDownload(app.id, 'cover-letter')}
-                  >
-                    Download Cover Letter
-                  </Button>
-                </HStack>
+                {app.id ? (
+                  <HStack spacing={4} mt={2}>
+                    <Button
+                      leftIcon={<FaDownload />}
+                      colorScheme="blue"
+                      variant="solid"
+                      onClick={() => handleDownload(app.id, 'cv')}
+                    >
+                      Download CV
+                    </Button>
+                    <Button
+                      leftIcon={<FaDownload />}
+                      colorScheme="purple"
+                      variant="solid"
+                      onClick={() => handleDownload(app.id, 'cover-letter')}
+                    >
+                      Download Cover Letter
+                    </Button>
+                  </HStack>
+                ) : (
+                  <Text color="red.500" fontWeight={600} mt={2}>No valid application ID found.</Text>
+                )}
               </VStack>
             </Card>
           ))}
