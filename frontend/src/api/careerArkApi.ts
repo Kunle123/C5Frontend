@@ -71,7 +71,7 @@ export async function getArcData() {
 
 // 6. Generate Application Materials
 export async function generateApplicationMaterials(jobAdvert: string, arcData: any, num_pages: number, include_keywords: boolean, include_relevant_experience: boolean) {
-  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/generate`, {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/generate-assistant`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
