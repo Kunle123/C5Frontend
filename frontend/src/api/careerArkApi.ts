@@ -282,4 +282,87 @@ export async function saveGeneratedCV({ role_title, job_description, cv_text, co
     throw new Error(errorMsg);
   }
   return res.json();
+}
+
+/**
+ * Generate CV and Cover Letter with user options (relevant experience, keywords, style, tone, etc.)
+ * @param {Object} params
+ * @param {string} params.jobAdvert - The job description or advert
+ * @param {any} params.arcData - The user's Ark profile data
+ * @param {Object} params.options - User-selected options (relevantExperience, keywords, style, tone, etc.)
+ * @returns {Promise<{cv: string, cover_letter: string}>}
+ */
+export async function generateCVWithOptions({ jobAdvert, arcData, options }: {
+  jobAdvert: string,
+  arcData: any,
+  options: {
+    relevantExperience?: string[];
+    keywords?: string[];
+    style?: string;
+    tone?: string;
+    [key: string]: any;
+  }
+}) {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/generate-assistant`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ jobAdvert, arcData, ...options }),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to generate CV with options'));
+  return res.json();
+}
+
+/**
+ * List all user's CVs (metadata only)
+ * @returns {Promise<any[]>}
+ */
+export async function listCVs() {
+  const res = await fetch(`/api/cv`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to list CVs'));
+  return res.json();
+}
+
+/**
+ * Download a persisted DOCX CV by ID (returns { filename, filedata, cv_id })
+ * @param {string} cv_id
+ * @returns {Promise<{filename: string, filedata: string, cv_id: string}>}
+ */
+export async function downloadCV(cv_id: string) {
+  const res = await fetch(`/api/cv/${cv_id}/download`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to download CV'));
+  return res.json();
+}
+
+/**
+ * Utility: Download a base64-encoded DOCX file in the browser
+ * @param {string} base64 - The base64-encoded file data
+ * @param {string} filename - The filename for download
+ */
+export function downloadBase64Docx(base64: string, filename: string = 'cv.docx') {
+  const byteCharacters = atob(base64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
 } 
