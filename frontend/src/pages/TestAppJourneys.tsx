@@ -14,7 +14,7 @@ import {
   Textarea,
 } from '@chakra-ui/react';
 import { login, register } from '../api';
-import { uploadCV, getArcData, generateCVWithOptions } from '../api/careerArkApi';
+import { uploadCV, getArcData, generateApplicationMaterials } from '../api/careerArkApi';
 import { Link as RouterLink } from 'react-router-dom';
 
 const TestAppJourneys: React.FC = () => {
@@ -96,15 +96,7 @@ const TestAppJourneys: React.FC = () => {
     setError(''); setGenResult(null);
     try {
       const arc = arcData || await getArcData();
-      const res = await generateCVWithOptions({
-        jobAdvert,
-        arcData: arc,
-        options: {
-          numPages,
-          includeKeywords,
-          includeRelevantExperience
-        }
-      });
+      const res = await generateApplicationMaterials(jobAdvert, arc, numPages, includeKeywords, includeRelevantExperience);
       setGenResult(res);
     } catch (err: any) {
       setError(err?.error || err?.message || 'Failed to generate application');

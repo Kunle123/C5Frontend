@@ -35,7 +35,7 @@ import {
 import { listCVs, uploadCV, deleteCV, downloadCV, getCurrentUser } from '../api';
 import { optimizeCV as aiOptimizeCV, extractKeywords, analyzeCV as aiAnalyzeCV } from '../api/aiApi';
 import { useNavigate } from 'react-router-dom';
-import { getArcData, generateCVWithOptions, saveGeneratedCV } from '../api/careerArkApi';
+import { getArcData, generateApplicationMaterials, saveGeneratedCV } from '../api/careerArkApi';
 import { FiKey } from 'react-icons/fi';
 
 const steps = [
@@ -336,15 +336,13 @@ const Application: React.FC = () => {
     setSaveSuccess('');
     setSaveError('');
     try {
-      const result = await generateCVWithOptions({
-        jobAdvert: jobDesc,
+      const result = await generateApplicationMaterials(
+        jobDesc,
         arcData,
-        options: {
-          numPages,
-          includeKeywords,
-          includeRelevantExperience
-        }
-      });
+        numPages,
+        includeKeywords,
+        includeRelevantExperience
+      );
       setOptimizedCV(result.cv || '');
       setOptimizedCL(result.cover_letter || result.coverLetter || '');
       setStep(3);
