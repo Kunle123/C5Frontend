@@ -165,7 +165,8 @@ const Application: React.FC = () => {
     setExtracting(true);
     setError('');
     try {
-      const result = await extractKeywords(jobDesc);
+      // Use arcData as profile and jobDesc as job_description
+      const result = await extractKeywords(arcData, jobDesc, token);
       setKeywords(result.keywords || []);
     } catch (err: any) {
       setError(err.message || 'Keyword extraction failed');
@@ -246,20 +247,7 @@ const Application: React.FC = () => {
     }
     setLoading(true);
     try {
-      // 1. Extract keywords from job description
-      let kwResult;
-      try {
-        kwResult = await extractKeywords(jobDesc, token);
-      } catch (err: any) {
-        setError('Sorry, we could not extract keywords from your job description. Please check your input or try again later.');
-        console.error('Keyword extraction failed:', err);
-        setLoading(false);
-        return;
-      }
-      // Patch: handle both array and object return from extractKeywords
-      const keywords = (Array.isArray(kwResult) ? kwResult : kwResult.keywords || []).slice(0, 20); // Limit to 20 keywords for user-friendliness
-      setKeywords(keywords);
-      // 2. Fetch Arc data
+      // 1. Fetch Arc data (profile)
       let data;
       try {
         data = await getArcData();
@@ -270,6 +258,18 @@ const Application: React.FC = () => {
         return;
       }
       setArcData(data);
+      // 2. Extract keywords from job description
+      let kwResult;
+      try {
+        kwResult = await extractKeywords(data, jobDesc, token);
+      } catch (err: any) {
+        setError('Sorry, we could not extract keywords from your job description. Please check your input or try again later.');
+        console.error('Keyword extraction failed:', err);
+        setLoading(false);
+        return;
+      }
+      const keywords = (Array.isArray(kwResult) ? kwResult : kwResult.keywords || []).slice(0, 20); // Limit to 20 keywords for user-friendliness
+      setKeywords(keywords);
       // 3. Analyze keywords against ALL Arc data sections
       const arcText = JSON.stringify(data).toLowerCase();
       const now = new Date();
@@ -336,12 +336,11 @@ const Application: React.FC = () => {
     setSaveSuccess('');
     setSaveError('');
     try {
+      // Use arcData as profile, jobDesc as job_description, and keywords as keywords
       const result = await generateApplicationMaterials(
-        jobDesc,
         arcData,
-        numPages,
-        includeKeywords,
-        includeRelevantExperience
+        jobDesc,
+        keywords
       );
       setOptimizedCV(result.cv || '');
       setOptimizedCL(result.cover_letter || result.coverLetter || '');

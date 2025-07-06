@@ -96,7 +96,7 @@ const TestAppJourneys: React.FC = () => {
     setError(''); setGenResult(null);
     try {
       const arc = arcData || await getArcData();
-      const res = await generateApplicationMaterials(jobAdvert, arc, numPages, includeKeywords, includeRelevantExperience);
+      const res = await generateApplicationMaterials(arc, jobAdvert);
       setGenResult(res);
     } catch (err: any) {
       setError(err?.error || err?.message || 'Failed to generate application');
