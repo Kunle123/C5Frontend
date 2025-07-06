@@ -70,16 +70,40 @@ export async function getArcData() {
 // }
 
 // 6. Generate Application Materials
-export async function generateApplicationMaterials(jobAdvert: string, arcData: any, num_pages: number, include_keywords: boolean, include_relevant_experience: boolean) {
+export async function generateApplicationMaterials(profile: any, job_description: string, keywords?: string[]) {
   const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/generate-assistant`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ jobAdvert, arcData, num_pages, include_keywords, include_relevant_experience }),
+    body: JSON.stringify({
+      action: 'generate_cv',
+      profile,
+      job_description,
+      ...(keywords ? { keywords } : {})
+    }),
   });
   if (!res.ok) throw await res.json().catch(() => new Error('Failed to generate application materials'));
+  return res.json();
+}
+
+export async function updateCV(profile: any, job_description: string, existing_cv: string, additional_keypoints?: string[]) {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/generate-assistant`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      action: 'update_cv',
+      profile,
+      job_description,
+      existing_cv,
+      ...(additional_keypoints ? { additional_keypoints } : {})
+    }),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update CV'));
   return res.json();
 }
 
