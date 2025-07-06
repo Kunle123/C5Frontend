@@ -97,6 +97,8 @@ const Application: React.FC = () => {
   const [saveSuccess, setSaveSuccess] = useState('');
   const [saveError, setSaveError] = useState('');
 
+  const [threadId, setThreadId] = useState<string | null>(null);
+
   useEffect(() => {
     getCurrentUser(token).then(setUser).catch(() => setUser(null));
   }, [token]);
@@ -165,9 +167,17 @@ const Application: React.FC = () => {
     setExtracting(true);
     setError('');
     try {
-      // Use arcData as profile and jobDesc as job_description
-      const result = await extractKeywords(arcData, jobDesc, token);
+      // Construct profile with only required fields
+      const profile = {
+        work_experience: arcData.work_experience || [],
+        education: arcData.education || [],
+        skills: arcData.skills || [],
+        projects: arcData.projects || [],
+        certifications: arcData.certifications || [],
+      };
+      const result = await extractKeywords(profile, jobDesc, token);
       setKeywords(result.keywords || []);
+      if (result.thread_id) setThreadId(result.thread_id);
     } catch (err: any) {
       setError(err.message || 'Keyword extraction failed');
     } finally {
@@ -336,12 +346,31 @@ const Application: React.FC = () => {
     setSaveSuccess('');
     setSaveError('');
     try {
-      // Use arcData as profile, jobDesc as job_description, and keywords as keywords
-      const result = await generateApplicationMaterials(
-        arcData,
-        jobDesc,
-        keywords
-      );
+      let result;
+      if (threadId) {
+        // Use thread_id for subsequent calls
+        result = await generateApplicationMaterials(
+          undefined,
+          jobDesc,
+          keywords,
+          threadId
+        );
+      } else {
+        // Fallback: construct profile for first call
+        const profile = {
+          work_experience: arcData.work_experience || [],
+          education: arcData.education || [],
+          skills: arcData.skills || [],
+          projects: arcData.projects || [],
+          certifications: arcData.certifications || [],
+        };
+        result = await generateApplicationMaterials(
+          profile,
+          jobDesc,
+          keywords
+        );
+        if (result.thread_id) setThreadId(result.thread_id);
+      }
       setOptimizedCV(result.cv || '');
       setOptimizedCL(result.cover_letter || result.coverLetter || '');
       setStep(3);
