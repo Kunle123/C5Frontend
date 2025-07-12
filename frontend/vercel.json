@@ -1,12 +1,8 @@
 {
   "rewrites": [
-    { "source": "/api/cv", "destination": "https://api-gw-production.up.railway.app/api/cv" },
-    { "source": "/api/cv/:id/download", "destination": "https://api-gw-production.up.railway.app/api/cv/:id/download" },
-    { "source": "/api/cover-letter", "destination": "https://api-gw-production.up.railway.app/api/cover-letter" },
-    { "source": "/api/cover-letter/:id/download", "destination": "https://api-gw-production.up.railway.app/api/cover-letter/:id/download" },
-    { "source": "/api/career-ark/generate", "destination": "https://api-gw-production.up.railway.app/api/career-ark/generate" },
-    { "source": "/api/applications", "destination": "https://api-gw-production.up.railway.app/api/applications" },
-    { "source": "/api/applications/(.*)", "destination": "https://api-gw-production.up.railway.app/api/applications/$1" },
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://api-gw-production.up.railway.app/api/:path*"
+    }
   ]
 } 
