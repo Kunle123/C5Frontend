@@ -234,6 +234,85 @@ export async function updateEducation(id: string, data: any) {
   return res.json();
 }
 
+// Add Training
+export async function addTraining(data: any) {
+  const res = await fetch(`${API_BASE}/training`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to add training'));
+  return res.json();
+}
+
+// Update Training (Career Ark)
+export async function updateTraining(id: string, data: any) {
+  const token = localStorage.getItem('token') || '';
+  const res = await fetch(`${API_CAREER_ARK}/training/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update training'));
+  return res.json();
+}
+
+// Delete Education
+export async function deleteEducation(id: string) {
+  const res = await fetch(`${API_BASE}/education/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete education'));
+  return res.json();
+}
+
+// Delete Training
+export async function deleteTraining(id: string) {
+  const res = await fetch(`${API_BASE}/training/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete training'));
+  return res.json();
+}
+
+// Delete Skill
+export async function deleteSkill(id: string) {
+  const res = await fetch(`${API_BASE}/skills/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete skill'));
+  return res.json();
+}
+
+// Delete Project
+export async function deleteProject(id: string) {
+  const res = await fetch(`${API_BASE}/projects/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete project'));
+  return res.json();
+}
+
+// Delete Certification
+export async function deleteCertification(id: string) {
+  const res = await fetch(`${API_BASE}/certifications/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete certification'));
+  return res.json();
+}
+
 // Utility: Download a base64-encoded DOCX file in the browser
 export function downloadBase64Docx(base64: string, filename: string = 'cv.docx') {
   const byteCharacters = atob(base64);
