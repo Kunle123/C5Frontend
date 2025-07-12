@@ -87,8 +87,36 @@ export async function generateApplicationMaterials(profile: any, job_description
     },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to generate application materials'));
-  return res.json();
+  let text;
+  try {
+    text = await res.text();
+    return JSON.parse(text);
+  } catch (err) {
+    throw new Error(`API response is not valid JSON: ${text}`);
+  }
+}
+
+// 6b. Extract Keywords from Job Description
+export async function extractKeywords(profile: any, job_description: string) {
+  const payload = {
+    profile,
+    job_description,
+  };
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/keywords`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  let text;
+  try {
+    text = await res.text();
+    return JSON.parse(text);
+  } catch (err) {
+    throw new Error(`API response is not valid JSON: ${text}`);
+  }
 }
 
 export async function updateCV(profile: any, job_description: string, existing_cv: string, additional_keypoints?: string[]) {
@@ -206,174 +234,7 @@ export async function updateEducation(id: string, data: any) {
   return res.json();
 }
 
-// Education
-export async function deleteEducation(id: string) {
-  const res = await fetch(`${API_BASE}/education/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete education'));
-  return res.json();
-}
-
-// Add Training
-export async function addTraining(data: any) {
-  const res = await fetch(`${API_BASE}/training`, {
-    method: 'POST',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to add training'));
-  return res.json();
-}
-
-// Update Training (Career Ark)
-export async function updateTraining(id: string, data: any) {
-  const token = localStorage.getItem('token') || '';
-  const res = await fetch(`${API_CAREER_ARK}/training/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update training'));
-  return res.json();
-}
-
-// Training
-export async function deleteTraining(id: string) {
-  const res = await fetch(`${API_BASE}/training/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete training'));
-  return res.json();
-}
-
-// Skills
-export async function deleteSkill(id: string) {
-  const res = await fetch(`${API_BASE}/skills/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete skill'));
-  return res.json();
-}
-
-// Projects
-export async function deleteProject(id: string) {
-  const res = await fetch(`${API_BASE}/projects/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete project'));
-  return res.json();
-}
-
-// Certifications
-export async function deleteCertification(id: string) {
-  const res = await fetch(`${API_BASE}/certifications/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to delete certification'));
-  return res.json();
-}
-
-// Save generated CV and cover letter as a new application (per new API contract)
-export async function saveGeneratedCV({ role_title, job_description, cv_text, cover_letter_text }: {
-  role_title: string,
-  job_description: string,
-  cv_text: string,
-  cover_letter_text: string
-}) {
-  const res = await fetch(`/api/applications`, {
-    method: 'POST',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ role_title, job_description, cv_text, cover_letter_text }),
-  });
-  if (!res.ok) {
-    let errorMsg = 'Failed to save application';
-    try {
-      const error = await res.json();
-      errorMsg = error.detail || error.message || errorMsg;
-    } catch {}
-    throw new Error(errorMsg);
-  }
-  return res.json();
-}
-
-/**
- * Generate CV and Cover Letter with user options (relevant experience, keywords, style, tone, etc.)
- * @param {Object} params
- * @param {string} params.jobAdvert - The job description or advert
- * @param {any} params.arcData - The user's Ark profile data
- * @param {Object} params.options - User-selected options (relevantExperience, keywords, style, tone, etc.)
- * @returns {Promise<{cv: string, cover_letter: string}>}
- */
-export async function generateCVWithOptions({ jobAdvert, arcData, options }: {
-  jobAdvert: string,
-  arcData: any,
-  options: {
-    relevantExperience?: string[];
-    keywords?: string[];
-    style?: string;
-    tone?: string;
-    [key: string]: any;
-  }
-}) {
-  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/generate-assistant`, {
-    method: 'POST',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ jobAdvert, arcData, ...options }),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to generate CV with options'));
-  return res.json();
-}
-
-/**
- * List all user's CVs (metadata only)
- * @returns {Promise<any[]>}
- */
-export async function listCVs() {
-  const res = await fetch(`/api/cv`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to list CVs'));
-  return res.json();
-}
-
-/**
- * Download a persisted DOCX CV by ID (returns { filename, filedata, cv_id })
- * @param {string} cv_id
- * @returns {Promise<{filename: string, filedata: string, cv_id: string}>}
- */
-export async function downloadCV(cv_id: string) {
-  const res = await fetch(`/api/cv/${cv_id}/download`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-  if (!res.ok) throw await res.json().catch(() => new Error('Failed to download CV'));
-  return res.json();
-}
-
-/**
- * Utility: Download a base64-encoded DOCX file in the browser
- * @param {string} base64 - The base64-encoded file data
- * @param {string} filename - The filename for download
- */
+// Utility: Download a base64-encoded DOCX file in the browser
 export function downloadBase64Docx(base64: string, filename: string = 'cv.docx') {
   const byteCharacters = atob(base64);
   const byteNumbers = new Array(byteCharacters.length);
@@ -392,4 +253,4 @@ export function downloadBase64Docx(base64: string, filename: string = 'cv.docx')
   link.click();
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
-} 
+}
