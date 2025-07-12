@@ -37,6 +37,7 @@ const TestAppJourneys: React.FC = () => {
   const [numPages, setNumPages] = useState(2);
   const [includeKeywords, setIncludeKeywords] = useState(true);
   const [includeRelevantExperience, setIncludeRelevantExperience] = useState(true);
+  const [threadId, setThreadId] = useState<string | null>(null);
 
   // Auth handlers
   const handleSignup = async () => {
@@ -96,8 +97,23 @@ const TestAppJourneys: React.FC = () => {
     setError(''); setGenResult(null);
     try {
       const arc = arcData || await getArcData();
-      const res = await generateApplicationMaterials(arc, jobAdvert);
-      setGenResult(res);
+      // Always construct the profile from arc
+      const profile = {
+        work_experience: arc.work_experience || [],
+        education: arc.education || [],
+        skills: arc.skills || [],
+        projects: arc.projects || [],
+        certifications: arc.certifications || [],
+      };
+      let result;
+      result = await generateApplicationMaterials(
+        profile,
+        jobAdvert,
+        undefined,
+        threadId || undefined
+      );
+      if (result.thread_id && !threadId) setThreadId(result.thread_id);
+      setGenResult(result);
     } catch (err: any) {
       setError(err?.error || err?.message || 'Failed to generate application');
     }

@@ -346,31 +346,22 @@ const Application: React.FC = () => {
     setSaveSuccess('');
     setSaveError('');
     try {
+      // Always construct the profile from arcData
+      const profile = {
+        work_experience: arcData.work_experience || [],
+        education: arcData.education || [],
+        skills: arcData.skills || [],
+        projects: arcData.projects || [],
+        certifications: arcData.certifications || [],
+      };
       let result;
-      if (threadId) {
-        // Use thread_id for subsequent calls
-        result = await generateApplicationMaterials(
-          undefined,
-          jobDesc,
-          keywords,
-          threadId
-        );
-      } else {
-        // Fallback: construct profile for first call
-        const profile = {
-          work_experience: arcData.work_experience || [],
-          education: arcData.education || [],
-          skills: arcData.skills || [],
-          projects: arcData.projects || [],
-          certifications: arcData.certifications || [],
-        };
-        result = await generateApplicationMaterials(
-          profile,
-          jobDesc,
-          keywords
-        );
-        if (result.thread_id) setThreadId(result.thread_id);
-      }
+      result = await generateApplicationMaterials(
+        profile,
+        jobDesc,
+        keywords,
+        threadId || undefined
+      );
+      if (result.thread_id && !threadId) setThreadId(result.thread_id);
       setOptimizedCV(result.cv || '');
       setOptimizedCL(result.cover_letter || result.coverLetter || '');
       setStep(3);
