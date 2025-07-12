@@ -254,3 +254,28 @@ export function downloadBase64Docx(base64: string, filename: string = 'cv.docx')
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
 }
+
+export async function saveGeneratedCV({ role_title, job_description, cv_text, cover_letter_text }: {
+  role_title: string,
+  job_description: string,
+  cv_text: string,
+  cover_letter_text: string
+}) {
+  const res = await fetch(`/api/applications`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ role_title, job_description, cv_text, cover_letter_text }),
+  });
+  if (!res.ok) {
+    let errorMsg = 'Failed to save application';
+    try {
+      const error = await res.json();
+      errorMsg = error.detail || error.message || errorMsg;
+    } catch {}
+    throw new Error(errorMsg);
+  }
+  return res.json();
+}
