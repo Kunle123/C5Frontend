@@ -385,6 +385,31 @@ const Application: React.FC = () => {
       } catch (saveErr: any) {
         setSaveError(saveErr.message || 'Failed to save generated CV and cover letter');
       }
+      // In the handleAnalyzeAndOptimize function, after generating the CV, save it using a direct fetch call matching the curl command:
+      if (result.cv && typeof result.cv === 'string' && result.cv.trim()) {
+        try {
+          const token = localStorage.getItem('token') || '';
+          const res = await fetch('/api/cv', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ cv: result.cv }),
+          });
+          if (!res.ok) {
+            let errorMsg = 'Failed to save CV';
+            try {
+              const error = await res.json();
+              errorMsg = error.detail || error.message || errorMsg;
+            } catch {}
+            throw new Error(errorMsg);
+          }
+          setSaveSuccess('Generated CV saved successfully!');
+        } catch (saveErr: any) {
+          setSaveError(saveErr.message || 'Failed to save generated CV');
+        }
+      }
     } catch (err: any) {
       setError(err.message || 'AI optimization failed');
     } finally {
