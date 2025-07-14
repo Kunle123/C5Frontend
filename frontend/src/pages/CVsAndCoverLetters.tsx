@@ -32,7 +32,7 @@ import {
   TabPanel,
   Tab,
 } from '@chakra-ui/react';
-import { listCVs, uploadCV, deleteCV, downloadCV, getCurrentUser } from '../api';
+import { uploadCV, deleteCV, downloadCV, getCurrentUser } from '../api';
 import { optimizeCV as aiOptimizeCV, extractKeywords, analyzeCV as aiAnalyzeCV } from '../api/aiApi';
 import { useNavigate } from 'react-router-dom';
 import { getArcData, generateApplicationMaterials, saveGeneratedCV } from '../api/careerArkApi';
@@ -47,7 +47,6 @@ const steps = [
 type KeywordAnalysisEntry = { keyword: string, status: 'green' | 'amber' | 'red' };
 
 const Application: React.FC = () => {
-  const [cvs, setCVs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState<any>(null);
@@ -111,9 +110,6 @@ const Application: React.FC = () => {
     setLoading(true);
     try {
       await uploadCV(file, token);
-      // Refresh the CV list from the backend
-      const updatedCVs = await listCVs(token);
-      setCVs(updatedCVs);
       setUploadSuccess('CV uploaded successfully!');
     } catch (err: any) {
       setUploadError(err.message || 'Upload failed');
@@ -126,7 +122,7 @@ const Application: React.FC = () => {
     setError('');
     try {
       await deleteCV(cvId, token);
-      setCVs(prev => prev.filter(cv => cv.id !== cvId));
+      // setCVs(prev => prev.filter(cv => cv.id !== cvId)); // Removed as per edit hint
     } catch (err: any) {
       setError(err.message || 'Delete failed');
     } finally {
@@ -177,6 +173,7 @@ const Application: React.FC = () => {
       };
       const result = await extractKeywords(profile, jobDesc, token);
       setKeywords(result.keywords || []);
+      if (result.match_percentage !== undefined) setMatchScore(result.match_percentage);
       if (result.thread_id) setThreadId(result.thread_id);
     } catch (err: any) {
       setError(err.message || 'Keyword extraction failed');
@@ -280,6 +277,7 @@ const Application: React.FC = () => {
       }
       const keywords = (Array.isArray(kwResult) ? kwResult : kwResult.keywords || []).slice(0, 20); // Limit to 20 keywords for user-friendliness
       setKeywords(keywords);
+      if (kwResult.match_percentage !== undefined) setMatchScore(kwResult.match_percentage);
       // 3. Analyze keywords against ALL Arc data sections
       const arcText = JSON.stringify(data).toLowerCase();
       const now = new Date();
@@ -328,10 +326,6 @@ const Application: React.FC = () => {
         return { keyword: kw, status };
       });
       setKeywordAnalysis(keywordStatuses);
-      // 4. Calculate match score
-      const greenCount = keywordStatuses.filter((k: KeywordAnalysisEntry) => k.status === 'green').length;
-      const match = keywords.length > 0 ? Math.round((greenCount / keywords.length) * 100) : null;
-      setMatchScore(match);
       setStep(1);
     } catch (err: any) {
       setError('Sorry, something went wrong. Please try again or contact support.');
