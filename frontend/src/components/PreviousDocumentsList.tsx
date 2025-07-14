@@ -91,22 +91,22 @@ const Card = ({ children }: { children: React.ReactNode }) => (
 );
 
 const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) => {
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [exports, setExports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token || isTokenExpired(token)) {
+    if (!token) {
       localStorage.removeItem('token');
       window.location.href = '/login';
       return;
     }
     setLoading(true);
     setError(null);
-    fetch("/api/applications", { headers: { Authorization: `Bearer ${token}` } })
+    fetch('/api/export', { headers: { Authorization: `Bearer ${token}` } })
       .then(async res => {
         if (!res.ok) {
-          let errMsg = `Failed to fetch applications (${res.status})`;
+          let errMsg = `Failed to fetch exports (${res.status})`;
           try {
             const err = await res.json();
             errMsg = err.message || err.error || errMsg;
@@ -115,17 +115,34 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
         }
         return res.json();
       })
-      .then(apps => {
-        console.log('Fetched applications:', apps);
-        setApplications(apps);
+      .then(data => {
+        setExports(data.exports || []);
       })
-      .catch(err => setError(err.message || 'Failed to fetch applications'))
+      .catch(err => setError(err.message || 'Failed to fetch exports'))
       .finally(() => setLoading(false));
   }, [token]);
 
-  const handleDownload = (id: string, type: 'cv' | 'cover-letter') => {
-    const endpoint = `/api/applications/${id}/${type}`;
-    downloadBase64Docx(endpoint, token).catch(err => alert(err.message || err));
+  const handleDownload = (downloadUrl: string) => {
+    fetch(downloadUrl, { headers: { Authorization: `Bearer ${token}` } })
+      .then(async res => {
+        if (!res.ok) throw new Error('Failed to download file');
+        const blob = await res.blob();
+        const contentDisposition = res.headers.get('Content-Disposition');
+        let filename = 'exported_cv.docx';
+        if (contentDisposition) {
+          const match = contentDisposition.match(/filename="(.+)"/);
+          if (match) filename = match[1];
+        }
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(err => alert(err.message || err));
   };
 
   if (loading) return <Box textAlign="center" py={8}><Spinner size="lg" /></Box>;
@@ -133,39 +150,34 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
 
   return (
     <Box>
-      <Heading as="h3" size="lg" mb={4} color="brand.700">Previously Generated Applications</Heading>
-      {applications.length === 0 ? (
-        <Text color="gray.500" mb={6}>No applications found.</Text>
+      <Heading as="h3" size="lg" mb={4} color="brand.700">Exported CVs</Heading>
+      {exports.length === 0 ? (
+        <Text color="gray.500" mb={6}>No exported CVs found.</Text>
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={8}>
-          {applications.map(app => (
-            <Card key={app.id || app.role_title}>
+          {exports.map(exp => (
+            <Card key={exp.id}>
               <VStack align="start" spacing={2} w="100%">
-                <Text fontWeight={700} fontSize="lg">{app.role_title}</Text>
+                <Text fontWeight={700} fontSize="lg">CV ID: {exp.cv_id}</Text>
                 <Text fontSize="sm" color="gray.500">
-                  {app.created_at ? `Created: ${new Date(app.created_at).toLocaleString()}` : ''}
+                  {exp.created_at ? `Created: ${new Date(exp.created_at).toLocaleString()}` : ''}
                 </Text>
-                {app.id ? (
+                <Text fontSize="sm" color="gray.500">Format: {exp.format}</Text>
+                <Text fontSize="sm" color={exp.status === 'completed' ? 'green.600' : exp.status === 'failed' ? 'red.600' : 'orange.600'}>
+                  Status: {exp.status}
+                </Text>
+                {exp.status === 'completed' && exp.download_url ? (
                   <HStack spacing={4} mt={2}>
                     <Button
-                      leftIcon={<FaDownload />}
                       colorScheme="blue"
                       variant="solid"
-                      onClick={() => handleDownload(app.id, 'cv')}
+                      onClick={() => handleDownload(exp.download_url)}
                     >
-                      Download CV
-                    </Button>
-                    <Button
-                      leftIcon={<FaDownload />}
-                      colorScheme="purple"
-                      variant="solid"
-                      onClick={() => handleDownload(app.id, 'cover-letter')}
-                    >
-                      Download Cover Letter
+                      Download
                     </Button>
                   </HStack>
                 ) : (
-                  <Text color="red.500" fontWeight={600} mt={2}>No valid application ID found.</Text>
+                  <Text color="gray.400" fontWeight={600} mt={2}>Not ready for download</Text>
                 )}
               </VStack>
             </Card>
