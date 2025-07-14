@@ -622,23 +622,33 @@ const Application: React.FC = () => {
                 <TabPanels>
                   <TabPanel>
                     <Heading as="h4" size="md" mb={2}>Optimized CV</Heading>
-                    <Textarea
-                      value={optimizedCV}
-                      onChange={e => setOptimizedCV(e.target.value)}
-                      minH={200}
-                      bg={useColorModeValue('gray.50', 'gray.700')}
+                    <Box
+                      p={4}
+                      borderWidth="1px"
                       borderRadius="md"
-                    />
+                      bg={useColorModeValue('gray.50', 'gray.700')}
+                      fontFamily="'Times New Roman', Times, serif"
+                      fontSize="md"
+                      whiteSpace="pre-line"
+                      minH={200}
+                    >
+                      {optimizedCV}
+                    </Box>
                   </TabPanel>
                   <TabPanel>
                     <Heading as="h4" size="md" mb={2}>Optimized Cover Letter</Heading>
-                    <Textarea
-                      value={optimizedCL}
-                      onChange={e => setOptimizedCL(e.target.value)}
-                      minH={150}
-                      bg={useColorModeValue('gray.50', 'gray.700')}
+                    <Box
+                      p={4}
+                      borderWidth="1px"
                       borderRadius="md"
-                    />
+                      bg={useColorModeValue('gray.50', 'gray.700')}
+                      fontFamily="'Times New Roman', Times, serif"
+                      fontSize="md"
+                      whiteSpace="pre-line"
+                      minH={150}
+                    >
+                      {optimizedCL}
+                    </Box>
                   </TabPanel>
                 </TabPanels>
               </Tabs>

@@ -179,7 +179,37 @@ const TestAppJourneys: React.FC = () => {
             <Button colorScheme={includeRelevantExperience ? 'blue' : 'gray'} onClick={() => setIncludeRelevantExperience(!includeRelevantExperience)}>{includeRelevantExperience ? 'Yes' : 'No'}</Button>
           </Stack>
           <Button colorScheme="blue" onClick={handleGenerate}>Generate CV & Cover Letter</Button>
-          {genResult && <Alert status="success" whiteSpace="pre-wrap" maxH={200} overflowY="auto"><AlertIcon />{JSON.stringify(genResult, null, 2)}</Alert>}
+          {genResult && (
+            <Box mt={4}>
+              <Heading as="h4" size="md" mb={2}>Generated CV</Heading>
+              <Box
+                p={4}
+                borderWidth="1px"
+                borderRadius="md"
+                bg="gray.50"
+                fontFamily="'Times New Roman', Times, serif"
+                fontSize="md"
+                whiteSpace="pre-line"
+                minH={200}
+                mb={4}
+              >
+                {genResult.cv}
+              </Box>
+              <Heading as="h4" size="md" mb={2}>Generated Cover Letter</Heading>
+              <Box
+                p={4}
+                borderWidth="1px"
+                borderRadius="md"
+                bg="gray.50"
+                fontFamily="'Times New Roman', Times, serif"
+                fontSize="md"
+                whiteSpace="pre-line"
+                minH={150}
+              >
+                {genResult.cover_letter || genResult.coverLetter}
+              </Box>
+            </Box>
+          )}
         </Stack>
         {error && <Alert status="error" mt={3}><AlertIcon />{error}</Alert>}
       </Box>
