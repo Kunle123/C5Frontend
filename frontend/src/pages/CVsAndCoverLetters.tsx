@@ -373,12 +373,13 @@ const Application: React.FC = () => {
         cover_letter_text: result.cover_letter || result.coverLetter || ''
       };
       console.log('Saving generated application to /api/applications with payload:', payload);
-      try {
-        await saveGeneratedCV(payload);
-        setSaveSuccess('Generated CV and cover letter saved successfully!');
-      } catch (saveErr: any) {
-        setSaveError(saveErr.message || 'Failed to save generated CV and cover letter');
-      }
+      // Remove the call to saveGeneratedCV (POST /api/applications)
+      // try {
+      //   await saveGeneratedCV(payload);
+      //   setSaveSuccess('Generated CV and cover letter saved successfully!');
+      // } catch (saveErr: any) {
+      //   setSaveError(saveErr.message || 'Failed to save generated CV and cover letter');
+      // }
       // In the handleAnalyzeAndOptimize function, after generating the CV, save it using a direct fetch call matching the curl command:
       if (result.cv && typeof result.cv === 'string' && result.cv.trim()) {
         try {
