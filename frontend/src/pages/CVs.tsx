@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Box, Heading, Text, Input, Button, Alert, Spinner, Stack, Badge, useColorModeValue, Textarea } from '@chakra-ui/react';
-import { listCVs, uploadCV, deleteCV, downloadCV } from '../api';
+import { uploadCV, deleteCV } from '../api';
 import { useNavigate } from 'react-router-dom';
 
 const steps = [
@@ -38,8 +38,14 @@ const CVs: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     setError('');
-    listCVs(token)
-      .then(data => setCVs(data))
+    fetch('/api/cvs', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(async res => {
+        if (!res.ok) throw new Error('Failed to fetch CVs');
+        return res.json();
+      })
+      .then(data => setCVs(data.cvs || []))
       .catch(err => setError(err.message || 'Failed to load CVs'))
       .finally(() => setLoading(false));
   }, [token]);
@@ -88,9 +94,6 @@ const CVs: React.FC = () => {
       const file = e.target.files[0];
       await uploadCV(file, token);
       setSuccess('CV uploaded successfully!');
-      // Refresh list
-      const data = await listCVs(token);
-      setCVs(data);
     } catch (err: any) {
       setError(err.message || 'Failed to upload CV');
     } finally {
@@ -111,11 +114,32 @@ const CVs: React.FC = () => {
     }
   };
 
-  const handleDownloadCV = async (id: string) => {
-    setDownloadingId(id);
+  const handleDownloadCV = async (cvId: string) => {
+    setDownloadingId(cvId);
     setError('');
     try {
-      await downloadCV(id, token);
+      const res = await fetch(`/api/cv/${cvId}/download`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to download CV');
+      const data = await res.json();
+      const byteCharacters = atob(data.filedata);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], {
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.filename || 'cv.docx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (err: any) {
       setError(err.message || 'Failed to download CV');
     } finally {
@@ -252,7 +276,7 @@ const CVs: React.FC = () => {
                 <Text fontWeight={600}>{cv.name}</Text>
                 <Box>
                   <Button size="sm" colorScheme="blue" mr={2} isLoading={downloadingId === cv.id} onClick={() => handleDownloadCV(cv.id)}>
-                    Download
+                    Download as DOCX
                   </Button>
                   <Button size="sm" colorScheme="red" isLoading={deletingId === cv.id} onClick={() => handleDeleteCV(cv.id)}>
                     Delete
