@@ -104,7 +104,7 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
         return res.json();
       })
       .then(data => {
-        setCVs(data.cvs || []);
+        setCVs(data || []);
       })
       .catch(err => setError(err.message || 'Failed to fetch CVs'))
       .finally(() => setLoading(false));
