@@ -20,7 +20,10 @@ import { FaFileWord, FaDownload } from 'react-icons/fa';
 interface CV {
   id: string;
   created_at: string;
-  // Add other fields as needed
+  job_title?: string;
+  company?: string;
+  cover_letter_available?: boolean;
+  cover_letter_download_url?: string;
 }
 
 interface PreviousDocumentsListProps {
@@ -110,8 +113,11 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
       .finally(() => setLoading(false));
   }, [token]);
 
-  const handleDownload = (cvId: string) => {
+  const handleDownloadCV = (cvId: string) => {
     downloadBase64Docx(`/api/cv/${cvId}/download`, token).catch(err => alert(err.message || err));
+  };
+  const handleDownloadCoverLetter = (url: string) => {
+    downloadBase64Docx(url, token).catch(err => alert(err.message || err));
   };
 
   if (loading) return <Box textAlign="center" py={8}><Spinner size="lg" /></Box>;
@@ -127,7 +133,10 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
           {cvs.map(cv => (
             <Card key={cv.id}>
               <VStack align="start" spacing={2} w="100%">
-                <Text fontWeight={700} fontSize="lg">CV ID: {cv.id}</Text>
+                <Text fontWeight={700} fontSize="lg">
+                  {cv.job_title || 'Untitled Role'}
+                  {cv.company ? ` @ ${cv.company}` : ''}
+                </Text>
                 <Text fontSize="sm" color="gray.500">
                   {cv.created_at ? `Created: ${new Date(cv.created_at).toLocaleString()}` : ''}
                 </Text>
@@ -136,10 +145,20 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
                     colorScheme="blue"
                     variant="solid"
                     leftIcon={<FaDownload />}
-                    onClick={() => handleDownload(cv.id)}
+                    onClick={() => handleDownloadCV(cv.id)}
                   >
-                    Download as DOCX
+                    Download CV
                   </Button>
+                  {cv.cover_letter_available && cv.cover_letter_download_url && (
+                    <Button
+                      colorScheme="teal"
+                      variant="outline"
+                      leftIcon={<FaFileWord />}
+                      onClick={() => handleDownloadCoverLetter(cv.cover_letter_download_url!)}
+                    >
+                      Download Cover Letter
+                    </Button>
+                  )}
                 </HStack>
               </VStack>
             </Card>
