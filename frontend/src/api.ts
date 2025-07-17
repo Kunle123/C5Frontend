@@ -68,13 +68,6 @@ export function getSocialAuthUrl(provider: 'google' | 'facebook' | 'linkedin') {
 // CV Service API
 const CV_API_BASE = 'https://api-gw-production.up.railway.app/cvs';
 
-export async function listCVs(token: string) {
-  const res = await authFetch(CV_API_BASE);
-  if (!res) throw new Error('Unauthorized or network error');
-  if (!res.ok) throw await res.json();
-  return res.json();
-}
-
 export async function uploadCV(file: File, token: string) {
   const formData = new FormData();
   formData.append('file', file);
