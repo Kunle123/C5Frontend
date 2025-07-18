@@ -31,25 +31,44 @@ export async function generateCoverLetter({ cv_id, job_description, user_comment
   return res.json();
 }
 
-export async function extractKeywords(profile: any, job_description: string, token?: string) {
+export async function extractKeywords(job_description: string, token?: string) {
   if (!token) throw new Error('Authentication token is required for keyword extraction');
-  const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
+  const res = await fetch(`${AI_API_BASE}/keywords`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({
-      action: 'extract_keywords',
-      profile,
-      job_description
-    }),
+    body: JSON.stringify({ job_description }),
   });
   if (!res.ok) {
-    if (res.status === 404) {
-      throw new Error('Keyword extraction service is unavailable. Please try again later.');
-    }
-    throw new Error('Keyword extraction failed.');
+    let errMsg = 'Keyword extraction failed.';
+    try {
+      const err = await res.json();
+      errMsg = err.error || err.message || errMsg;
+    } catch {}
+    throw new Error(errMsg);
+  }
+  return res.json();
+}
+
+export async function generateCV(profile: any, job_description: string, token?: string) {
+  if (!token) throw new Error('Authentication token is required for CV generation');
+  const res = await fetch(`${AI_API_BASE}/generate-cv`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ profile, job_description }),
+  });
+  if (!res.ok) {
+    let errMsg = 'CV generation failed.';
+    try {
+      const err = await res.json();
+      errMsg = err.error || err.message || errMsg;
+    } catch {}
+    throw new Error(errMsg);
   }
   return res.json();
 }
