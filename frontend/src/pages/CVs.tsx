@@ -242,7 +242,8 @@ const CVs: React.FC = () => {
   };
 
   return (
-    <Box py={8} maxW="700px" mx="auto">
+    <Box py={8} maxW="800px" mx="auto">
+      <Heading as="h1" size="md" color="red.500" mb={2} textAlign="center">PAGE: CVs</Heading>
       <Badge colorScheme="green" mb={4} fontSize="lg">Chakra UI: Migrated</Badge>
       <Heading as="h2" size="xl" mb={6} textAlign="center">My CVs</Heading>
       <Box mb={6}>

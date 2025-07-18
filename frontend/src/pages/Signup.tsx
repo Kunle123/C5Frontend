@@ -36,8 +36,9 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" minH="70vh">
-      <Box bg={cardBg} boxShadow={cardShadow} p={8} minW={340} maxW={400} w="100%" borderRadius="xl">
+    <Box py={8} minH="80vh" display="flex" alignItems="center" justifyContent="center">
+      <Box bg={cardBg} boxShadow={cardShadow} p={8} maxW={400} w="100%" borderRadius="xl">
+        <Heading as="h1" size="md" color="red.500" mb={2} textAlign="center">PAGE: Signup</Heading>
         <Heading as="h1" size="lg" textAlign="center" fontWeight={700} mb={6}>
           Sign Up
         </Heading>

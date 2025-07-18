@@ -53,6 +53,7 @@ const Landing: React.FC = () => {
   return (
     <Box minH="100vh" py={8} px={2} bgGradient="linear(120deg, white 0%, lilac 100%)" display="flex" alignItems="center" justifyContent="center">
       <Box bg="white" borderRadius="2xl" boxShadow="lg" maxW={800} w="100%" p={{ base: 4, md: 8 }}>
+        <Heading as="h1" size="md" color="red.500" mb={2} textAlign="center">PAGE: Landing</Heading>
         <Heading as="h1" size="2xl" textAlign="center" fontWeight={800} color="brand.500" mb={2}>
           Candidate 5 – Your Edge in a Competitive Job Market
         </Heading>

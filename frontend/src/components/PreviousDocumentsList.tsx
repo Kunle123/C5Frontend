@@ -133,37 +133,45 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={8}>
           {cvs.map(cv => (
             <Card key={cv.id}>
-              <VStack align="start" spacing={2} w="100%">
-                <Text fontWeight={700} fontSize="xl">
-                  {cv.job_title || 'Unknown Job Title'}
-                </Text>
-                <Text fontWeight={500} fontSize="md" color="gray.600">
-                  {cv.company_name || 'Unknown Company'}
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  {cv.created_at ? `Created: ${new Date(cv.created_at).toLocaleString()}` : ''}
-                </Text>
-                <HStack spacing={4} mt={2}>
-                  <Button
-                    colorScheme="blue"
-                    variant="solid"
-                    leftIcon={<FaDownload />}
-                    onClick={() => handleDownloadCV(cv.id)}
-                  >
-                    Download CV
-                  </Button>
-                  <Button
-                    colorScheme="teal"
-                    variant="outline"
-                    leftIcon={<FaFileWord />}
-                    onClick={() => cv.cover_letter_available && cv.cover_letter_download_url ? handleDownloadCoverLetter(cv.cover_letter_download_url) : null}
-                    isDisabled={!cv.cover_letter_available || !cv.cover_letter_download_url}
-                    title={!cv.cover_letter_available ? 'No cover letter available for this CV' : ''}
-                  >
-                    Download Cover Letter
-                  </Button>
-                </HStack>
-              </VStack>
+              <Box maxW="400px" mx="auto" w="100%">
+                <VStack align="start" spacing={2} w="100%">
+                  <Text fontWeight={700} fontSize="xl">
+                    {cv.job_title || 'Unknown Job Title'}
+                  </Text>
+                  <Text fontWeight={500} fontSize="md" color="gray.600">
+                    {cv.company_name || 'Unknown Company'}
+                  </Text>
+                  <Text fontSize="sm" color="gray.500">
+                    {cv.created_at ? `Created: ${new Date(cv.created_at).toLocaleString()}` : ''}
+                  </Text>
+                  <Box w="100%" mt={2}>
+                    <HStack spacing={4} w="100%" justify="flex-start">
+                      <Button
+                        colorScheme="blue"
+                        variant="solid"
+                        leftIcon={<FaDownload />}
+                        w="50%"
+                        minW="140px"
+                        onClick={() => handleDownloadCV(cv.id)}
+                      >
+                        Download CV
+                      </Button>
+                      <Button
+                        colorScheme="teal"
+                        variant="outline"
+                        leftIcon={<FaFileWord />}
+                        w="50%"
+                        minW="180px"
+                        onClick={() => cv.cover_letter_available && cv.cover_letter_download_url ? handleDownloadCoverLetter(cv.cover_letter_download_url) : null}
+                        isDisabled={!cv.cover_letter_available || !cv.cover_letter_download_url}
+                        title={!cv.cover_letter_available ? 'No cover letter available for this CV' : ''}
+                      >
+                        Download Cover Letter
+                      </Button>
+                    </HStack>
+                  </Box>
+                </VStack>
+              </Box>
             </Card>
           ))}
         </SimpleGrid>
