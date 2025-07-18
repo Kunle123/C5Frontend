@@ -31,15 +31,15 @@ export async function generateCoverLetter({ cv_id, job_description, user_comment
   return res.json();
 }
 
-export async function extractKeywords(job_description: string, token?: string) {
+export async function extractKeywords(profile: any, job_description: string, token?: string) {
   if (!token) throw new Error('Authentication token is required for keyword extraction');
-  const res = await fetch(`${AI_API_BASE}/keywords`, {
+  const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({ job_description }),
+    body: JSON.stringify({ action: 'extract_keywords', profile, job_description }),
   });
   if (!res.ok) {
     let errMsg = 'Keyword extraction failed.';
