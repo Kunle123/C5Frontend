@@ -101,9 +101,10 @@ const Application: React.FC = () => {
   // 1. Add state for jobTitle and companyName
   const [jobTitle, setJobTitle] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null); // Store /profiles/me data
 
   useEffect(() => {
-    getCurrentUser(token).then(setUser).catch(() => setUser(null));
+    getCurrentUser(token).then(setUserProfile).catch(() => setUserProfile(null));
   }, [token]);
 
   const handleUploadCV = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,7 +168,9 @@ const Application: React.FC = () => {
     setExtracting(true);
     setError('');
     try {
+      // Merge /profiles/me and arcData for richer profile
       const profile = {
+        ...(userProfile || {}),
         work_experience: arcData.work_experience || [],
         education: arcData.education || [],
         skills: arcData.skills || [],
@@ -259,7 +262,7 @@ const Application: React.FC = () => {
     }
     setLoading(true);
     try {
-      // 1. Fetch Arc data (profile)
+      // 1. Fetch Arc data (profile sections)
       let data;
       try {
         data = await getArcData();
@@ -270,16 +273,18 @@ const Application: React.FC = () => {
         return;
       }
       setArcData(data);
-      // 2. Extract keywords from job description
+      // 2. Merge /profiles/me and arcData for richer profile
+      const profile = {
+        ...(userProfile || {}),
+        work_experience: data.work_experience || [],
+        education: data.education || [],
+        skills: data.skills || [],
+        projects: data.projects || [],
+        certifications: data.certifications || [],
+      };
+      // 3. Extract keywords from job description
       let kwResult;
       try {
-        const profile = {
-          work_experience: data.work_experience || [],
-          education: data.education || [],
-          skills: data.skills || [],
-          projects: data.projects || [],
-          certifications: data.certifications || [],
-        };
         kwResult = await extractKeywords(profile, jobDesc, token);
       } catch (err: any) {
         setError('Sorry, we could not extract keywords from your job description. Please check your input or try again later.');
@@ -290,7 +295,7 @@ const Application: React.FC = () => {
       const keywords = (Array.isArray(kwResult) ? kwResult : kwResult.keywords || []).slice(0, 20); // Limit to 20 keywords for user-friendliness
       setKeywords(keywords);
       if (kwResult.match_percentage !== undefined) setMatchScore(kwResult.match_percentage);
-      // 3. Analyze keywords against ALL Arc data sections
+      // 4. Analyze keywords against ALL Arc data sections
       const arcText = JSON.stringify(data).toLowerCase();
       const now = new Date();
       const keywordStatuses = keywords.map((kw: string) => {
@@ -352,7 +357,9 @@ const Application: React.FC = () => {
     setSaveSuccess('');
     setSaveError('');
     try {
+      // Merge /profiles/me and arcData for richer profile
       const profile = {
+        ...(userProfile || {}),
         work_experience: arcData.work_experience || [],
         education: arcData.education || [],
         skills: arcData.skills || [],
