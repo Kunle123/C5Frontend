@@ -25,6 +25,9 @@ interface CV {
   company_name?: string;
   cover_letter_available?: boolean;
   cover_letter_download_url?: string;
+  metadata?: {
+    name: string;
+  };
 }
 
 interface PreviousDocumentsListProps {
@@ -131,7 +134,7 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
         <Text color="gray.500" mb={6}>No CVs found.</Text>
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={8}>
-          {cvs.map(cv => (
+          {cvs.filter(cv => cv.metadata?.name === "Generated CV").map(cv => (
             <Card key={cv.id}>
               <Box maxW="400px" mx="auto" w="100%">
                 <VStack align="start" spacing={2} w="100%">
