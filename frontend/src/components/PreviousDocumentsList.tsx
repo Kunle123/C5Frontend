@@ -22,6 +22,7 @@ interface CV {
   created_at: string;
   job_title?: string;
   company?: string;
+  company_name?: string;
   cover_letter_available?: boolean;
   cover_letter_download_url?: string;
 }
@@ -133,9 +134,11 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
           {cvs.map(cv => (
             <Card key={cv.id}>
               <VStack align="start" spacing={2} w="100%">
-                <Text fontWeight={700} fontSize="lg">
-                  {cv.job_title || 'Untitled Role'}
-                  {cv.company ? ` @ ${cv.company}` : ''}
+                <Text fontWeight={700} fontSize="xl">
+                  {cv.job_title || 'Unknown Job Title'}
+                </Text>
+                <Text fontWeight={500} fontSize="md" color="gray.600">
+                  {cv.company_name || 'Unknown Company'}
                 </Text>
                 <Text fontSize="sm" color="gray.500">
                   {cv.created_at ? `Created: ${new Date(cv.created_at).toLocaleString()}` : ''}
@@ -149,16 +152,16 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
                   >
                     Download CV
                   </Button>
-                  {cv.cover_letter_available && cv.cover_letter_download_url && (
-                    <Button
-                      colorScheme="teal"
-                      variant="outline"
-                      leftIcon={<FaFileWord />}
-                      onClick={() => handleDownloadCoverLetter(cv.cover_letter_download_url!)}
-                    >
-                      Download Cover Letter
-                    </Button>
-                  )}
+                  <Button
+                    colorScheme="teal"
+                    variant="outline"
+                    leftIcon={<FaFileWord />}
+                    onClick={() => cv.cover_letter_available && cv.cover_letter_download_url ? handleDownloadCoverLetter(cv.cover_letter_download_url) : null}
+                    isDisabled={!cv.cover_letter_available || !cv.cover_letter_download_url}
+                    title={!cv.cover_letter_available ? 'No cover letter available for this CV' : ''}
+                  >
+                    Download Cover Letter
+                  </Button>
                 </HStack>
               </VStack>
             </Card>
