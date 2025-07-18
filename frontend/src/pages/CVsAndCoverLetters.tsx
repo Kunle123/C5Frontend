@@ -377,7 +377,12 @@ const Application: React.FC = () => {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`,
             },
-            body: JSON.stringify({ cv: result.cv }),
+            body: JSON.stringify({
+              cv: result.cv,
+              cover_letter: result.cover_letter || result.coverLetter || '',
+              job_title: result.job_title || '',
+              company_name: result.company_name || ''
+            })
           });
           if (!res.ok) {
             let errorMsg = 'Failed to save CV';
