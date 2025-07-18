@@ -148,12 +148,12 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
                     {cv.created_at ? `Created: ${new Date(cv.created_at).toLocaleString()}` : ''}
                   </Text>
                   <Box w="100%" mt={2}>
-                    <HStack spacing={4} w="100%" justify="flex-start">
+                    <VStack spacing={2} w="100%" align="stretch">
                       <Button
                         colorScheme="blue"
                         variant="solid"
                         leftIcon={<FaDownload />}
-                        w="50%"
+                        w="100%"
                         minW="140px"
                         onClick={() => handleDownloadCV(cv.id)}
                       >
@@ -163,15 +163,15 @@ const PreviousDocumentsList: React.FC<PreviousDocumentsListProps> = ({ token }) 
                         colorScheme="teal"
                         variant="outline"
                         leftIcon={<FaFileWord />}
-                        w="50%"
-                        minW="180px"
+                        w="100%"
+                        minW="140px"
                         onClick={() => cv.cover_letter_available && cv.cover_letter_download_url ? handleDownloadCoverLetter(cv.cover_letter_download_url) : null}
                         isDisabled={!cv.cover_letter_available || !cv.cover_letter_download_url}
                         title={!cv.cover_letter_available ? 'No cover letter available for this CV' : ''}
                       >
                         Download Cover Letter
                       </Button>
-                    </HStack>
+                    </VStack>
                   </Box>
                 </VStack>
               </Box>
