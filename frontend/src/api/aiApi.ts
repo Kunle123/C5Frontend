@@ -54,13 +54,13 @@ export async function extractKeywords(job_description: string, token?: string) {
 
 export async function generateCV(profile: any, job_description: string, token?: string) {
   if (!token) throw new Error('Authentication token is required for CV generation');
-  const res = await fetch(`${AI_API_BASE}/generate-cv`, {
+  const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({ profile, job_description }),
+    body: JSON.stringify({ action: 'generate_cv', profile, job_description }),
   });
   if (!res.ok) {
     let errMsg = 'CV generation failed.';
