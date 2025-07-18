@@ -35,7 +35,7 @@ import {
 import { uploadCV, deleteCV, downloadCV, getCurrentUser } from '../api';
 import { optimizeCV as aiOptimizeCV, extractKeywords, analyzeCV as aiAnalyzeCV } from '../api/aiApi';
 import { useNavigate } from 'react-router-dom';
-import { getArcData, generateApplicationMaterials, saveGeneratedCV } from '../api/careerArkApi';
+import { getArcData, generateApplicationMaterials } from '../api/careerArkApi';
 import { FiKey } from 'react-icons/fi';
 
 const steps = [
@@ -97,6 +97,10 @@ const Application: React.FC = () => {
   const [saveError, setSaveError] = useState('');
 
   const [threadId, setThreadId] = useState<string | null>(null);
+
+  // 1. Add state for jobTitle and companyName
+  const [jobTitle, setJobTitle] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState<string | null>(null);
 
   useEffect(() => {
     getCurrentUser(token).then(setUser).catch(() => setUser(null));
@@ -163,7 +167,6 @@ const Application: React.FC = () => {
     setExtracting(true);
     setError('');
     try {
-      // Construct profile with only required fields
       const profile = {
         work_experience: arcData.work_experience || [],
         education: arcData.education || [],
@@ -172,9 +175,11 @@ const Application: React.FC = () => {
         certifications: arcData.certifications || [],
       };
       const result = await extractKeywords(profile, jobDesc, token);
+      if (result.error) throw new Error(result.error);
       setKeywords(result.keywords || []);
       if (result.match_percentage !== undefined) setMatchScore(result.match_percentage);
-      if (result.thread_id) setThreadId(result.thread_id);
+      setJobTitle(result.job_title || null);
+      setCompanyName(result.company_name || null);
     } catch (err: any) {
       setError(err.message || 'Keyword extraction failed');
     } finally {
@@ -340,7 +345,6 @@ const Application: React.FC = () => {
     setSaveSuccess('');
     setSaveError('');
     try {
-      // Always construct the profile from arcData
       const profile = {
         work_experience: arcData.work_experience || [],
         education: arcData.education || [],
@@ -348,39 +352,22 @@ const Application: React.FC = () => {
         projects: arcData.projects || [],
         certifications: arcData.certifications || [],
       };
-      let result;
-      result = await generateApplicationMaterials(
+      let result = await generateApplicationMaterials(
         profile,
         jobDesc,
-        keywords,
-        threadId || undefined
+        keywords
       );
-      if (result.thread_id && !threadId) setThreadId(result.thread_id);
+      if (result.error) throw new Error(result.error);
       setOptimizedCV(result.cv || '');
       setOptimizedCL(result.cover_letter || result.coverLetter || '');
+      setJobTitle(result.job_title || null);
+      setCompanyName(result.company_name || null);
       setStep(3);
-      // Ensure result.cv is a non-empty string before saving
       if (!result.cv || typeof result.cv !== 'string' || !result.cv.trim()) {
         setSaveError('Generated CV is empty. Please try again.');
         return;
       }
-      // Log outgoing payload for debugging
-      const roleTitle = jobDesc.split('\n')[0].slice(0, 80) || 'Untitled Role';
-      const payload = {
-        role_title: roleTitle,
-        job_description: jobDesc,
-        cv_text: result.cv,
-        cover_letter_text: result.cover_letter || result.coverLetter || ''
-      };
-      console.log('Saving generated application to /api/applications with payload:', payload);
-      // Remove the call to saveGeneratedCV (POST /api/applications)
-      // try {
-      //   await saveGeneratedCV(payload);
-      //   setSaveSuccess('Generated CV and cover letter saved successfully!');
-      // } catch (saveErr: any) {
-      //   setSaveError(saveErr.message || 'Failed to save generated CV and cover letter');
-      // }
-      // In the handleAnalyzeAndOptimize function, after generating the CV, save it using a direct fetch call matching the curl command:
+      // Save CV as before...
       if (result.cv && typeof result.cv === 'string' && result.cv.trim()) {
         try {
           const token = localStorage.getItem('token') || '';
@@ -564,6 +551,13 @@ const Application: React.FC = () => {
           !!arcData && typeof arcData === 'object' && Object.keys(arcData).length > 0 ? (
             <Stack spacing={3}>
               <Heading as="h3" size="md">Keyword Match Analysis</Heading>
+              {jobTitle && <Text fontWeight="bold">Job Title: {jobTitle}</Text>}
+              {companyName && <Text fontWeight="bold">Company: {companyName}</Text>}
+              {matchScore !== null && (
+                <Heading as="h4" size="sm" color={matchScore >= 80 ? 'green.500' : matchScore >= 50 ? 'orange.500' : 'red.500'}>
+                  Match Score: {matchScore}%
+                </Heading>
+              )}
               {Array.isArray(keywordAnalysis) && keywordAnalysis.length > 0 && (
                 <Box>
                   <Text fontWeight="semibold" mb={1}>Keyword Match Analysis</Text>
@@ -582,11 +576,6 @@ const Application: React.FC = () => {
                       </Badge>
                     ))}
                   </HStack>
-                  {matchScore !== null && (
-                    <Heading as="h4" size="sm" color={matchScore >= 80 ? 'green.500' : matchScore >= 50 ? 'orange.500' : 'red.500'}>
-                      Match Score: {matchScore}%
-                    </Heading>
-                  )}
                 </Box>
               )}
               <Button variant="outline" colorScheme="gray" onClick={() => {
@@ -632,6 +621,8 @@ const Application: React.FC = () => {
         {step === 3 && (
           <Stack spacing={3}>
             <Alert status="success"><AlertIcon />Optimized CV and cover letter generated!</Alert>
+            {jobTitle && <Text fontWeight="bold">Job Title: {jobTitle}</Text>}
+            {companyName && <Text fontWeight="bold">Company: {companyName}</Text>}
             <Text fontWeight="semibold">View CV and Cover Letter</Text>
             <Box>
               <Tabs colorScheme="purple" variant="line" isFitted>
