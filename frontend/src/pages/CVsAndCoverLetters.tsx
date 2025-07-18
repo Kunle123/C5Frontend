@@ -174,7 +174,7 @@ const Application: React.FC = () => {
         projects: arcData.projects || [],
         certifications: arcData.certifications || [],
       };
-      const result = await extractKeywords(jobDesc, token);
+      const result = await extractKeywords(profile, jobDesc, token);
       if (result.error) throw new Error(result.error);
       setKeywords(result.keywords || []);
       if (result.match_percentage !== undefined) setMatchScore(result.match_percentage);
@@ -273,7 +273,14 @@ const Application: React.FC = () => {
       // 2. Extract keywords from job description
       let kwResult;
       try {
-        kwResult = await extractKeywords(jobDesc, token);
+        const profile = {
+          work_experience: data.work_experience || [],
+          education: data.education || [],
+          skills: data.skills || [],
+          projects: data.projects || [],
+          certifications: data.certifications || [],
+        };
+        kwResult = await extractKeywords(profile, jobDesc, token);
       } catch (err: any) {
         setError('Sorry, we could not extract keywords from your job description. Please check your input or try again later.');
         console.error('Keyword extraction failed:', err);
