@@ -89,8 +89,10 @@ const Login: React.FC = () => {
         <Stack spacing={3} mt={6}>
           <Button
             leftIcon={<FaGoogle />}
-            colorScheme="red"
-            variant="outline"
+            bg="white"
+            color="gray.800"
+            border="1px solid #ddd"
+            _hover={{ bg: 'gray.100' }}
             w="100%"
             onClick={() => window.location.href = 'https://api-gw-production.up.railway.app/auth/google'}
           >
@@ -98,8 +100,9 @@ const Login: React.FC = () => {
           </Button>
           <Button
             leftIcon={<FaLinkedin />}
-            colorScheme="linkedin"
-            variant="outline"
+            bg="#0077B5"
+            color="white"
+            _hover={{ bg: '#005983' }}
             w="100%"
             onClick={() => window.location.href = 'https://api-gw-production.up.railway.app/auth/linkedin'}
           >
