@@ -9,6 +9,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
+import logo from '/candidate5-logo.svg';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 
@@ -54,7 +55,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           cursor="pointer"
           _hover={{ color: 'white' }}
         >
-          Candidate 5 - CV
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <img src={logo} alt="Candidate 5 logo" style={{ height: 32, width: 32, objectFit: 'contain', filter: 'invert(18%) sepia(98%) saturate(7492%) hue-rotate(202deg) brightness(97%) contrast(101%)' }} />
+            <span>Candidate 5</span>
+          </span>
         </Box>
         <Box display={{ base: 'block', md: 'none' }}>
           <IconButton
