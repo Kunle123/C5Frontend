@@ -105,10 +105,10 @@ const HighConvertingLanding: React.FC = () => {
       <Flex direction={{ base: 'column', md: 'row' }} align="center" justify="space-between" px={{ base: 2, sm: 4, md: 16 }} py={{ base: 8, md: 16 }} bg="white">
         <VStack align="start" spacing={6} maxW={{ base: '100%', md: 'lg' }} w="100%">
           <Heading as="h1" textStyle="h1" fontSize={{ base: '2xl', sm: '3xl', md: '5xl' }} fontWeight="bold" color="navy">
-            Stop Rewriting, Start Applying: Land Your Dream Job Faster with CandidateV.
+            Stop Rewriting, Start Applying: Land Your Dream Job Faster with Candidate 5 - CV.
           </Heading>
           <Text fontSize={{ base: 'md', md: 'xl' }} color="slate">
-            Tired of endless CV tweaks for every job? CandidateV's AI uses your unique career history—your personal Career Arc™—to craft perfectly tailored CVs and cover letters in minutes, so you get noticed by employers.
+            Tired of endless CV tweaks for every job? Candidate 5 - CV's AI uses your unique career history—your personal Career Arc™—to craft perfectly tailored CVs and cover letters in minutes, so you get noticed by employers.
           </Text>
           <HStack spacing={4} flexWrap="wrap">
             <Button colorScheme="brand" variant="solid" size={{ base: 'md', md: 'lg' }} borderRadius="md" leftIcon={<FaRocket />}>Create Your Free Account</Button>
@@ -135,7 +135,7 @@ const HighConvertingLanding: React.FC = () => {
 
       {/* 3. Problem / Solution Section */}
       <Box py={{ base: 8, md: 16 }} px={{ base: 2, sm: 4, md: 16 }} textAlign="center">
-        <Heading as="h2" textStyle="h2" fontSize={{ base: 'xl', md: '2xl', lg: '4xl' }} mb={4} color="navy">The Job Application Grind is Real. CandidateV is Your Way Out.</Heading>
+        <Heading as="h2" textStyle="h2" fontSize={{ base: 'xl', md: '2xl', lg: '4xl' }} mb={4} color="navy">The Job Application Grind is Real. Candidate 5 - CV is Your Way Out.</Heading>
         <Text fontSize={{ base: 'md', md: 'lg' }} color="slate" maxW="2xl" mx="auto">
           Spending hours tailoring your CV for each role? Worried your application will get lost in the ATS black hole? Juggling multiple CV versions? It's exhausting and inefficient. CandidateV automates the tedious parts, so you can focus on what matters: acing the interview.
         </Text>
@@ -202,12 +202,12 @@ const HighConvertingLanding: React.FC = () => {
 
       {/* 6. Why Choose CandidateV? */}
       <Box py={{ base: 8, md: 16 }} px={{ base: 2, sm: 4, md: 16 }}>
-        <Heading as="h2" textStyle="h2" fontSize={{ base: '2xl', md: '4xl' }} mb={12} textAlign="center" color="navy">The CandidateV Advantage: More Than Just a CV Builder</Heading>
+        <Heading as="h2" textStyle="h2" fontSize={{ base: '2xl', md: '4xl' }} mb={12} textAlign="center" color="navy">The Candidate 5 - CV Advantage: More Than Just a CV Builder</Heading>
         <SimpleGrid columns={{ base: 1, md: 4 }} spacing={{ base: 6, md: 10 }}>
           <VStack align="center" spacing={4} bg={cardBg} p={6} borderRadius="md" boxShadow="md">
             <Icon as={FaBrain} boxSize={10} color={accent} />
             <Heading as="h4" size="md" color="navy">Intelligent Personalization</Heading>
-            <Text color="slate">Go beyond templates. CandidateV uses your unique Career Arc™ to create genuinely bespoke applications that reflect your true value.</Text>
+            <Text color="slate">Go beyond templates. Candidate 5 - CV uses your unique Career Arc™ to create genuinely bespoke applications that reflect your true value.</Text>
           </VStack>
           <VStack align="center" spacing={4} bg={cardBg} p={6} borderRadius="md" boxShadow="md">
             <Icon as={FaClock} boxSize={10} color={accent} />
