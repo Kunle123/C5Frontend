@@ -8,6 +8,7 @@ const Signup: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -20,6 +21,11 @@ const Signup: React.FC = () => {
     setError('');
     setLoading(true);
     setSuccess(false);
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
     try {
       const res = await register({ name, email, password });
       setSuccess(true);
@@ -73,6 +79,17 @@ const Signup: React.FC = () => {
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                required
+                autoComplete="new-password"
+              />
+            </Box>
+            <Box>
+              <Text mb={1} fontWeight={600}>Confirm Password</Text>
+              <Input
+                placeholder="Confirm Password"
+                type="password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
                 required
                 autoComplete="new-password"
               />
