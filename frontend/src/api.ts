@@ -131,7 +131,10 @@ export async function getUser(token: string) {
 
 // Subscription Service
 export async function getSubscription(userId: string, token: string) {
-  const res = await authFetch(`${API_GATEWAY_BASE}/api/subscriptions/user/${userId}`);
+  const res = await fetch(`${API_GATEWAY_BASE}/api/subscriptions/user/${userId}`, {
+    method: 'GET',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
   if (!res) throw new Error('Unauthorized or network error');
   if (!res.ok) throw await res.json();
   return res.json();
