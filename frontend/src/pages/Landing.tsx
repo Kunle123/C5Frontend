@@ -1,174 +1,222 @@
-import React, { useEffect, useState } from 'react';
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
 import {
-  Box,
-  Button,
-  Text,
-  Heading,
-  HStack,
-  useBreakpointValue,
-  Grid,
-  GridItem,
-  Divider,
-} from '@chakra-ui/react';
-import { FaRocket, FaBriefcase, FaMagic, FaCheckCircle } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { getArcData } from '../api/careerArkApi';
-
-const accentGradient = 'linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%)';
+  ArrowRight,
+  Play,
+  CheckCircle,
+  Zap,
+  Shield,
+  Target,
+  Users,
+  Clock,
+  Star,
+  FileText,
+  Brain,
+  Sparkles
+} from "lucide-react";
+import React from "react";
 
 const Landing: React.FC = () => {
-  const navigate = useNavigate();
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const [arcData, setArcData] = useState<any>(null);
-  const [arcLoading, setArcLoading] = useState(false);
-  const [arcError, setArcError] = useState('');
-  const [arcHasData, setArcHasData] = useState(true);
-
-  useEffect(() => {
-    if (token) {
-      setArcLoading(true);
-      getArcData()
-        .then(data => {
-          setArcData(data);
-          // Check if any key sections have data
-          const hasData = !!(
-            (data.work_experience && data.work_experience.length > 0) ||
-            (data.education && data.education.length > 0) ||
-            (data.skills && data.skills.length > 0) ||
-            (data.projects && data.projects.length > 0) ||
-            (data.certifications && data.certifications.length > 0)
-          );
-          setArcHasData(hasData);
-        })
-        .catch(err => {
-          setArcError('Could not load Career Ark data.');
-          setArcHasData(false);
-        })
-        .finally(() => setArcLoading(false));
-    }
-  }, [token]);
-
-  const startTrial = () => navigate('/signup');
-
   return (
-    <Box minH="100vh" py={8} px={2} bgGradient="linear(120deg, white 0%, lilac 100%)" display="flex" alignItems="center" justifyContent="center">
-      <Box bg="white" borderRadius="2xl" boxShadow="lg" maxW={800} w="100%" p={{ base: 4, md: 8 }}>
-        <Heading as="h1" size="md" color="red.500" mb={2} textAlign="center">PAGE: Landing</Heading>
-        <Heading as="h1" size="2xl" textAlign="center" fontWeight={800} color="brand.500" mb={2}>
-          Candidate 5 – Your Edge in a Competitive Job Market
-        </Heading>
-        <Divider my={4} borderColor="brand.500" borderWidth={2} w={20} mx="auto" />
-        <Heading as="h2" size="lg" textAlign="center" mb={2}>
-          Apply in minutes, not hours. Never miss an opportunity again.
-        </Heading>
-        <Text textAlign="center" mb={4} color="text.secondary">
-          Tired of spending hours rewriting your CV for every role? With Candidate 5, you can generate tailored applications in just minutes—so you can act fast, apply smarter, and stay ready for what's next.
-        </Text>
-        <Box display="flex" justifyContent="center" mb={4}>
-          <Button
-            size="lg"
-            borderRadius="lg"
-            fontWeight={700}
-            fontSize="xl"
-            bgGradient={accentGradient}
-            color="white"
-            _hover={{ transform: 'scale(1.05)', boxShadow: 'lg', bgGradient: accentGradient }}
-            onClick={startTrial}
-          >
-            <HStack gap={2}><FaRocket /> <span>Start Your Free Trial</span></HStack>
-          </Button>
-        </Box>
-        <Divider my={4} />
-        <Heading as="h3" size="md" fontWeight={700} mb={1} display="flex" alignItems="center" gap={2}>
-          <FaRocket color="#3366CC" /> What is Candidate 5?
-        </Heading>
-        <Text mb={3}>
-          Candidate 5 is your intelligent application assistant, built to transform how you apply for jobs. It combines customisation, optimisation, and long-term career management into one seamless platform.
-        </Text>
-        <Box display="flex" justifyContent="center" mb={3}>
-          <Button
-            size="lg"
-            borderRadius="lg"
-            fontWeight={600}
-            bgGradient={accentGradient}
-            color="white"
-            _hover={{ bgGradient: accentGradient, opacity: 0.9 }}
-            onClick={startTrial}
-          >
-            <HStack gap={2}><FaRocket /> <span>Start Your Free Trial</span></HStack>
-          </Button>
-        </Box>
-        <Divider my={4} />
-        <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={{ base: 4, md: 6 }} mb={3}>
-          <GridItem>
-            <Box bg="brand.50" borderRadius="lg" boxShadow="md" h="100%" p={4}>
-              <Heading as="h4" size="md" fontWeight={700} color="brand.500" display="flex" alignItems="center" gap={2} mb={2}>
-                <FaBriefcase color="#3366CC" /> Career Ark – Build Once, Apply Forever
-              </Heading>
-              <Text mb={1} fontSize="md" color="text.secondary">
-                Career Ark is your personal career hub. Add your CVs, skills, experiences, and achievements to create a living profile that grows with you.
-              </Text>
-              <Box display="flex" flexDirection="column" alignItems="flex-start" gap={2} mb={2}>
-                <HStack gap={2}><FaCheckCircle color="#22C55E" /><Text>Every new skill or update feeds future applications</Text></HStack>
-                <HStack gap={2}><FaCheckCircle color="#22C55E" /><Text>Keep your career story consistent and compelling</Text></HStack>
-                <HStack gap={2}><FaCheckCircle color="#22C55E" /><Text>No more digging through files or rewriting the same content</Text></HStack>
-                <HStack gap={2}><FaCheckCircle color="#22C55E" /><Text>Always ready, always up to date</Text></HStack>
-              </Box>
-              <Text fontSize="sm" color="text.secondary" fontStyle="italic">
-                With Career Ark, every application makes your next one even stronger.
-              </Text>
-            </Box>
-          </GridItem>
-          <GridItem>
-            <Box bg="pink.50" borderRadius="lg" boxShadow="md" h="100%" p={4}>
-              <Heading as="h4" size="md" fontWeight={700} color="pink.500" display="flex" alignItems="center" gap={2} mb={2}>
-                <FaMagic color="#fc5c7d" /> Application Wizard – Custom Applications in Seconds
-              </Heading>
-              <Text mb={1} fontSize="md" color="text.secondary">
-                Paste a job advert—and let Application Wizard do the rest. It instantly generates a CV and cover letter tailored to that exact role by:
-              </Text>
-              <Box display="flex" flexDirection="column" alignItems="flex-start" gap={2} mb={2}>
-                <HStack gap={2}><FaCheckCircle color="#3366CC" /><Text>Integrating the right keywords</Text></HStack>
-                <HStack gap={2}><FaCheckCircle color="#3366CC" /><Text>Highlighting your most relevant experience first</Text></HStack>
-                <HStack gap={2}><FaCheckCircle color="#3366CC" /><Text>Adapting tone and language to match the job description</Text></HStack>
-                <HStack gap={2}><FaCheckCircle color="#3366CC" /><Text>Ensuring a clean, professional format every time</Text></HStack>
-              </Box>
-              <Text fontSize="sm" color="text.secondary" fontStyle="italic">
-                Apply confidently from anywhere—whether you're at your desk or on the move.
-              </Text>
-            </Box>
-          </GridItem>
-        </Grid>
-        <Box display="flex" justifyContent="center" mb={3}>
-          <Button
-            size="lg"
-            borderRadius="lg"
-            fontWeight={600}
-            bgGradient={accentGradient}
-            color="white"
-            _hover={{ bgGradient: accentGradient, opacity: 0.9 }}
-            onClick={startTrial}
-          >
-            <HStack gap={2}><FaRocket /> <span>Start Your Free Trial</span></HStack>
-          </Button>
-        </Box>
-        <Divider my={4} />
-        <Heading as="h4" size="md" fontWeight={700} mb={1}>
-          Why Candidates Choose Candidate 5
-        </Heading>
-        <Box display="flex" flexDirection="column" alignItems="flex-start" mb={4} gap={2} pl={2}>
-          <Text>• Cut application time from hours to minutes</Text>
-          <Text>• Stay ready for any opportunity</Text>
-          <Text>• Make your experience work harder for you</Text>
-          <Text>• Apply more often with less effort</Text>
-        </Box>
-        <Divider my={4} />
-        <Text textAlign="center" mb={4} fontWeight={500}>
-          Candidate 5 isn't just a tool—it's your career advantage.<br />
-          <b>Start applying smarter today.</b>
-        </Text>
-      </Box>
-    </Box>
+    <div className="min-h-screen bg-background">
+      {/* Navigation */}
+      <nav className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="text-2xl font-bold text-primary">Candidate 5</div>
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#home" className="text-foreground hover:text-primary transition-colors">Home</a>
+              <a href="#pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
+              <Button variant="outline">Login</Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <Badge variant="success" className="gap-2">
+                <Sparkles className="h-3 w-3" />
+                AI-Powered Career Growth
+              </Badge>
+              <h1 className="text-5xl lg:text-6xl font-bold text-card-foreground leading-tight">
+                Stop Rewriting, Start <span className="text-primary"> Applying</span>
+              </h1>
+              <p className="text-xl text-muted-foreground leading-relaxed">
+                Land your dream job faster with Candidate 5 - CV. Our AI uses your unique Career Arc™ 
+                to craft perfectly tailored CVs and cover letters in minutes.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button size="lg" className="gap-2 text-lg px-8 py-6">
+                  <CheckCircle className="h-5 w-5" />
+                  Create Your Free Account
+                </Button>
+                <Button variant="outline" size="lg" className="gap-2 text-lg px-8 py-6">
+                  <Play className="h-5 w-5" />
+                  See How It Works (60s)
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Join 10,000+ job seekers already optimizing their applications!
+              </p>
+            </div>
+            <div className="relative">
+              <div className="relative bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl p-8 border shadow-elevated">
+                <div className="bg-background rounded-2xl p-6 shadow-card">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-success rounded-full"></div>
+                      <div className="w-3 h-3 bg-warning rounded-full"></div>
+                      <div className="w-3 h-3 bg-destructive rounded-full"></div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-4 bg-muted rounded w-3/4"></div>
+                      <div className="h-4 bg-muted rounded w-full"></div>
+                      <div className="h-4 bg-muted rounded w-1/2"></div>
+                      <div className="h-6 bg-primary/20 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -top-4 -right-4 bg-primary rounded-full p-3 shadow-glow">
+                  <Brain className="h-6 w-6 text-primary-foreground" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof */}
+      <section className="py-12 border-y border-border/50 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4">
+          <p className="text-center text-muted-foreground mb-8">As seen on</p>
+          <div className="flex justify-center items-center gap-12 opacity-60">
+            <div className="h-8 w-24 bg-muted rounded"></div>
+            <div className="h-8 w-24 bg-muted rounded"></div>
+            <div className="h-8 w-24 bg-muted rounded"></div>
+          </div>
+        </div>
+      </section>
+
+      {/* Problem Statement */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h2 className="text-4xl font-bold text-card-foreground">
+            The Job Application Grind is Real. Candidate 5 - CV is Your Way Out.
+          </h2>
+          <p className="text-xl text-muted-foreground leading-relaxed">
+            Spending hours tailoring your CV for each role? Worried your application will get lost in the ATS black hole? 
+            Juggling multiple CV versions? It's exhausting and inefficient. Candidate 5 automates the tedious parts, 
+            so you can focus on what matters: acing the interview.
+          </p>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="py-20 px-4 bg-muted/20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-card-foreground mb-4">
+              Meet Your AI-Powered Application Toolkit
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <Card className="border-2 border-transparent hover:border-primary/20 transition-all duration-300 shadow-card hover:shadow-elevated">
+              <CardContent className="p-8 space-y-6">
+                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                  <Target className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-semibold text-card-foreground">
+                  Build Once, Apply Perfectly, Forever
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Your Career Arc™ is your private, intelligent career repository. Upload your existing CVs 
+                  or add your experiences. Arc™ extracts, structures, and stores every skill and achievement.
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Consolidate your entire career history
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Ensure consistency across applications
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Gets more powerful with every update
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+            {/* Feature 2 */}
+            <Card className="border-2 border-transparent hover:border-primary/20 transition-all duration-300 shadow-card hover:shadow-elevated">
+              <CardContent className="p-8 space-y-6">
+                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                  <Zap className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-semibold text-card-foreground">
+                  Tailored CVs & Cover Letters, Instantly
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Paste any job description, and let the Application Wizard work its magic. Our AI instantly 
+                  analyzes the role and generates perfectly optimized applications.
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Beat Applicant Tracking Systems (ATS)
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Highlight relevant experiences
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Save hours per application
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+            {/* Feature 3 */}
+            <Card className="border-2 border-transparent hover:border-primary/20 transition-all duration-300 shadow-card hover:shadow-elevated">
+              <CardContent className="p-8 space-y-6">
+                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                  <FileText className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-semibold text-card-foreground">
+                  All Your Docs, One Place
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Store, manage, and access all your CVs, cover letters, and supporting docs in one secure place.
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Secure cloud storage
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Easy version control
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Access from any device
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* More sections from lovable design can be added here as needed */}
+    </div>
   );
 };
 

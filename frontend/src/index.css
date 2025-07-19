@@ -11,6 +11,21 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Primary Brand */
+  --primary: 219 78% 58%;
+  --primary-foreground: 255 255 255;
+  --primary-glow: 219 78% 68%;
+
+  /* Status Colors */
+  --success: 142 76% 36%;
+  --warning: 43 96% 56%;
+  --destructive: 0 84% 60%;
+
+  /* Neutral Palette */
+  --background: 248 250 252;
+  --foreground: 226 232 240;
+  --muted-foreground: 51 65 85;
 }
 
 a {
