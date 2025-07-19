@@ -1,238 +1,200 @@
-import React from 'react';
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Badge } from "./ui/badge";
 import {
-  Box, Flex, Heading, Text, Button, VStack, HStack, Image, SimpleGrid, Link, Icon, Badge
-} from '@chakra-ui/react';
-import { ArrowRight, Play, CheckCircle, Zap, Shield, Target, Users, Clock, Star, FileText, Brain, Sparkles } from 'lucide-react';
+  ArrowRight,
+  Play,
+  CheckCircle,
+  Zap,
+  Shield,
+  Target,
+  Users,
+  Clock,
+  Star,
+  FileText,
+  Brain,
+  Sparkles
+} from "lucide-react";
 
-const primary = '#6a82fb';
-const accent = '#fc5c7d';
-const mutedBg = '#f8fafc';
-const mutedFg = '#64748b';
-const cardFg = '#1e293b';
-const accentYellow = '#fbbf24';
+const heroImg = "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5";
 
-const CandidateLanding: React.FC = () => {
+export function CandidateLanding() {
   return (
-    <Box bg={mutedBg} minH="100vh">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <Box as="nav" bg="white" borderBottom="1px solid #e5e7eb" px={{ base: 4, md: 12 }} py={0} position="sticky" top={0} zIndex={100} boxShadow="sm">
-        <Flex align="center" justify="space-between" h={16} maxW="7xl" mx="auto">
-          <Text fontWeight={700} fontSize="2xl" color={primary} letterSpacing="-0.01em">Candidate 5</Text>
-          <HStack gap={0} align="center" display={{ base: 'none', md: 'flex' }}>
-            <Link href="#home" px={4} py={2} fontWeight={600} color={cardFg} _hover={{ color: primary }}>Home</Link>
-            <Link href="#pricing" px={4} py={2} fontWeight={600} color={cardFg} _hover={{ color: primary }}>Pricing</Link>
-            <Button variant="outline" color={primary} borderColor={primary} ml={4} size="sm">Login</Button>
-          </HStack>
-        </Flex>
-      </Box>
-
+      <nav className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="text-2xl font-bold text-primary">Candidate 5</div>
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#home" className="text-foreground hover:text-primary transition-colors">Home</a>
+              <a href="#pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
+              <Button variant="outline">Login</Button>
+            </div>
+          </div>
+        </div>
+      </nav>
       {/* Hero Section */}
-      <Flex id="home" justify="center" align="center" py={20} px={4} bg={mutedBg}>
-        <Box maxW="7xl" w="100%" display="grid" gridTemplateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={12} alignItems="center">
-          <VStack align="start" gap={8} maxW="xl" w="100%">
-            <Badge bg="green.400" color="white" mb={2} px={3} py={1} borderRadius="md" fontWeight={600} fontSize="sm">
-              <HStack gap={2}><Icon as={Sparkles} w={4} h={4} />AI-Powered Career Growth</HStack>
-            </Badge>
-            <Heading as="h1" fontSize={{ base: '4xl', lg: '6xl' }} fontWeight={800} color={cardFg} lineHeight="tight">
-              Stop Rewriting, Start <Text as="span" color={primary} display="inline">Applying</Text>
-            </Heading>
-            <Text fontSize="xl" color={mutedFg} mb={2}>
-              Land your dream job faster with Candidate 5 - CV. Our AI uses your unique Career Arc™ to craft perfectly tailored CVs and cover letters in minutes.
-            </Text>
-            <HStack gap={4} flexDir={{ base: 'column', sm: 'row' }} alignItems={{ base: 'stretch', sm: 'center' }}>
-              <Button size="lg" bg={primary} color="white" _hover={{ bg: accent }} fontWeight={700} px={8} py={6} borderRadius="md">
-                <HStack gap={2}><CheckCircle size={20} /> <span>Create Your Free Account</span></HStack>
-              </Button>
-              <Button variant="outline" borderColor={primary} color={primary} _hover={{ bg: accent, color: 'white' }} size="lg" fontWeight={700} px={8} py={6} borderRadius="md">
-                <HStack gap={2}><Play size={20} /> <span>See How It Works (60s)</span></HStack>
-              </Button>
-            </HStack>
-            <Text fontSize="sm" color={mutedFg} mt={2}>
-              Join 10,000+ job seekers already optimizing their applications!
-            </Text>
-          </VStack>
-          <Box position="relative" display="flex" justifyContent="center" alignItems="center">
-            <Box bgGradient={`linear(to-br, ${primary}10, ${accent}10)`} borderRadius="3xl" p={8} borderWidth={1} borderColor={`${primary}10`} boxShadow="lg" position="relative">
-              <Box bg={mutedBg} borderRadius="2xl" p={6} boxShadow="md">
-                <VStack gap={3} align="stretch">
-                  <HStack gap={2}>
-                    <Box w={3} h={3} bg="green.400" borderRadius="full" />
-                    <Box w={3} h={3} bg="yellow.400" borderRadius="full" />
-                    <Box w={3} h={3} bg="red.400" borderRadius="full" />
-                  </HStack>
-                  <VStack gap={2} align="stretch">
-                    <Box h={4} bg={mutedBg} borderRadius="md" w="75%" />
-                    <Box h={4} bg={mutedBg} borderRadius="md" w="100%" />
-                    <Box h={4} bg={mutedBg} borderRadius="md" w="50%" />
-                    <Box h={6} bg={primary} opacity={0.2} borderRadius="md" w="66%" />
-                  </VStack>
-                </VStack>
-              </Box>
-              <Box position="absolute" top={-4} right={-4} bg={primary} borderRadius="full" p={3} boxShadow="lg">
-                <Icon as={Brain} w={6} h={6} color="white" />
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Flex>
+      <section className="relative py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <Badge variant="success" className="gap-2">
+                <Sparkles className="h-3 w-3" />
+                AI-Powered Career Growth
+              </Badge>
+              <h1 className="text-5xl lg:text-6xl font-bold text-card-foreground leading-tight">
+                Stop Rewriting, Start <span className="text-primary"> Applying</span>
+              </h1>
+              <p className="text-xl text-muted-foreground leading-relaxed">
+                Land your dream job faster with Candidate 5 - CV. Our AI uses your unique Career Arc™ to craft perfectly tailored CVs and cover letters in minutes.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button size="lg" className="gap-2 text-lg px-8 py-6">
+                  <CheckCircle className="h-5 w-5" />
+                  Create Your Free Account
+                </Button>
+                <Button variant="outline" size="lg" className="gap-2 text-lg px-8 py-6">
+                  <Play className="h-5 w-5" />
+                  See How It Works (60s)
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Join 10,000+ job seekers already optimizing their applications!
+              </p>
+            </div>
+            <div className="relative">
+              <div className="relative bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl p-8 border shadow-elevated">
+                <div className="bg-background rounded-2xl p-6 shadow-card">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-success rounded-full"></div>
+                      <div className="w-3 h-3 bg-warning rounded-full"></div>
+                      <div className="w-3 h-3 bg-destructive rounded-full"></div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-4 bg-muted rounded w-3/4"></div>
+                      <div className="h-4 bg-muted rounded w-full"></div>
+                      <div className="h-4 bg-muted rounded w-1/2"></div>
+                      <div className="h-6 bg-primary/20 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -top-4 -right-4 bg-primary rounded-full p-3 shadow-glow">
+                  <Brain className="h-6 w-6 text-primary-foreground" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      {/* Social Proof */}
-      <Box py={12} borderY="1px" borderColor="#e5e7eb" bg={mutedBg}>
-        <Box maxW="7xl" mx="auto" px={4}>
-          <Text textAlign="center" color={mutedFg} mb={8}>As seen on</Text>
-          <HStack justify="center" align="center" gap={12} opacity={0.6}>
-            <Box h={8} w={24} bg={mutedBg} borderRadius="md" />
-            <Box h={8} w={24} bg={mutedBg} borderRadius="md" />
-            <Box h={8} w={24} bg={mutedBg} borderRadius="md" />
-          </HStack>
-        </Box>
-      </Box>
+      {/* Problem Statement Section */}
+      <div className="py-12 px-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-2">
+          Job Applications Are Broken. Candidate 5 Fixes Them.
+        </h2>
+        <p className="text-md sm:text-lg text-gray-600 text-center max-w-2xl mx-auto">
+          Tired of spending hours rewriting your CV for every job? Candidate 5 automates the tedious parts, so you can focus on what matters: acing the interview.
+        </p>
+      </div>
 
-      {/* Problem Statement */}
-      <Box py={20} px={4} bg="white">
-        <Box maxW="4xl" mx="auto" textAlign="center">
-          <Heading as="h2" fontSize={{ base: '2xl', md: '4xl' }} fontWeight={700} color={cardFg} mb={6}>
-            The Job Application Grind is Real. Candidate 5 - CV is Your Way Out.
-          </Heading>
-          <Text fontSize="xl" color={mutedFg}>
-            Spending hours tailoring your CV for each role? Worried your application will get lost in the ATS black hole? Juggling multiple CV versions? It's exhausting and inefficient. Candidate 5 automates the tedious parts, so you can focus on what matters: acing the interview.
-          </Text>
-        </Box>
-      </Box>
+      {/* Features Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 px-4 sm:px-16 mb-16">
+        <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+          <img src="/brain.svg" alt="AI-Personalized CVs" className="w-16 h-16" />
+          <h4 className="text-md font-bold text-primary">AI-Personalized CVs</h4>
+          <p className="text-gray-600">Go beyond templates. Candidate 5 uses your Career Arc™ to create bespoke applications that reflect your true value.</p>
+        </div>
+        <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+          <img src="/clock.svg" alt="Radical Time Savings" className="w-16 h-16" />
+          <h4 className="text-md font-bold text-primary">Radical Time Savings</h4>
+          <p className="text-gray-600">Cut application time from hours to minutes. Apply to more opportunities with less effort.</p>
+        </div>
+        <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+          <img src="/sparkles.svg" alt="Career Arc™ System" className="w-16 h-16" />
+          <h4 className="text-md font-bold text-primary">Career Arc™ System</h4>
+          <p className="text-gray-600">Your Career Arc™ evolves with you, making each future application stronger and smarter.</p>
+        </div>
+      </div>
 
-      {/* Features */}
-      <Box py={20} px={4} bg={mutedBg}>
-        <Box maxW="7xl" mx="auto">
-          <Text textAlign="center" fontSize="2xl" fontWeight={700} color={cardFg} mb={16}>Meet Your AI-Powered Application Toolkit</Text>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
-            <Box bg="white" borderRadius="xl" boxShadow="md" p={8} _hover={{ borderColor: primary, boxShadow: 'lg' }} borderWidth={2} borderColor="transparent" transition="all 0.3s">
-              <Icon as={Target} w={8} h={8} color={primary} mb={4} />
-              <Heading as="h3" fontSize="2xl" fontWeight={600} color={cardFg} mb={2}>Build Once, Apply Perfectly, Forever</Heading>
-              <Text color={mutedFg} mb={4}>Your Career Arc™ is your private, intelligent career repository. Upload your existing CVs or add your experiences. Arc™ extracts, structures, and stores every skill and achievement.</Text>
-              <VStack align="start" gap={2} fontSize="sm">
-                <HStack><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>Consolidate your entire career history</Text></HStack>
-                <HStack><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>Ensure consistency across applications</Text></HStack>
-                <HStack><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>Gets more powerful with every update</Text></HStack>
-              </VStack>
-            </Box>
-            <Box bg="white" borderRadius="xl" boxShadow="md" p={8} _hover={{ borderColor: primary, boxShadow: 'lg' }} borderWidth={2} borderColor="transparent" transition="all 0.3s">
-              <Icon as={Zap} w={8} h={8} color={primary} mb={4} />
-              <Heading as="h3" fontSize="2xl" fontWeight={600} color={cardFg} mb={2}>Tailored CVs & Cover Letters, Instantly</Heading>
-              <Text color={mutedFg} mb={4}>Paste any job description, and let the Application Wizard work its magic. Our AI instantly analyzes the role and generates perfectly optimized applications.</Text>
-              <VStack align="start" gap={2} fontSize="sm">
-                <HStack><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>Beat Applicant Tracking Systems (ATS)</Text></HStack>
-                <HStack><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>Highlight relevant experiences</Text></HStack>
-                <HStack><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>Save hours per application</Text></HStack>
-              </VStack>
-            </Box>
-            <Box bg="white" borderRadius="xl" boxShadow="md" p={8} _hover={{ borderColor: primary, boxShadow: 'lg' }} borderWidth={2} borderColor="transparent" transition="all 0.3s">
-              <Icon as={FileText} w={8} h={8} color={primary} mb={4} />
-              <Heading as="h3" fontSize="2xl" fontWeight={600} color={cardFg} mb={2}>Your Master Career Profile, Always Ready</Heading>
-              <Text color={mutedFg} mb={4}>The Mega CV draws from your Arc™ to create a comprehensive master version of your resume, perfect for networking and speculative applications.</Text>
-              <VStack align="start" gap={2} fontSize="sm">
-                <HStack><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>Complete, always-current master document</Text></HStack>
-                <HStack><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>Ideal for diverse application needs</Text></HStack>
-                <HStack><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>Showcase the full breadth of experience</Text></HStack>
-              </VStack>
-            </Box>
-          </SimpleGrid>
-        </Box>
-      </Box>
+      {/* Process Steps */}
+      <div className="py-20 px-4 bg-muted/20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-card-foreground mb-4">
+              Get Your Perfect Application in 3 Simple Steps
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center space-y-4">
+              <div className="bg-primary w-16 h-16 rounded-full flex items-center justify-center mx-auto text-primary-foreground font-bold text-xl">
+                1
+              </div>
+              <h3 className="text-xl font-semibold text-card-foreground">Feed Your Arc™</h3>
+              <p className="text-muted-foreground">
+                Securely upload your existing CVs or manually add your career details. Our AI intelligently populates your personal Career Arc™.
+              </p>
+            </div>
+            <div className="text-center space-y-4">
+              <div className="bg-primary w-16 h-16 rounded-full flex items-center justify-center mx-auto text-primary-foreground font-bold text-xl">
+                2
+              </div>
+              <h3 className="text-xl font-semibold text-card-foreground">Target Your Role</h3>
+              <p className="text-muted-foreground">
+                Find a job you love? Simply paste the job description into Candidate 5.
+              </p>
+            </div>
+            <div className="text-center space-y-4">
+              <div className="bg-primary w-16 h-16 rounded-full flex items-center justify-center mx-auto text-primary-foreground font-bold text-xl">
+                3
+              </div>
+              <h3 className="text-xl font-semibold text-card-foreground">Apply with Confidence</h3>
+              <p className="text-muted-foreground">
+                Instantly generate a tailored CV and cover letter, optimized for the role. Download and apply!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      {/* How It Works */}
-      <Box py={20} px={4} bg="white">
-        <Box maxW="6xl" mx="auto">
-          <Text textAlign="center" fontSize="2xl" fontWeight={700} color={cardFg} mb={16}>Get Your Perfect Application in 3 Simple Steps</Text>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
-            <VStack textAlign="center" gap={4}>
-              <Box bg={primary} color="white" w={16} h={16} borderRadius="full" display="flex" alignItems="center" justifyContent="center" fontWeight="bold" fontSize="xl">1</Box>
-              <Heading as="h3" fontSize="xl" fontWeight={600} color={cardFg}>Feed Your Arc™</Heading>
-              <Text color={mutedFg}>Securely upload your existing CVs or manually add your career details. Our AI intelligently populates your personal Career Arc™.</Text>
-            </VStack>
-            <VStack textAlign="center" gap={4}>
-              <Box bg={primary} color="white" w={16} h={16} borderRadius="full" display="flex" alignItems="center" justifyContent="center" fontWeight="bold" fontSize="xl">2</Box>
-              <Heading as="h3" fontSize="xl" fontWeight={600} color={cardFg}>Target Your Role</Heading>
-              <Text color={mutedFg}>Find a job you love? Simply paste the job description into Candidate 5.</Text>
-            </VStack>
-            <VStack textAlign="center" gap={4}>
-              <Box bg={primary} color="white" w={16} h={16} borderRadius="full" display="flex" alignItems="center" justifyContent="center" fontWeight="bold" fontSize="xl">3</Box>
-              <Heading as="h3" fontSize="xl" fontWeight={600} color={cardFg}>Apply with Confidence</Heading>
-              <Text color={mutedFg}>Instantly generate a tailored CV and cover letter, optimized for the role. Download and apply!</Text>
-            </VStack>
-          </SimpleGrid>
-        </Box>
-      </Box>
-
-      {/* Advantages */}
-      <Box py={20} px={4} bg={mutedBg}>
-        <Box maxW="6xl" mx="auto">
-          <Text textAlign="center" fontSize="2xl" fontWeight={700} color={cardFg} mb={16}>The Candidate 5 - CV Advantage: More Than Just a CV Builder</Text>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={6}>
-            <VStack bg="white" borderRadius="xl" boxShadow="md" p={6} textAlign="center">
-              <Icon as={Brain} w={12} h={12} color={primary} mb={2} />
-              <Heading as="h3" fontSize="lg" fontWeight={600} color={cardFg}>Intelligent Personalization</Heading>
-              <Text color={mutedFg} fontSize="sm">Go beyond templates. Create genuinely bespoke applications that reflect your true value.</Text>
-            </VStack>
-            <VStack bg="white" borderRadius="xl" boxShadow="md" p={6} textAlign="center">
-              <Icon as={Clock} w={12} h={12} color={primary} mb={2} />
-              <Heading as="h3" fontSize="lg" fontWeight={600} color={cardFg}>Radical Time Savings</Heading>
-              <Text color={mutedFg} fontSize="sm">Cut down application time from hours to mere minutes. Apply to more opportunities.</Text>
-            </VStack>
-            <VStack bg="white" borderRadius="xl" boxShadow="md" p={6} textAlign="center">
-              <Icon as={Users} w={12} h={12} color={primary} mb={2} />
-              <Heading as="h3" fontSize="lg" fontWeight={600} color={cardFg}>Career Long Companion</Heading>
-              <Text color={mutedFg} fontSize="sm">Your Career Arc™ evolves with you, making each future application stronger and smarter.</Text>
-            </VStack>
-            <VStack bg="white" borderRadius="xl" boxShadow="md" p={6} textAlign="center">
-              <Icon as={Shield} w={12} h={12} color={primary} mb={2} />
-              <Heading as="h3" fontSize="lg" fontWeight={600} color={cardFg}>Your Data, Your Control</Heading>
-              <Text color={mutedFg} fontSize="sm">We prioritize your privacy. Your Career Arc™ is your secure, personal career database.</Text>
-            </VStack>
-          </SimpleGrid>
-        </Box>
-      </Box>
-
-      {/* Testimonials */}
-      <Box py={20} px={4} bg="white">
-        <Box maxW="6xl" mx="auto">
-          <Text textAlign="center" fontSize="2xl" fontWeight={700} color={cardFg} mb={16}>Don't Just Take Our Word For It...</Text>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
-            {/* Testimonials would go here, adapt as needed for Chakra UI */}
-          </SimpleGrid>
-        </Box>
-      </Box>
-
-      {/* Pricing */}
-      <Box id="pricing" py={20} px={4} bg={mutedBg}>
-        <Box maxW="6xl" mx="auto">
-          <Text textAlign="center" fontSize="2xl" fontWeight={700} color={cardFg} mb={16}>Find the Perfect Plan to Launch Your Next Career Move</Text>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
-            {/* Pricing plans would go here, adapt as needed for Chakra UI */}
-          </SimpleGrid>
-          <Text textAlign="center" color={mutedFg} mt={8}>All plans start with a 7-day free trial. Cancel anytime.</Text>
-        </Box>
-      </Box>
-
-      {/* CTA */}
-      <Box py={20} px={4} bg="white">
-        <Box maxW="4xl" mx="auto" textAlign="center">
-          <Heading as="h2" fontSize={{ base: '2xl', md: '4xl' }} fontWeight={700} color={cardFg} mb={8}>Ready to Transform Your Job Search?</Heading>
-          <Text fontSize={{ base: 'lg', md: 'xl' }} color={mutedFg} mb={8}>Stop letting tedious applications hold you back. Join Candidate 5 today and start applying smarter, faster, and with more confidence.</Text>
-          <Button size="lg" bg={primary} color="white" _hover={{ bg: accent }} fontWeight={700} px={8} py={6} borderRadius="md" mb={4}>
-            <HStack gap={2}><span>Sign Up for Your Free Trial Now</span> <ArrowRight size={20} /></HStack>
-          </Button>
-          <Text fontSize="sm" color={mutedFg}>No credit card required for trial. Takes less than 2 minutes to get started.</Text>
-        </Box>
-      </Box>
+      {/* Pricing Section */}
+      <div className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-card-foreground mb-4">
+              Find the Perfect Plan to Launch Your Next Career Move
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+              <h4 className="text-2xl font-bold text-gray-800">Starter</h4>
+              <p className="text-3xl font-bold text-primary">Free</p>
+              <p className="text-gray-600">Build your Career Arc™ and try basic AI CV generation.</p>
+              <Button variant="outline" size="lg" className="w-full hover:bg-gray-100">Get Started</Button>
+            </div>
+            <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md border border-blue-500">
+              <h4 className="text-2xl font-bold text-gray-800">Accelerator</h4>
+              <p className="text-3xl font-bold text-primary">£14.99/mo</p>
+              <p className="text-gray-600">Unlimited tailored applications, advanced AI, and priority support.</p>
+              <Button variant="default" size="lg" className="w-full hover:bg-blue-700">Start Free Trial</Button>
+            </div>
+            <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+              <h4 className="text-2xl font-bold text-gray-800">Dominator</h4>
+              <p className="text-3xl font-bold text-primary">£29.99/mo</p>
+              <p className="text-gray-600">Everything in Accelerator plus 1:1 expert review and early access.</p>
+              <Button variant="outline" size="lg" className="w-full hover:bg-gray-100">Contact Sales</Button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Footer */}
-      <Box as="footer" borderTop="1px" borderColor="#e5e7eb" bg={mutedBg} py={8} px={4}>
-        <Box maxW="7xl" mx="auto" textAlign="center">
-          <Text color={mutedFg}>© 2024 Candidate 5. All rights reserved.</Text>
-        </Box>
-      </Box>
-    </Box>
+      <footer className="border-t border-border/50 bg-background py-8 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-muted-foreground">© 2024 Candidate 5. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
   );
-};
-
-export default CandidateLanding; 
+} 
