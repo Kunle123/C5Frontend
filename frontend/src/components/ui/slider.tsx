@@ -1,3 +1,7 @@
+// @ts-ignore
+// Temporary module declaration for missing types
+declare module '@radix-ui/react-slider';
+
 import * as React from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
 
