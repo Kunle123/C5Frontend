@@ -1,227 +1,244 @@
-import React from 'react';
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Badge } from "./ui/badge";
 import {
-  Box, Flex, Heading, Text, Button, VStack, HStack, Image, Divider, SimpleGrid, Avatar, Stack, Link, useColorModeValue
-} from '@chakra-ui/react';
-import { ArrowRight, Play } from 'lucide-react';
+  ArrowRight,
+  Play,
+  CheckCircle,
+  Zap,
+  Shield,
+  Target,
+  Users,
+  Clock,
+  Star,
+  FileText,
+  Brain,
+  Sparkles
+} from "lucide-react";
 
-const heroImg = 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5';
+const heroImg = "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5";
 
-const CandidateLanding: React.FC = () => {
+export function CandidateLanding() {
   return (
-    <Box bg="#e8edfa" minH="100vh">
-      {/* Header/Nav */}
-      <Box as="header" bg="white" borderBottom="1px solid #e5e7eb" px={{ base: 4, md: 12 }} py={0} position="sticky" top={0} zIndex={100}>
-        <Flex align="center" justify="space-between" h={16}>
-          <HStack spacing={2}>
-            <Image src="/candidate5-logo.svg" alt="Candidate 5 logo" boxSize={7} />
-            <Text fontWeight={700} fontSize="lg" color="#2563eb" letterSpacing="-0.01em">Candidate 5</Text>
-          </HStack>
-          <HStack spacing={0} align="center">
-            <Link href="/" px={4} py={2} fontWeight={600} color="#2563eb" borderBottom="3px solid #2563eb" bg="white">Home</Link>
-            <Link href="/pricing" px={4} py={2} fontWeight={600} color="#1e293b" _hover={{ color: '#2563eb' }}>Pricing</Link>
-            <Link href="/login" px={4} py={2} fontWeight={600} color="#1e293b" _hover={{ color: '#2563eb' }}>Login</Link>
-          </HStack>
-        </Flex>
-      </Box>
-
-      {/* Hero Card */}
-      <Flex justify="center" align="center" py={12} px={2}>
-        <Box bg="white" borderRadius="lg" boxShadow="sm" maxW="900px" w="100%" px={{ base: 4, md: 12 }} py={{ base: 8, md: 12 }} display="flex" flexDir={{ base: 'column', md: 'row' }} alignItems="center" gap={8}>
-          <Box flex={1} minW={0}>
-            <HStack mb={6} spacing={2} align="center">
-              <Image src="/candidate5-logo.svg" alt="Candidate 5 logo" boxSize={6} />
-              <Text fontWeight={700} fontSize="md" color="#2563eb">Candidate 5</Text>
-            </HStack>
-            <Heading as="h1" fontSize={{ base: '2xl', md: '3xl', lg: '3.2rem' }} fontWeight={700} color="#1e293b" mb={4} lineHeight={1.1} letterSpacing="-0.02em" textAlign={{ base: 'left', md: 'left' }}>
-              Land Your Dream Job Faster<br />with AI-Powered CVs
-            </Heading>
-            <Text fontSize={{ base: 'md', md: 'lg' }} color="#64748b" mb={6} maxW="lg">
-              Candidate 5 uses your unique career history—your personal Career Arc™—to craft perfectly tailored CVs and cover letters in minutes.
-            </Text>
-            <HStack spacing={3} mb={2}>
-              <Button
-                color="#fff"
-                bg="#2563eb"
-                _hover={{ bg: '#1e40af' }}
-                size="lg"
-                fontWeight={700}
-                px={6}
-                borderRadius="md"
-                rightIcon={<ArrowRight size={20} />}
-              >
-                Get Started Free
-              </Button>
-              <Button
-                variant="outline"
-                borderColor="#2563eb"
-                color="#2563eb"
-                _hover={{ bg: '#f1f5f9' }}
-                size="lg"
-                fontWeight={700}
-                px={6}
-                borderRadius="md"
-                leftIcon={<Play size={20} />}
-              >
-                See How It Works
-              </Button>
-            </HStack>
-          </Box>
-          <Box flex={1} minW={0} display="flex" justifyContent="center" alignItems="center">
-            <Image src={heroImg} alt="AI Visual" borderRadius="md" boxSize={{ base: '220px', sm: '300px', md: '340px' }} objectFit="cover" />
-          </Box>
-        </Box>
-      </Flex>
+    <div className="min-h-screen bg-background">
+      {/* Navigation */}
+      <nav className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="text-2xl font-bold text-primary">Candidate 5</div>
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#home" className="text-foreground hover:text-primary transition-colors">Home</a>
+              <a href="#pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
+              <Button variant="outline">Login</Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+      {/* Hero Section */}
+      <section className="relative py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <Badge variant="success" className="gap-2">
+                <Sparkles className="h-3 w-3" />
+                AI-Powered Career Growth
+              </Badge>
+              <h1 className="text-5xl lg:text-6xl font-bold text-card-foreground leading-tight">
+                Stop Rewriting, Start <span className="text-primary"> Applying</span>
+              </h1>
+              <p className="text-xl text-muted-foreground leading-relaxed">
+                Land your dream job faster with Candidate 5 - CV. Our AI uses your unique Career Arc™ to craft perfectly tailored CVs and cover letters in minutes.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button size="lg" className="gap-2 text-lg px-8 py-6">
+                  <CheckCircle className="h-5 w-5" />
+                  Create Your Free Account
+                </Button>
+                <Button variant="outline" size="lg" className="gap-2 text-lg px-8 py-6">
+                  <Play className="h-5 w-5" />
+                  See How It Works (60s)
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Join 10,000+ job seekers already optimizing their applications!
+              </p>
+            </div>
+            <div className="relative">
+              <div className="relative bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl p-8 border shadow-elevated">
+                <div className="bg-background rounded-2xl p-6 shadow-card">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-success rounded-full"></div>
+                      <div className="w-3 h-3 bg-warning rounded-full"></div>
+                      <div className="w-3 h-3 bg-destructive rounded-full"></div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-4 bg-muted rounded w-3/4"></div>
+                      <div className="h-4 bg-muted rounded w-full"></div>
+                      <div className="h-4 bg-muted rounded w-1/2"></div>
+                      <div className="h-6 bg-primary/20 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -top-4 -right-4 bg-primary rounded-full p-3 shadow-glow">
+                  <Brain className="h-6 w-6 text-primary-foreground" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Problem Statement Section */}
-      <Box py={12} px={2}>
-        <Heading as="h2" fontSize={{ base: 'xl', md: '2xl' }} fontWeight={700} color="#1e293b" textAlign="center" mb={2}>
+      <div className="py-12 px-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-2">
           Job Applications Are Broken. Candidate 5 Fixes Them.
-        </Heading>
-        <Text fontSize={{ base: 'md', md: 'lg' }} color="#64748b" textAlign="center" maxW="2xl" mx="auto">
+        </h2>
+        <p className="text-md sm:text-lg text-gray-600 text-center max-w-2xl mx-auto">
           Tired of spending hours rewriting your CV for every job? Candidate 5 automates the tedious parts, so you can focus on what matters: acing the interview.
-        </Text>
-      </Box>
+        </p>
+      </div>
 
       {/* Features Section */}
-      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} px={{ base: 4, md: 16 }} mb={16}>
-        <VStack align="center" spacing={4} bg="white" p={6} borderRadius="md" boxShadow="md">
-          <Image src="/brain.svg" alt="AI-Personalized CVs" boxSize={32} />
-          <Heading as="h4" size="md" color="#2563eb">AI-Personalized CVs</Heading>
-          <Text color="#64748b">Go beyond templates. Candidate 5 uses your Career Arc™ to create bespoke applications that reflect your true value.</Text>
-        </VStack>
-        <VStack align="center" spacing={4} bg="white" p={6} borderRadius="md" boxShadow="md">
-          <Image src="/clock.svg" alt="Radical Time Savings" boxSize={32} />
-          <Heading as="h4" size="md" color="#2563eb">Radical Time Savings</Heading>
-          <Text color="#64748b">Cut application time from hours to minutes. Apply to more opportunities with less effort.</Text>
-        </VStack>
-        <VStack align="center" spacing={4} bg="white" p={6} borderRadius="md" boxShadow="md">
-          <Image src="/sparkles.svg" alt="Career Arc™ System" boxSize={32} />
-          <Heading as="h4" size="md" color="#2563eb">Career Arc™ System</Heading>
-          <Text color="#64748b">Your Career Arc™ evolves with you, making each future application stronger and smarter.</Text>
-        </VStack>
-      </SimpleGrid>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 px-4 sm:px-16 mb-16">
+        <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+          <img src="/brain.svg" alt="AI-Personalized CVs" className="w-16 h-16" />
+          <h4 className="text-md font-bold text-primary">AI-Personalized CVs</h4>
+          <p className="text-gray-600">Go beyond templates. Candidate 5 uses your Career Arc™ to create bespoke applications that reflect your true value.</p>
+        </div>
+        <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+          <img src="/clock.svg" alt="Radical Time Savings" className="w-16 h-16" />
+          <h4 className="text-md font-bold text-primary">Radical Time Savings</h4>
+          <p className="text-gray-600">Cut application time from hours to minutes. Apply to more opportunities with less effort.</p>
+        </div>
+        <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+          <img src="/sparkles.svg" alt="Career Arc™ System" className="w-16 h-16" />
+          <h4 className="text-md font-bold text-primary">Career Arc™ System</h4>
+          <p className="text-gray-600">Your Career Arc™ evolves with you, making each future application stronger and smarter.</p>
+        </div>
+      </div>
 
       {/* Process Steps */}
-      <Box px={{ base: 4, md: 16 }} mb={16}>
-        <Heading as="h3" size="lg" mb={8} color="#1e293b" textAlign="center">How It Works</Heading>
-        <SimpleGrid columns={{ base: 1, md: 4 }} spacing={8}>
-          <VStack align="center" spacing={3}>
-            <Image src="/check-circle.svg" alt="1. Paste Job Description" boxSize={32} />
-            <Text fontWeight={700} color="#1e293b">1. Paste Job Description</Text>
-            <Text color="#64748b">Paste the job advert and let our AI extract the key requirements.</Text>
-          </VStack>
-          <VStack align="center" spacing={3}>
-            <Image src="/file-text.svg" alt="2. Build Your Career Arc™" boxSize={32} />
-            <Text fontWeight={700} color="#1e293b">2. Build Your Career Arc™</Text>
-            <Text color="#64748b">Upload your CV or add your experience to create your Career Arc™.</Text>
-          </VStack>
-          <VStack align="center" spacing={3}>
-            <Image src="/zap.svg" alt="3. Generate CV & Cover Letter" boxSize={32} />
-            <Text fontWeight={700} color="#1e293b">3. Generate CV & Cover Letter</Text>
-            <Text color="#64748b">Our AI crafts tailored documents for each application.</Text>
-          </VStack>
-          <VStack align="center" spacing={3}>
-            <Image src="/arrow-right.svg" alt="4. Apply & Track" boxSize={32} />
-            <Text fontWeight={700} color="#1e293b">4. Apply & Track</Text>
-            <Text color="#64748b">Download, apply, and track your applications in one place.</Text>
-          </VStack>
-        </SimpleGrid>
-      </Box>
+      <div className="px-4 sm:px-16 mb-16">
+        <h3 className="text-lg font-bold text-gray-800 text-center mb-8">How It Works</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-8">
+          <div className="flex flex-col items-center text-center">
+            <img src="/check-circle.svg" alt="1. Paste Job Description" className="w-16 h-16" />
+            <h4 className="text-md font-bold text-gray-800">1. Paste Job Description</h4>
+            <p className="text-gray-600">Paste the job advert and let our AI extract the key requirements.</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <img src="/file-text.svg" alt="2. Build Your Career Arc™" className="w-16 h-16" />
+            <h4 className="text-md font-bold text-gray-800">2. Build Your Career Arc™</h4>
+            <p className="text-gray-600">Upload your CV or add your experience to create your Career Arc™.</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <img src="/zap.svg" alt="3. Generate CV & Cover Letter" className="w-16 h-16" />
+            <h4 className="text-md font-bold text-gray-800">3. Generate CV & Cover Letter</h4>
+            <p className="text-gray-600">Our AI crafts tailored documents for each application.</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <img src="/arrow-right.svg" alt="4. Apply & Track" className="w-16 h-16" />
+            <h4 className="text-md font-bold text-gray-800">4. Apply & Track</h4>
+            <p className="text-gray-600">Download, apply, and track your applications in one place.</p>
+          </div>
+        </div>
+      </div>
 
       {/* Advantages Section */}
-      <Box px={{ base: 4, md: 16 }} mb={16}>
-        <Heading as="h3" size="lg" mb={8} color="#1e293b" textAlign="center">Why Choose Candidate 5?</Heading>
-        <SimpleGrid columns={{ base: 1, md: 4 }} spacing={8}>
-          <VStack align="center" spacing={3}>
-            <Image src="/shield.svg" alt="Data Privacy" boxSize={32} />
-            <Text fontWeight={700} color="#1e293b">Data Privacy</Text>
-            <Text color="#64748b">Your data is encrypted and never shared. You have full control.</Text>
-          </VStack>
-          <VStack align="center" spacing={3}>
-            <Image src="/target.svg" alt="ATS Optimized" boxSize={32} />
-            <Text fontWeight={700} color="#1e293b">ATS Optimized</Text>
-            <Text color="#64748b">Beat the bots. Our CVs are designed to pass ATS filters.</Text>
-          </VStack>
-          <VStack align="center" spacing={3}>
-            <Image src="/users.svg" alt="Community Support" boxSize={32} />
-            <Text fontWeight={700} color="#1e293b">Community Support</Text>
-            <Text color="#64748b">Join 10,000+ job seekers already optimizing their applications.</Text>
-          </VStack>
-          <VStack align="center" spacing={3}>
-            <Image src="/star.svg" alt="Proven Results" boxSize={32} />
-            <Text fontWeight={700} color="#1e293b">Proven Results</Text>
-            <Text color="#64748b">15-25% higher conversion rate for sign-ups and interviews.</Text>
-          </VStack>
-        </SimpleGrid>
-      </Box>
+      <div className="px-4 sm:px-16 mb-16">
+        <h3 className="text-lg font-bold text-gray-800 text-center mb-8">Why Choose Candidate 5?</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-8">
+          <div className="flex flex-col items-center text-center">
+            <img src="/shield.svg" alt="Data Privacy" className="w-16 h-16" />
+            <h4 className="text-md font-bold text-gray-800">Data Privacy</h4>
+            <p className="text-gray-600">Your data is encrypted and never shared. You have full control.</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <img src="/target.svg" alt="ATS Optimized" className="w-16 h-16" />
+            <h4 className="text-md font-bold text-gray-800">ATS Optimized</h4>
+            <p className="text-gray-600">Beat the bots. Our CVs are designed to pass ATS filters.</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <img src="/users.svg" alt="Community Support" className="w-16 h-16" />
+            <h4 className="text-md font-bold text-gray-800">Community Support</h4>
+            <p className="text-gray-600">Join 10,000+ job seekers already optimizing their applications.</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <img src="/star.svg" alt="Proven Results" className="w-16 h-16" />
+            <h4 className="text-md font-bold text-gray-800">Proven Results</h4>
+            <p className="text-gray-600">15-25% higher conversion rate for sign-ups and interviews.</p>
+          </div>
+        </div>
+      </div>
 
       {/* Social Proof / Testimonials */}
-      <Box px={{ base: 4, md: 16 }} mb={16}>
-        <Heading as="h3" size="lg" mb={8} color="#1e293b" textAlign="center">What Our Users Say</Heading>
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
-          <VStack align="center" spacing={4} bg="white" p={6} borderRadius="md" boxShadow="md">
-            <Avatar src="https://via.placeholder.com/150" size="lg" name="Sarah K." />
-            <Text fontWeight={700} color="#1e293b">Sarah K.</Text>
-            <Text color="#64748b" fontStyle="italic">“Candidate 5 is a game-changer! I landed three interviews in my first week using it.”</Text>
-            <HStack>
-              {[...Array(5)].map((_, i) => <Image key={i} src="/star.svg" alt="Star" boxSize={18} color="#facc15" fill="#facc15" />)}
-            </HStack>
-          </VStack>
-          <VStack align="center" spacing={4} bg="white" p={6} borderRadius="md" boxShadow="md">
-            <Avatar src="https://via.placeholder.com/150" size="lg" name="James T." />
-            <Text fontWeight={700} color="#1e293b">James T.</Text>
-            <Text color="#64748b" fontStyle="italic">“I used to spend hours on every application. Now it takes minutes and I get more callbacks.”</Text>
-            <HStack>
-              {[...Array(5)].map((_, i) => <Image key={i} src="/star.svg" alt="Star" boxSize={18} color="#facc15" fill="#facc15" />)}
-            </HStack>
-          </VStack>
-          <VStack align="center" spacing={4} bg="white" p={6} borderRadius="md" boxShadow="md">
-            <Avatar src="https://via.placeholder.com/150" size="lg" name="Priya S." />
-            <Text fontWeight={700} color="#1e293b">Priya S.</Text>
-            <Text color="#64748b" fontStyle="italic">“The Career Arc keeps all my experience organized. I feel so much more confident applying!”</Text>
-            <HStack>
-              {[...Array(5)].map((_, i) => <Image key={i} src="/star.svg" alt="Star" boxSize={18} color="#facc15" fill="#facc15" />)}
-            </HStack>
-          </VStack>
-        </SimpleGrid>
-      </Box>
+      <div className="px-4 sm:px-16 mb-16">
+        <h3 className="text-lg font-bold text-gray-800 text-center mb-8">What Our Users Say</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+            <img src="https://via.placeholder.com/150" alt="Sarah K." className="w-16 h-16 rounded-full" />
+            <h4 className="text-md font-bold text-gray-800">Sarah K.</h4>
+            <p className="text-gray-600 italic">"Candidate 5 is a game-changer! I landed three interviews in my first week using it."</p>
+            <div className="flex items-center">
+              {[...Array(5)].map((_, i) => <img key={i} src="/star.svg" alt="Star" className="w-5 h-5 fill-yellow-500" />)}
+            </div>
+          </div>
+          <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+            <img src="https://via.placeholder.com/150" alt="James T." className="w-16 h-16 rounded-full" />
+            <h4 className="text-md font-bold text-gray-800">James T.</h4>
+            <p className="text-gray-600 italic">"I used to spend hours on every application. Now it takes minutes and I get more callbacks."</p>
+            <div className="flex items-center">
+              {[...Array(5)].map((_, i) => <img key={i} src="/star.svg" alt="Star" className="w-5 h-5 fill-yellow-500" />)}
+            </div>
+          </div>
+          <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+            <img src="https://via.placeholder.com/150" alt="Priya S." className="w-16 h-16 rounded-full" />
+            <h4 className="text-md font-bold text-gray-800">Priya S.</h4>
+            <p className="text-gray-600 italic">"The Career Arc keeps all my experience organized. I feel so much more confident applying!"</p>
+            <div className="flex items-center">
+              {[...Array(5)].map((_, i) => <img key={i} src="/star.svg" alt="Star" className="w-5 h-5 fill-yellow-500" />)}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Pricing Section */}
-      <Box px={{ base: 4, md: 16 }} mb={16}>
-        <Heading as="h3" size="lg" mb={8} color="#1e293b" textAlign="center">Pricing</Heading>
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
-          <VStack align="center" spacing={4} bg="white" p={6} borderRadius="md" boxShadow="md">
-            <Text fontWeight={700} fontSize="2xl" color="#1e293b">Starter</Text>
-            <Text fontSize="3xl" fontWeight={700} color="#2563eb">Free</Text>
-            <Text color="#64748b">Build your Career Arc™ and try basic AI CV generation.</Text>
-            <Button colorScheme="brand" variant="outline" w="100%" color="#2563eb" borderColor="#2563eb" _hover={{ bg: '#f1f5f9' }}>Get Started</Button>
-          </VStack>
-          <VStack align="center" spacing={4} bg="white" p={6} borderRadius="md" boxShadow="md" border="2px solid #2563eb">
-            <Text fontWeight={700} fontSize="2xl" color="#1e293b">Accelerator</Text>
-            <Text fontSize="3xl" fontWeight={700} color="#2563eb">£14.99/mo</Text>
-            <Text color="#64748b">Unlimited tailored applications, advanced AI, and priority support.</Text>
-            <Button colorScheme="brand" variant="solid" w="100%" color="#2563eb" bg="#2563eb" _hover={{ bg: '#1e40af' }}>Start Free Trial</Button>
-          </VStack>
-          <VStack align="center" spacing={4} bg="white" p={6} borderRadius="md" boxShadow="md">
-            <Text fontWeight={700} fontSize="2xl" color="#1e293b">Dominator</Text>
-            <Text fontSize="3xl" fontWeight={700} color="#2563eb">£29.99/mo</Text>
-            <Text color="#64748b">Everything in Accelerator plus 1:1 expert review and early access.</Text>
-            <Button colorScheme="brand" variant="outline" w="100%" color="#2563eb" borderColor="#2563eb" _hover={{ bg: '#f1f5f9' }}>Contact Sales</Button>
-          </VStack>
-        </SimpleGrid>
-      </Box>
+      <div className="px-4 sm:px-16 mb-16">
+        <h3 className="text-lg font-bold text-gray-800 text-center mb-8">Pricing</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+            <h4 className="text-2xl font-bold text-gray-800">Starter</h4>
+            <p className="text-3xl font-bold text-primary">Free</p>
+            <p className="text-gray-600">Build your Career Arc™ and try basic AI CV generation.</p>
+            <Button variant="outline" size="lg" className="w-full hover:bg-gray-100">Get Started</Button>
+          </div>
+          <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md border border-blue-500">
+            <h4 className="text-2xl font-bold text-gray-800">Accelerator</h4>
+            <p className="text-3xl font-bold text-primary">£14.99/mo</p>
+            <p className="text-gray-600">Unlimited tailored applications, advanced AI, and priority support.</p>
+            <Button variant="default" size="lg" className="w-full hover:bg-blue-700">Start Free Trial</Button>
+          </div>
+          <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-md">
+            <h4 className="text-2xl font-bold text-gray-800">Dominator</h4>
+            <p className="text-3xl font-bold text-primary">£29.99/mo</p>
+            <p className="text-gray-600">Everything in Accelerator plus 1:1 expert review and early access.</p>
+            <Button variant="outline" size="lg" className="w-full hover:bg-gray-100">Contact Sales</Button>
+          </div>
+        </div>
+      </div>
 
       {/* Footer */}
-      <Box as="footer" bg="navy" color="white" py={8} px={4} textAlign="center">
-        <Text fontWeight={700} fontSize="lg">Candidate 5 &copy; {new Date().getFullYear()}</Text>
-        <HStack justify="center" spacing={6} mt={2}>
-          <Link href="/privacy-policy" color="white" _hover={{ textDecoration: 'underline' }}>Privacy Policy</Link>
-          <Link href="/terms" color="white" _hover={{ textDecoration: 'underline' }}>Terms</Link>
-          <Link href="/faq" color="white" _hover={{ textDecoration: 'underline' }}>FAQ</Link>
-        </HStack>
-      </Box>
-    </Box>
+      <footer className="bg-navy text-white py-8 px-4 text-center">
+        <p className="text-lg font-bold">Candidate 5 &copy; {new Date().getFullYear()}</p>
+        <div className="flex justify-center space-x-6 mt-2">
+          <a href="/privacy-policy" className="text-white hover:underline">Privacy Policy</a>
+          <a href="/terms" className="text-white hover:underline">Terms</a>
+          <a href="/faq" className="text-white hover:underline">FAQ</a>
+        </div>
+      </footer>
+    </div>
   );
-};
+}
 
 export default CandidateLanding; 
