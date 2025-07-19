@@ -79,6 +79,10 @@ const CandidateLanding: React.FC = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   return (
     <Box bg={mutedBg} minH="100vh">
+      {/* DEPLOYMENT VERIFICATION HEADING */}
+      <Box bg={accent} color="white" py={4} textAlign="center">
+        <Heading as="h1" fontSize="3xl" fontWeight={900} letterSpacing="wider">LOVABLE LANDING PAGE TEST</Heading>
+      </Box>
       {/* Navigation */}
       <Box as="nav" bg="white" borderBottom="1px solid #e5e7eb" px={{ base: 4, md: 12 }} py={0} position="sticky" top={0} zIndex={100} boxShadow="sm">
         <Flex align="center" justify="space-between" h={16} maxW="7xl" mx="auto">
