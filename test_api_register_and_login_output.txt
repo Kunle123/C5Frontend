@@ -1,5 +1,0 @@
-
-Register response:
-Internal Server Error
-
-Failed to register or extract token.
