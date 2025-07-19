@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Heading, Text, Input, Button, Link as ChakraLink, Stack, Alert, Spinner, useColorModeValue } from '@chakra-ui/react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FaGoogle, FaLinkedin } from 'react-icons/fa';
 import { login } from '../api';
 
 const Login: React.FC = () => {
@@ -36,6 +37,16 @@ const Login: React.FC = () => {
   // Show message if redirected from protected route
   const params = new URLSearchParams(location.search);
   const showAuthMsg = params.get('reason') === 'auth';
+
+  // Handle OAuth redirect with token in URL
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   return (
     <Box py={8} minH="80vh" display="flex" alignItems="center" justifyContent="center">
@@ -75,6 +86,26 @@ const Login: React.FC = () => {
             </Button>
           </Stack>
         </form>
+        <Stack spacing={3} mt={6}>
+          <Button
+            leftIcon={<FaGoogle />}
+            colorScheme="red"
+            variant="outline"
+            w="100%"
+            onClick={() => window.location.href = 'https://api-gw-production.up.railway.app/auth/google'}
+          >
+            Sign in with Google
+          </Button>
+          <Button
+            leftIcon={<FaLinkedin />}
+            colorScheme="linkedin"
+            variant="outline"
+            w="100%"
+            onClick={() => window.location.href = 'https://api-gw-production.up.railway.app/auth/linkedin'}
+          >
+            Sign in with LinkedIn
+          </Button>
+        </Stack>
         <Text fontSize="sm" textAlign="center" mt={6}>
           Don't have an account?{' '}
           <ChakraLink as={Link} to="/signup" color="brand.500" fontWeight={600} _hover={{ textDecoration: 'underline' }}>

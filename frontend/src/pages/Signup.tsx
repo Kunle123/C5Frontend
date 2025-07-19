@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Heading, Text, Input, Button, Link as ChakraLink, Stack, Alert, useColorModeValue } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaGoogle, FaLinkedin } from 'react-icons/fa';
 import { register } from '../api';
 
 const Signup: React.FC = () => {
@@ -89,6 +90,26 @@ const Signup: React.FC = () => {
             </Text>
           </Stack>
         </form>
+        <Stack spacing={3} mt={6}>
+          <Button
+            leftIcon={<FaGoogle />}
+            colorScheme="red"
+            variant="outline"
+            w="100%"
+            onClick={() => window.location.href = 'https://api-gw-production.up.railway.app/auth/google'}
+          >
+            Sign up with Google
+          </Button>
+          <Button
+            leftIcon={<FaLinkedin />}
+            colorScheme="linkedin"
+            variant="outline"
+            w="100%"
+            onClick={() => window.location.href = 'https://api-gw-production.up.railway.app/auth/linkedin'}
+          >
+            Sign up with LinkedIn
+          </Button>
+        </Stack>
       </Box>
     </Box>
   );
