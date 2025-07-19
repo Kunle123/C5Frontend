@@ -19,23 +19,25 @@ const AccountUnifiedSection: React.FC = () => {
         <Text textAlign="center" color="brown.300" fontSize="lg" mb={8}>
           Manage your profile and subscription preferences
         </Text>
-        <Box bg="white" boxShadow="lg" borderRadius="xl" p={8} mb={10}>
-          <Heading as="h2" size="lg" mb={1} color="brown.600" fontWeight={700}>
-            <span role="img" aria-label="profile">👤</span> Profile Information
-          </Heading>
-          <Text color="brown.300" fontSize="md" mb={6}>
-            Update your personal details and contact information
-          </Text>
-          <ProfileSection />
-        </Box>
-        <Box bg="white" boxShadow="lg" borderRadius="xl" p={8}>
-          <Heading as="h2" size="lg" mb={1} color="brown.600" fontWeight={700}>
-            <span role="img" aria-label="subscription">📄</span> Subscription & Billing
-          </Heading>
-          <Text color="brown.300" fontSize="md" mb={6}>
-            Manage your subscription plan and billing information
-          </Text>
-          <SubscriptionSection />
+        <Box display="flex" flexDirection="column" alignItems="center" gap={8}>
+          <Box bg="white" boxShadow="lg" borderRadius="xl" p={8} mb={0} maxW="600px" w="100%">
+            <Heading as="h2" size="lg" mb={1} color="brown.600" fontWeight={700}>
+              <span role="img" aria-label="profile">👤</span> Profile Information
+            </Heading>
+            <Text color="brown.300" fontSize="md" mb={6}>
+              Update your personal details and contact information
+            </Text>
+            <ProfileSection />
+          </Box>
+          <Box bg="white" boxShadow="lg" borderRadius="xl" p={8} maxW="600px" w="100%">
+            <Heading as="h2" size="lg" mb={1} color="brown.600" fontWeight={700}>
+              <span role="img" aria-label="subscription">📄</span> Subscription & Billing
+            </Heading>
+            <Text color="brown.300" fontSize="md" mb={6}>
+              Manage your subscription plan and billing information
+            </Text>
+            <SubscriptionSection />
+          </Box>
         </Box>
       </Box>
     </Box>
