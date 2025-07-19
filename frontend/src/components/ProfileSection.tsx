@@ -30,7 +30,7 @@ import { useNavigate } from 'react-router-dom';
 const ProfileSection: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', phone: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', address_line1: '', city_state_postal: '', linkedin: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -60,6 +60,9 @@ const ProfileSection: React.FC = () => {
           name: data.name || '',
           email: data.email || '',
           phone: data.phone || '',
+          address_line1: data.address_line1 || '',
+          city_state_postal: data.city_state_postal || '',
+          linkedin: data.linkedin || '',
         });
         setError('');
       })
@@ -77,6 +80,9 @@ const ProfileSection: React.FC = () => {
       name: user?.name || '',
       email: user?.email || '',
       phone: user?.phone || '',
+      address_line1: user?.address_line1 || '',
+      city_state_postal: user?.city_state_postal || '',
+      linkedin: user?.linkedin || '',
     });
     setError('');
     setSuccess('');
@@ -168,6 +174,14 @@ const ProfileSection: React.FC = () => {
             <FormLabel fontSize="md">Name</FormLabel>
             <Input name="name" value={form.name} onChange={handleChange} disabled={!editMode} fontSize="md" />
           </FormControl>
+          <FormControl isDisabled={!editMode}>
+            <FormLabel fontSize="md">Address Line 1</FormLabel>
+            <Input name="address_line1" value={form.address_line1} onChange={handleChange} disabled={!editMode} fontSize="md" />
+          </FormControl>
+          <FormControl isDisabled={!editMode}>
+            <FormLabel fontSize="md">City, State/Province, Postal Code</FormLabel>
+            <Input name="city_state_postal" value={form.city_state_postal} onChange={handleChange} disabled={!editMode} fontSize="md" />
+          </FormControl>
           <FormControl isDisabled={!editMode} isRequired>
             <FormLabel fontSize="md">Email</FormLabel>
             <Input name="email" value={form.email} onChange={handleChange} disabled={!editMode} fontSize="md" />
@@ -189,6 +203,10 @@ const ProfileSection: React.FC = () => {
             {!isPhoneValid && (
               <Text fontSize="xs" color="red.500">Phone number must be in international format, e.g. +447966461005</Text>
             )}
+          </FormControl>
+          <FormControl isDisabled={!editMode}>
+            <FormLabel fontSize="md">LinkedIn Profile</FormLabel>
+            <Input name="linkedin" value={form.linkedin} onChange={handleChange} disabled={!editMode} fontSize="md" />
           </FormControl>
           <HStack spacing={2} wrap="wrap" justify="center">
             {!editMode ? (
