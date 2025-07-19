@@ -26,6 +26,7 @@ import FAQ from './pages/FAQ';
 import DebugCVAIResponse from './pages/DebugCVAIResponse';
 import CareerArkV2 from './pages/CareerArkV2';
 import SearchJobs from './pages/SearchJobs';
+import CandidateLanding from './components/CandidateLanding';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -65,7 +66,7 @@ function App() {
         <Layout>
           <Box maxW="container.lg" mx="auto">
             <Routes>
-              <Route path="/" element={<HighConvertingLanding />} />
+              <Route path="/" element={<CandidateLanding />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -86,7 +87,7 @@ function App() {
               <Route path="/career-ark-demo" element={<CareerArkDemo />} />
               <Route path="/debug-cv-ai" element={<DebugCVAIResponse />} />
               <Route path="/career-ark-v2" element={<ProtectedRoute><CareerArkV2 /></ProtectedRoute>} />
-              <Route path="/search-jobs" element={<SearchJobs />} />
+              <Route path="ke to see th/search-jobs" element={<SearchJobs />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Box>
