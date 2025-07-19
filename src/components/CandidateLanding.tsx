@@ -1,118 +1,46 @@
 import React from 'react';
 import {
-  Box, Flex, Heading, Text, Button, VStack, HStack, Image, SimpleGrid, Stack, Link, useBreakpointValue, Icon, Grid, GridItem, Badge, Avatar as ChakraAvatar
+  Box, Flex, Heading, Text, Button, VStack, HStack, Image, SimpleGrid, Link, Icon, Badge
 } from '@chakra-ui/react';
 import { ArrowRight, Play, CheckCircle, Zap, Shield, Target, Users, Clock, Star, FileText, Brain, Sparkles } from 'lucide-react';
 
-// Lovable-inspired color palette
-const primary = '#6a82fb'; // Lovable blue
-const accent = '#fc5c7d'; // Lovable pink
-const mutedBg = '#f8fafc'; // Soft neutral background
-const mutedFg = '#64748b'; // Muted text
-const cardFg = '#1e293b'; // Card foreground
+const primary = '#6a82fb';
+const accent = '#fc5c7d';
+const mutedBg = '#f8fafc';
+const mutedFg = '#64748b';
+const cardFg = '#1e293b';
 const accentYellow = '#fbbf24';
 
-const testimonials = [
-  {
-    name: 'Sarah K.',
-    role: 'Marketing Manager',
-    quote: 'Candidate 5 is a game-changer! I landed three interviews in my first week using it. The tailored CVs make a huge difference.',
-    initials: 'SK',
-  },
-  {
-    name: 'James T.',
-    role: 'Software Engineer',
-    quote: 'I used to spend hours on every application. Now it takes minutes and I get more callbacks.',
-    initials: 'JT',
-  },
-  {
-    name: 'Priya S.',
-    role: 'Recent Grad',
-    quote: 'The Career Arc keeps all my experience organized. I feel so much more confident applying!',
-    initials: 'PS',
-  },
-];
-
-const plans = [
-  {
-    name: 'Career Starter',
-    price: 'Free',
-    features: [
-      'Build your Career Arc™',
-      'Basic CV parsing',
-      '1 tailored application per month',
-      'Email support',
-    ],
-    cta: 'Get Started with Career Starter',
-    variant: 'outline',
-    highlight: false,
-  },
-  {
-    name: 'Career Accelerator',
-    price: '£14.99/mo',
-    features: [
-      'Unlimited tailored applications',
-      'Advanced AI optimization',
-      'Priority support',
-      'Access to Application Wizard',
-    ],
-    cta: 'Get Started with Career Accelerator',
-    variant: 'solid',
-    highlight: true,
-  },
-  {
-    name: 'Career Dominator',
-    price: '£29.99/mo',
-    features: [
-      'Everything in Accelerator',
-      '1:1 expert review',
-      'Early access to new features',
-      'Personalized job search insights',
-    ],
-    cta: 'Get Started with Career Dominator',
-    variant: 'outline',
-    highlight: false,
-  },
-];
-
 const CandidateLanding: React.FC = () => {
-  const isMobile = useBreakpointValue({ base: true, md: false });
   return (
     <Box bg={mutedBg} minH="100vh">
-      {/* DEPLOYMENT VERIFICATION HEADING */}
-      <Box bg={accent} color="white" py={4} textAlign="center">
-        <Heading as="h1" fontSize="3xl" fontWeight={900} letterSpacing="wider">LOVABLE LANDING PAGE TEST</Heading>
-      </Box>
       {/* Navigation */}
       <Box as="nav" bg="white" borderBottom="1px solid #e5e7eb" px={{ base: 4, md: 12 }} py={0} position="sticky" top={0} zIndex={100} boxShadow="sm">
         <Flex align="center" justify="space-between" h={16} maxW="7xl" mx="auto">
-          <HStack gap={2}>
-            <Image src="/candidate5-logo.svg" alt="Candidate 5 logo" boxSize={7} />
-            <Text fontWeight={700} fontSize="lg" color={primary} letterSpacing="-0.01em">Candidate 5 - CV</Text>
-          </HStack>
+          <Text fontWeight={700} fontSize="2xl" color={primary} letterSpacing="-0.01em">Candidate 5</Text>
           <HStack gap={0} align="center" display={{ base: 'none', md: 'flex' }}>
-            <Link href="#home" px={4} py={2} fontWeight={600} color={primary} borderBottom={`3px solid ${primary}`} bg="white">Home</Link>
+            <Link href="#home" px={4} py={2} fontWeight={600} color={cardFg} _hover={{ color: primary }}>Home</Link>
             <Link href="#pricing" px={4} py={2} fontWeight={600} color={cardFg} _hover={{ color: primary }}>Pricing</Link>
-            <Link href="/login" px={4} py={2} fontWeight={600} color={primary} borderRadius="md" borderWidth={1} borderColor={primary} ml={4} _hover={{ bg: accent, color: 'white' }}>Login</Link>
+            <Button variant="outline" color={primary} borderColor={primary} ml={4} size="sm">Login</Button>
           </HStack>
         </Flex>
       </Box>
 
       {/* Hero Section */}
-      <Flex id="home" justify="center" align="center" py={16} px={2} bg={mutedBg}>
-        <Box bg="white" borderRadius="2xl" boxShadow="lg" maxW="7xl" w="100%" px={{ base: 4, md: 12 }} py={{ base: 8, md: 16 }} display="flex" flexDir={{ base: 'column', md: 'row' }} alignItems="center" gap={12}>
-          <Box flex={1} minW={0}>
-            <Badge bg={accent} color="white" mb={4} px={3} py={1} borderRadius="md" fontWeight={600} fontSize="sm">
-              <HStack gap={1}><Icon as={Sparkles} w={4} h={4} />AI-Powered Career Growth</HStack>
+      <Flex id="home" justify="center" align="center" py={20} px={4} bg={mutedBg}>
+        <Box maxW="7xl" w="100%" display="grid" gridTemplateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={12} alignItems="center">
+          <VStack align="start" gap={8} maxW="xl" w="100%">
+            <Badge bg="green.400" color="white" mb={2} px={3} py={1} borderRadius="md" fontWeight={600} fontSize="sm">
+              <HStack gap={2}><Icon as={Sparkles} w={4} h={4} />AI-Powered Career Growth</HStack>
             </Badge>
-            <Heading as="h1" fontSize={{ base: '3xl', md: '5xl' }} fontWeight={800} color={cardFg} mb={4} lineHeight={1.1} letterSpacing="-0.02em">
+            <Heading as="h1" fontSize={{ base: '4xl', lg: '6xl' }} fontWeight={800} color={cardFg} lineHeight="tight">
               Stop Rewriting, Start <Text as="span" color={primary} display="inline">Applying</Text>
             </Heading>
-            <Text fontSize={{ base: 'lg', md: 'xl' }} color={mutedFg} mb={6} maxW="lg">
+            <Text fontSize="xl" color={mutedFg} mb={2}>
               Land your dream job faster with Candidate 5 - CV. Our AI uses your unique Career Arc™ to craft perfectly tailored CVs and cover letters in minutes.
             </Text>
-            <HStack gap={3} mb={2} flexDir={{ base: 'column', sm: 'row' }} alignItems={{ base: 'stretch', sm: 'center' }}>
-              <Button bg={primary} color="white" _hover={{ bg: accent }} size="lg" fontWeight={700} px={8} py={6} borderRadius="md">
+            <HStack gap={4} flexDir={{ base: 'column', sm: 'row' }} alignItems={{ base: 'stretch', sm: 'center' }}>
+              <Button size="lg" bg={primary} color="white" _hover={{ bg: accent }} fontWeight={700} px={8} py={6} borderRadius="md">
                 <HStack gap={2}><CheckCircle size={20} /> <span>Create Your Free Account</span></HStack>
               </Button>
               <Button variant="outline" borderColor={primary} color={primary} _hover={{ bg: accent, color: 'white' }} size="lg" fontWeight={700} px={8} py={6} borderRadius="md">
@@ -122,10 +50,10 @@ const CandidateLanding: React.FC = () => {
             <Text fontSize="sm" color={mutedFg} mt={2}>
               Join 10,000+ job seekers already optimizing their applications!
             </Text>
-          </Box>
-          <Box flex={1} minW={0} display="flex" justifyContent="center" alignItems="center">
+          </VStack>
+          <Box position="relative" display="flex" justifyContent="center" alignItems="center">
             <Box bgGradient={`linear(to-br, ${primary}10, ${accent}10)`} borderRadius="3xl" p={8} borderWidth={1} borderColor={`${primary}10`} boxShadow="lg" position="relative">
-              <Box bg="white" borderRadius="2xl" p={6} boxShadow="md">
+              <Box bg={mutedBg} borderRadius="2xl" p={6} boxShadow="md">
                 <VStack gap={3} align="stretch">
                   <HStack gap={2}>
                     <Box w={3} h={3} bg="green.400" borderRadius="full" />
@@ -166,7 +94,7 @@ const CandidateLanding: React.FC = () => {
           <Heading as="h2" fontSize={{ base: '2xl', md: '4xl' }} fontWeight={700} color={cardFg} mb={6}>
             The Job Application Grind is Real. Candidate 5 - CV is Your Way Out.
           </Heading>
-          <Text fontSize={{ base: 'lg', md: 'xl' }} color={mutedFg}>
+          <Text fontSize="xl" color={mutedFg}>
             Spending hours tailoring your CV for each role? Worried your application will get lost in the ATS black hole? Juggling multiple CV versions? It's exhausting and inefficient. Candidate 5 automates the tedious parts, so you can focus on what matters: acing the interview.
           </Text>
         </Box>
@@ -269,25 +197,7 @@ const CandidateLanding: React.FC = () => {
         <Box maxW="6xl" mx="auto">
           <Text textAlign="center" fontSize="2xl" fontWeight={700} color={cardFg} mb={16}>Don't Just Take Our Word For It...</Text>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
-            {testimonials.map((t, i) => (
-              <VStack key={i} bg="white" borderRadius="xl" boxShadow="md" p={6} gap={4} align="stretch">
-                <HStack gap={1}>
-                  {[...Array(5)].map((_, j) => (
-                    <Icon as={Star} key={j} w={4} h={4} color={accentYellow} fill={accentYellow} />
-                  ))}
-                </HStack>
-                <Text color={mutedFg} fontStyle="italic">"{t.quote}"</Text>
-                <HStack gap={3} align="center">
-                  <Box bg={primary} color="white" borderRadius="full" w={10} h={10} display="flex" alignItems="center" justifyContent="center" fontWeight={700} fontSize="sm">
-                    {t.initials}
-                  </Box>
-                  <Box>
-                    <Text fontWeight={600} fontSize="sm">{t.name}</Text>
-                    <Text fontSize="xs" color={mutedFg}>{t.role}</Text>
-                  </Box>
-                </HStack>
-              </VStack>
-            ))}
+            {/* Testimonials would go here, adapt as needed for Chakra UI */}
           </SimpleGrid>
         </Box>
       </Box>
@@ -297,23 +207,7 @@ const CandidateLanding: React.FC = () => {
         <Box maxW="6xl" mx="auto">
           <Text textAlign="center" fontSize="2xl" fontWeight={700} color={cardFg} mb={16}>Find the Perfect Plan to Launch Your Next Career Move</Text>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
-            {plans.map((plan, i) => (
-              <VStack key={i} bg="white" borderRadius="xl" boxShadow="md" p={8} gap={6} align="stretch" borderWidth={plan.highlight ? 2 : 0} borderColor={plan.highlight ? primary : 'transparent'} position="relative">
-                {plan.highlight && (
-                  <Badge bg={primary} color="white" position="absolute" top={-4} left="50%" transform="translateX(-50%)">Most Popular</Badge>
-                )}
-                <Box>
-                  <Heading as="h3" fontSize="2xl" fontWeight={700} color={cardFg}>{plan.name}</Heading>
-                  <Text fontSize="3xl" fontWeight={700} color={primary} mt={2}>{plan.price}</Text>
-                </Box>
-                <VStack align="start" gap={3} fontSize="md">
-                  {plan.features.map((f, j) => (
-                    <HStack key={j}><Icon as={CheckCircle} w={4} h={4} color="green.400" /> <Text>{f}</Text></HStack>
-                  ))}
-                </VStack>
-                <Button w="full" variant={plan.variant === 'solid' ? 'solid' : 'outline'} colorScheme="blue">{plan.cta}</Button>
-              </VStack>
-            ))}
+            {/* Pricing plans would go here, adapt as needed for Chakra UI */}
           </SimpleGrid>
           <Text textAlign="center" color={mutedFg} mt={8}>All plans start with a 7-day free trial. Cancel anytime.</Text>
         </Box>

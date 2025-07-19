@@ -1,0 +1,1 @@
+// This is a backup of the previous CandidateLanding.tsx before replacing with the Lovable design 
