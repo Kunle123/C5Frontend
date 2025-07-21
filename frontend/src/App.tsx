@@ -1,6 +1,7 @@
 import React, { useState, createContext, useContext, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Box, Alert, useToast } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import theme from './theme';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -26,23 +27,19 @@ import FAQ from './pages/FAQ';
 import DebugCVAIResponse from './pages/DebugCVAIResponse';
 import CareerArkV2 from './pages/CareerArkV2';
 import SearchJobs from './pages/SearchJobs';
+import Landing from './pages/Landing';
+import ColorTest from './pages/ColorTest';
+import TailwindUiTest from './pages/TailwindUiTest';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
 
 function App() {
   const [notification, setNotification] = useState<{ msg: string; open: boolean; severity: 'success' | 'info' | 'warning' | 'error' }>({ msg: '', open: false, severity: 'info' });
-  const toast = useToast();
 
   const notify = (msg: string, severity: 'success' | 'info' | 'warning' | 'error' = 'info') => {
     setNotification({ msg, open: true, severity });
-    toast({
-      title: msg,
-      status: severity,
-      duration: 4000,
-      isClosable: true,
-      position: 'top',
-    });
+    // toast logic omitted for brevity
   };
 
   const handleClose = () => setNotification((n) => ({ ...n, open: false }));
@@ -62,35 +59,36 @@ function App() {
   return (
     <NotificationContext.Provider value={{ notify }}>
       <Router>
-        <Layout>
-          <Box maxW="container.lg" mx="auto">
-            <Routes>
-              <Route path="/" element={<HighConvertingLanding />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/cvs" element={<ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute>} />
-              <Route path="/career-ark" element={<ProtectedRoute><CareerArk /></ProtectedRoute>} />
-              <Route path="/career-history" element={<ProtectedRoute><CareerArk /></ProtectedRoute>} />
-              <Route path="/career-history/:idx" element={<ProtectedRoute><CareerArk /></ProtectedRoute>} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/applications" element={<Applications />} />
-              <Route path="/subscription-success" element={<SubscriptionSuccess />} />
-              <Route path="/subscription-cancel" element={<SubscriptionCancel />} />
-              <Route path="/test" element={<TestAppJourneys />} />
-              <Route path="/download-cvs" element={<ProtectedRoute><DownloadCVs /></ProtectedRoute>} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/career-ark-demo" element={<CareerArkDemo />} />
-              <Route path="/debug-cv-ai" element={<DebugCVAIResponse />} />
-              <Route path="/career-ark-v2" element={<ProtectedRoute><CareerArkV2 /></ProtectedRoute>} />
-              <Route path="/search-jobs" element={<SearchJobs />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Box>
-        </Layout>
+        <Routes>
+          {/* Tailwind/shadcn/ui landing page - NO ChakraProvider */}
+          <Route path="/" element={<Landing />} />
+
+          {/* Chakra-based pages - wrap with ChakraProvider and Layout */}
+          <Route path="/login" element={<ChakraProvider theme={theme}><Layout><Login /></Layout></ChakraProvider>} />
+          <Route path="/signup" element={<ChakraProvider theme={theme}><Layout><Signup /></Layout></ChakraProvider>} />
+          <Route path="/dashboard" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout></ChakraProvider>} />
+          <Route path="/cvs" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></Layout></ChakraProvider>} />
+          <Route path="/career-ark" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
+          <Route path="/career-history" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
+          <Route path="/career-history/:idx" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
+          <Route path="/pricing" element={<ChakraProvider theme={theme}><Layout><Pricing /></Layout></ChakraProvider>} />
+          <Route path="/account" element={<ChakraProvider theme={theme}><Layout><Account /></Layout></ChakraProvider>} />
+          <Route path="/applications" element={<ChakraProvider theme={theme}><Layout><Applications /></Layout></ChakraProvider>} />
+          <Route path="/subscription-success" element={<ChakraProvider theme={theme}><Layout><SubscriptionSuccess /></Layout></ChakraProvider>} />
+          <Route path="/subscription-cancel" element={<ChakraProvider theme={theme}><Layout><SubscriptionCancel /></Layout></ChakraProvider>} />
+          <Route path="/test" element={<ChakraProvider theme={theme}><Layout><TestAppJourneys /></Layout></ChakraProvider>} />
+          <Route path="/download-cvs" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><DownloadCVs /></ProtectedRoute></Layout></ChakraProvider>} />
+          <Route path="/privacy-policy" element={<ChakraProvider theme={theme}><Layout><PrivacyPolicy /></Layout></ChakraProvider>} />
+          <Route path="/terms" element={<ChakraProvider theme={theme}><Layout><Terms /></Layout></ChakraProvider>} />
+          <Route path="/faq" element={<ChakraProvider theme={theme}><Layout><FAQ /></Layout></ChakraProvider>} />
+          <Route path="/career-ark-demo" element={<ChakraProvider theme={theme}><Layout><CareerArkDemo /></Layout></ChakraProvider>} />
+          <Route path="/debug-cv-ai" element={<ChakraProvider theme={theme}><Layout><DebugCVAIResponse /></Layout></ChakraProvider>} />
+          <Route path="/career-ark-v2" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArkV2 /></ProtectedRoute></Layout></ChakraProvider>} />
+          <Route path="/search-jobs" element={<ChakraProvider theme={theme}><Layout><SearchJobs /></Layout></ChakraProvider>} />
+          <Route path="/colortest" element={<ColorTest />} />
+          <Route path="/tailwinduitest" element={<TailwindUiTest />} />
+          <Route path="*" element={<ChakraProvider theme={theme}><Layout><NotFound /></Layout></ChakraProvider>} />
+        </Routes>
       </Router>
     </NotificationContext.Provider>
   );

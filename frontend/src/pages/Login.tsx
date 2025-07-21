@@ -1,89 +1,46 @@
-import React, { useState } from 'react';
-import { Box, Heading, Text, Input, Button, Link as ChakraLink, Stack, Alert, Spinner, useColorModeValue } from '@chakra-ui/react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { login } from '../api';
+import { useState } from 'react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Link } from 'react-router-dom';
 
-const Login: React.FC = () => {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const cardShadow = useColorModeValue('md', 'dark-lg');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const res = await login({ email, password });
-      localStorage.setItem('token', res.token);
-      navigate('/dashboard');
-    } catch (err: any) {
-      let msg = 'Login failed';
-      if (err?.error) msg = err.error;
-      if (err?.detail) msg = err.detail;
-      if (typeof err === 'string') msg = err;
-      setError(msg);
-      console.log('Login error:', err);
-    } finally {
-      setLoading(false);
+    // TODO: Implement login logic
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return;
     }
+    setError('');
+    // ...login logic
   };
 
-  // Show message if redirected from protected route
-  const params = new URLSearchParams(location.search);
-  const showAuthMsg = params.get('reason') === 'auth';
-
   return (
-    <Box py={8} minH="80vh" display="flex" alignItems="center" justifyContent="center">
-      <Box bg={cardBg} boxShadow={cardShadow} p={8} maxW={400} w="100%" borderRadius="xl">
-        <Heading as="h1" size="md" color="red.500" mb={2} textAlign="center">PAGE: Login</Heading>
-        <Heading as="h1" size="lg" textAlign="center" fontWeight={700} mb={6}>
-          Login
-        </Heading>
-        {showAuthMsg && <Alert status="warning" mb={2}>You must be logged in to access this page.</Alert>}
-        {error && <Alert status="error" mb={2}>{error}</Alert>}
-        <form onSubmit={handleSubmit}>
-          <Stack spacing={4}>
-            <Box>
-              <Text mb={1} fontWeight={600}>Email</Text>
-              <Input
-                placeholder="Email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </Box>
-            <Box>
-              <Text mb={1} fontWeight={600}>Password</Text>
-              <Input
-                placeholder="Password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
-            </Box>
-            <Button type="submit" colorScheme="brand" size="lg" fontWeight={700} isLoading={loading} loadingText="Logging in" w="100%">
-              Login
-            </Button>
-          </Stack>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="w-full max-w-md bg-card shadow-card rounded-xl p-8 space-y-6">
+        <h2 className="text-3xl font-bold text-center text-card-foreground mb-2">Sign in to your account</h2>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-1">Email address</label>
+            <Input id="email" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full" />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-muted-foreground mb-1">Password</label>
+            <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full" />
+          </div>
+          {error && <div className="text-destructive text-sm">{error}</div>}
+          <Button type="submit" className="w-full mt-2">Sign in</Button>
         </form>
-        <Text fontSize="sm" textAlign="center" mt={6}>
-          Don't have an account?{' '}
-          <ChakraLink as={Link} to="/signup" color="brand.500" fontWeight={600} _hover={{ textDecoration: 'underline' }}>
-            Sign up
-          </ChakraLink>
-        </Text>
-      </Box>
-    </Box>
+        <div className="flex justify-between items-center mt-4">
+          <Link to="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
+          <span className="text-sm text-muted-foreground">or</span>
+          <Link to="/signup" className="text-sm text-primary hover:underline">Create an account</Link>
+        </div>
+      </div>
+    </div>
   );
-};
-
-export default Login; 
+} 
