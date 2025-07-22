@@ -34,7 +34,7 @@ interface Experience {
   startDate: string;
   endDate: string;
   current: boolean;
-  description: string;
+  description: string[];
   achievements: string[];
   skills: string[];
 }
@@ -53,25 +53,30 @@ export function CareerArcPage() {
       .then(data => {
         console.log('API work_experience:', data.work_experience); // TEMP LOG
         const exp = (data.work_experience || []).map((item: any) => {
-          let achievements: string[] = [];
-          if (Array.isArray(item.responsibilities)) {
-            achievements = item.responsibilities;
+          // Ensure description and skills are arrays
+          let description: string[] = [];
+          if (Array.isArray(item.description)) {
+            description = item.description;
           } else if (typeof item.description === 'string' && item.description.trim().length > 0) {
-            achievements = item.description.split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean);
-          } else if (Array.isArray(item.achievements)) {
-            achievements = item.achievements;
+            description = item.description.split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean);
+          }
+          let skills: string[] = [];
+          if (Array.isArray(item.skills)) {
+            skills = item.skills;
+          } else if (typeof item.skills === 'string' && item.skills.trim().length > 0) {
+            skills = item.skills.split(',').map((s: string) => s.trim()).filter(Boolean);
           }
           return {
             id: item.id,
             title: item.positionTitle || item.title || '',
             company: item.companyName || item.company || '',
             location: item.location || '',
-            startDate: item.startDate || item.start_date || '',
-            endDate: item.endDate || item.end_date || 'Present',
-            current: !(item.endDate || item.end_date),
-            description: item.description || '',
-            achievements,
-            skills: item.skills || [],
+            startDate: item.startDate || (item as any)?.start_date || '',
+            endDate: item.endDate || (item as any)?.end_date || 'Present',
+            current: !(item.endDate || (item as any)?.end_date),
+            description,
+            achievements: description, // Use description for bullets
+            skills,
           };
         });
         setExperiences(exp);
@@ -121,7 +126,11 @@ export function CareerArcPage() {
         startDate: "2022-01",
         endDate: "2023-12",
         current: false,
-        description: "",
+        description: [
+          "Successfully imported from CV",
+          "Experience details extracted automatically",
+          "Ready for editing and customization"
+        ],
         achievements: [
           "Successfully imported from CV",
           "Experience details extracted automatically",
@@ -429,17 +438,25 @@ interface ExperienceDialogProps {
 }
 
 function ExperienceDialog({ experience, onSave }: ExperienceDialogProps) {
-  const [formData, setFormData] = useState<Partial<Experience>>({
+  const [formData, setFormData] = useState<Partial<Experience> & { description: string[]; skills: string[] }>({
     title: "",
     company: "",
     location: "",
     startDate: "",
     endDate: "",
     current: false,
-    description: "",
     achievements: [],
-    skills: [],
-    ...experience
+    description: Array.isArray(experience?.description)
+      ? experience?.description
+      : String(experience?.description || '').trim().length > 0
+        ? String(experience?.description || '').split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean)
+        : [],
+    skills: Array.isArray(experience?.skills)
+      ? experience?.skills
+      : String(experience?.skills || '').trim().length > 0
+        ? String(experience?.skills || '').split(',').map((s: string) => s.trim()).filter(Boolean)
+        : [],
+    ...experience,
   });
 
   useEffect(() => {
@@ -467,9 +484,19 @@ function ExperienceDialog({ experience, onSave }: ExperienceDialogProps) {
       startDate: formatMonth(experience?.startDate || (experience as any)?.start_date),
       endDate: formatMonth(experience?.endDate || (experience as any)?.end_date),
       current: experience?.current || false,
-      description: experience?.description || "",
-      achievements: experience?.achievements || [],
-      skills: experience?.skills || [],
+      // Always use array for description
+      description: Array.isArray(experience?.description)
+        ? experience?.description
+        : String(experience?.description || '').trim().length > 0
+          ? String(experience?.description || '').split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean)
+          : [],
+      achievements: [], // not used
+      // Always use array for skills
+      skills: Array.isArray(experience?.skills)
+        ? experience?.skills
+        : String(experience?.skills || '').trim().length > 0
+          ? String(experience?.skills || '').split(',').map((s: string) => s.trim()).filter(Boolean)
+          : [],
     });
   }, [experience]);
 
@@ -558,8 +585,11 @@ function ExperienceDialog({ experience, onSave }: ExperienceDialogProps) {
           <Label htmlFor="description">Description</Label>
           <Textarea
             id="description"
-            value={formData.description}
-            onChange={(e) => setFormData({...formData, description: e.target.value})}
+            value={Array.isArray(formData.description) ? formData.description.join('\n') : ''}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({
+              ...formData,
+              description: (e.target.value || '').split('\n').map((s: string) => s.trim()).filter(Boolean)
+            })}
             placeholder="Describe your role and responsibilities..."
             rows={3}
           />
