@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getArcData, updateWorkExperience, deleteWorkExperience } from "@/api/careerArkApi";
+import { getArcData, updateWorkExperience, deleteWorkExperience, uploadCV } from "@/api/careerArkApi";
 
 interface Experience {
   id: string;
@@ -47,6 +47,7 @@ export function CareerArcPage() {
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
   const [refreshFlag, setRefreshFlag] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getArcData()
@@ -106,53 +107,50 @@ export function CareerArcPage() {
   };
 
   const handleImportCV = async () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.value = '';
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
     setIsImporting(true);
-    
-    toast({
-      title: "Starting CV import",
-      description: "Processing your CV file...",
-    });
-
+    toast({ title: "Starting CV import", description: "Uploading and processing your CV file..." });
     try {
-      // Simulate CV processing time
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Mock imported experience
-      const importedExperience: Experience = {
-        id: Date.now().toString(),
-        title: "Imported Position",
-        company: "Imported Company",
-        location: "Remote",
-        startDate: "2022-01",
-        endDate: "2023-12",
-        current: false,
-        description: [
-          "Successfully imported from CV",
-          "Experience details extracted automatically",
-          "Ready for editing and customization"
-        ],
-        achievements: [
-          "Successfully imported from CV",
-          "Experience details extracted automatically",
-          "Ready for editing and customization"
-        ],
-        skills: ["CV Import", "Data Processing", "Automation"]
+      const uploadRes = await uploadCV(file);
+      const taskId = uploadRes.taskId;
+      // Poll for extraction completion
+      let pollCount = 0;
+      const poll = async () => {
+        try {
+          const statusRes = await fetch(`/api/arc/cv/${taskId}/status`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+          });
+          const statusData = await statusRes.json();
+          if (statusData.status === 'completed') {
+            setIsImporting(false);
+            setRefreshFlag(f => f + 1);
+            toast({ title: "CV imported successfully", description: "New experience has been added to your Career Arc™." });
+          } else if (statusData.status === 'failed') {
+            setIsImporting(false);
+            toast({ title: "Import failed", description: statusData.error || 'CV extraction failed.', variant: 'destructive' });
+          } else if (pollCount < 30) {
+            setTimeout(poll, 2000);
+            pollCount++;
+          } else {
+            setIsImporting(false);
+            toast({ title: "Import timed out", description: 'CV extraction timed out.', variant: 'destructive' });
+          }
+        } catch (err) {
+          setIsImporting(false);
+          toast({ title: "Import failed", description: 'Error polling extraction status.', variant: 'destructive' });
+        }
       };
-
-      setExperiences(prev => [importedExperience, ...prev]);
-      
-      toast({
-        title: "CV imported successfully",
-        description: "New experience has been added to your Career Arc™.",
-      });
-    } catch (error) {
-      toast({
-        title: "Import failed",
-        description: "There was an error processing your CV. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
+      poll();
+    } catch (error: any) {
       setIsImporting(false);
+      toast({ title: "Import failed", description: error?.message || 'There was an error processing your CV.', variant: 'destructive' });
     }
   };
 
@@ -240,6 +238,7 @@ export function CareerArcPage() {
               )}
               {isImporting ? "Importing..." : "Import CV"}
             </Button>
+            <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} accept=".pdf,.doc,.docx" />
           </div>
         </div>
 
