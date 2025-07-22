@@ -50,16 +50,17 @@ export function CareerArcPage() {
   useEffect(() => {
     getArcData()
       .then(data => {
+        console.log('API work_experience:', data.work_experience); // TEMP LOG
         const exp = (data.work_experience || []).map((item: any) => ({
           id: item.id,
-          title: item.positionTitle,
-          company: item.companyName,
-          location: item.location || "",
-          startDate: item.startDate,
-          endDate: item.endDate || "Present",
-          current: !item.endDate,
-          description: item.description || "",
-          achievements: item.responsibilities || [],
+          title: item.positionTitle || item.title || '',
+          company: item.companyName || item.company || '',
+          location: item.location || '',
+          startDate: item.startDate || item.start_date || '',
+          endDate: item.endDate || item.end_date || 'Present',
+          current: !(item.endDate || item.end_date),
+          description: item.description || '',
+          achievements: item.responsibilities || item.achievements || [],
           skills: item.skills || [],
         }));
         setExperiences(exp);
