@@ -10,6 +10,7 @@ import SocialAuthButton from "@/components/auth/SocialAuthButton";
 import CaptchaComponent, { CaptchaRef } from "@/components/auth/CaptchaComponent";
 import { oauthService } from "@/services/oauthService";
 import { useToast } from "@/hooks/use-toast";
+import NavBanner from "@/components/NavBanner";
 
 const Signup = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -75,68 +76,71 @@ const Signup = () => {
   const handleCaptchaError = () => { toast({ title: "CAPTCHA Error", description: "CAPTCHA verification failed. Please try again.", variant: "destructive" }); setCaptchaToken(null); };
 
   return (
-    <div className="min-h-screen bg-auth-gradient-subtle flex items-center justify-center p-4">
-      <div className="w-full max-w-md animate-fade-in">
-        <Card className="shadow-elegant border-0 bg-card/95 backdrop-blur-sm">
-          <CardHeader className="text-center pb-2">
-            <CardTitle className="text-4xl font-bold text-primary">Create Account</CardTitle>
-            <CardDescription className="text-muted-foreground">Join us today and get started</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground font-medium">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input id="name" name="name" type="text" placeholder="Enter your full name" value={formData.name} onChange={handleChange} className="pl-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+    <>
+      <NavBanner />
+      <div className="min-h-screen bg-auth-gradient-subtle flex items-center justify-center p-4">
+        <div className="w-full max-w-md animate-fade-in">
+          <Card className="shadow-elegant border-0 bg-card/95 backdrop-blur-sm">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-4xl font-bold text-primary">Create Account</CardTitle>
+              <CardDescription className="text-muted-foreground">Join us today and get started</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-foreground font-medium">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input id="name" name="name" type="text" placeholder="Enter your full name" value={formData.name} onChange={handleChange} className="pl-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground font-medium">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input id="email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} className="pl-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-foreground font-medium">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input id="email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} className="pl-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input id="password" name="password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={formData.password} onChange={handleChange} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input id="password" name="password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={formData.password} onChange={handleChange} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground font-medium">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password" value={formData.confirmPassword} onChange={handleChange} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
-                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-foreground font-medium">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password" value={formData.confirmPassword} onChange={handleChange} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
+                  </div>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="terms" checked={agreeToTerms} onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)} />
+                  <Label htmlFor="terms" className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">I agree to the{" "}<Link to="/terms" className="text-primary hover:text-primary-glow underline">Terms of Service</Link>{" "}and{" "}<Link to="/privacy" className="text-primary hover:text-primary-glow underline">Privacy Policy</Link></Label>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-foreground font-medium flex items-center gap-2"><Shield className="h-4 w-4" />Security Verification</Label>
+                  <CaptchaComponent ref={captchaRef} siteKey="6LcjwIsrAAAAAB0gcJBueXnRM-5QJM_GOdckHwAy" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
+                </div>
+                <Button type="submit" className="w-full bg-auth-gradient hover:opacity-90 border-0 shadow-soft transition-all duration-300 hover:shadow-elegant hover:-translate-y-0.5" disabled={isLoading || !agreeToTerms || !captchaToken}>{isLoading ? "Creating account..." : "Create Account"}</Button>
+              </form>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
+                <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Or continue with</span></div>
               </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="terms" checked={agreeToTerms} onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)} />
-                <Label htmlFor="terms" className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">I agree to the{" "}<Link to="/terms" className="text-primary hover:text-primary-glow underline">Terms of Service</Link>{" "}and{" "}<Link to="/privacy" className="text-primary hover:text-primary-glow underline">Privacy Policy</Link></Label>
+              <div className="space-y-3">
+                <SocialAuthButton provider="google" onClick={handleGoogleAuth} disabled={isLoading} />
+                <SocialAuthButton provider="linkedin" onClick={handleLinkedInAuth} disabled={isLoading} />
               </div>
-              <div className="space-y-2">
-                <Label className="text-foreground font-medium flex items-center gap-2"><Shield className="h-4 w-4" />Security Verification</Label>
-                <CaptchaComponent ref={captchaRef} siteKey="6LcjwIsrAAAAAB0gcJBueXnRM-5QJM_GOdckHwAy" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
-              </div>
-              <Button type="submit" className="w-full bg-auth-gradient hover:opacity-90 border-0 shadow-soft transition-all duration-300 hover:shadow-elegant hover:-translate-y-0.5" disabled={isLoading || !agreeToTerms || !captchaToken}>{isLoading ? "Creating account..." : "Create Account"}</Button>
-            </form>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
-              <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Or continue with</span></div>
-            </div>
-            <div className="space-y-3">
-              <SocialAuthButton provider="google" onClick={handleGoogleAuth} disabled={isLoading} />
-              <SocialAuthButton provider="linkedin" onClick={handleLinkedInAuth} disabled={isLoading} />
-            </div>
-            <p className="text-center text-sm text-muted-foreground">Already have an account?{" "}<Link to="/login" className="text-primary hover:text-primary-glow transition-colors underline-offset-4 hover:underline font-medium">Sign in</Link></p>
-          </CardContent>
-        </Card>
+              <p className="text-center text-sm text-muted-foreground">Already have an account?{" "}<Link to="/login" className="text-primary hover:text-primary-glow transition-colors underline-offset-4 hover:underline font-medium">Sign in</Link></p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
