@@ -51,18 +51,28 @@ export function CareerArcPage() {
     getArcData()
       .then(data => {
         console.log('API work_experience:', data.work_experience); // TEMP LOG
-        const exp = (data.work_experience || []).map((item: any) => ({
-          id: item.id,
-          title: item.positionTitle || item.title || '',
-          company: item.companyName || item.company || '',
-          location: item.location || '',
-          startDate: item.startDate || item.start_date || '',
-          endDate: item.endDate || item.end_date || 'Present',
-          current: !(item.endDate || item.end_date),
-          description: item.description || '',
-          achievements: item.responsibilities || item.achievements || [],
-          skills: item.skills || [],
-        }));
+        const exp = (data.work_experience || []).map((item: any) => {
+          let achievements: string[] = [];
+          if (Array.isArray(item.responsibilities)) {
+            achievements = item.responsibilities;
+          } else if (typeof item.description === 'string' && item.description.trim().length > 0) {
+            achievements = item.description.split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean);
+          } else if (Array.isArray(item.achievements)) {
+            achievements = item.achievements;
+          }
+          return {
+            id: item.id,
+            title: item.positionTitle || item.title || '',
+            company: item.companyName || item.company || '',
+            location: item.location || '',
+            startDate: item.startDate || item.start_date || '',
+            endDate: item.endDate || item.end_date || 'Present',
+            current: !(item.endDate || item.end_date),
+            description: item.description || '',
+            achievements,
+            skills: item.skills || [],
+          };
+        });
         setExperiences(exp);
       })
       .catch(() => setExperiences([]))
