@@ -31,6 +31,7 @@ import Landing from './pages/Landing';
 import ColorTest from './pages/ColorTest';
 import TailwindUiTest from './pages/TailwindUiTest';
 import AuthCallback from './pages/AuthCallback';
+import CareerArcV2 from './pages/CareerArcV2';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -89,6 +90,7 @@ function App() {
           <Route path="/search-jobs" element={<ChakraProvider theme={theme}><Layout><SearchJobs /></Layout></ChakraProvider>} />
           <Route path="/colortest" element={<ColorTest />} />
           <Route path="/tailwinduitest" element={<TailwindUiTest />} />
+          <Route path="/careerarcv2" element={<CareerArcV2 />} />
           <Route path="*" element={<ChakraProvider theme={theme}><Layout><NotFound /></Layout></ChakraProvider>} />
         </Routes>
       </Router>
