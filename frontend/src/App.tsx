@@ -30,6 +30,7 @@ import SearchJobs from './pages/SearchJobs';
 import Landing from './pages/Landing';
 import ColorTest from './pages/ColorTest';
 import TailwindUiTest from './pages/TailwindUiTest';
+import AuthCallback from './pages/AuthCallback';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -62,6 +63,10 @@ function App() {
         <Routes>
           {/* Tailwind/shadcn/ui landing page - NO ChakraProvider */}
           <Route path="/" element={<Landing />} />
+
+          {/* OAuth callback routes - NO ChakraProvider */}
+          <Route path="/auth/google/callback" element={<AuthCallback />} />
+          <Route path="/auth/linkedin/callback" element={<AuthCallback />} />
 
           {/* Chakra-based pages - wrap with ChakraProvider and Layout */}
           <Route path="/login" element={<ChakraProvider theme={theme}><Layout><Login /></Layout></ChakraProvider>} />
