@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getArcData } from "@/api/careerArkApi";
 
 interface Experience {
   id: string;
@@ -38,66 +39,34 @@ interface Experience {
   skills: string[];
 }
 
-const mockExperiences: Experience[] = [
-  {
-    id: "1",
-    title: "Mobile App Project Manager",
-    company: "Dosh Mobile App, Allpay Ltd.",
-    location: "London, UK",
-    startDate: "2025-02",
-    endDate: "Present",
-    current: true,
-    description: "",
-    achievements: [
-      "Managed a team of offshore and onshore developers to develop and launch a new payments mobile app",
-      "Coordinated multiple disciplines including Testing, UX/UI, Product and Compliance",
-      "Developed and enhanced an MVP concept within ITIL Service management framework",
-      "Delivered robust consumer experience"
-    ],
-    skills: ["Project Management", "Mobile Development", "UX/UI", "ITIL", "Team Leadership"]
-  },
-  {
-    id: "2",
-    title: "Digital Channels & Payments Delivery Lead",
-    company: "Transport for London (TfL)",
-    location: "London, UK",
-    startDate: "2023-06",
-    endDate: "2025-02",
-    current: false,
-    description: "",
-    achievements: [
-      "Led digital transformation initiatives for payment systems across London's transport network",
-      "Delivered critical payment infrastructure improvements",
-      "Managed stakeholder relationships across multiple departments",
-      "Improved system reliability by 40%"
-    ],
-    skills: ["Digital Transformation", "Payment Systems", "Stakeholder Management", "Infrastructure"]
-  },
-  {
-    id: "3",
-    title: "Integration Delivery Lead",
-    company: "UKHSA",
-    location: "London, UK",
-    startDate: "2021-01",
-    endDate: "2022-12",
-    current: false,
-    description: "",
-    achievements: [
-      "Oversaw integration projects for health data systems during the pandemic response",
-      "Successfully integrated multiple health data sources",
-      "Ensured GDPR compliance across all systems",
-      "Reduced data processing time by 60%"
-    ],
-    skills: ["Data Integration", "GDPR Compliance", "Health Systems", "API Development"]
-  }
-];
-
 export function CareerArcPage() {
-  const [experiences, setExperiences] = useState<Experience[]>(mockExperiences);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    getArcData()
+      .then(data => {
+        const exp = (data.work_experience || []).map((item: any) => ({
+          id: item.id,
+          title: item.positionTitle,
+          company: item.companyName,
+          location: item.location || "",
+          startDate: item.startDate,
+          endDate: item.endDate || "Present",
+          current: !item.endDate,
+          description: item.description || "",
+          achievements: item.responsibilities || [],
+          skills: item.skills || [],
+        }));
+        setExperiences(exp);
+      })
+      .catch(() => setExperiences([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleAddExperience = () => {
     setEditingExperience(null);
