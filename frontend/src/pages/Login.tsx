@@ -106,7 +106,7 @@ const Login = () => {
               {showCaptcha && (
                 <div className="space-y-2">
                   <Label className="font-medium text-foreground flex items-center gap-2"><Shield className="h-4 w-4" />Security Verification</Label>
-                  <CaptchaComponent ref={captchaRef} siteKey="6Ld1vosrAAAAAN1yqpjI9rd6VU4UbxKh5MtCa7mF" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
+                  <CaptchaComponent ref={captchaRef} siteKey="6LcjwIsrAAAAAB0gcJBueXnRM-5QJM_GOdckHwAy" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
                 </div>
               )}
               <Button type="submit" className="w-full font-medium bg-primary text-primary-foreground hover:bg-primary-glow" disabled={isLoading || (showCaptcha && !captchaToken)}>

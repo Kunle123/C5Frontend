@@ -120,7 +120,7 @@ const Signup = () => {
               </div>
               <div className="space-y-2">
                 <Label className="text-foreground font-medium flex items-center gap-2"><Shield className="h-4 w-4" />Security Verification</Label>
-                <CaptchaComponent ref={captchaRef} siteKey="6Ld1vosrAAAAAN1yqpjI9rd6VU4UbxKh5MtCa7mF" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
+                <CaptchaComponent ref={captchaRef} siteKey="6LcjwIsrAAAAAB0gcJBueXnRM-5QJM_GOdckHwAy" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
               </div>
               <Button type="submit" className="w-full bg-auth-gradient hover:opacity-90 border-0 shadow-soft transition-all duration-300 hover:shadow-elegant hover:-translate-y-0.5" disabled={isLoading || !agreeToTerms || !captchaToken}>{isLoading ? "Creating account..." : "Create Account"}</Button>
             </form>
