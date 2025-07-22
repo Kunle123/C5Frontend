@@ -443,12 +443,19 @@ function ExperienceDialog({ experience, onSave }: ExperienceDialogProps) {
   });
 
   useEffect(() => {
+    // Format dates as yyyy-MM for input type='month'
+    const formatMonth = (date: string) => {
+      if (!date || date === 'Present') return '';
+      // Accept both yyyy-MM and yyyy-MM-dd
+      const match = date.match(/^(\d{4}-\d{2})/);
+      return match ? match[1] : '';
+    };
     setFormData({
       title: experience?.title || "",
       company: experience?.company || "",
       location: experience?.location || "",
-      startDate: experience?.startDate || "",
-      endDate: experience?.endDate || "",
+      startDate: formatMonth(experience?.startDate || ""),
+      endDate: formatMonth(experience?.endDate || ""),
       current: experience?.current || false,
       description: experience?.description || "",
       achievements: experience?.achievements || [],
