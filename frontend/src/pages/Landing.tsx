@@ -15,6 +15,7 @@ import {
   Brain,
   Sparkles
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Landing() {
   return (
@@ -27,7 +28,9 @@ export default function Landing() {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#home" className="text-foreground hover:text-primary transition-colors">Home</a>
               <a href="#pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
-              <Button variant="outline">Login</Button>
+              <Link to="/login">
+                <Button variant="outline">Login</Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -51,10 +54,12 @@ export default function Landing() {
                 to craft perfectly tailored CVs and cover letters in minutes.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="gap-2 text-lg px-8 py-6">
-                  <CheckCircle className="h-5 w-5" />
-                  Create Your Free Account
-                </Button>
+                <Link to="/signup">
+                  <Button size="lg" className="gap-2 text-lg px-8 py-6">
+                    <CheckCircle className="h-5 w-5" />
+                    Create Your Free Account
+                  </Button>
+                </Link>
                 <Button variant="outline" size="lg" className="gap-2 text-lg px-8 py-6">
                   <Play className="h-5 w-5" />
                   See How It Works (60s)
@@ -421,9 +426,11 @@ export default function Landing() {
                     Email support
                   </li>
                 </ul>
-                <Button className="w-full" variant="outline">
-                  Get Started with Career Starter
-                </Button>
+                <Link to="/signup">
+                  <Button className="w-full" variant="outline">
+                    Get Started with Career Starter
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
             {/* Accelerator Plan */}
@@ -454,9 +461,11 @@ export default function Landing() {
                     Access to Application Wizard
                   </li>
                 </ul>
-                <Button className="w-full">
-                  Get Started with Career Accelerator
-                </Button>
+                <Link to="/signup">
+                  <Button className="w-full">
+                    Get Started with Career Accelerator
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
             {/* Dominator Plan */}
@@ -484,9 +493,11 @@ export default function Landing() {
                     Personalized job search insights
                   </li>
                 </ul>
-                <Button className="w-full" variant="outline">
-                  Get Started with Career Dominator
-                </Button>
+                <Link to="/signup">
+                  <Button className="w-full" variant="outline">
+                    Get Started with Career Dominator
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
@@ -506,10 +517,12 @@ export default function Landing() {
             Stop letting tedious applications hold you back. Join Candidate 5 today and start applying 
             smarter, faster, and with more confidence.
           </p>
-          <Button size="lg" className="gap-2 text-lg px-8 py-6">
-            Sign Up for Your Free Trial Now
-            <ArrowRight className="h-5 w-5" />
-          </Button>
+          <Link to="/signup">
+            <Button size="lg" className="gap-2 text-lg px-8 py-6">
+              Sign Up for Your Free Trial Now
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+          </Link>
           <p className="text-sm text-muted-foreground">
             No credit card required for trial. Takes less than 2 minutes to get started.
           </p>
