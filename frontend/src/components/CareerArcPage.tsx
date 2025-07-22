@@ -442,6 +442,20 @@ function ExperienceDialog({ experience, onSave }: ExperienceDialogProps) {
     ...experience
   });
 
+  useEffect(() => {
+    setFormData({
+      title: experience?.title || "",
+      company: experience?.company || "",
+      location: experience?.location || "",
+      startDate: experience?.startDate || "",
+      endDate: experience?.endDate || "",
+      current: experience?.current || false,
+      description: experience?.description || "",
+      achievements: experience?.achievements || [],
+      skills: experience?.skills || [],
+    });
+  }, [experience]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData as Experience);
