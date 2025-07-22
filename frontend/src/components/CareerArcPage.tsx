@@ -443,19 +443,29 @@ function ExperienceDialog({ experience, onSave }: ExperienceDialogProps) {
   });
 
   useEffect(() => {
-    // Format dates as yyyy-MM for input type='month'
-    const formatMonth = (date: string) => {
+    // Log the raw values for debugging
+    console.log('Edit dialog startDate:', experience?.startDate, 'endDate:', experience?.endDate);
+
+    // Robustly extract yyyy-MM from various formats
+    const formatMonth = (date: string | undefined | null) => {
       if (!date || date === 'Present') return '';
-      // Accept both yyyy-MM and yyyy-MM-dd
-      const match = date.match(/^(\d{4}-\d{2})/);
-      return match ? match[1] : '';
+      // Accept yyyy-MM, yyyy-MM-dd, or ISO strings
+      const match = date.match(/^\d{4}-\d{2}/);
+      if (match) return match[0];
+      // Try to parse as Date and format as yyyy-MM
+      const d = new Date(date);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString().slice(0, 7);
+      }
+      return '';
     };
+
     setFormData({
       title: experience?.title || "",
       company: experience?.company || "",
       location: experience?.location || "",
-      startDate: formatMonth(experience?.startDate || ""),
-      endDate: formatMonth(experience?.endDate || ""),
+      startDate: formatMonth(experience?.startDate || (experience as any)?.start_date),
+      endDate: formatMonth(experience?.endDate || (experience as any)?.end_date),
       current: experience?.current || false,
       description: experience?.description || "",
       achievements: experience?.achievements || [],
