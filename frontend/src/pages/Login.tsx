@@ -78,7 +78,7 @@ const Login = () => {
       <div className="w-full max-w-md animate-fade-in">
         <Card className="shadow-elegant border-0 bg-card/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl font-bold text-primary">Welcome Back</CardTitle>
+            <CardTitle className="text-4xl font-bold text-primary">Welcome Back</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">Sign in to your account to continue</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -106,7 +106,7 @@ const Login = () => {
               {showCaptcha && (
                 <div className="space-y-2">
                   <Label className="font-medium text-foreground flex items-center gap-2"><Shield className="h-4 w-4" />Security Verification</Label>
-                  <CaptchaComponent ref={captchaRef} siteKey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
+                  <CaptchaComponent ref={captchaRef} siteKey="6Ld1vosrAAAAAN1yqpjI9rd6VU4UbxKh5MtCa7mF" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
                 </div>
               )}
               <Button type="submit" className="w-full font-medium bg-primary text-primary-foreground hover:bg-primary-glow" disabled={isLoading || (showCaptcha && !captchaToken)}>
