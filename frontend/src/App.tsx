@@ -86,7 +86,6 @@ function App() {
           <Route path="/faq" element={<ChakraProvider theme={theme}><Layout><FAQ /></Layout></ChakraProvider>} />
           <Route path="/career-ark-demo" element={<ChakraProvider theme={theme}><Layout><CareerArkDemo /></Layout></ChakraProvider>} />
           <Route path="/debug-cv-ai" element={<ChakraProvider theme={theme}><Layout><DebugCVAIResponse /></Layout></ChakraProvider>} />
-          <Route path="/career-ark-v2" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArkV2 /></ProtectedRoute></Layout></ChakraProvider>} />
           <Route path="/search-jobs" element={<ChakraProvider theme={theme}><Layout><SearchJobs /></Layout></ChakraProvider>} />
           <Route path="/colortest" element={<ColorTest />} />
           <Route path="/tailwinduitest" element={<TailwindUiTest />} />
