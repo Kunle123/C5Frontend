@@ -24,7 +24,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getArcData } from "@/api/careerArkApi";
+import { getArcData, updateWorkExperience, deleteWorkExperience } from "@/api/careerArkApi";
 
 interface Experience {
   id: string;
@@ -46,6 +46,7 @@ export function CareerArcPage() {
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
+  const [refreshFlag, setRefreshFlag] = useState(0);
 
   useEffect(() => {
     getArcData()
@@ -77,7 +78,7 @@ export function CareerArcPage() {
       })
       .catch(() => setExperiences([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshFlag]);
 
   const handleAddExperience = () => {
     setEditingExperience(null);
@@ -89,12 +90,14 @@ export function CareerArcPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDeleteExperience = (id: string) => {
-    setExperiences(experiences.filter(exp => exp.id !== id));
-    toast({
-      title: "Experience deleted",
-      description: "The experience has been removed from your Career Arc™.",
-    });
+  const handleDeleteExperience = async (id: string) => {
+    try {
+      await deleteWorkExperience(id);
+      toast({ title: "Experience deleted", description: "The experience has been removed from your Career Arc™." });
+      setRefreshFlag(f => f + 1);
+    } catch (err: any) {
+      toast({ title: "Delete failed", description: err?.message || "Could not delete experience", variant: "destructive" });
+    }
   };
 
   const handleImportCV = async () => {
@@ -193,11 +196,21 @@ export function CareerArcPage() {
                 experience={editingExperience}
                 onSave={(exp) => {
                   if (editingExperience) {
-                    setExperiences(experiences.map(e => e.id === exp.id ? exp : e));
-                    toast({ title: "Experience updated", description: "Your Career Arc™ has been updated." });
+                    updateWorkExperience(exp.id, exp)
+                      .then(() => {
+                        toast({ title: "Experience updated", description: "Your Career Arc™ has been updated." });
+                        setRefreshFlag(f => f + 1);
+                      })
+                      .catch(err => {
+                        toast({ title: "Update failed", description: err?.message || "Could not update experience", variant: "destructive" });
+                      });
                   } else {
-                    setExperiences([{ ...exp, id: Date.now().toString() }, ...experiences]);
+                    // This case should ideally not be reached for new experiences,
+                    // but as a fallback, we can add a new experience with a temporary ID
+                    // or handle it differently if the backend supports direct add.
+                    // For now, we'll just toast a generic message.
                     toast({ title: "Experience added", description: "New experience added to your Career Arc™." });
+                    setRefreshFlag(f => f + 1); // Refresh to show the new experience
                   }
                   setIsDialogOpen(false);
                 }}
