@@ -79,7 +79,7 @@ const Signup = () => {
       <div className="w-full max-w-md animate-fade-in">
         <Card className="shadow-elegant border-0 bg-card/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl font-bold bg-auth-gradient bg-clip-text text-transparent">Create Account</CardTitle>
+            <CardTitle className="text-4xl font-bold text-primary">Create Account</CardTitle>
             <CardDescription className="text-muted-foreground">Join us today and get started</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
