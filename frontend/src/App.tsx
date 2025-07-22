@@ -61,16 +61,14 @@ function App() {
     <NotificationContext.Provider value={{ notify }}>
       <Router>
         <Routes>
-          {/* Tailwind/shadcn/ui landing page - NO ChakraProvider */}
+          {/* Tailwind/shadcn/ui landing and auth pages - NO ChakraProvider */}
           <Route path="/" element={<Landing />} />
-
-          {/* OAuth callback routes - NO ChakraProvider */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/auth/google/callback" element={<AuthCallback />} />
           <Route path="/auth/linkedin/callback" element={<AuthCallback />} />
 
           {/* Chakra-based pages - wrap with ChakraProvider and Layout */}
-          <Route path="/login" element={<ChakraProvider theme={theme}><Layout><Login /></Layout></ChakraProvider>} />
-          <Route path="/signup" element={<ChakraProvider theme={theme}><Layout><Signup /></Layout></ChakraProvider>} />
           <Route path="/dashboard" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout></ChakraProvider>} />
           <Route path="/cvs" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></Layout></ChakraProvider>} />
           <Route path="/career-ark" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
