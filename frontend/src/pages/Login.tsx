@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,7 @@ const Login = () => {
   const [showCaptcha, setShowCaptcha] = useState(false);
   const captchaRef = useRef<CaptchaRef>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +41,6 @@ const Login = () => {
     }
     setIsLoading(true);
     try {
-      // TODO: Connect to your backend API
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +49,10 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         toast({ title: "Login successful!", description: "Welcome back!" });
-        // Handle successful login (redirect, store token, etc.)
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          navigate("/dashboard");
+        }
       } else {
         const error = await response.json();
         toast({ title: "Login failed", description: error.message || "Invalid credentials", variant: "destructive" });
