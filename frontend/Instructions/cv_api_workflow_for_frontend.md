@@ -28,7 +28,7 @@ This document explains the end-to-end workflow for generating and downloading CV
 ---
 
 ## 2. **Fetch Ark Profile**
-- **Endpoint:** `GET /api/career-ark/profiles/me`
+- **Endpoint:** `GET /api/user/profile`
 - **Purpose:** Retrieve the user's Ark profile data (used for CV generation).
 - **Headers:**
   - `Authorization: Bearer <JWT_TOKEN>`

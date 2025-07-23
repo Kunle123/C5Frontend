@@ -146,7 +146,7 @@ const CareerArk: React.FC = () => {
       return;
     }
     // Fetch the user's profile using the correct endpoint, always bypassing cache
-    fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
+    fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
       headers: { Authorization: `Bearer ${token}`, 'Cache-Control': 'no-cache' },
     })
       .then(res => {
@@ -457,7 +457,7 @@ const CareerArk: React.FC = () => {
       const keywords: string[] = JSON.parse(storedKeywords);
       // Fetch latest Ark data
       const token = localStorage.getItem('token') || '';
-      const profileRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
+      const profileRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!profileRes.ok) throw new Error('Failed to fetch profile');

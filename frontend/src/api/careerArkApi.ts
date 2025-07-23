@@ -19,7 +19,7 @@ export async function healthCheck() {
 export async function uploadCV(file: File) {
   const token = localStorage.getItem('token') || '';
   // Fetch the user's profile to get profile_id
-  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
+  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!profileRes.ok) throw new Error('Failed to fetch profile');
@@ -49,7 +49,7 @@ export async function getCVStatus(taskId: string) {
 export async function getArcData() {
   const token = localStorage.getItem('token') || '';
   // Fetch the user's profile
-  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
+  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!profileRes.ok) throw new Error('Failed to fetch profile');

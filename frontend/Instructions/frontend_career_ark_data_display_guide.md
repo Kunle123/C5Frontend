@@ -9,7 +9,7 @@
 For a given user, first fetch their profile ID:
 
 - **Get Profile:**
-  - `GET /api/career-ark/profiles/me`
+  - `GET /api/user/profile`
   - Response: `{ id: <profile_id>, ... }`
 
 Then, use the profile ID to fetch each section:

@@ -9,7 +9,7 @@ This document lists all expected endpoints for the Career Ark (CV management) fe
 ## 1. Profile & Section Endpoints
 
 ### Get Current User Profile
-- **GET** `/api/career-ark/profiles/me`
+- **GET** `/api/user/profile`
 - **Description:** Fetch the current user's Career Ark profile (returns profile object with `id`).
 
 ### Get All Sections for a Profile
