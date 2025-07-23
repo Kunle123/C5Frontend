@@ -135,13 +135,13 @@ const CareerArkV2: React.FC = () => {
     try {
       const token = (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '';
       // Fetch the user's profile
-      const profileRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/me`, {
+      const userRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!profileRes.ok) throw new Error('Failed to fetch profile');
-      const profile = await profileRes.json();
-      // Fetch all sections using the profileId
-      const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
+      if (!userRes.ok) throw new Error('Failed to fetch user');
+      const user = await userRes.json();
+      // Fetch all sections using the userId
+      const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${user.id}/all_sections`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch Ark data');
