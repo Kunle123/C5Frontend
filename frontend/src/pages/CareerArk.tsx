@@ -773,6 +773,16 @@ const CareerArk: React.FC = () => {
                       <Text whiteSpace="pre-line" fontSize="md">
                         {item.description && item.description.length > 300 ? <ShowMoreText text={item.description} /> : item.description}
                       </Text>
+                      {item.skills && item.skills.length > 0 && (
+                        <Box mt={2}>
+                          <Text fontSize="xs" color="blue.700" fontWeight="bold">Skills:</Text>
+                          <HStack wrap="wrap" spacing={1} mt={1}>
+                            {item.skills.map((skill: string, i: number) => (
+                              <Box key={i} px={2} py={1} borderRadius="md" bg="blue.50" color="blue.700" fontSize="xs">{skill}</Box>
+                            ))}
+                          </HStack>
+                        </Box>
+                      )}
                     </Box>
                   );
                 case 'education':
