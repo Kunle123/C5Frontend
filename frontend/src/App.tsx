@@ -33,6 +33,7 @@ import TailwindUiTest from './pages/TailwindUiTest';
 import AuthCallback from './pages/AuthCallback';
 import CareerArcV2 from './pages/CareerArcV2';
 import DashboardNew from './pages/DashboardNew';
+import MyCVsNew from './pages/MyCVsNew';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -93,6 +94,7 @@ function App() {
           <Route path="/colortest" element={<ColorTest />} />
           <Route path="/tailwinduitest" element={<TailwindUiTest />} />
           <Route path="/careerarcv2" element={<CareerArcV2 />} />
+          <Route path="/my-cvs-new" element={<MyCVsNew />} />
           <Route path="*" element={<ChakraProvider theme={theme}><Layout><NotFound /></Layout></ChakraProvider>} />
         </Routes>
       </Router>

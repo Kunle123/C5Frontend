@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Navigation } from "./Navigation";
 import { Download, FileText, Mail } from "lucide-react";
 
 interface CVItem {
@@ -87,21 +88,7 @@ const mockCVs: CVItem[] = [
 export function CVDownload() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="text-2xl font-bold text-primary">Candidate 5</div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-foreground hover:text-primary transition-colors">Home</a>
-              <a href="/dashboard" className="text-foreground hover:text-primary transition-colors">Dashboard</a>
-              <a href="/my-cvs" className="text-primary font-medium">My CVs</a>
-              <a href="/account" className="text-foreground hover:text-primary transition-colors">Account</a>
-              <Button variant="outline">Logout</Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

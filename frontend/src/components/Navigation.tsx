@@ -39,9 +39,9 @@ export function Navigation() {
               Career Arc
             </button>
             <button 
-              onClick={() => navigate("/my-cvs")}
+              onClick={() => navigate("/my-cvs-new")}
               className={`transition-colors ${
-                isActive("/my-cvs") 
+                isActive("/my-cvs-new") 
                   ? "text-primary font-medium" 
                   : "text-foreground hover:text-primary"
               }`}
