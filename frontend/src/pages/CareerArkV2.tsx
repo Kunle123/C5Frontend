@@ -81,40 +81,47 @@ const CareerArkV2: React.FC = () => {
             setTaskId(data.taskId);
             setStatus('pending');
             setPolling(true);
-            // Poll for extraction completion
+            // Poll for extraction completion using setInterval
             let pollCount = 0;
-            const poll = async () => {
+            const interval = setInterval(async () => {
               try {
                 const res = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/cv/status/${data.taskId}`, {
                   headers: { Authorization: `Bearer ${token}` },
                 });
                 const statusData = await res.json();
                 setStatus(statusData.status);
-                if (statusData.status === 'completed') {
-                  setUploadProgress(100);
+                if (
+                  statusData.status === 'completed' ||
+                  statusData.status === 'completed_with_errors' ||
+                  statusData.status === 'failed'
+                ) {
                   setPolling(false);
-                  setSummary(statusData.extractedDataSummary || null);
-                  fetchArcData();
-                  toast({ status: 'success', title: 'CV imported and processed!' });
-                } else if (statusData.status === 'failed') {
-                  setPolling(false);
-                  setUploadError(statusData.error || 'CV extraction failed.');
-                } else if (pollCount < 30) {
-                  setTimeout(poll, 2000);
-                  pollCount++;
-                  setUploadProgress(70 + Math.min(30, pollCount));
-                } else {
+                  clearInterval(interval);
+                  if (statusData.status === 'completed') {
+                    setUploadProgress(100);
+                    setSummary(statusData.extractedDataSummary || null);
+                    fetchArcData();
+                    toast({ status: 'success', title: 'CV imported and processed!' });
+                  } else if (statusData.status === 'completed_with_errors') {
+                    setUploadError('CV processed with errors: ' + (statusData.error || 'Unknown error'));
+                    setSummary(statusData.extractedDataSummary || null);
+                  } else if (statusData.status === 'failed') {
+                    setUploadError(statusData.error || 'CV extraction failed.');
+                  }
+                } else if (pollCount >= 20) { // ~1 minute
                   setPolling(false);
                   setUploadError('CV extraction timed out.');
+                  clearInterval(interval);
                 }
+                pollCount++;
               } catch {
                 setPolling(false);
                 setUploadError('Failed to check CV extraction status.');
+                clearInterval(interval);
               } finally {
                 setUploading(false);
               }
-            };
-            poll();
+            }, 3000); // poll every 3 seconds
           } else {
             setUploadError('Upload failed');
             setUploading(false);
