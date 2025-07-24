@@ -48,9 +48,16 @@ export function Navigation() {
             >
               My CVs
             </button>
-            <Button variant="outline" size="sm">
+            <button 
+              onClick={() => navigate("/account-new")}
+              className={`transition-colors ${
+                isActive("/account-new") 
+                  ? "text-primary font-medium" 
+                  : "text-foreground hover:text-primary"
+              }`}
+            >
               Account
-            </Button>
+            </button>
             <Button variant="outline" size="sm">
               Log Out
             </Button>
