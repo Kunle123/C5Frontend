@@ -4,95 +4,11 @@ import { Badge } from "./ui/badge";
 import { Navigation } from "./Navigation";
 import { Download, FileText, Mail } from "lucide-react";
 
-interface CVItem {
-  id: string;
-  jobTitle: string;
-  company: string;
-  createdDate: string;
-  status: 'draft' | 'final';
-}
-
-const mockCVs: CVItem[] = [
-  {
-    id: '1',
-    jobTitle: 'IT Project Manager',
-    company: 'Leading Energy Sector Company',
-    createdDate: '20/07/2025, 10:52:48',
-    status: 'final'
-  },
-  {
-    id: '2',
-    jobTitle: 'Unknown Job Title',
-    company: 'Unknown Company',
-    createdDate: '19/07/2025, 13:40:54',
-    status: 'draft'
-  },
-  {
-    id: '3',
-    jobTitle: 'IT Project Manager',
-    company: 'Leading Energy Sector Company',
-    createdDate: '19/07/2025, 13:19:16',
-    status: 'final'
-  },
-  {
-    id: '4',
-    jobTitle: 'IT Project Manager',
-    company: 'Leading Energy Sector Company',
-    createdDate: '19/07/2025, 13:01:41',
-    status: 'final'
-  },
-  {
-    id: '5',
-    jobTitle: 'IT Project Manager',
-    company: 'Leading Energy Sector Company',
-    createdDate: '19/07/2025, 12:58:42',
-    status: 'final'
-  },
-  {
-    id: '6',
-    jobTitle: 'Project Manager',
-    company: 'Global Technology Firm',
-    createdDate: '19/07/2025, 10:43:38',
-    status: 'final'
-  },
-  {
-    id: '7',
-    jobTitle: 'Unknown Job Title',
-    company: 'Unknown Company',
-    createdDate: '19/07/2025, 11:36:51',
-    status: 'draft'
-  },
-  {
-    id: '8',
-    jobTitle: 'Unknown Job Title',
-    company: 'Unknown Company',
-    createdDate: '19/07/2025, 01:04:15',
-    status: 'draft'
-  },
-  {
-    id: '9',
-    jobTitle: 'Unknown Job Title',
-    company: 'Unknown Company',
-    createdDate: '18/07/2025, 23:15:22',
-    status: 'draft'
-  },
-  {
-    id: '10',
-    jobTitle: 'Project Manager',
-    company: 'Innovation Tech Solutions',
-    createdDate: '18/07/2025, 20:08:17',
-    status: 'final'
-  }
-];
-
 export function CVDownload() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-card-foreground mb-4">
             Download Your CVs & Cover Letters
@@ -101,50 +17,13 @@ export function CVDownload() {
             Download your previously generated CVs and cover letters as DOCX files.
           </p>
         </div>
-
-        {/* CVs Section */}
+        {/* CVs Section - now empty, ready for real data integration */}
         <div className="mb-12">
           <h2 className="text-2xl font-semibold text-card-foreground mb-8">Your CVs</h2>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockCVs.map((cv) => (
-              <Card key={cv.id} className="hover:shadow-lg transition-shadow duration-200">
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg text-card-foreground line-clamp-2">
-                        {cv.jobTitle}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
-                        {cv.company}
-                      </p>
-                    </div>
-                    <Badge variant={cv.status === 'final' ? 'success' : 'secondary'} className="ml-2 text-xs">
-                      {cv.status}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Created: {cv.createdDate}
-                  </p>
-                </CardHeader>
-                
-                <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    <Button className="w-full" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download CV
-                    </Button>
-                    <Button variant="outline" className="w-full" size="sm">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Download Cover Letter
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {/* No CVs to display yet */}
           </div>
         </div>
-
         {/* Empty State for Cover Letters */}
         <div className="text-center py-12">
           <div className="max-w-md mx-auto">
