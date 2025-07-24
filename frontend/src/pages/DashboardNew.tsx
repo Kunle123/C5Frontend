@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../style-zen-project/src/components/ui/card";
-import { Button } from "../../style-zen-project/src/components/ui/button";
-import { Badge } from "../../style-zen-project/src/components/ui/badge";
-import { Navigation } from "../../style-zen-project/src/components/Navigation";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Navigation } from "../components/Navigation";
 import { 
   User, 
   Briefcase, 
