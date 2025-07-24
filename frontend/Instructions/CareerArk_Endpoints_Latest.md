@@ -58,8 +58,8 @@ This document lists all expected endpoints for the Career Ark (CV management) fe
 ## 2. CV Upload & Processing
 
 ### Upload CV
-- **POST** `/api/career-ark/profiles/{profileId}/cv`
-- **Description:** Upload a CV file for processing and extraction. This is the only supported endpoint for CV uploads; do not use `/api/career-ark/cv`.
+- **POST** `/api/career-ark/cv`
+- **Description:** Upload a CV file for processing and extraction. This is the only supported endpoint for CV uploads.
 
 ### Poll CV Processing Status
 - **GET** `/api/career-ark/cv/status/{taskId}`

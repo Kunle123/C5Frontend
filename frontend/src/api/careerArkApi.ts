@@ -18,16 +18,10 @@ export async function healthCheck() {
 // 2. Upload CV
 export async function uploadCV(file: File) {
   const token = localStorage.getItem('token') || '';
-  // Fetch the user's profile to get profile_id
-  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!profileRes.ok) throw new Error('Failed to fetch profile');
-  const profile = await profileRes.json();
   const formData = new FormData();
   formData.append('file', file);
-  // Upload to the correct endpoint
-  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/cv`, {
+  // Upload to the correct endpoint (no profileId)
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/cv`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
