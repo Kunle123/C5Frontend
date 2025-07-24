@@ -32,6 +32,7 @@ import ColorTest from './pages/ColorTest';
 import TailwindUiTest from './pages/TailwindUiTest';
 import AuthCallback from './pages/AuthCallback';
 import CareerArcV2 from './pages/CareerArcV2';
+import DashboardNew from './pages/DashboardNew';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -71,6 +72,7 @@ function App() {
 
           {/* Chakra-based pages - wrap with ChakraProvider and Layout */}
           <Route path="/dashboard" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout></ChakraProvider>} />
+          <Route path="/dashboard-new" element={<DashboardNew />} />
           <Route path="/cvs" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></Layout></ChakraProvider>} />
           <Route path="/career-ark" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
           <Route path="/career-history" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
