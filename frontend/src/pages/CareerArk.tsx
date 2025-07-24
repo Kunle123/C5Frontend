@@ -235,16 +235,17 @@ const CareerArk: React.FC = () => {
             setTaskId(data.taskId);
             setStatus('pending');
             setPolling(true);
-            // Poll for extraction completion
+            // Poll for extraction completion using setInterval
             let pollCount = 0;
-            const poll = async () => {
+            const interval = setInterval(async () => {
               try {
                 const statusData = await getCVStatus(data.taskId);
                 setStatus(statusData.status);
-                if (statusData.status === 'completed') {
+                if (statusData.status === 'completed' || statusData.status === 'completed_with_errors') {
                   setUploadProgress(100);
                   setPolling(false);
                   setSummary(statusData.extractedDataSummary || null);
+                  clearInterval(interval);
                   // Refresh Ark data, bypassing cache
                   const arcRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
                     headers: {
@@ -278,22 +279,21 @@ const CareerArk: React.FC = () => {
                 } else if (statusData.status === 'failed') {
                   setPolling(false);
                   setUploadError(statusData.error || 'CV extraction failed.');
-                } else if (pollCount < 30) {
-                  setTimeout(poll, 2000);
-                  pollCount++;
-                  setUploadProgress(70 + Math.min(30, pollCount));
-                } else {
+                  clearInterval(interval);
+                } else if (pollCount >= 20) { // ~1 minute
                   setPolling(false);
                   setUploadError('CV extraction timed out.');
+                  clearInterval(interval);
                 }
+                pollCount++;
               } catch {
                 setPolling(false);
                 setUploadError('Failed to check CV extraction status.');
+                clearInterval(interval);
               } finally {
                 setUploading(false);
               }
-            };
-            poll();
+            }, 3000); // poll every 3 seconds
           } else {
             setUploadError('Upload failed');
             setUploading(false);
