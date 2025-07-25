@@ -506,7 +506,10 @@ const CareerArkV2: React.FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} isLoading={formLoading} onClick={async () => {
-              if (!editItem) return;
+              if (!editItem || !editItem.id) {
+                setFormError('Invalid work experience ID. Please try again.');
+                return;
+              }
               setFormLoading(true); setFormError('');
               try {
                 await updateWorkExperience(editItem.id, { ...form, description: form.description.split('\n').filter(Boolean) });
@@ -573,7 +576,10 @@ const CareerArkV2: React.FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} isLoading={eduFormLoading} onClick={async () => {
-              if (!editEduItem) return;
+              if (!editEduItem || !editEduItem.id) {
+                setEduFormError('Invalid education ID. Please try again.');
+                return;
+              }
               setEduFormLoading(true); setEduFormError('');
               try {
                 await updateEducation(editEduItem.id, { ...eduForm, description: eduForm.description.split('\n').filter(Boolean) });
@@ -636,7 +642,10 @@ const CareerArkV2: React.FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} isLoading={trainingFormLoading} onClick={async () => {
-              if (!editTrainingItem) return;
+              if (!editTrainingItem || !editTrainingItem.id) {
+                setTrainingFormError('Invalid training ID. Please try again.');
+                return;
+              }
               setTrainingFormLoading(true); setTrainingFormError('');
               try {
                 await updateTraining(editTrainingItem.id, { ...trainingForm, details: trainingForm.details.split('\n').filter(Boolean) });
@@ -695,7 +704,10 @@ const CareerArkV2: React.FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} isLoading={projectFormLoading} onClick={async () => {
-              if (!editProjectItem) return;
+              if (!editProjectItem || !editProjectItem.id) {
+                setProjectFormError('Invalid project ID. Please try again.');
+                return;
+              }
               setProjectFormLoading(true); setProjectFormError('');
               try {
                 await updateProject(editProjectItem.id, projectForm);
@@ -756,7 +768,10 @@ const CareerArkV2: React.FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} isLoading={certFormLoading} onClick={async () => {
-              if (!editCertItem) return;
+              if (!editCertItem || !editCertItem.id) {
+                setCertFormError('Invalid certification ID. Please try again.');
+                return;
+              }
               setCertFormLoading(true); setCertFormError('');
               try {
                 await updateCertification(editCertItem.id, certForm);
