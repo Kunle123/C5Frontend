@@ -198,7 +198,7 @@ export async function updateWorkExperience(id: string, data: any) {
 
 // Work Experience
 export async function deleteWorkExperience(id: string) {
-  const res = await fetch(`${API_BASE}/work_experience/${id}`, {
+  const res = await fetch(`${API_CAREER_ARK}/work_experience/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });

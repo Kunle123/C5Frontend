@@ -342,13 +342,17 @@ const CareerArkV2: React.FC = () => {
                         )}
                       </Box>
                       <HStack>
-                        <Button size="xs" leftIcon={<EditIcon />} onClick={() => { 
-                          console.log('Opening edit modal for item:', item);
-                          console.log('Item ID:', item.id);
-                          setEditItem(item); 
-                          setForm({ company: item.company, title: item.title, start_date: item.start_date, end_date: item.end_date, description: Array.isArray(item.details) ? item.details.join('\n') : (item.description || '') }); 
-                          setShowEditModal(true); 
-                        }}>Edit</Button>
+                        <Button size="xs" leftIcon={<EditIcon />} 
+                          onClick={() => { 
+                            console.log('Opening edit modal for item:', item);
+                            console.log('Item ID:', item.id);
+                            setEditItem(item); 
+                            setForm({ company: item.company, title: item.title, start_date: item.start_date, end_date: item.end_date, description: Array.isArray(item.details) ? item.details.join('\n') : (item.description || '') }); 
+                            setShowEditModal(true); 
+                          }}
+                          isDisabled={!item.id}
+                          title={!item.id ? 'Cannot edit: missing ID' : ''}
+                        >Edit</Button>
                         <Button size="xs" leftIcon={<DeleteIcon />} colorScheme="red" onClick={async () => { setFormLoading(true); try { await deleteWorkExperience(item.id); fetchArcData(); toast({ status: 'success', title: 'Deleted' }); } catch (err: any) { toast({ status: 'error', title: err.message || 'Delete failed' }); } finally { setFormLoading(false); } }}>Delete</Button>
                       </HStack>
                     </Flex>
