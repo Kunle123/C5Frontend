@@ -345,6 +345,7 @@ const CareerArkV2: React.FC = () => {
                       <HStack>
                         <Button size="xs" leftIcon={<EditIcon />} 
                           onClick={() => {
+                            console.log('Edit button pressed for entry with id:', item.id);
                             // Defensive: Only allow if item.id is present
                             if (!item.id) {
                               console.error('Attempted to open edit modal for item with missing id:', item);
