@@ -79,6 +79,8 @@ const CareerArkV2: React.FC = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [profile, setProfile] = useState<any>(null);
+  const [profileError, setProfileError] = useState('');
 
   // Education CRUD state
   const [showAddEduModal, setShowAddEduModal] = useState(false);
@@ -200,18 +202,25 @@ const CareerArkV2: React.FC = () => {
     }
   };
 
-  // Fetch Arc data
+  // Fetch Arc data and user profile
   const fetchArcData = async () => {
     setArcLoading(true);
     setArcError('');
+    setProfileError('');
     try {
       const token = (typeof window !== 'undefined' ? localStorage.getItem('token') : '') || '';
       // Fetch the user's profile
       const userRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!userRes.ok) throw new Error('Failed to fetch user');
+      if (!userRes.ok) {
+        setProfileError('User profile not found. Please complete your profile before using Career Ark.');
+        setProfile(null);
+        setArcData(null);
+        return;
+      }
       const user = await userRes.json();
+      setProfile(user);
       // Fetch all sections using the userId
       const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${user.id}/all_sections`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -244,6 +253,16 @@ const CareerArkV2: React.FC = () => {
       const bDate = b.end_date || b.start_date || '';
       return bDate.localeCompare(aDate);
     });
+  };
+
+  // Defensive: Block modal opening if profile is missing
+  const openAddModal = () => {
+    if (!profile || !profile.id) {
+      setFormError('Cannot add work experience: user profile is missing.');
+      return;
+    }
+    setForm({ company: '', title: '', start_date: '', end_date: '', description: '' });
+    setShowAddModal(true);
   };
 
   return (
@@ -305,7 +324,7 @@ const CareerArkV2: React.FC = () => {
             <Box mb={6} id="work_experience">
               <Flex justify="space-between" align="center" mb={2}>
                 <Heading size="sm">Work Experience</Heading>
-                <Button leftIcon={<AddIcon />} size="sm" colorScheme="blue" onClick={() => { setForm({ company: '', title: '', start_date: '', end_date: '', description: '' }); setShowAddModal(true); }}>Add</Button>
+                <Button leftIcon={<AddIcon />} size="sm" colorScheme="blue" onClick={openAddModal}>Add</Button>
               </Flex>
               {Array.isArray(arcData?.work_experience) && arcData.work_experience.length > 0 ? (
                 sortByEndDate(arcData.work_experience).map((item, idx) => (
@@ -474,6 +493,10 @@ const CareerArkV2: React.FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} isLoading={formLoading} onClick={async () => {
+              if (!profile || !profile.id) {
+                setFormError('Cannot add work experience: user profile is missing.');
+                return;
+              }
               setFormLoading(true); setFormError('');
               try {
                 await addWorkExperience({ ...form, description: form.description.split('\n').filter(Boolean) });
@@ -506,6 +529,10 @@ const CareerArkV2: React.FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} isLoading={formLoading} onClick={async () => {
+              if (!profile || !profile.id) {
+                setFormError('Cannot update work experience: user profile is missing.');
+                return;
+              }
               if (!editItem || !editItem.id) {
                 setFormError('Invalid work experience ID. Please try again.');
                 return;
@@ -786,6 +813,10 @@ const CareerArkV2: React.FC = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      {/* Show profile error if missing */}
+      {profileError && (
+        <Alert status="error" mt={4}><AlertIcon />{profileError}</Alert>
+      )}
     </Box>
   );
 };
