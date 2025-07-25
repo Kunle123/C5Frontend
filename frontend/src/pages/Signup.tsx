@@ -1,16 +1,16 @@
 import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Checkbox } from "../components/ui/checkbox";
 import { Mail, Lock, User, Eye, EyeOff, Shield } from "lucide-react";
-import SocialAuthButton from "@/components/auth/SocialAuthButton";
-import CaptchaComponent, { CaptchaRef } from "@/components/auth/CaptchaComponent";
-import { oauthService } from "@/services/oauthService";
-import { useToast } from "@/hooks/use-toast";
-import NavBanner from "@/components/NavBanner";
+import SocialAuthButton from "../components/auth/SocialAuthButton";
+import CaptchaComponent, { CaptchaRef } from "../components/auth/CaptchaComponent";
+import { oauthService } from "../services/oauthService";
+import { useToast } from "../hooks/use-toast";
+import NavBanner from "../components/NavBanner";
 
 const Signup = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -21,6 +21,7 @@ const Signup = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<CaptchaRef>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -51,7 +52,7 @@ const Signup = () => {
       if (response.ok) {
         const data = await response.json();
         toast({ title: "Account created successfully!", description: "Please check your email to verify your account." });
-        // Handle successful registration (redirect to login, etc.)
+        navigate("/login"); // Redirect to login after successful registration
       } else {
         const error = await response.json();
         toast({ title: "Registration failed", description: error.message || "Failed to create account", variant: "destructive" });
@@ -125,7 +126,14 @@ const Signup = () => {
                   <Label className="text-foreground font-medium flex items-center gap-2"><Shield className="h-4 w-4" />Security Verification</Label>
                   <CaptchaComponent ref={captchaRef} siteKey="6LcjwIsrAAAAAB0gcJBueXnRM-5QJM_GOdckHwAy" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
                 </div>
-                <Button type="submit" className="w-full bg-auth-gradient hover:opacity-90 border-0 shadow-soft transition-all duration-300 hover:shadow-elegant hover:-translate-y-0.5" disabled={isLoading || !agreeToTerms || !captchaToken}>{isLoading ? "Creating account..." : "Create Account"}</Button>
+                <Button
+                  type="submit"
+                  className="w-full bg-auth-gradient border-0 shadow-soft transition-all duration-300"
+                  disabled={isLoading}
+                  style={{ opacity: 1, visibility: 'visible' }}
+                >
+                  {isLoading ? "Creating account..." : "Create Account"}
+                </Button>
               </form>
               <div className="relative">
                 <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
