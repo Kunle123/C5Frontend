@@ -1,15 +1,15 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Mail, Lock, Eye, EyeOff, Shield } from "lucide-react";
-import SocialAuthButton from "@/components/auth/SocialAuthButton";
-import CaptchaComponent, { CaptchaRef } from "@/components/auth/CaptchaComponent";
-import { oauthService } from "@/services/oauthService";
-import { useToast } from "@/hooks/use-toast";
-import NavBanner from "@/components/NavBanner";
+import SocialAuthButton from "../components/auth/SocialAuthButton";
+import CaptchaComponent, { CaptchaRef } from "../components/auth/CaptchaComponent";
+import { oauthService } from "../services/oauthService";
+import { useToast } from "../hooks/use-toast";
+import NavBanner from "../components/NavBanner";
 
 const Login = () => {
   const [email, setEmail] = useState("");

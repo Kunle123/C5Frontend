@@ -58,6 +58,26 @@ export function Navigation() {
             >
               Account
             </button>
+            <button 
+              onClick={() => navigate("/login")}
+              className={`transition-colors ${
+                isActive("/login") 
+                  ? "text-primary font-medium" 
+                  : "text-foreground hover:text-primary"
+              }`}
+            >
+              Login
+            </button>
+            <button 
+              onClick={() => navigate("/signup")}
+              className={`transition-colors ${
+                isActive("/signup") 
+                  ? "text-primary font-medium" 
+                  : "text-foreground hover:text-primary"
+              }`}
+            >
+              Sign Up
+            </button>
             <Button variant="outline" size="sm">
               Log Out
             </Button>

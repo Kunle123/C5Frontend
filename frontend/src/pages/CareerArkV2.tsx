@@ -27,7 +27,7 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { API_GATEWAY_BASE } from '../api/careerArkApi';
-import { addWorkExperience, updateWorkExperience, deleteWorkExperience, addEducation, updateEducation, deleteEducation, addTraining, updateTraining, deleteTraining } from '../api/careerArkApi';
+import { addWorkExperience, updateWorkExperience, deleteWorkExperience, addEducation, updateEducation, deleteEducation, addTraining, updateTraining, deleteTraining, addSkill, updateSkill, deleteSkill, addProject, updateProject, deleteProject, addCertification, updateCertification, deleteCertification } from '../api/careerArkApi';
 
 const sectionList = [
   { key: 'work_experience', label: 'Work Experience' },
@@ -94,6 +94,25 @@ const CareerArkV2: React.FC = () => {
   const [trainingForm, setTrainingForm] = useState({ name: '', provider: '', date: '', details: '' });
   const [trainingFormLoading, setTrainingFormLoading] = useState(false);
   const [trainingFormError, setTrainingFormError] = useState('');
+
+  // Skills CRUD state
+  const [skillInput, setSkillInput] = useState('');
+  const [skillLoading, setSkillLoading] = useState(false);
+  const [skillError, setSkillError] = useState('');
+  // Projects CRUD state
+  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
+  const [showEditProjectModal, setShowEditProjectModal] = useState(false);
+  const [editProjectItem, setEditProjectItem] = useState<any>(null);
+  const [projectForm, setProjectForm] = useState({ name: '', description: '' });
+  const [projectFormLoading, setProjectFormLoading] = useState(false);
+  const [projectFormError, setProjectFormError] = useState('');
+  // Certifications CRUD state
+  const [showAddCertModal, setShowAddCertModal] = useState(false);
+  const [showEditCertModal, setShowEditCertModal] = useState(false);
+  const [editCertItem, setEditCertItem] = useState<any>(null);
+  const [certForm, setCertForm] = useState({ name: '', issuer: '', year: '' });
+  const [certFormLoading, setCertFormLoading] = useState(false);
+  const [certFormError, setCertFormError] = useState('');
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -369,22 +388,40 @@ const CareerArkV2: React.FC = () => {
               )}
             </Box>
             {/* Skills */}
-            <Box mb={6}>
-              <Heading size="sm" mb={2}>Skills</Heading>
-              {Array.isArray(arcData.skills) && arcData.skills.length > 0 ? (
-                <Box>{arcData.skills.map((s: string, i: number) => <Text as="span" key={i} mr={2} bg="blue.50" px={2} py={1} borderRadius="md">{s}</Text>)}</Box>
+            <Box mb={6} id="skills">
+              <Flex justify="space-between" align="center" mb={2}>
+                <Heading size="sm">Skills</Heading>
+                <HStack>
+                  <Input size="sm" placeholder="Add skill" value={skillInput} onChange={e => setSkillInput(e.target.value)} onKeyDown={async e => { if (e.key === 'Enter' && skillInput.trim()) { setSkillLoading(true); setSkillError(''); try { await addSkill({ name: skillInput.trim() }); setSkillInput(''); fetchArcData(); toast({ status: 'success', title: 'Skill added' }); } catch (err: any) { setSkillError(err.message || 'Add failed'); } finally { setSkillLoading(false); } } }} />
+                  <Button size="sm" colorScheme="blue" isLoading={skillLoading} onClick={async () => { if (!skillInput.trim()) return; setSkillLoading(true); setSkillError(''); try { await addSkill({ name: skillInput.trim() }); setSkillInput(''); fetchArcData(); toast({ status: 'success', title: 'Skill added' }); } catch (err: any) { setSkillError(err.message || 'Add failed'); } finally { setSkillLoading(false); } }}>Add</Button>
+                </HStack>
+              </Flex>
+              {skillError && <Alert status="error"><AlertIcon />{skillError}</Alert>}
+              {Array.isArray(arcData?.skills) && arcData.skills.length > 0 ? (
+                <Box>{arcData.skills.map((s: any, i: number) => <Button key={s.id || i} size="sm" variant="outline" colorScheme="blue" mr={2} mb={2} onClick={async () => { setSkillLoading(true); try { await deleteSkill(s.id); fetchArcData(); toast({ status: 'success', title: 'Skill removed' }); } catch (err: any) { toast({ status: 'error', title: err.message || 'Delete failed' }); } finally { setSkillLoading(false); } }}>{s.name || s.skill || s}</Button>)}</Box>
               ) : (
                 <EmptyState section="skills" onUpload={handleUploadClick} />
               )}
             </Box>
             {/* Projects */}
-            <Box mb={6}>
-              <Heading size="sm" mb={2}>Projects</Heading>
-              {Array.isArray(arcData.projects) && arcData.projects.length > 0 ? (
+            <Box mb={6} id="projects">
+              <Flex justify="space-between" align="center" mb={2}>
+                <Heading size="sm">Projects</Heading>
+                <Button leftIcon={<AddIcon />} size="sm" colorScheme="blue" onClick={() => { setProjectForm({ name: '', description: '' }); setShowAddProjectModal(true); }}>Add</Button>
+              </Flex>
+              {Array.isArray(arcData?.projects) && arcData.projects.length > 0 ? (
                 arcData.projects.map((item: any, idx: number) => (
                   <Box key={item.id || idx} mb={3} p={3} borderRadius="md" bg="gray.50">
-                    <Text fontWeight="bold">{item.name || item.title}</Text>
-                    <Text fontSize="sm" color="gray.600">{item.description}</Text>
+                    <Flex justify="space-between" align="center">
+                      <Box>
+                        <Text fontWeight="bold">{item.name}</Text>
+                        <Text fontSize="sm" color="gray.600">{item.description}</Text>
+                      </Box>
+                      <HStack>
+                        <Button size="xs" leftIcon={<EditIcon />} onClick={() => { setEditProjectItem(item); setProjectForm({ name: item.name, description: item.description }); setShowEditProjectModal(true); }}>Edit</Button>
+                        <Button size="xs" leftIcon={<DeleteIcon />} colorScheme="red" onClick={async () => { setProjectFormLoading(true); try { await deleteProject(item.id); fetchArcData(); toast({ status: 'success', title: 'Deleted' }); } catch (err: any) { toast({ status: 'error', title: err.message || 'Delete failed' }); } finally { setProjectFormLoading(false); } }}>Delete</Button>
+                      </HStack>
+                    </Flex>
                   </Box>
                 ))
               ) : (
@@ -392,13 +429,24 @@ const CareerArkV2: React.FC = () => {
               )}
             </Box>
             {/* Certifications */}
-            <Box mb={6}>
-              <Heading size="sm" mb={2}>Certifications</Heading>
-              {Array.isArray(arcData.certifications) && arcData.certifications.length > 0 ? (
+            <Box mb={6} id="certifications">
+              <Flex justify="space-between" align="center" mb={2}>
+                <Heading size="sm">Certifications</Heading>
+                <Button leftIcon={<AddIcon />} size="sm" colorScheme="blue" onClick={() => { setCertForm({ name: '', issuer: '', year: '' }); setShowAddCertModal(true); }}>Add</Button>
+              </Flex>
+              {Array.isArray(arcData?.certifications) && arcData.certifications.length > 0 ? (
                 arcData.certifications.map((item: any, idx: number) => (
                   <Box key={item.id || idx} mb={3} p={3} borderRadius="md" bg="gray.50">
-                    <Text fontWeight="bold">{item.name || item.title}</Text>
-                    <Text fontSize="sm" color="gray.600">{item.issuer} {item.year ? `(${item.year})` : item.date ? `(${item.date})` : ''}</Text>
+                    <Flex justify="space-between" align="center">
+                      <Box>
+                        <Text fontWeight="bold">{item.name}</Text>
+                        <Text fontSize="sm" color="gray.600">{item.issuer} {item.year ? `(${item.year})` : ''}</Text>
+                      </Box>
+                      <HStack>
+                        <Button size="xs" leftIcon={<EditIcon />} onClick={() => { setEditCertItem(item); setCertForm({ name: item.name, issuer: item.issuer, year: item.year }); setShowEditCertModal(true); }}>Edit</Button>
+                        <Button size="xs" leftIcon={<DeleteIcon />} colorScheme="red" onClick={async () => { setCertFormLoading(true); try { await deleteCertification(item.id); fetchArcData(); toast({ status: 'success', title: 'Deleted' }); } catch (err: any) { toast({ status: 'error', title: err.message || 'Delete failed' }); } finally { setCertFormLoading(false); } }}>Delete</Button>
+                      </HStack>
+                    </Flex>
                   </Box>
                 ))
               ) : (
@@ -600,6 +648,126 @@ const CareerArkV2: React.FC = () => {
               }
             }}>Save</Button>
             <Button onClick={() => setShowEditTrainingModal(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Add Project Modal */}
+      <Modal isOpen={showAddProjectModal} onClose={() => setShowAddProjectModal(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add Project</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={3} align="stretch">
+              <Input placeholder="Project Name" value={projectForm.name} onChange={e => setProjectForm(f => ({ ...f, name: e.target.value }))} />
+              <Textarea placeholder="Description" value={projectForm.description} onChange={e => setProjectForm(f => ({ ...f, description: e.target.value }))} />
+              {projectFormError && <Alert status="error"><AlertIcon />{projectFormError}</Alert>}
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} isLoading={projectFormLoading} onClick={async () => {
+              setProjectFormLoading(true); setProjectFormError('');
+              try {
+                await addProject(projectForm);
+                setShowAddProjectModal(false); fetchArcData(); toast({ status: 'success', title: 'Added' });
+              } catch (err: any) {
+                setProjectFormError(err.message || 'Add failed');
+              } finally {
+                setProjectFormLoading(false);
+              }
+            }}>Add</Button>
+            <Button onClick={() => setShowAddProjectModal(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Edit Project Modal */}
+      <Modal isOpen={showEditProjectModal} onClose={() => setShowEditProjectModal(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Project</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={3} align="stretch">
+              <Input placeholder="Project Name" value={projectForm.name} onChange={e => setProjectForm(f => ({ ...f, name: e.target.value }))} />
+              <Textarea placeholder="Description" value={projectForm.description} onChange={e => setProjectForm(f => ({ ...f, description: e.target.value }))} />
+              {projectFormError && <Alert status="error"><AlertIcon />{projectFormError}</Alert>}
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} isLoading={projectFormLoading} onClick={async () => {
+              if (!editProjectItem) return;
+              setProjectFormLoading(true); setProjectFormError('');
+              try {
+                await updateProject(editProjectItem.id, projectForm);
+                setShowEditProjectModal(false); fetchArcData(); toast({ status: 'success', title: 'Updated' });
+              } catch (err: any) {
+                setProjectFormError(err.message || 'Update failed');
+              } finally {
+                setProjectFormLoading(false);
+              }
+            }}>Save</Button>
+            <Button onClick={() => setShowEditProjectModal(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Add Certification Modal */}
+      <Modal isOpen={showAddCertModal} onClose={() => setShowAddCertModal(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add Certification</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={3} align="stretch">
+              <Input placeholder="Certification Name" value={certForm.name} onChange={e => setCertForm(f => ({ ...f, name: e.target.value }))} />
+              <Input placeholder="Issuer" value={certForm.issuer} onChange={e => setCertForm(f => ({ ...f, issuer: e.target.value }))} />
+              <Input placeholder="Year" value={certForm.year} onChange={e => setCertForm(f => ({ ...f, year: e.target.value }))} />
+              {certFormError && <Alert status="error"><AlertIcon />{certFormError}</Alert>}
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} isLoading={certFormLoading} onClick={async () => {
+              setCertFormLoading(true); setCertFormError('');
+              try {
+                await addCertification(certForm);
+                setShowAddCertModal(false); fetchArcData(); toast({ status: 'success', title: 'Added' });
+              } catch (err: any) {
+                setCertFormError(err.message || 'Add failed');
+              } finally {
+                setCertFormLoading(false);
+              }
+            }}>Add</Button>
+            <Button onClick={() => setShowAddCertModal(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Edit Certification Modal */}
+      <Modal isOpen={showEditCertModal} onClose={() => setShowEditCertModal(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Certification</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={3} align="stretch">
+              <Input placeholder="Certification Name" value={certForm.name} onChange={e => setCertForm(f => ({ ...f, name: e.target.value }))} />
+              <Input placeholder="Issuer" value={certForm.issuer} onChange={e => setCertForm(f => ({ ...f, issuer: e.target.value }))} />
+              <Input placeholder="Year" value={certForm.year} onChange={e => setCertForm(f => ({ ...f, year: e.target.value }))} />
+              {certFormError && <Alert status="error"><AlertIcon />{certFormError}</Alert>}
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} isLoading={certFormLoading} onClick={async () => {
+              if (!editCertItem) return;
+              setCertFormLoading(true); setCertFormError('');
+              try {
+                await updateCertification(editCertItem.id, certForm);
+                setShowEditCertModal(false); fetchArcData(); toast({ status: 'success', title: 'Updated' });
+              } catch (err: any) {
+                setCertFormError(err.message || 'Update failed');
+              } finally {
+                setCertFormLoading(false);
+              }
+            }}>Save</Button>
+            <Button onClick={() => setShowEditCertModal(false)}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
