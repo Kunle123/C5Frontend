@@ -124,7 +124,7 @@ export function CareerArcPage() {
       let pollCount = 0;
       const poll = async () => {
         try {
-          const statusRes = await fetch(`/api/arc/cv/${taskId}/status`, {
+          const statusRes = await fetch(`/api/career-ark/cv/status/${taskId}`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
           });
           const statusData = await statusRes.json();
