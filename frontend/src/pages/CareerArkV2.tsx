@@ -332,6 +332,7 @@ const CareerArkV2: React.FC = () => {
                     <Flex justify="space-between" align="center">
                       <Box>
                         <Text fontWeight="bold">{item.title} @ {item.company}</Text>
+                        <Text fontSize="xs" color="gray.400">ID: {item.id}</Text>
                         <Text fontSize="sm" color="gray.600">{item.start_date} - {item.end_date || 'Present'}</Text>
                         {getDetails(item).length > 0 && (
                           <ul style={{ marginLeft: 16 }}>
