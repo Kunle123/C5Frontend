@@ -343,12 +343,18 @@ const CareerArkV2: React.FC = () => {
                       </Box>
                       <HStack>
                         <Button size="xs" leftIcon={<EditIcon />} 
-                          onClick={() => { 
+                          onClick={() => {
+                            // Defensive: Only allow if item.id is present
+                            if (!item.id) {
+                              console.error('Attempted to open edit modal for item with missing id:', item);
+                              toast({ status: 'error', title: 'Cannot edit: missing ID on entry.' });
+                              return;
+                            }
                             console.log('Opening edit modal for item:', item);
                             console.log('Item ID:', item.id);
-                            setEditItem(item); 
-                            setForm({ company: item.company, title: item.title, start_date: item.start_date, end_date: item.end_date, description: Array.isArray(item.details) ? item.details.join('\n') : (item.description || '') }); 
-                            setShowEditModal(true); 
+                            setEditItem(item);
+                            setForm({ company: item.company, title: item.title, start_date: item.start_date, end_date: item.end_date, description: Array.isArray(item.details) ? item.details.join('\n') : (item.description || '') });
+                            setShowEditModal(true);
                           }}
                           isDisabled={!item.id}
                           title={!item.id ? 'Cannot edit: missing ID' : ''}
@@ -539,14 +545,15 @@ const CareerArkV2: React.FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} isLoading={formLoading} onClick={async () => {
+              if (!editItem || !editItem.id) {
+                console.error('Save blocked: editItem or editItem.id is missing.', editItem);
+                setFormError('Invalid work experience ID. Please try again.');
+                return;
+              }
               console.log('Attempting to update work experience. editItem:', editItem);
               console.log('editItem.id:', editItem?.id);
               if (!profile || !profile.id) {
                 setFormError('Cannot update work experience: user profile is missing.');
-                return;
-              }
-              if (!editItem || !editItem.id) {
-                setFormError('Invalid work experience ID. Please try again.');
                 return;
               }
               setFormLoading(true); setFormError('');
