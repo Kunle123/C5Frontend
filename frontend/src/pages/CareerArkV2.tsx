@@ -12,8 +12,31 @@ import {
   AlertIcon,
   Center,
   Image,
+  Input,
+  Textarea,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  VStack,
+  HStack,
+  useDisclosure,
 } from '@chakra-ui/react';
+import { AddIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { API_GATEWAY_BASE } from '../api/careerArkApi';
+import { addWorkExperience, updateWorkExperience, deleteWorkExperience } from '../api/careerArkApi';
+
+const sectionList = [
+  { key: 'work_experience', label: 'Work Experience' },
+  { key: 'education', label: 'Education' },
+  { key: 'training', label: 'Training' },
+  { key: 'skills', label: 'Skills' },
+  { key: 'projects', label: 'Projects' },
+  { key: 'certifications', label: 'Certifications' },
+];
 
 function EmptyState({ section, onUpload }: { section: string, onUpload?: () => void }) {
   const sectionNames: Record<string, string> = {
@@ -48,6 +71,14 @@ const CareerArkV2: React.FC = () => {
   const [arcData, setArcData] = useState<any>(null);
   const [arcLoading, setArcLoading] = useState(false);
   const [arcError, setArcError] = useState('');
+  const [activeSection, setActiveSection] = useState('work_experience');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null);
+  const [form, setForm] = useState({ company: '', title: '', start_date: '', end_date: '', description: '' });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState('');
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -221,21 +252,47 @@ const CareerArkV2: React.FC = () => {
           <Alert status="error"><AlertIcon />{arcError}</Alert>
         ) : arcData ? (
           <>
+            {/* Section navigation */}
+            <Box mb={8}>
+              <HStack spacing={4} justify="center">
+                {sectionList.map(sec => (
+                  <Button
+                    key={sec.key}
+                    variant={activeSection === sec.key ? 'solid' : 'ghost'}
+                    colorScheme={activeSection === sec.key ? 'blue' : 'gray'}
+                    onClick={() => setActiveSection(sec.key)}
+                  >
+                    {sec.label}
+                  </Button>
+                ))}
+              </HStack>
+            </Box>
             {/* Work Experience */}
-            <Box mb={6}>
-              <Heading size="sm" mb={2}>Work Experience</Heading>
-              {Array.isArray(arcData.work_experience) && arcData.work_experience.length > 0 ? (
+            <Box mb={6} id="work_experience">
+              <Flex justify="space-between" align="center" mb={2}>
+                <Heading size="sm">Work Experience</Heading>
+                <Button leftIcon={<AddIcon />} size="sm" colorScheme="blue" onClick={() => { setForm({ company: '', title: '', start_date: '', end_date: '', description: '' }); setShowAddModal(true); }}>Add</Button>
+              </Flex>
+              {Array.isArray(arcData?.work_experience) && arcData.work_experience.length > 0 ? (
                 sortByEndDate(arcData.work_experience).map((item, idx) => (
                   <Box key={item.id || idx} mb={3} p={3} borderRadius="md" bg="gray.50">
-                    <Text fontWeight="bold">{item.title} @ {item.company}</Text>
-                    <Text fontSize="sm" color="gray.600">{item.start_date} - {item.end_date || 'Present'}</Text>
-                    {getDetails(item).length > 0 && (
-                      <ul style={{ marginLeft: 16 }}>
-                        {getDetails(item).map((d: string, i: number) => (
-                          <li key={i}><Text fontSize="sm">{d}</Text></li>
-                        ))}
-                      </ul>
-                    )}
+                    <Flex justify="space-between" align="center">
+                      <Box>
+                        <Text fontWeight="bold">{item.title} @ {item.company}</Text>
+                        <Text fontSize="sm" color="gray.600">{item.start_date} - {item.end_date || 'Present'}</Text>
+                        {getDetails(item).length > 0 && (
+                          <ul style={{ marginLeft: 16 }}>
+                            {getDetails(item).map((d: string, i: number) => (
+                              <li key={i}><Text fontSize="sm">{d}</Text></li>
+                            ))}
+                          </ul>
+                        )}
+                      </Box>
+                      <HStack>
+                        <Button size="xs" leftIcon={<EditIcon />} onClick={() => { setEditItem(item); setForm({ company: item.company, title: item.title, start_date: item.start_date, end_date: item.end_date, description: Array.isArray(item.details) ? item.details.join('\n') : (item.description || '') }); setShowEditModal(true); }}>Edit</Button>
+                        <Button size="xs" leftIcon={<DeleteIcon />} colorScheme="red" onClick={async () => { setFormLoading(true); try { await deleteWorkExperience(item.id); fetchArcData(); toast({ status: 'success', title: 'Deleted' }); } catch (err: any) { toast({ status: 'error', title: err.message || 'Delete failed' }); } finally { setFormLoading(false); } }}>Delete</Button>
+                      </HStack>
+                    </Flex>
                   </Box>
                 ))
               ) : (
@@ -325,6 +382,71 @@ const CareerArkV2: React.FC = () => {
           </>
         ) : null}
       </Box>
+      {/* Add Modal */}
+      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add Work Experience</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={3} align="stretch">
+              <Input placeholder="Company" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
+              <Input placeholder="Title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+              <Input placeholder="Start Date" value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} />
+              <Input placeholder="End Date" value={form.end_date} onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))} />
+              <Textarea placeholder="Description (one per line)" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+              {formError && <Alert status="error"><AlertIcon />{formError}</Alert>}
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} isLoading={formLoading} onClick={async () => {
+              setFormLoading(true); setFormError('');
+              try {
+                await addWorkExperience({ ...form, description: form.description.split('\n').filter(Boolean) });
+                setShowAddModal(false); fetchArcData(); toast({ status: 'success', title: 'Added' });
+              } catch (err: any) {
+                setFormError(err.message || 'Add failed');
+              } finally {
+                setFormLoading(false);
+              }
+            }}>Add</Button>
+            <Button onClick={() => setShowAddModal(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Edit Modal */}
+      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Work Experience</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={3} align="stretch">
+              <Input placeholder="Company" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
+              <Input placeholder="Title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+              <Input placeholder="Start Date" value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} />
+              <Input placeholder="End Date" value={form.end_date} onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))} />
+              <Textarea placeholder="Description (one per line)" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+              {formError && <Alert status="error"><AlertIcon />{formError}</Alert>}
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} isLoading={formLoading} onClick={async () => {
+              if (!editItem) return;
+              setFormLoading(true); setFormError('');
+              try {
+                await updateWorkExperience(editItem.id, { ...form, description: form.description.split('\n').filter(Boolean) });
+                setShowEditModal(false); fetchArcData(); toast({ status: 'success', title: 'Updated' });
+              } catch (err: any) {
+                setFormError(err.message || 'Update failed');
+              } finally {
+                setFormLoading(false);
+              }
+            }}>Save</Button>
+            <Button onClick={() => setShowEditModal(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
