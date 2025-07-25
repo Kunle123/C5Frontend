@@ -354,6 +354,46 @@ export async function addCertification(data: { name: string; issuer?: string; ye
   return res.json();
 }
 
+// Update Skill
+export async function updateSkill(id: string, data: any) {
+  const res = await fetch(`${API_BASE}/skills/${id}`, {
+    method: 'PUT',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update skill'));
+  return res.json();
+}
+// Update Project
+export async function updateProject(id: string, data: any) {
+  const res = await fetch(`${API_BASE}/projects/${id}`, {
+    method: 'PUT',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update project'));
+  return res.json();
+}
+// Update Certification
+export async function updateCertification(id: string, data: any) {
+  const res = await fetch(`${API_BASE}/certifications/${id}`, {
+    method: 'PUT',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw await res.json().catch(() => new Error('Failed to update certification'));
+  return res.json();
+}
+
 // Utility: Download a base64-encoded DOCX file in the browser
 export function downloadBase64Docx(base64: string, filename: string = 'cv.docx') {
   const byteCharacters = atob(base64);
