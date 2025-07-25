@@ -342,7 +342,13 @@ const CareerArkV2: React.FC = () => {
                         )}
                       </Box>
                       <HStack>
-                        <Button size="xs" leftIcon={<EditIcon />} onClick={() => { setEditItem(item); setForm({ company: item.company, title: item.title, start_date: item.start_date, end_date: item.end_date, description: Array.isArray(item.details) ? item.details.join('\n') : (item.description || '') }); setShowEditModal(true); }}>Edit</Button>
+                        <Button size="xs" leftIcon={<EditIcon />} onClick={() => { 
+                          console.log('Opening edit modal for item:', item);
+                          console.log('Item ID:', item.id);
+                          setEditItem(item); 
+                          setForm({ company: item.company, title: item.title, start_date: item.start_date, end_date: item.end_date, description: Array.isArray(item.details) ? item.details.join('\n') : (item.description || '') }); 
+                          setShowEditModal(true); 
+                        }}>Edit</Button>
                         <Button size="xs" leftIcon={<DeleteIcon />} colorScheme="red" onClick={async () => { setFormLoading(true); try { await deleteWorkExperience(item.id); fetchArcData(); toast({ status: 'success', title: 'Deleted' }); } catch (err: any) { toast({ status: 'error', title: err.message || 'Delete failed' }); } finally { setFormLoading(false); } }}>Delete</Button>
                       </HStack>
                     </Flex>
@@ -529,6 +535,8 @@ const CareerArkV2: React.FC = () => {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} isLoading={formLoading} onClick={async () => {
+              console.log('Attempting to update work experience. editItem:', editItem);
+              console.log('editItem.id:', editItem?.id);
               if (!profile || !profile.id) {
                 setFormError('Cannot update work experience: user profile is missing.');
                 return;
