@@ -267,6 +267,9 @@ const CareerArkV2: React.FC = () => {
 
   return (
     <Box minH="100vh" bg="gray.50" p={8}>
+      <div style={{ background: '#38bdf8', color: '#1e293b', padding: '8px', fontWeight: 'bold', textAlign: 'center', fontSize: '18px' }}>
+        Career Ark Page 2
+      </div>
       <Box maxW="600px" mx="auto" bg="white" p={8} borderRadius="lg" boxShadow="md" mb={8}>
         <Heading size="lg" mb={6}>Career Ark – CV Upload (v2)</Heading>
         <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
