@@ -502,8 +502,15 @@ const CareerArkV2: React.FC = () => {
                                   variant="outline" 
                                   size="sm"
                                   onClick={() => {
+                                    console.log('Editing work experience:', experience, 'start_date:', convertToMonthInput(experience.start_date), 'end_date:', convertToMonthInput(experience.end_date));
                                     setEditItem(experience);
-                                    setForm({ company: experience.company, title: experience.title, start_date: experience.start_date, end_date: experience.end_date, description: Array.isArray(experience.details) ? experience.details.join('\n') : (experience.description || '') });
+                                    setForm({
+                                      company: experience.company,
+                                      title: experience.title,
+                                      start_date: convertToMonthInput(experience.start_date),
+                                      end_date: convertToMonthInput(experience.end_date),
+                                      description: Array.isArray(experience.details) ? experience.details.join('\n') : (experience.description || '')
+                                    });
                                     setShowEditModal(true);
                                   }}
                                   className="gap-1"
