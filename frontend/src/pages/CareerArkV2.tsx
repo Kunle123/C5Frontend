@@ -521,6 +521,113 @@ const CareerArkV2: React.FC = () => {
                   )}
                 </div>
               </ScrollArea>
+              {/* Education Section */}
+              <h2 className="text-2xl font-semibold text-card-foreground flex items-center gap-2 mt-12">
+                <Award className="h-6 w-6 text-primary" />
+                Education
+              </h2>
+              <div className="space-y-4 mt-4">
+                {Array.isArray(arcData?.education) && arcData.education.length > 0 ? (
+                  arcData.education.map((edu: any, idx: number) => (
+                    <Card key={edu.id || idx} className="shadow-card">
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg text-card-foreground">{edu.degree} @ {edu.institution}</CardTitle>
+                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                              <Calendar className="h-4 w-4" />
+                              <span>{edu.start_date} - {edu.end_date || 'Present'}</span>
+                              {edu.field && <Badge variant="secondary" className="ml-2">{edu.field}</Badge>}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button size="sm" variant="outline" onClick={() => { setEditEduItem(edu); setEduForm({ institution: edu.institution, degree: edu.degree, field: edu.field || '', start_date: edu.start_date, end_date: edu.end_date, description: Array.isArray(edu.details) ? edu.details.join('\n') : (edu.description || '') }); setShowEditEduModal(true); }}>Edit</Button>
+                            <Button size="sm" variant="destructive" onClick={async () => { setEduFormLoading(true); try { await deleteEducation(edu.id); fetchArcData(); toast({ title: 'Deleted' }); } catch (err: any) { toast({ title: err.message || 'Delete failed' }); } finally { setEduFormLoading(false); } }}>Delete</Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        {Array.isArray(edu.description) && edu.description.length > 0 && (
+                          <ul className="list-disc ml-6 text-muted-foreground text-sm">
+                            {edu.description.map((desc: string, i: number) => (
+                              <li key={i}>{desc}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-muted-foreground text-center py-8">No education entries found.</div>
+                )}
+              </div>
+              {/* Add/Edit Education Modal */}
+              <Dialog open={showAddEduModal || showEditEduModal} onOpenChange={(open) => { setShowAddEduModal(open && !editEduItem); setShowEditEduModal(open && !!editEduItem); if (!open) { setEditEduItem(null); setEduForm({ institution: '', degree: '', field: '', start_date: '', end_date: '', description: '' }); setEduFormError(''); } }}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>{editEduItem ? 'Edit Education' : 'Add New Education'}</DialogTitle>
+                    <DialogDescription>
+                      {editEduItem ? 'Update your education details' : 'Add a new education entry to your Career Ark™'}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    setEduFormLoading(true); setEduFormError('');
+                    try {
+                      if (editEduItem) {
+                        if (!editEduItem.id) throw new Error('Invalid education ID');
+                        await updateEducation(editEduItem.id, { ...eduForm, description: eduForm.description.split('\n').filter(Boolean) });
+                        setShowEditEduModal(false);
+                      } else {
+                        await addEducation({ ...eduForm, description: eduForm.description.split('\n').filter(Boolean) });
+                        setShowAddEduModal(false);
+                      }
+                      fetchArcData();
+                      toast({ title: editEduItem ? 'Education updated' : 'Education added' });
+                    } catch (err: any) {
+                      setEduFormError(err.message || 'Save failed');
+                    } finally {
+                      setEduFormLoading(false);
+                    }
+                  }} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="degree">Degree</Label>
+                        <Input id="degree" value={eduForm.degree} onChange={e => setEduForm(f => ({ ...f, degree: e.target.value }))} placeholder="e.g. BSc Computer Science" required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="institution">Institution</Label>
+                        <Input id="institution" value={eduForm.institution} onChange={e => setEduForm(f => ({ ...f, institution: e.target.value }))} placeholder="e.g. University of London" required />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="field">Field</Label>
+                      <Input id="field" value={eduForm.field} onChange={e => setEduForm(f => ({ ...f, field: e.target.value }))} placeholder="e.g. Computer Science" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="start_date">Start Date</Label>
+                        <Input id="start_date" type="month" value={eduForm.start_date} onChange={e => setEduForm(f => ({ ...f, start_date: e.target.value }))} required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="end_date">End Date</Label>
+                        <Input id="end_date" type="month" value={eduForm.end_date} onChange={e => setEduForm(f => ({ ...f, end_date: e.target.value }))} />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description (one per line)</Label>
+                      <Textarea id="description" value={eduForm.description} onChange={e => setEduForm(f => ({ ...f, description: e.target.value }))} placeholder="Describe your studies, achievements, etc..." rows={3} />
+                    </div>
+                    {eduFormError && <div className="text-red-500 text-sm">{eduFormError}</div>}
+                    <div className="flex justify-end gap-2 pt-4">
+                      <Button type="submit" disabled={eduFormLoading}>
+                        {eduFormLoading ? 'Saving...' : (editEduItem ? 'Update Education' : 'Add Education')}
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => { setShowAddEduModal(false); setShowEditEduModal(false); setEditEduItem(null); setEduForm({ institution: '', degree: '', field: '', start_date: '', end_date: '', description: '' }); setEduFormError(''); }}>Cancel</Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
