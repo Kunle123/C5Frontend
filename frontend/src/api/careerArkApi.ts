@@ -184,6 +184,7 @@ export async function addWorkExperience(data: any) {
 // Update Work Experience (Career Ark)
 export async function updateWorkExperience(id: string, data: any) {
   const token = localStorage.getItem('token') || '';
+  console.log('PATCH payload for updateWorkExperience:', id, data);
   const res = await fetch(`${API_CAREER_ARK}/work_experience/${id}`, {
     method: 'PATCH',
     headers: {
