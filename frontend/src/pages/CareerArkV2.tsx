@@ -41,6 +41,35 @@ function EmptyState({ section, onUpload }: { section: string, onUpload?: () => v
   );
 }
 
+function convertToMonthInput(dateStr: string) {
+  if (!dateStr) return "";
+  if (/^\d{4}-\d{2}$/.test(dateStr)) return dateStr;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr.slice(0, 7);
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const match = dateStr.match(/^(\w{3}) (\d{4})$/);
+  if (match) {
+    const month = months.indexOf(match[1]) + 1;
+    return `${match[2]}-${month.toString().padStart(2, '0')}`;
+  }
+  return "";
+}
+
+function getUniqueMonths(workExperiences: any[]) {
+  const months = new Set<string>();
+  workExperiences.forEach(exp => {
+    const start = exp.start_date ? new Date(exp.start_date) : null;
+    const end = exp.end_date && exp.end_date !== 'Present' ? new Date(exp.end_date) : new Date();
+    if (!start || !end) return;
+    let current = new Date(start.getFullYear(), start.getMonth(), 1);
+    const last = new Date(end.getFullYear(), end.getMonth(), 1);
+    while (current <= last) {
+      months.add(`${current.getFullYear()}-${(current.getMonth()+1).toString().padStart(2,'0')}`);
+      current.setMonth(current.getMonth() + 1);
+    }
+  });
+  return months;
+}
+
 const CareerArkV2: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -255,6 +284,12 @@ const CareerArkV2: React.FC = () => {
     </div>
   );
 
+  const workExps = Array.isArray(arcData?.work_experience) ? arcData.work_experience : [];
+  const uniqueMonths = getUniqueMonths(workExps);
+  const totalYears = uniqueMonths.size > 0 ? (uniqueMonths.size / 12).toFixed(1) : '--';
+  const totalRoles = workExps.length;
+  const allSkills: string[] = [...new Set((workExps.flatMap((exp: any) => Array.isArray(exp.skills) ? exp.skills : [])) as string[])];
+
   return (
     <div className="min-h-screen bg-background">
       {banner}
@@ -374,18 +409,20 @@ const CareerArkV2: React.FC = () => {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-3 bg-primary/5 rounded-lg">
-                    <div className="text-2xl font-bold text-primary">--</div>
+                    <div className="text-2xl font-bold text-primary">{totalYears}</div>
                     <div className="text-xs text-muted-foreground">Years Experience</div>
                   </div>
                   <div className="text-center p-3 bg-success/5 rounded-lg">
-                    <div className="text-2xl font-bold text-success">--</div>
+                    <div className="text-2xl font-bold text-success">{totalRoles}</div>
                     <div className="text-xs text-muted-foreground">Total Roles</div>
                   </div>
                 </div>
                 <div>
                   <h4 className="font-medium mb-2 text-sm">Top Skills</h4>
                   <div className="flex flex-wrap gap-1">
-                    {/* Top skills badges will go here */}
+                    {allSkills.slice(0, 8).map((skill: string) => (
+                      <Badge key={skill} variant="secondary" className="text-xs">{skill}</Badge>
+                    ))}
                   </div>
                 </div>
               </CardContent>
@@ -541,7 +578,7 @@ const CareerArkV2: React.FC = () => {
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            <Button size="sm" variant="outline" onClick={() => { setEditEduItem(edu); setEduForm({ institution: edu.institution, degree: edu.degree, field: edu.field || '', start_date: edu.start_date, end_date: edu.end_date, description: Array.isArray(edu.details) ? edu.details.join('\n') : (edu.description || '') }); setShowEditEduModal(true); }}>Edit</Button>
+                            <Button size="sm" variant="outline" onClick={() => { setEditEduItem(edu); setEduForm({ institution: edu.institution, degree: edu.degree, field: edu.field || '', start_date: convertToMonthInput(edu.start_date), end_date: convertToMonthInput(edu.end_date), description: Array.isArray(edu.details) ? edu.details.join('\n') : (edu.description || '') }); setShowEditEduModal(true); }}>Edit</Button>
                             <Button size="sm" variant="destructive" onClick={async () => { setEduFormLoading(true); try { await deleteEducation(edu.id); fetchArcData(); toast({ title: 'Deleted' }); } catch (err: any) { toast({ title: err.message || 'Delete failed' }); } finally { setEduFormLoading(false); } }}>Delete</Button>
                           </div>
                         </div>
