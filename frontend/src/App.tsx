@@ -73,7 +73,7 @@ function App() {
           <Route path="/auth/linkedin/callback" element={<AuthCallback />} />
 
           {/* Chakra-based pages - wrap with ChakraProvider and Layout */}
-          <Route path="/dashboard" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout></ChakraProvider>} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard-new" element={<DashboardNew />} />
           <Route path="/cvs" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></Layout></ChakraProvider>} />
           <Route path="/career-ark" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
