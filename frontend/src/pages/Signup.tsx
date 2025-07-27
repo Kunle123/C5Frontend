@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -22,6 +22,13 @@ const Signup = () => {
   const captchaRef = useRef<CaptchaRef>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    if (isLocal) {
+      setCaptchaToken("dev-bypass");
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -124,7 +131,9 @@ const Signup = () => {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-foreground font-medium flex items-center gap-2"><Shield className="h-4 w-4" />Security Verification</Label>
-                  <CaptchaComponent ref={captchaRef} siteKey="6LcjwIsrAAAAAB0gcJBueXnRM-5QJM_GOdckHwAy" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
+                  {!(window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") && (
+                    <CaptchaComponent ref={captchaRef} siteKey="6LcjwIsrAAAAAB0gcJBueXnRM-5QJM_GOdckHwAy" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
+                  )}
                 </div>
                 <Button
                   type="submit"
