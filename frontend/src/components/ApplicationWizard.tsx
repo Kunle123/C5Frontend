@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Switch } from './ui/switch';
 import { useToast } from '../hooks/use-toast';
 import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
+import { extractKeywords, generateCV } from '../api/aiApi';
+import { useEffect } from 'react';
 
 interface Keyword {
   text: string;
@@ -40,6 +42,51 @@ const ApplicationWizard = () => {
   });
   const [generatedCV, setGeneratedCV] = useState('');
   const [generatedCoverLetter, setGeneratedCoverLetter] = useState('');
+  const [profile, setProfile] = useState<any>(null);
+  const [arcData, setArcData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch user profile and arc data on mount
+  useEffect(() => {
+    const fetchProfileAndArc = async () => {
+      try {
+        setError(null);
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Not authenticated');
+        // 1. Get user profile
+        const profileRes = await fetch('https://api-gw-production.up.railway.app/api/user/profile', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!profileRes.ok) throw new Error('Failed to fetch user profile');
+        const userProfile = await profileRes.json();
+        setProfile(userProfile);
+        // 2. Get arc data
+        const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfile.id}/all_sections`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!arcRes.ok) throw new Error('Failed to fetch arc data');
+        const arc = await arcRes.json();
+        setArcData(arc);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load profile/arc data');
+      }
+    };
+    fetchProfileAndArc();
+  }, []);
+
+  // Helper to merge profile and arc data
+  const getMergedProfile = () => {
+    if (!profile || !arcData) return null;
+    return {
+      ...profile,
+      work_experience: arcData.work_experience || [],
+      education: arcData.education || [],
+      skills: arcData.skills || [],
+      projects: arcData.projects || [],
+      certifications: arcData.certifications || [],
+      training: arcData.training || [],
+    };
+  };
 
   const steps = [
     { number: 1, title: 'Paste Job Description' },
@@ -48,41 +95,61 @@ const ApplicationWizard = () => {
     { number: 4, title: 'Review & Download' },
   ];
 
+  // Replace handleJobDescriptionNext with real API call
   const handleJobDescriptionNext = async () => {
     if (!jobDescription.trim()) return;
     setIsAnalyzing(true);
+    setError(null);
     setCurrentStep(2);
-    setTimeout(() => {
-      setExtractedKeywords([
-        { text: 'React', status: 'match' },
-        { text: 'TypeScript', status: 'match' },
-        { text: 'Node.js', status: 'partial' },
-        { text: 'GraphQL', status: 'missing' },
-        { text: 'AWS', status: 'partial' },
-        { text: 'Docker', status: 'match' },
-        { text: 'Kubernetes', status: 'missing' },
-        { text: 'Agile', status: 'match' },
-      ]);
-      setMatchScore(72);
-      setJobTitle('Senior Full Stack Developer');
-      setCompanyName('TechCorp Inc.');
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
+      const mergedProfile = getMergedProfile();
+      if (!mergedProfile) throw new Error('Profile data not loaded');
+      const result = await extractKeywords(mergedProfile, jobDescription, token);
+      setExtractedKeywords((result.keywords || []).map((text: string) => ({ text, status: 'match' })));
+      setMatchScore(result.match_percentage || 0);
+      setJobTitle(result.job_title || '');
+      setCompanyName(result.company_name || '');
+    } catch (err: any) {
+      setError(err.message || 'Keyword extraction failed');
+      toast({ title: 'Error', description: err.message || 'Keyword extraction failed' });
+    } finally {
       setIsAnalyzing(false);
-    }, 2000);
+    }
   };
 
+  // Replace handleGenerate with real API call for both CV and cover letter
   const handleGenerate = async () => {
     setIsGenerating(true);
     setShowOptionsModal(false);
-    setTimeout(() => {
-      setGeneratedCV(`JOHN DOE\nSenior Full Stack Developer\n\nEXPERIENCE\nSoftware Engineer | Current Company | 2022-Present\n• Built scalable React applications with TypeScript\n• Implemented microservices using Node.js and Docker\n• Collaborated in Agile development environment\n• Increased application performance by 40%\n\nSKILLS\nReact, TypeScript, Node.js, Docker, Agile Development\n\nEDUCATION\nComputer Science Degree | University | 2018-2022`);
-      setGeneratedCoverLetter(`Dear Hiring Manager,\n\nI am writing to express my strong interest in the Senior Full Stack Developer position at TechCorp Inc. With my extensive experience in React, TypeScript, and modern development practices, I am confident I would be a valuable addition to your team.\n\nIn my current role, I have successfully built scalable applications and worked with technologies directly relevant to your job requirements. My experience with React and TypeScript aligns perfectly with your tech stack, and I am eager to contribute to your innovative projects.\n\nI would welcome the opportunity to discuss how my skills and experience can benefit TechCorp Inc.\n\nBest regards,\nJohn Doe`);
-      setCurrentStep(4);
-      setIsGenerating(false);
-      toast({
-        title: "Documents Generated",
-        description: "Your CV and cover letter have been successfully generated!",
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
+      const mergedProfile = getMergedProfile();
+      if (!mergedProfile) throw new Error('Profile data not loaded');
+      // Generate both CV and Cover Letter in one call
+      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'generate_cv_and_cover_letter', profile: mergedProfile, job_description: jobDescription }),
       });
-    }, 3000);
+      if (!res.ok) throw new Error('Failed to generate documents');
+      const data = await res.json();
+      setGeneratedCV(data.cv_text || '');
+      setGeneratedCoverLetter(data.cover_letter_text || '');
+      setCurrentStep(4);
+      toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated!' });
+    } catch (err: any) {
+      setError(err.message || 'Document generation failed');
+      toast({ title: 'Error', description: err.message || 'Document generation failed' });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const getKeywordColor = (status: Keyword['status']) => {
