@@ -26,7 +26,7 @@ export async function login({ email, password }: { email: string; password: stri
 }
 
 export async function getCurrentUser(token: string) {
-  const res = await authFetch('https://api-gw-production.up.railway.app/users/me');
+  const res = await authFetch('https://api-gw-production.up.railway.app/api/user/profile');
   if (!res) throw new Error('Unauthorized or network error');
   if (!res.ok) throw await res.json();
   return res.json();
@@ -118,7 +118,7 @@ export async function downloadCV(cvId: string, token: string) {
 
 // User Service
 export async function getUser(token: string) {
-  const res = await fetch("https://api-gw-production.up.railway.app/users/me", {
+  const res = await fetch("https://api-gw-production.up.railway.app/api/user/profile", {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`,
