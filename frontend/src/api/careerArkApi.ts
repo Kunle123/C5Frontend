@@ -1,5 +1,5 @@
 const API_BASE = 'https://api-gw-production.up.railway.app/api/arc';
-export const API_GATEWAY_BASE = 'https://api-gw-production.up.railway.app';
+export const API_GATEWAY_BASE = import.meta.env.VITE_API_GATEWAY_BASE || 'https://api-gw-production.up.railway.app';
 const API_CAREER_ARK = 'https://api-gw-production.up.railway.app/api/career-ark';
 
 function getAuthHeaders() {

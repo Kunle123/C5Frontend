@@ -10,6 +10,7 @@ import CaptchaComponent, { CaptchaRef } from "../components/auth/CaptchaComponen
 import { oauthService } from "../services/oauthService";
 import { useToast } from "../hooks/use-toast";
 import NavBanner from "../components/NavBanner";
+import { API_GATEWAY_BASE } from "../api/careerArkApi";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -42,7 +43,7 @@ const Login = () => {
     }
     setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${API_GATEWAY_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, captchaToken }),

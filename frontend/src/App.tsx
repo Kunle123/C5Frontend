@@ -25,7 +25,6 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import FAQ from './pages/FAQ';
 import DebugCVAIResponse from './pages/DebugCVAIResponse';
-import CareerArkV2 from './pages/CareerArkV2';
 import SearchJobs from './pages/SearchJobs';
 import Landing from './pages/Landing';
 import ColorTest from './pages/ColorTest';
@@ -95,7 +94,6 @@ function App() {
           <Route path="/search-jobs" element={<ChakraProvider theme={theme}><Layout><SearchJobs /></Layout></ChakraProvider>} />
           <Route path="/colortest" element={<ColorTest />} />
           <Route path="/tailwinduitest" element={<TailwindUiTest />} />
-          <Route path="/careerarcv2" element={<CareerArcV2 />} />
           <Route path="/my-cvs-new" element={<MyCVsNew />} />
           <Route path="*" element={<ChakraProvider theme={theme}><Layout><NotFound /></Layout></ChakraProvider>} />
         </Routes>
