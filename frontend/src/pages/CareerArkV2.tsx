@@ -509,7 +509,12 @@ const CareerArkV2: React.FC = () => {
                                       title: experience.title,
                                       start_date: convertToMonthInput(experience.start_date),
                                       end_date: convertToMonthInput(experience.end_date),
-                                      description: Array.isArray(experience.details) ? experience.details.join('\n') : (experience.description || '')
+                                      description:
+                                        Array.isArray(experience.details)
+                                          ? experience.details.join('\n')
+                                          : Array.isArray(experience.description)
+                                            ? experience.description.join('\n')
+                                            : (experience.description || '')
                                     });
                                     setShowEditModal(true);
                                   }}
@@ -588,7 +593,19 @@ const CareerArkV2: React.FC = () => {
                             <Button size="sm" variant="outline" onClick={() => {
                               console.log('Editing education:', edu, 'start_date:', convertToMonthInput(edu.start_date), 'end_date:', convertToMonthInput(edu.end_date));
                               setEditEduItem(edu);
-                              setEduForm({ institution: edu.institution, degree: edu.degree, field: edu.field || '', start_date: convertToMonthInput(edu.start_date), end_date: convertToMonthInput(edu.end_date), description: Array.isArray(edu.details) ? edu.details.join('\n') : (edu.description || '') });
+                              setEduForm({
+                                institution: edu.institution,
+                                degree: edu.degree,
+                                field: edu.field || '',
+                                start_date: convertToMonthInput(edu.start_date),
+                                end_date: convertToMonthInput(edu.end_date),
+                                description:
+                                  Array.isArray(edu.details)
+                                    ? edu.details.join('\n')
+                                    : Array.isArray(edu.description)
+                                      ? edu.description.join('\n')
+                                      : (edu.description || '')
+                              });
                               setShowEditEduModal(true);
                             }}>Edit</Button>
                             <Button size="sm" variant="destructive" onClick={async () => { setEduFormLoading(true); try { await deleteEducation(edu.id); fetchArcData(); toast({ title: 'Deleted' }); } catch (err: any) { toast({ title: err.message || 'Delete failed' }); } finally { setEduFormLoading(false); } }}>Delete</Button>
