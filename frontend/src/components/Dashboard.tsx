@@ -11,6 +11,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
 
 interface StepProps {
   number: number;
@@ -24,7 +25,7 @@ interface StepProps {
   onAction?: () => void;
 }
 
-const StepCard = ({ number, title, description, icon, completed, current, actionText, actionPath, onAction }: StepProps) => {
+const StepCard = ({ number, title, description, icon, completed, current, actionText, actionPath, onAction, userProgress, hasWorkExperience }: StepProps & { userProgress: any, hasWorkExperience: boolean }) => {
   const navigate = useNavigate();
 
   const handleAction = () => {
@@ -62,7 +63,7 @@ const StepCard = ({ number, title, description, icon, completed, current, action
           onClick={handleAction}
           variant={completed ? "secondary" : current ? "default" : "outline"}
           className="w-full gap-2"
-          disabled={!current && !completed}
+          disabled={number === 3 && !hasWorkExperience}
         >
           {actionText}
           <ArrowRight className="h-4 w-4" />
@@ -74,12 +75,47 @@ const StepCard = ({ number, title, description, icon, completed, current, action
 
 export const Dashboard = () => {
   const navigate = useNavigate();
+  const [arcData, setArcData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchArcData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Not authenticated');
+        // Fetch user profile
+        const profileRes = await fetch('https://api-gw-production.up.railway.app/api/user/profile', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!profileRes.ok) throw new Error('Failed to fetch user profile');
+        const userProfile = await profileRes.json();
+        // Fetch arc data
+        const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfile.id}/all_sections`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!arcRes.ok) throw new Error('Failed to fetch arc data');
+        const arc = await arcRes.json();
+        setArcData(arc);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load arc data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchArcData();
+  }, []);
+
+  // Determine if user has at least 1 work experience
+  const hasWorkExperience = arcData && Array.isArray(arcData.work_experience) && arcData.work_experience.length > 0;
 
   // Mock user progress - in real app this would come from user state/API
   const userProgress = {
     personalDetails: true,
-    careerHistory: false,
-    applicationReady: false,
+    careerHistory: true,
+    applicationReady: hasWorkExperience,
     hasDownloads: false
   };
 
@@ -154,6 +190,8 @@ export const Dashboard = () => {
               {...step}
               completed={step.number < currentStep}
               current={step.number === currentStep}
+              userProgress={userProgress}
+              hasWorkExperience={hasWorkExperience}
             />
           ))}
         </div>
