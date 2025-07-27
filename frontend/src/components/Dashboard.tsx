@@ -99,10 +99,7 @@ export const Dashboard = () => {
       description: "Set up your profile with personal information, contact details, and preferences.",
       icon: <User className="h-6 w-6" />,
       actionText: userProgress.personalDetails ? "Edit Profile" : "Complete Profile",
-      onAction: () => {
-        // Navigate to profile settings or create profile page
-        console.log("Navigate to profile setup");
-      }
+      actionPath: "/account-new"
     },
     {
       number: 2,
@@ -118,9 +115,7 @@ export const Dashboard = () => {
       description: "Generate tailored CVs and cover letters using our Application Wizard.",
       icon: <FileText className="h-6 w-6" />,
       actionText: userProgress.applicationReady ? "Create New Application" : "Start Application Wizard",
-      onAction: () => {
-        console.log("Start application wizard");
-      }
+      actionPath: "/applications"
     },
     {
       number: 4,
@@ -176,16 +171,16 @@ export const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="gap-2 h-auto py-4 flex-col"
-                onClick={() => navigate("/careerarcv2")}
+                onClick={() => navigate("/account-new")}
               >
-                <Briefcase className="h-6 w-6" />
-                <span>Career Arc</span>
-                <span className="text-xs text-muted-foreground">Build your timeline</span>
+                <User className="h-6 w-6" />
+                <span>Account</span>
+                <span className="text-xs text-muted-foreground">Profile & settings</span>
               </Button>
               <Button 
                 variant="outline" 
                 className="gap-2 h-auto py-4 flex-col"
-                disabled={currentStep < 3}
+                onClick={() => navigate("/applications")}
               >
                 <FileText className="h-6 w-6" />
                 <span>Application Wizard</span>
