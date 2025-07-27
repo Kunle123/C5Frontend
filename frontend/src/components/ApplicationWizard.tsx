@@ -136,12 +136,19 @@ const ApplicationWizard = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ action: 'generate_cv_and_cover_letter', profile: mergedProfile, job_description: jobDescription }),
+        body: JSON.stringify({
+          action: 'generate_cv',
+          profile: mergedProfile,
+          job_description: jobDescription,
+          // Optionally add keywords/cv_length if needed
+        }),
       });
       if (!res.ok) throw new Error('Failed to generate documents');
       const data = await res.json();
-      setGeneratedCV(data.cv_text || '');
-      setGeneratedCoverLetter(data.cover_letter_text || '');
+      setGeneratedCV(data.cv || '');
+      setGeneratedCoverLetter(data.cover_letter || '');
+      setJobTitle(data.job_title || '');
+      setCompanyName(data.company_name || '');
       setCurrentStep(4);
       toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated!' });
     } catch (err: any) {
