@@ -35,6 +35,7 @@ import DashboardNew from './pages/DashboardNew';
 import MyCVsNew from './pages/MyCVsNew';
 import AccountNew from './pages/AccountNew';
 import CareerArkV2 from './pages/CareerArkV2';
+import Apply from './pages/Apply';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -81,8 +82,8 @@ function App() {
           <Route path="/career-history/:idx" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
           <Route path="/pricing" element={<ChakraProvider theme={theme}><Layout><Pricing /></Layout></ChakraProvider>} />
           <Route path="/account" element={<ChakraProvider theme={theme}><Layout><Account /></Layout></ChakraProvider>} />
-          <Route path="/account-new" element={<AccountNew />} />
-          <Route path="/applications" element={<ChakraProvider theme={theme}><Layout><Applications /></Layout></ChakraProvider>} />
+          <Route path="/account-new" element={<ProtectedRoute><AccountNew /></ProtectedRoute>} />
+          <Route path="/apply" element={<ProtectedRoute><Apply /></ProtectedRoute>} />
           <Route path="/subscription-success" element={<ChakraProvider theme={theme}><Layout><SubscriptionSuccess /></Layout></ChakraProvider>} />
           <Route path="/subscription-cancel" element={<ChakraProvider theme={theme}><Layout><SubscriptionCancel /></Layout></ChakraProvider>} />
           <Route path="/test" element={<ChakraProvider theme={theme}><Layout><TestAppJourneys /></Layout></ChakraProvider>} />

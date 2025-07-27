@@ -112,10 +112,10 @@ export const Dashboard = () => {
     {
       number: 3,
       title: "Create Applications",
-      description: "Generate tailored CVs and cover letters using our Application Wizard.",
-      icon: <FileText className="h-6 w-6" />,
+      description: "Generate tailored CVs and cover letters for each job.",
+      icon: <FileText className="w-6 h-6" />,
       actionText: userProgress.applicationReady ? "Create New Application" : "Start Application Wizard",
-      actionPath: "/applications"
+      actionPath: "/apply"
     },
     {
       number: 4,
@@ -180,7 +180,7 @@ export const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="gap-2 h-auto py-4 flex-col"
-                onClick={() => navigate("/applications")}
+                onClick={() => navigate("/apply")}
               >
                 <FileText className="h-6 w-6" />
                 <span>Application Wizard</span>
