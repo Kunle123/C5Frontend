@@ -273,9 +273,257 @@ const CareerArkV2: React.FC = () => {
               </p>
             </div>
           </div>
-          {/* Action Buttons will go here in the next step */}
+          {/* Action Buttons */}
+          <div className="flex gap-4 mb-8">
+            <Dialog open={showAddModal || showEditModal} onOpenChange={(open) => { setShowAddModal(open && !editItem); setShowEditModal(open && !!editItem); if (!open) { setEditItem(null); setForm({ company: '', title: '', start_date: '', end_date: '', description: '' }); setFormError(''); } }}>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>{editItem ? 'Edit Experience' : 'Add New Experience'}</DialogTitle>
+                  <DialogDescription>
+                    {editItem ? 'Update your experience details' : 'Add a new role to your Career Ark™'}
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setFormLoading(true); setFormError('');
+                  try {
+                    if (editItem) {
+                      if (!editItem.id) throw new Error('Invalid experience ID');
+                      await updateWorkExperience(editItem.id, { ...form, description: form.description.split('\n').filter(Boolean) });
+                      setShowEditModal(false);
+                    } else {
+                      await addWorkExperience({ ...form, description: form.description.split('\n').filter(Boolean) });
+                      setShowAddModal(false);
+                    }
+                    fetchArcData();
+                    toast({ title: editItem ? 'Experience updated' : 'Experience added' });
+                  } catch (err: any) {
+                    setFormError(err.message || 'Save failed');
+                  } finally {
+                    setFormLoading(false);
+                  }
+                }} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Job Title</Label>
+                      <Input id="title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. Senior Software Engineer" required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="company">Company</Label>
+                      <Input id="company" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} placeholder="e.g. Tech Corp Ltd." required />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="start_date">Start Date</Label>
+                      <Input id="start_date" type="month" value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="end_date">End Date</Label>
+                      <Input id="end_date" type="month" value={form.end_date} onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description (one per line)</Label>
+                    <Textarea id="description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Describe your role and responsibilities..." rows={3} />
+                  </div>
+                  {formError && <div className="text-red-500 text-sm">{formError}</div>}
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="submit" disabled={formLoading}>
+                      {formLoading ? 'Saving...' : (editItem ? 'Update Experience' : 'Add Experience')}
+                    </Button>
+                    <Button type="button" variant="outline" onClick={() => { setShowAddModal(false); setShowEditModal(false); setEditItem(null); setForm({ company: '', title: '', start_date: '', end_date: '', description: '' }); setFormError(''); }}>Cancel</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+            <Button 
+              variant="outline" 
+              className="gap-2" 
+              onClick={handleUploadClick}
+              disabled={uploading || polling}
+            >
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              {uploading ? "Importing..." : "Import CV"}
+            </Button>
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx"
+              style={{ display: 'none' }}
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              disabled={uploading || polling}
+            />
+          </div>
         </div>
-        {/* Main content will be migrated next */}
+        {/* Main content area */}
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/* Career Summary Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Award className="h-5 w-5 text-primary" />
+                  Career Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-primary/5 rounded-lg">
+                    <div className="text-2xl font-bold text-primary">--</div>
+                    <div className="text-xs text-muted-foreground">Years Experience</div>
+                  </div>
+                  <div className="text-center p-3 bg-success/5 rounded-lg">
+                    <div className="text-2xl font-bold text-success">--</div>
+                    <div className="text-xs text-muted-foreground">Total Roles</div>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-medium mb-2 text-sm">Top Skills</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {/* Top skills badges will go here */}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            {/* AI Suggestions */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Brain className="h-5 w-5 text-primary" />
+                  AI Suggestions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+                  <div className="flex items-start gap-2">
+                    <Sparkles className="h-4 w-4 text-primary mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-medium text-card-foreground">Add missing skills</p>
+                      <p className="text-muted-foreground text-xs">Based on your roles, consider adding "Agile" and "Scrum"</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-3 bg-secondary/5 rounded-lg border border-secondary/20">
+                  <div className="flex items-start gap-2">
+                    <FileText className="h-4 w-4 text-secondary mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-medium text-card-foreground">Enhance descriptions</p>
+                      <p className="text-muted-foreground text-xs">Add quantifiable achievements to recent roles</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          {/* Timeline area (to be migrated next) */}
+          <div className="lg:col-span-3">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold text-card-foreground flex items-center gap-2">
+                <Clock className="h-6 w-6 text-primary" />
+                Career Timeline
+              </h2>
+              {/* Timeline and experience cards */}
+              <ScrollArea className="h-[600px] pr-4">
+                <div className="relative">
+                  {/* Timeline Line */}
+                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
+                  {Array.isArray(arcData?.work_experience) && arcData.work_experience.length > 0 ? (
+                    arcData.work_experience.map((experience: any, index: number) => (
+                      <div key={experience.id || index} className="relative flex gap-6 pb-8">
+                        {/* Timeline Node */}
+                        <div className="relative">
+                          <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-glow">
+                            <Building className="h-6 w-6 text-primary-foreground" />
+                          </div>
+                        </div>
+                        {/* Experience Card */}
+                        <Card className="flex-1 shadow-card hover:shadow-elevated transition-all duration-300">
+                          <CardHeader>
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-2">
+                                <CardTitle className="text-xl text-card-foreground">{experience.title}</CardTitle>
+                                <div className="flex items-center gap-4 text-muted-foreground">
+                                  <div className="flex items-center gap-1">
+                                    <Building className="h-4 w-4" />
+                                    <span className="font-medium">{experience.company}</span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                  <Calendar className="h-4 w-4" />
+                                  <span>
+                                    {experience.start_date} - {experience.end_date || 'Present'}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditItem(experience);
+                                    setForm({ company: experience.company, title: experience.title, start_date: experience.start_date, end_date: experience.end_date, description: Array.isArray(experience.details) ? experience.details.join('\n') : (experience.description || '') });
+                                    setShowEditModal(true);
+                                  }}
+                                  className="gap-1"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                  Edit
+                                </Button>
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm"
+                                  onClick={async () => { setFormLoading(true); try { await deleteWorkExperience(experience.id); fetchArcData(); toast({ title: 'Deleted' }); } catch (err: any) { toast({ title: err.message || 'Delete failed' }); } finally { setFormLoading(false); } }}
+                                  className="gap-1"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                  Delete
+                                </Button>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            {Array.isArray(experience.description) && experience.description.length > 0 && (
+                              <div>
+                                <h4 className="font-medium mb-2 text-card-foreground">Key Achievements</h4>
+                                <ul className="space-y-1">
+                                  {experience.description.map((achievement: string, idx: number) => (
+                                    <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                                      <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                                      {achievement}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {Array.isArray(experience.skills) && experience.skills.length > 0 && (
+                              <div>
+                                <h4 className="font-medium mb-2 text-card-foreground">Skills & Technologies</h4>
+                                <div className="flex flex-wrap gap-1">
+                                  {experience.skills.map((skill: string) => (
+                                    <Badge key={skill} variant="outline" className="text-xs">
+                                      {skill}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-muted-foreground text-center py-8">No work experience found.</div>
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
