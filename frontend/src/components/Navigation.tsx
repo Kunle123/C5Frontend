@@ -13,15 +13,15 @@ export function Navigation() {
         <div className="flex justify-between items-center h-16">
           <div 
             className="text-2xl font-bold text-primary cursor-pointer" 
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
           >
             CandidateV
           </div>
           <div className="hidden md:flex items-center space-x-8">
             <button 
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/dashboard")}
               className={`transition-colors ${
-                isActive("/") 
+                isActive("/dashboard") 
                   ? "text-primary font-medium" 
                   : "text-foreground hover:text-primary"
               }`}
