@@ -34,6 +34,7 @@ import CareerArcV2 from './pages/CareerArcV2';
 import DashboardNew from './pages/DashboardNew';
 import MyCVsNew from './pages/MyCVsNew';
 import AccountNew from './pages/AccountNew';
+import CareerArkV2 from './pages/CareerArkV2';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -95,6 +96,7 @@ function App() {
           <Route path="/colortest" element={<ColorTest />} />
           <Route path="/tailwinduitest" element={<TailwindUiTest />} />
           <Route path="/my-cvs-new" element={<MyCVsNew />} />
+          <Route path="/careerarcv2" element={<CareerArkV2 />} />
           <Route path="*" element={<ChakraProvider theme={theme}><Layout><NotFound /></Layout></ChakraProvider>} />
         </Routes>
       </Router>
