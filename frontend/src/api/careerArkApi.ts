@@ -185,7 +185,7 @@ export async function addWorkExperience(data: any) {
 export async function updateWorkExperience(id: string, data: any) {
   const token = localStorage.getItem('token') || '';
   const res = await fetch(`${API_CAREER_ARK}/work_experience/${id}`, {
-    method: 'PUT',
+    method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -224,7 +224,7 @@ export async function addEducation(data: any) {
 export async function updateEducation(id: string, data: any) {
   const token = localStorage.getItem('token') || '';
   const res = await fetch(`${API_CAREER_ARK}/education/${id}`, {
-    method: 'PUT',
+    method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -253,7 +253,7 @@ export async function addTraining(data: any) {
 export async function updateTraining(id: string, data: any) {
   const token = localStorage.getItem('token') || '';
   const res = await fetch(`${API_CAREER_ARK}/training/${id}`, {
-    method: 'PUT',
+    method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
