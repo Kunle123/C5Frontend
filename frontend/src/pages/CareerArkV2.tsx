@@ -259,11 +259,22 @@ const CareerArkV2: React.FC = () => {
     return [];
   };
 
+  const parseDate = (dateStr: string) => {
+    if (!dateStr || dateStr === 'Present') return new Date();
+    // Try YYYY-MM or YYYY-MM-DD
+    if (/^\d{4}-\d{2}/.test(dateStr)) return new Date(dateStr);
+    // Try 'Jan 2020'
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const match = dateStr.match(/^(\w{3}) (\d{4})$/);
+    if (match) return new Date(`${match[2]}-${(months.indexOf(match[1])+1).toString().padStart(2,'0')}-01`);
+    return new Date(dateStr);
+  };
+
   const sortByEndDate = (arr: any[]): any[] => {
     return [...arr].sort((a, b) => {
-      const aDate = a.end_date || a.start_date || '';
-      const bDate = b.end_date || b.start_date || '';
-      return bDate.localeCompare(aDate);
+      const aDate = parseDate(a.end_date || a.start_date || '');
+      const bDate = parseDate(b.end_date || b.start_date || '');
+      return bDate.getTime() - aDate.getTime();
     });
   };
 
