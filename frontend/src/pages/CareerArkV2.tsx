@@ -486,7 +486,7 @@ const CareerArkV2: React.FC = () => {
                   {/* Timeline Line */}
                   <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
                   {Array.isArray(arcData?.work_experience) && arcData.work_experience.length > 0 ? (
-                    arcData.work_experience.map((experience: any, index: number) => (
+                    sortByEndDate(arcData.work_experience).map((experience: any, index: number) => (
                       <div key={experience.id || index} className="relative flex gap-6 pb-8">
                         {/* Timeline Node */}
                         <div className="relative">
