@@ -76,9 +76,6 @@ function App() {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard-new" element={<DashboardNew />} />
           <Route path="/cvs" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></Layout></ChakraProvider>} />
-          <Route path="/career-ark" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
-          <Route path="/career-history" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
-          <Route path="/career-history/:idx" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CareerArk /></ProtectedRoute></Layout></ChakraProvider>} />
           <Route path="/pricing" element={<ChakraProvider theme={theme}><Layout><Pricing /></Layout></ChakraProvider>} />
           <Route path="/account" element={<ChakraProvider theme={theme}><Layout><Account /></Layout></ChakraProvider>} />
           <Route path="/account-new" element={<ProtectedRoute><AccountNew /></ProtectedRoute>} />
@@ -90,7 +87,6 @@ function App() {
           <Route path="/privacy-policy" element={<ChakraProvider theme={theme}><Layout><PrivacyPolicy /></Layout></ChakraProvider>} />
           <Route path="/terms" element={<ChakraProvider theme={theme}><Layout><Terms /></Layout></ChakraProvider>} />
           <Route path="/faq" element={<ChakraProvider theme={theme}><Layout><FAQ /></Layout></ChakraProvider>} />
-          <Route path="/career-ark-demo" element={<ChakraProvider theme={theme}><Layout><CareerArkDemo /></Layout></ChakraProvider>} />
           <Route path="/debug-cv-ai" element={<ChakraProvider theme={theme}><Layout><DebugCVAIResponse /></Layout></ChakraProvider>} />
           <Route path="/search-jobs" element={<ChakraProvider theme={theme}><Layout><SearchJobs /></Layout></ChakraProvider>} />
           <Route path="/colortest" element={<ColorTest />} />
