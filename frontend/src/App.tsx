@@ -10,7 +10,6 @@ import CVs from './pages/CVs';
 import Pricing from './pages/Pricing';
 import Account from './pages/Account';
 import NotFound from './pages/NotFound';
-import Applications from './pages/Applications';
 import SubscriptionSuccess from './pages/SubscriptionSuccess';
 import SubscriptionCancel from './pages/SubscriptionCancel';
 import CVsAndCoverLetters from './pages/CVsAndCoverLetters';
