@@ -63,7 +63,7 @@ const StepCard = ({ number, title, description, icon, completed, current, action
           onClick={handleAction}
           variant={completed ? "secondary" : current ? "default" : "outline"}
           className="w-full gap-2"
-          disabled={number === 3 && !hasWorkExperience}
+          disabled={number === 3 && !hasWorkExperience || number === 4 && !userProgress.hasDownloads}
         >
           {actionText}
           <ArrowRight className="h-4 w-4" />
@@ -78,6 +78,7 @@ export const Dashboard = () => {
   const [arcData, setArcData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasDownloads, setHasDownloads] = useState(false);
 
   useEffect(() => {
     const fetchArcData = async () => {
@@ -99,8 +100,18 @@ export const Dashboard = () => {
         if (!arcRes.ok) throw new Error('Failed to fetch arc data');
         const arc = await arcRes.json();
         setArcData(arc);
+        // Fetch available downloads (CVs/cover letters)
+        const downloadsRes = await fetch(`https://api-gw-production.up.railway.app/api/mega-cv`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        let hasDownloads = false;
+        if (downloadsRes.ok) {
+          const downloads = await downloadsRes.json();
+          hasDownloads = Array.isArray(downloads.megaCVs) && downloads.megaCVs.length > 0;
+        }
+        setHasDownloads(hasDownloads);
       } catch (err: any) {
-        setError(err.message || 'Failed to load arc data');
+        setError(err.message || 'Failed to load arc/downloads data');
       } finally {
         setLoading(false);
       }
@@ -116,7 +127,7 @@ export const Dashboard = () => {
     personalDetails: true,
     careerHistory: true,
     applicationReady: hasWorkExperience,
-    hasDownloads: false
+    hasDownloads: hasDownloads
   };
 
   const getCurrentStep = () => {
