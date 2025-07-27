@@ -78,6 +78,16 @@ export function Navigation() {
             >
               Sign Up
             </button>
+            <button 
+              onClick={() => navigate("/applications")}
+              className={`transition-colors ${
+                isActive("/applications") 
+                  ? "text-primary font-medium" 
+                  : "text-foreground hover:text-primary"
+              }`}
+            >
+              Applications
+            </button>
             <Button variant="outline" size="sm">
               Log Out
             </Button>
