@@ -29,9 +29,9 @@ export function Navigation() {
               Dashboard
             </button>
             <button 
-              onClick={() => navigate("/career-arc")}
+              onClick={() => navigate("/careerarcv2")}
               className={`transition-colors ${
-                isActive("/career-arc") 
+                isActive("/careerarcv2") 
                   ? "text-primary font-medium" 
                   : "text-foreground hover:text-primary"
               }`}

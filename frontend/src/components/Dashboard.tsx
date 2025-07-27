@@ -110,7 +110,7 @@ export const Dashboard = () => {
       description: "Build your career timeline using our Career Arc tool or upload an existing CV.",
       icon: <Briefcase className="h-6 w-6" />,
       actionText: userProgress.careerHistory ? "Edit Career Arc" : "Build Career Arc",
-      actionPath: "/career-arc"
+      actionPath: "/careerarcv2"
     },
     {
       number: 3,
@@ -176,7 +176,7 @@ export const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="gap-2 h-auto py-4 flex-col"
-                onClick={() => navigate("/career-arc")}
+                onClick={() => navigate("/careerarcv2")}
               >
                 <Briefcase className="h-6 w-6" />
                 <span>Career Arc</span>
