@@ -123,7 +123,7 @@ export const Dashboard = () => {
       description: "Download your completed CVs and cover letters, then apply to your dream jobs.",
       icon: <Download className="h-6 w-6" />,
       actionText: userProgress.hasDownloads ? "View Downloads" : "Go to My CVs",
-      actionPath: "/my-cvs"
+      actionPath: "/my-cvs-new"
     }
   ];
 
@@ -189,7 +189,7 @@ export const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="gap-2 h-auto py-4 flex-col"
-                onClick={() => navigate("/my-cvs")}
+                onClick={() => navigate("/my-cvs-new")}
               >
                 <Download className="h-6 w-6" />
                 <span>My CVs</span>

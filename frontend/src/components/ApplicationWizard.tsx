@@ -366,7 +366,7 @@ const ApplicationWizard = () => {
                     Back to Analysis
                   </Button>
                   <Button
-                    onClick={() => window.location.href = '/my-cvs'}
+                    onClick={() => window.location.href = '/my-cvs-new'}
                     className="flex-1"
                   >
                     Go to Download CVs Page
