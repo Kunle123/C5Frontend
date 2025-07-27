@@ -294,7 +294,23 @@ const CareerArkV2: React.FC = () => {
     <div className="min-h-screen bg-background">
       {banner}
       <Navigation />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ position: 'relative' }}>
+        {arcLoading && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(255,255,255,0.7)',
+            zIndex: 50,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <Loader2 className="h-12 w-12 text-primary animate-spin" />
+          </div>
+        )}
         {/* Header Section */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
