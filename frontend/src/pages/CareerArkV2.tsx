@@ -131,6 +131,10 @@ const CareerArkV2: React.FC = () => {
   const [certFormLoading, setCertFormLoading] = useState(false);
   const [certFormError, setCertFormError] = useState('');
 
+  // Add state for polling modal
+  const [showPollingModal, setShowPollingModal] = useState(false);
+  const [pollingSteps, setPollingSteps] = useState<string[]>([]);
+
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
@@ -163,6 +167,8 @@ const CareerArkV2: React.FC = () => {
             setTaskId(data.taskId);
             setStatus('pending');
             setPolling(true);
+            setShowPollingModal(true);
+            setPollingSteps(["Uploading CV...", "Extracting job titles...", "Extracting experience details...", "Extracting education..."]);
             // Poll for extraction completion using setInterval
             let pollCount = 0;
             const interval = setInterval(async () => {
@@ -172,32 +178,42 @@ const CareerArkV2: React.FC = () => {
                 });
                 const statusData = await res.json();
                 setStatus(statusData.status);
+                // Update polling steps for UI
+                if (statusData.status === 'metadata_extracted') {
+                  setPollingSteps(["Job titles loaded", "Loading experience details...", "Loading education..."]);
+                } else if (statusData.status === 'completed') {
+                  setPollingSteps(["Job titles loaded", "Experience details loaded", "Education loaded", "Done!"]);
+                }
                 if (
                   statusData.status === 'completed' ||
                   statusData.status === 'completed_with_errors' ||
                   statusData.status === 'failed'
                 ) {
                   setPolling(false);
+                  setShowPollingModal(false);
                   clearInterval(interval);
                   if (statusData.status === 'completed') {
                     setUploadProgress(100);
-                  setSummary(statusData.extractedDataSummary || null);
-                  fetchArcData();
+                    setSummary(statusData.extractedDataSummary || null);
+                    await fetchArcData(); // Ensure arcData is refreshed after import
                     toast({ title: 'CV imported and processed!', description: 'CV imported and processed!' });
                   } else if (statusData.status === 'completed_with_errors') {
                     setUploadError('CV processed with errors: ' + (statusData.error || 'Unknown error'));
                     setSummary(statusData.extractedDataSummary || null);
-                } else if (statusData.status === 'failed') {
-                  setUploadError(statusData.error || 'CV extraction failed.');
+                    await fetchArcData();
+                  } else if (statusData.status === 'failed') {
+                    setUploadError(statusData.error || 'CV extraction failed.');
                   }
                 } else if (pollCount >= 20) { // ~1 minute
                   setPolling(false);
+                  setShowPollingModal(false);
                   setUploadError('CV extraction timed out.');
                   clearInterval(interval);
                 }
                 pollCount++;
               } catch {
                 setPolling(false);
+                setShowPollingModal(false);
                 setUploadError('Failed to check CV extraction status.');
                 clearInterval(interval);
               } finally {
@@ -928,6 +944,24 @@ const CareerArkV2: React.FC = () => {
             </div>
           </div>
         </div>
+        {/* Polling Modal */}
+        <Dialog open={showPollingModal}>
+          <DialogContent className="max-w-md text-center">
+            <div className="flex flex-col items-center gap-4 py-4">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+              <h2 className="text-lg font-semibold">Processing your CV...</h2>
+              <ul className="text-left text-sm space-y-1">
+                {pollingSteps.map((step, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <span className="inline-block w-2 h-2 rounded-full bg-primary" />
+                    {step}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-muted-foreground mt-2">This may take up to a minute. Please do not close the page.</p>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
