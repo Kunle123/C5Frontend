@@ -178,14 +178,14 @@ const CareerArkV2: React.FC = () => {
                   clearInterval(interval);
                   if (statusData.status === 'completed') {
                     setUploadProgress(100);
-                    setSummary(statusData.extractedDataSummary || null);
-                    fetchArcData();
+                  setSummary(statusData.extractedDataSummary || null);
+                  fetchArcData();
                     toast({ title: 'CV imported and processed!', description: 'CV imported and processed!' });
                   } else if (statusData.status === 'completed_with_errors') {
                     setUploadError('CV processed with errors: ' + (statusData.error || 'Unknown error'));
                     setSummary(statusData.extractedDataSummary || null);
-                  } else if (statusData.status === 'failed') {
-                    setUploadError(statusData.error || 'CV extraction failed.');
+                } else if (statusData.status === 'failed') {
+                  setUploadError(statusData.error || 'CV extraction failed.');
                   }
                 } else if (pollCount >= 20) { // ~1 minute
                   setPolling(false);
@@ -337,6 +337,15 @@ const CareerArkV2: React.FC = () => {
           </div>
           {/* Action Buttons */}
           <div className="flex gap-4 mb-8">
+            <Button 
+              variant="default"
+              className="gap-2"
+              onClick={openAddModal}
+              disabled={arcLoading || !profile || !profile.id}
+            >
+              <Plus className="h-4 w-4" />
+              Add Work Experience
+            </Button>
             <Dialog open={showAddModal || showEditModal} onOpenChange={(open) => { setShowAddModal(open && !editItem); setShowEditModal(open && !!editItem); if (!open) { setEditItem(null); setForm({ company: '', title: '', start_date: '', end_date: '', description: '' }); setFormError(''); } }}>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
@@ -412,14 +421,14 @@ const CareerArkV2: React.FC = () => {
               )}
               {uploading ? "Importing..." : "Import CV"}
             </Button>
-            <input
-              type="file"
-              accept=".pdf,.doc,.docx"
-              style={{ display: 'none' }}
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              disabled={uploading || polling}
-            />
+        <input
+          type="file"
+          accept=".pdf,.doc,.docx"
+          style={{ display: 'none' }}
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          disabled={uploading || polling}
+        />
           </div>
         </div>
         {/* Main content area */}
@@ -572,8 +581,8 @@ const CareerArkV2: React.FC = () => {
                                       <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                                       {achievement}
                                     </li>
-                                  ))}
-                                </ul>
+                        ))}
+                      </ul>
                               </div>
                             )}
                             {Array.isArray(experience.skills) && experience.skills.length > 0 && (
@@ -591,8 +600,8 @@ const CareerArkV2: React.FC = () => {
                           </CardContent>
                         </Card>
                       </div>
-                    ))
-                  ) : (
+                ))
+              ) : (
                     <div className="text-muted-foreground text-center py-8">No work experience found.</div>
                   )}
                 </div>
@@ -644,13 +653,13 @@ const CareerArkV2: React.FC = () => {
                           <ul className="list-disc ml-6 text-muted-foreground text-sm">
                             {edu.description.map((desc: string, i: number) => (
                               <li key={i}>{desc}</li>
-                            ))}
-                          </ul>
-                        )}
+                        ))}
+                      </ul>
+                    )}
                       </CardContent>
                     </Card>
-                  ))
-                ) : (
+                ))
+              ) : (
                   <div className="text-muted-foreground text-center py-8">No education entries found.</div>
                 )}
               </div>
