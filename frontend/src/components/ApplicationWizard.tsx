@@ -176,6 +176,16 @@ const ApplicationWizard = () => {
     }
   };
 
+  // Add useEffect to handle redirect after generation
+  useEffect(() => {
+    if (currentStep === 4 && !isGenerating) {
+      const timeout = setTimeout(() => {
+        window.location.href = '/my-cvs-new';
+      }, 2000); // Give user a moment to see the result before redirect
+      return () => clearTimeout(timeout);
+    }
+  }, [currentStep, isGenerating]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
