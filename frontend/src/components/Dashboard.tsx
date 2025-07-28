@@ -76,6 +76,7 @@ const StepCard = ({ number, title, description, icon, completed, current, action
 export const Dashboard = () => {
   const navigate = useNavigate();
   const [arcData, setArcData] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null); // <-- add userProfile state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasDownloads, setHasDownloads] = useState(false);
@@ -92,9 +93,10 @@ export const Dashboard = () => {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         if (!profileRes.ok) throw new Error('Failed to fetch user profile');
-        const userProfile = await profileRes.json();
+        const userProfileData = await profileRes.json();
+        setUserProfile(userProfileData); // <-- store userProfile
         // Fetch arc data
-        const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfile.id}/all_sections`, {
+        const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfileData.id}/all_sections`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         if (!arcRes.ok) throw new Error('Failed to fetch arc data');
@@ -104,12 +106,12 @@ export const Dashboard = () => {
         const downloadsRes = await fetch(`https://api-gw-production.up.railway.app/api/mega-cv`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
-        let hasDownloads = false;
+        let hasDownloadsFlag = false;
         if (downloadsRes.ok) {
           const downloads = await downloadsRes.json();
-          hasDownloads = Array.isArray(downloads.megaCVs) && downloads.megaCVs.length > 0;
+          hasDownloadsFlag = Array.isArray(downloads.megaCVs) && downloads.megaCVs.length > 0;
         }
-        setHasDownloads(hasDownloads);
+        setHasDownloads(hasDownloadsFlag);
       } catch (err: any) {
         setError(err.message || 'Failed to load arc/downloads data');
       } finally {
@@ -122,11 +124,14 @@ export const Dashboard = () => {
   // Determine if user has at least 1 work experience
   const hasWorkExperience = arcData && Array.isArray(arcData.work_experience) && arcData.work_experience.length > 0;
 
-  // Mock user progress - in real app this would come from user state/API
+  // Determine if personal details and career history are actually complete
+  const personalDetailsComplete = userProfile && userProfile.name && userProfile.email;
+  const careerHistoryComplete = arcData && Array.isArray(arcData.work_experience) && arcData.work_experience.length > 0;
+
   const userProgress = {
-    personalDetails: true,
-    careerHistory: true,
-    applicationReady: hasWorkExperience,
+    personalDetails: !!personalDetailsComplete,
+    careerHistory: !!careerHistoryComplete,
+    applicationReady: !!careerHistoryComplete,
     hasDownloads: hasDownloads
   };
 
