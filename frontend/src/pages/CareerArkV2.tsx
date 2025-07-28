@@ -134,6 +134,7 @@ const CareerArkV2: React.FC = () => {
   // Add state for polling modal
   const [showPollingModal, setShowPollingModal] = useState(false);
   const [pollingSteps, setPollingSteps] = useState<string[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -179,10 +180,23 @@ const CareerArkV2: React.FC = () => {
                 const statusData = await res.json();
                 setStatus(statusData.status);
                 // Update polling steps for UI
-                if (statusData.status === 'metadata_extracted') {
-                  setPollingSteps(["Job titles loaded", "Loading experience details...", "Loading education..."]);
-                } else if (statusData.status === 'completed') {
-                  setPollingSteps(["Job titles loaded", "Experience details loaded", "Education loaded", "Done!"]);
+                if (statusData.status === 'metadata_extracted' && statusData.extractedDataSummary) {
+                  const jobs = statusData.extractedDataSummary.work_experience_count || 0;
+                  const edu = statusData.extractedDataSummary.education_count || 0;
+                  setPollingSteps([
+                    `Job titles loaded (${jobs})`,
+                    `Loading experience details (${jobs})...`,
+                    `Loading education (${edu})...`
+                  ]);
+                } else if (statusData.status === 'completed' && statusData.extractedDataSummary) {
+                  const jobs = statusData.extractedDataSummary.work_experience_count || 0;
+                  const edu = statusData.extractedDataSummary.education_count || 0;
+                  setPollingSteps([
+                    `Job titles loaded (${jobs})`,
+                    `Experience details loaded (${jobs})`,
+                    `Education loaded (${edu})`,
+                    'Done!'
+                  ]);
                 }
                 if (
                   statusData.status === 'completed' ||
@@ -196,6 +210,7 @@ const CareerArkV2: React.FC = () => {
                     setUploadProgress(100);
                     setSummary(statusData.extractedDataSummary || null);
                     await fetchArcData(); // Ensure arcData is refreshed after import
+                    setRefreshKey(k => k + 1); // Force UI refresh
                     toast({ title: 'CV imported and processed!', description: 'CV imported and processed!' });
                   } else if (statusData.status === 'completed_with_errors') {
                     setUploadError('CV processed with errors: ' + (statusData.error || 'Unknown error'));
@@ -609,7 +624,7 @@ const CareerArkV2: React.FC = () => {
             </Card>
           </div>
           {/* Timeline area (to be migrated next) */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3" key={refreshKey}>
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold text-card-foreground flex items-center gap-2">
                 <Clock className="h-6 w-6 text-primary" />
@@ -958,7 +973,7 @@ const CareerArkV2: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <p className="text-muted-foreground mt-2">This may take up to a minute. Please do not close the page.</p>
+              <p className="text-muted-foreground mt-2">This could take several minutes. Please do not close the page.</p>
             </div>
           </DialogContent>
         </Dialog>
