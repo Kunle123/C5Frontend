@@ -21,12 +21,12 @@ export function CVDownload() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('https://api-gw-production.up.railway.app/api/mega-cv', {
+      const res = await fetch('/api/cv', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch CVs');
       const data = await res.json();
-      setCVs(data.megaCVs || []);
+      setCVs(data || []);
     } catch (err: any) {
       setError(err.message || 'Failed to fetch CVs');
     } finally {
@@ -39,7 +39,7 @@ export function CVDownload() {
     // eslint-disable-next-line
   }, [token]);
 
-  const handleDownload = async (url: string) => {
+  const handleDownload = (url: string) => {
     window.open(url, '_blank');
   };
 
@@ -119,24 +119,24 @@ export function CVDownload() {
             <div className="text-center text-muted-foreground py-8">No CVs found.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cvs.map((cv) => (
-                <Card key={cv.id}>
+              {cvs.map((cv: any) => (
+                <Card key={cv.cv_id || cv.id}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <FileText className="w-5 h-5" />
-                      {cv.job_title || 'CV'}
+                      {cv.job_title || cv.name || 'CV'}
                     </CardTitle>
                     <div className="text-sm text-muted-foreground mt-1">
                       {cv.created ? `Created: ${new Date(cv.created).toLocaleString()}` : ''}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <Button className="w-full" onClick={() => handleDownload(cv.download_url)}>
+                    <Button className="w-full" onClick={() => handleDownload(`/api/cv/${cv.cv_id || cv.id}/download`)}>
                       <Download className="w-4 h-4 mr-2" />
                       Download CV
                     </Button>
-                    {cv.cover_letter_url && (
-                      <Button className="w-full" variant="outline" onClick={() => handleDownload(cv.cover_letter_url)}>
+                    {cv.cover_letter_id && (
+                      <Button className="w-full" variant="outline" onClick={() => handleDownload(`/api/cover-letter/${cv.cover_letter_id}/download`)}>
                         <Download className="w-4 h-4 mr-2" />
                         Download Cover Letter
                       </Button>
@@ -144,10 +144,10 @@ export function CVDownload() {
                     <Button
                       className="w-full"
                       variant="destructive"
-                      onClick={() => handleDelete(cv.id)}
-                      disabled={deletingId === cv.id}
+                      onClick={() => handleDelete(cv.cv_id || cv.id)}
+                      disabled={deletingId === (cv.cv_id || cv.id)}
                     >
-                      {deletingId === cv.id ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                      {deletingId === (cv.cv_id || cv.id) ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
                       Delete
                     </Button>
                   </CardContent>
