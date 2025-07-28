@@ -335,8 +335,10 @@ const CareerArkV2: React.FC = () => {
   const totalRoles = workExps.length;
   const allSkills: string[] = [...new Set((workExps.flatMap((exp: any) => Array.isArray(exp.skills) ? exp.skills : [])) as string[])];
 
+  // Debug: log arcData before rendering
+  console.log('arcData for debug:', arcData);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" key={refreshKey}>
       {banner}
       <Navigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ position: 'relative' }}>
