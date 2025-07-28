@@ -8,10 +8,13 @@ import { Textarea } from '../components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Navigation } from '../components/Navigation';
-import { Plus, Edit, Trash2, Upload, Calendar, Building, Award, TrendingUp, Clock, MapPin, Sparkles, Brain, FileText, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, Building, Award, TrendingUp, Clock, MapPin, Sparkles, Brain, FileText, Loader2 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { API_GATEWAY_BASE } from '../api/careerArkApi';
 import { addWorkExperience, updateWorkExperience, deleteWorkExperience, addEducation, updateEducation, deleteEducation, addTraining, updateTraining, deleteTraining, addSkill, updateSkill, deleteSkill, addProject, updateProject, deleteProject, addCertification, updateCertification, deleteCertification } from '../api/careerArkApi';
+import { Calendar } from '../components/ui/calendar';
+import { Popover, PopoverTrigger, PopoverContent } from '../components/ui/popover';
+import { format } from 'date-fns';
 
 const sectionList = [
   { key: 'work_experience', label: 'Work Experience' },
@@ -387,11 +390,68 @@ const CareerArkV2: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="start_date">Start Date</Label>
-                      <Input id="start_date" type="month" value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} required />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={form.start_date ? '' : 'text-muted-foreground'}
+                          >
+                            {form.start_date ? format(new Date(form.start_date + '-01'), 'MMM yyyy') : 'Pick a start date'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent align="start" className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={form.start_date ? new Date(form.start_date + '-01') : undefined}
+                            onSelect={date => {
+                              if (date) {
+                                const y = date.getFullYear();
+                                const m = (date.getMonth() + 1).toString().padStart(2, '0');
+                                setForm(f => ({ ...f, start_date: `${y}-${m}` }));
+                              }
+                            }}
+                            captionLayout="dropdown"
+                            fromYear={1970}
+                            toYear={new Date().getFullYear() + 1}
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="end_date">End Date</Label>
-                      <Input id="end_date" type="month" value={form.end_date} onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))} />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={form.end_date ? '' : 'text-muted-foreground'}
+                          >
+                            {form.end_date ? (form.end_date === 'Present' ? 'Present' : format(new Date(form.end_date + '-01'), 'MMM yyyy')) : 'Pick an end date'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent align="start" className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={form.end_date && form.end_date !== 'Present' ? new Date(form.end_date + '-01') : undefined}
+                            onSelect={date => {
+                              if (date) {
+                                const y = date.getFullYear();
+                                const m = (date.getMonth() + 1).toString().padStart(2, '0');
+                                setForm(f => ({ ...f, end_date: `${y}-${m}` }));
+                              }
+                            }}
+                            captionLayout="dropdown"
+                            fromYear={1970}
+                            toYear={new Date().getFullYear() + 1}
+                          />
+                          <Button
+                            variant="ghost"
+                            className="w-full mt-2"
+                            onClick={() => setForm(f => ({ ...f, end_date: 'Present' }))}
+                          >
+                            Currently work here (Present)
+                          </Button>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -527,7 +587,7 @@ const CareerArkV2: React.FC = () => {
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                  <Calendar className="h-4 w-4" />
+                                  <Clock className="h-4 w-4" />
                                   <span>
                                     {experience.start_date} - {experience.end_date || 'Present'}
                                   </span>
@@ -620,7 +680,7 @@ const CareerArkV2: React.FC = () => {
                           <div>
                             <CardTitle className="text-lg text-card-foreground">{edu.degree} @ {edu.institution}</CardTitle>
                             <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                              <Calendar className="h-4 w-4" />
+                              <Clock className="h-4 w-4" />
                               <span>{edu.start_date} - {edu.end_date || 'Present'}</span>
                               {edu.field && <Badge variant="secondary" className="ml-2">{edu.field}</Badge>}
                             </div>
@@ -709,11 +769,68 @@ const CareerArkV2: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="start_date">Start Date</Label>
-                        <Input id="start_date" type="month" value={eduForm.start_date} onChange={e => setEduForm(f => ({ ...f, start_date: e.target.value }))} required />
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={eduForm.start_date ? '' : 'text-muted-foreground'}
+                            >
+                              {eduForm.start_date ? format(new Date(eduForm.start_date + '-01'), 'MMM yyyy') : 'Pick a start date'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent align="start" className="w-auto p-0">
+                            <Calendar
+                              mode="single"
+                              selected={eduForm.start_date ? new Date(eduForm.start_date + '-01') : undefined}
+                              onSelect={date => {
+                                if (date) {
+                                  const y = date.getFullYear();
+                                  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+                                  setEduForm(f => ({ ...f, start_date: `${y}-${m}` }));
+                                }
+                              }}
+                              captionLayout="dropdown"
+                              fromYear={1970}
+                              toYear={new Date().getFullYear() + 1}
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="end_date">End Date</Label>
-                        <Input id="end_date" type="month" value={eduForm.end_date} onChange={e => setEduForm(f => ({ ...f, end_date: e.target.value }))} />
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={eduForm.end_date ? '' : 'text-muted-foreground'}
+                            >
+                              {eduForm.end_date ? (eduForm.end_date === 'Present' ? 'Present' : format(new Date(eduForm.end_date + '-01'), 'MMM yyyy')) : 'Pick an end date'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent align="start" className="w-auto p-0">
+                            <Calendar
+                              mode="single"
+                              selected={eduForm.end_date && eduForm.end_date !== 'Present' ? new Date(eduForm.end_date + '-01') : undefined}
+                              onSelect={date => {
+                                if (date) {
+                                  const y = date.getFullYear();
+                                  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+                                  setEduForm(f => ({ ...f, end_date: `${y}-${m}` }));
+                                }
+                              }}
+                              captionLayout="dropdown"
+                              fromYear={1970}
+                              toYear={new Date().getFullYear() + 1}
+                            />
+                            <Button
+                              variant="ghost"
+                              className="w-full mt-2"
+                              onClick={() => setEduForm(f => ({ ...f, end_date: 'Present' }))}
+                            >
+                              Currently work here (Present)
+                            </Button>
+                          </PopoverContent>
+                        </Popover>
                       </div>
                     </div>
                     <div className="space-y-2">
