@@ -3,36 +3,80 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Navigation } from "./Navigation";
-import { Download, FileText, Mail, Loader2 } from "lucide-react";
+import { Download, FileText, Mail, Loader2, Trash2 } from "lucide-react";
+import { uploadCV, deleteCV } from "../api";
 
 export function CVDownload() {
   const [cvs, setCVs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
 
+  const fetchCVs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('https://api-gw-production.up.railway.app/api/mega-cv', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to fetch CVs');
+      const data = await res.json();
+      setCVs(data.megaCVs || []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch CVs');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCVs = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch('https://api-gw-production.up.railway.app/api/mega-cv', {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error('Failed to fetch CVs');
-        const data = await res.json();
-        setCVs(data.megaCVs || []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch CVs');
-      } finally {
-        setLoading(false);
-      }
-    };
     if (token) fetchCVs();
+    // eslint-disable-next-line
   }, [token]);
 
   const handleDownload = async (url: string) => {
     window.open(url, '_blank');
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFile(e.target.files?.[0] || null);
+    setUploadError(null);
+    setUploadSuccess(null);
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    setUploadSuccess(null);
+    try {
+      await uploadCV(file, token!);
+      setUploadSuccess('CV uploaded successfully!');
+      setFile(null);
+      await fetchCVs();
+    } catch (err: any) {
+      setUploadError(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async (cvId: string) => {
+    setDeletingId(cvId);
+    setError(null);
+    try {
+      await deleteCV(cvId, token!);
+      await fetchCVs();
+    } catch (err: any) {
+      setError(err.message || 'Delete failed');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -47,6 +91,22 @@ export function CVDownload() {
             Download your previously generated CVs and cover letters as DOCX files.
           </p>
         </div>
+        {/* Upload Section */}
+        <div className="mb-8 flex flex-col md:flex-row items-center gap-4 justify-center">
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx,.txt"
+            onChange={handleFileChange}
+            className="block w-full md:w-auto border rounded px-3 py-2 text-sm"
+            disabled={uploading}
+          />
+          <Button onClick={handleUpload} disabled={!file || uploading} className="w-full md:w-auto">
+            {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+            Upload CV
+          </Button>
+        </div>
+        {uploadError && <div className="text-center text-red-500 mb-4">{uploadError}</div>}
+        {uploadSuccess && <div className="text-center text-green-600 mb-4">{uploadSuccess}</div>}
         <div className="mb-12">
           <h2 className="text-2xl font-semibold text-card-foreground mb-8">Your CVs</h2>
           {loading ? (
@@ -81,6 +141,15 @@ export function CVDownload() {
                         Download Cover Letter
                       </Button>
                     )}
+                    <Button
+                      className="w-full"
+                      variant="destructive"
+                      onClick={() => handleDelete(cv.id)}
+                      disabled={deletingId === cv.id}
+                    >
+                      {deletingId === cv.id ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                      Delete
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
