@@ -17,7 +17,7 @@ import {
 import { getUser, updateUser, getUserIdFromToken, getSubscription, getPaymentMethods, getPaymentHistory, cancelSubscription } from "../api";
 
 function ProfileSettings() {
-  const [profile, setProfile] = useState({ name: "", email: "", phone: "", emailVerified: false });
+  const [profile, setProfile] = useState({ name: "", email: "", phone_number: "", emailVerified: false });
   const [subscription, setSubscription] = useState({ plan: "NONE", status: "INACTIVE", renewal: "N/A" });
   const [billing, setBilling] = useState<any[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
@@ -38,7 +38,7 @@ function ProfileSettings() {
         setProfile({
           name: user.name || '',
           email: user.email || '',
-          phone: user.phone || '',
+          phone_number: user.phone_number || '',
           emailVerified: !!user.email_verified
         });
         if (userId) {
@@ -72,10 +72,10 @@ function ProfileSettings() {
       console.log('Updating profile with:', profile); // Debug log
       const updated = await updateUser(profile, token);
       setProfile({
-        name: updated.name || '',
-        email: updated.email || '',
-        phone: updated.phone || '',
-        emailVerified: !!updated.email_verified
+        name: updated.name || profile.name || '',
+        email: updated.email || profile.email || '',
+        phone_number: updated.phone_number !== undefined ? updated.phone_number : profile.phone_number,
+        emailVerified: !!(updated.email_verified !== undefined ? updated.email_verified : profile.emailVerified)
       });
       setSuccess('Profile updated successfully!');
     } catch (err: any) {
@@ -138,11 +138,11 @@ function ProfileSettings() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+                  <Label htmlFor="phone_number" className="text-sm font-medium">Phone Number</Label>
                   <Input
-                    id="phone"
-                    value={profile.phone}
-                    onChange={e => setProfile({ ...profile, phone: e.target.value })}
+                    id="phone_number"
+                    value={profile.phone_number}
+                    onChange={e => setProfile({ ...profile, phone_number: e.target.value })}
                     placeholder="+44 7123 456 789" // UK example
                     className="h-10"
                   />

@@ -215,7 +215,7 @@ export async function listPreviousCVs(token: string) {
 }
 
 // Update user profile
-export async function updateUser(data: { name?: string; email?: string; phone?: string }, token: string) {
+export async function updateUser(data: { name?: string; email?: string; phone_number?: string }, token: string) {
   const res = await authFetch(`${API_GATEWAY_BASE}/api/user/profile`, {
     method: 'PATCH',
     body: JSON.stringify(data),
