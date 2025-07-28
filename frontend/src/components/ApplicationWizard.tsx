@@ -149,11 +149,37 @@ const ApplicationWizard = () => {
       setGeneratedCoverLetter(data.cover_letter || '');
       setJobTitle(data.job_title || '');
       setCompanyName(data.company_name || '');
-      setCurrentStep(4);
-      toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated!' });
+      // Persist the generated CV and cover letter
+      if (data.cv && data.cv.trim()) {
+        const persistRes = await fetch('/api/cv', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cv: data.cv,
+            cover_letter: data.cover_letter || '',
+            job_title: data.job_title || '',
+            company_name: data.company_name || ''
+          })
+        });
+        if (!persistRes.ok) {
+          let errorMsg = 'Failed to save CV';
+          try {
+            const error = await persistRes.json();
+            errorMsg = error.detail || error.message || errorMsg;
+          } catch {}
+          throw new Error(errorMsg);
+        }
+        toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
+        setCurrentStep(4);
+      } else {
+        throw new Error('Generated CV is empty. Please try again.');
+      }
     } catch (err: any) {
-      setError(err.message || 'Document generation failed');
-      toast({ title: 'Error', description: err.message || 'Document generation failed' });
+      setError(err.message || 'Document generation or save failed');
+      toast({ title: 'Error', description: err.message || 'Document generation or save failed' });
     } finally {
       setIsGenerating(false);
     }
@@ -178,13 +204,13 @@ const ApplicationWizard = () => {
 
   // Add useEffect to handle redirect after generation
   useEffect(() => {
-    if (currentStep === 4 && !isGenerating) {
+    if (currentStep === 4 && !isGenerating && !error) {
       const timeout = setTimeout(() => {
         window.location.href = '/my-cvs-new';
       }, 2000); // Give user a moment to see the result before redirect
       return () => clearTimeout(timeout);
     }
-  }, [currentStep, isGenerating]);
+  }, [currentStep, isGenerating, error]);
 
   return (
     <div className="min-h-screen bg-background">
