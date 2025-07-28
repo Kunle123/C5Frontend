@@ -209,13 +209,19 @@ const CareerArkV2: React.FC = () => {
                   if (statusData.status === 'completed') {
                     setUploadProgress(100);
                     setSummary(statusData.extractedDataSummary || null);
+                    // Keep modal open during delay
+                    await new Promise(res => setTimeout(res, 2000)); // 2 second delay
                     await fetchArcData(); // Ensure arcData is refreshed after import
                     setRefreshKey(k => k + 1); // Force UI refresh
+                    setShowPollingModal(false); // Only close modal after refresh
                     toast({ title: 'CV imported and processed!', description: 'CV imported and processed!' });
                   } else if (statusData.status === 'completed_with_errors') {
                     setUploadError('CV processed with errors: ' + (statusData.error || 'Unknown error'));
                     setSummary(statusData.extractedDataSummary || null);
+                    await new Promise(res => setTimeout(res, 2000));
                     await fetchArcData();
+                    setRefreshKey(k => k + 1);
+                    setShowPollingModal(false);
                   } else if (statusData.status === 'failed') {
                     setUploadError(statusData.error || 'CV extraction failed.');
                   }
@@ -973,8 +979,8 @@ const CareerArkV2: React.FC = () => {
                     <span className="inline-block w-2 h-2 rounded-full bg-primary" />
                     {step}
                   </li>
-                ))}
-              </ul>
+                        ))}
+                      </ul>
               <p className="text-muted-foreground mt-2">This could take several minutes. Please do not close the page.</p>
             </div>
           </DialogContent>
