@@ -69,6 +69,7 @@ function ProfileSettings() {
     setError("");
     setSuccess("");
     try {
+      console.log('Updating profile with:', profile); // Debug log
       const updated = await updateUser(profile, token);
       setProfile({
         name: updated.name || '',
@@ -142,10 +143,10 @@ function ProfileSettings() {
                     id="phone"
                     value={profile.phone}
                     onChange={e => setProfile({ ...profile, phone: e.target.value })}
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+44 7123 456 789" // UK example
                     className="h-10"
                   />
-                  <p className="text-xs text-muted-foreground">Phone must be in international format</p>
+                  <p className="text-xs text-muted-foreground">Phone must be in international format, e.g. +44 7123 456 789</p>
                 </div>
               </div>
               <div className="space-y-2">
