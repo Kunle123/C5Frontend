@@ -139,7 +139,6 @@ const Signup = () => {
                   type="submit"
                   className="w-full bg-auth-gradient border-0 shadow-soft transition-all duration-300"
                   disabled={isLoading}
-                  style={{ opacity: 1, visibility: 'visible' }}
                 >
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
