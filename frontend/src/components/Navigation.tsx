@@ -33,7 +33,7 @@ export function Navigation() {
             className="text-2xl font-bold text-primary cursor-pointer" 
             onClick={() => navigate("/")}
           >
-            CandidateV
+            Candidate 5
           </div>
           {isLoggedIn ? (
             <div className="flex items-center space-x-2 relative">

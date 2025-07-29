@@ -190,7 +190,7 @@ export const Dashboard = () => {
             PAGE: Dashboard
           </Badge>
           <h2 className="text-3xl font-bold text-foreground mb-4">
-            Welcome to CandidateV
+            Welcome to Candidate 5
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Follow these steps to set up your profile and start creating professional 

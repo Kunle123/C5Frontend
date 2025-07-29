@@ -54,7 +54,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           cursor="pointer"
           _hover={{ color: 'white' }}
         >
-          CandidateV
+          Candidate 5
         </Box>
         <Box display={{ base: 'block', md: 'none' }}>
           <IconButton
