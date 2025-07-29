@@ -138,7 +138,7 @@ const Signup = () => {
                 {/* Button should always be visible after CAPTCHA */}
                 <Button
                   type="submit"
-                  className="w-full bg-auth-gradient border-0 shadow-soft transition-all duration-300 mt-6 min-h-12 block border-4 border-red-500 bg-yellow-100"
+                  className="w-full bg-primary text-white hover:bg-primary-dark border-0 shadow-soft transition-all duration-300 mt-6 min-h-12 block"
                   disabled={isLoading}
                 >
                   {isLoading ? (
