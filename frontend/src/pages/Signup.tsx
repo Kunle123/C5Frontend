@@ -22,6 +22,7 @@ const Signup = () => {
   const captchaRef = useRef<CaptchaRef>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
@@ -37,18 +38,22 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
+      setErrorMessage("Passwords don't match! Please check and try again.");
       toast({ title: "Password mismatch", description: "Passwords don't match! Please check and try again.", variant: "destructive" });
       return;
     }
     if (!agreeToTerms) {
+      setErrorMessage("Please agree to the terms and conditions");
       toast({ title: "Terms required", description: "Please agree to the terms and conditions", variant: "destructive" });
       return;
     }
     if (!captchaToken) {
+      setErrorMessage("Please complete the CAPTCHA verification.");
       toast({ title: "CAPTCHA required", description: "Please complete the CAPTCHA verification.", variant: "destructive" });
       return;
     }
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       // TODO: Connect to your backend API
       const response = await fetch("/api/auth/register", {
@@ -59,14 +64,17 @@ const Signup = () => {
       if (response.ok) {
         const data = await response.json();
         toast({ title: "Account created successfully!", description: "Please check your email to verify your account." });
+        setErrorMessage(null);
         navigate("/login"); // Redirect to login after successful registration
       } else {
         const error = await response.json();
+        setErrorMessage(error.message || "Failed to create account");
         toast({ title: "Registration failed", description: error.message || "Failed to create account", variant: "destructive" });
         captchaRef.current?.reset();
         setCaptchaToken(null);
       }
     } catch (error) {
+      setErrorMessage("Something went wrong. Please try again.");
       console.error("Registration error:", error);
       toast({ title: "Registration error", description: "Something went wrong. Please try again.", variant: "destructive" });
     } finally {
@@ -94,26 +102,31 @@ const Signup = () => {
               <CardDescription className="text-muted-foreground">Join us today and get started</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {errorMessage && (
+                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-300 text-center">
+                  {errorMessage}
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-foreground font-medium">Full Name</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="name" name="name" type="text" placeholder="Enter your full name" value={formData.name} onChange={handleChange} className="pl-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                    <Input id="name" name="name" type="text" placeholder="Enter your full name" value={formData.name} onChange={(e) => { handleChange(e); setErrorMessage(null); }} className="pl-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-foreground font-medium">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} className="pl-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                    <Input id="email" name="email" type="email" placeholder="Enter your email" value={formData.email} onChange={(e) => { handleChange(e); setErrorMessage(null); }} className="pl-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="password" name="password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={formData.password} onChange={handleChange} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                    <Input id="password" name="password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={formData.password} onChange={(e) => { handleChange(e); setErrorMessage(null); }} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                   </div>
                 </div>
@@ -121,7 +134,7 @@ const Signup = () => {
                   <Label htmlFor="confirmPassword" className="text-foreground font-medium">Confirm Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password" value={formData.confirmPassword} onChange={handleChange} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                    <Input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password" value={formData.confirmPassword} onChange={(e) => { handleChange(e); setErrorMessage(null); }} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
                     <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                   </div>
                 </div>

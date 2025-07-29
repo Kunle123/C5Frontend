@@ -22,11 +22,13 @@ const Login = () => {
   const captchaRef = useRef<CaptchaRef>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!showCaptcha) {
       setShowCaptcha(true);
+      setErrorMessage('Please complete the CAPTCHA below to continue.');
       toast({
         title: "Security verification required",
         description: "Please complete the CAPTCHA below to continue."
@@ -34,6 +36,7 @@ const Login = () => {
       return;
     }
     if (!captchaToken) {
+      setErrorMessage('Please complete the CAPTCHA verification.');
       toast({
         title: "CAPTCHA required",
         description: "Please complete the CAPTCHA verification.",
@@ -42,6 +45,7 @@ const Login = () => {
       return;
     }
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       const response = await fetch(`${API_GATEWAY_BASE}/api/auth/login`, {
         method: "POST",
@@ -51,17 +55,20 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         toast({ title: "Login successful!", description: "Welcome back!" });
+        setErrorMessage(null);
         if (data.token) {
           localStorage.setItem("token", data.token);
           navigate("/dashboard");
         }
       } else {
         const error = await response.json();
+        setErrorMessage(error.message || "Invalid credentials");
         toast({ title: "Login failed", description: error.message || "Invalid credentials", variant: "destructive" });
         captchaRef.current?.reset();
         setCaptchaToken(null);
       }
     } catch (error) {
+      setErrorMessage("Something went wrong. Please try again.");
       console.error("Login error:", error);
       toast({ title: "Login error", description: "Something went wrong. Please try again.", variant: "destructive" });
     } finally {
@@ -89,19 +96,24 @@ const Login = () => {
               <CardDescription className="text-sm text-muted-foreground">Sign in to your account to continue</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {errorMessage && (
+                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-300 text-center">
+                  {errorMessage}
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="font-medium text-foreground">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10 border-input bg-input text-base placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                    <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={(e) => { setEmail(e.target.value); setErrorMessage(null); }} className="pl-10 border-input bg-input text-base placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password" className="font-medium text-foreground">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 pr-10 border-input bg-input text-base placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                    <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={(e) => { setPassword(e.target.value); setErrorMessage(null); }} className="pl-10 pr-10 border-input bg-input text-base placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
