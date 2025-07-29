@@ -43,8 +43,14 @@ export function CVDownload() {
         alert('Download failed: ' + text);
         return;
       }
+      // Check Content-Type
+      const contentType = res.headers.get('Content-Type');
+      if (!contentType || !contentType.includes('officedocument')) {
+        alert('Warning: The file is not a valid DOCX. Please contact support.\nContent-Type: ' + contentType);
+        return;
+      }
       const disposition = res.headers.get('Content-Disposition');
-      let suggestedFilename = filename || 'download';
+      let suggestedFilename = filename || 'download.docx';
       if (disposition && disposition.includes('filename=')) {
         suggestedFilename = disposition.split('filename=')[1].replace(/"/g, '').split(';')[0];
       }
