@@ -1,11 +1,13 @@
 import { Button } from "./ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Menu } from "lucide-react";
 
 export function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
@@ -33,30 +35,39 @@ export function Navigation() {
           >
             CandidateV
           </div>
-          <div className="hidden md:flex items-center space-x-8">
-            {/* Public menu items */}
-            {!isLoggedIn && (
-              <>
-                <button onClick={() => navigate("/")} className={`transition-colors ${isActive("/") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Home</button>
-                <button onClick={() => navigate("/pricing")} className={`transition-colors ${isActive("/pricing") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Pricing</button>
-                <button onClick={() => navigate("/privacy-policy")} className={`transition-colors ${isActive("/privacy-policy") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Privacy</button>
-                <button onClick={() => navigate("/terms")} className={`transition-colors ${isActive("/terms") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Terms</button>
-                <button onClick={() => navigate("/login")} className={`transition-colors ${isActive("/login") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Login</button>
-                <button onClick={() => navigate("/signup")} className={`transition-colors ${isActive("/signup") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Sign Up</button>
-              </>
-            )}
-            {/* Internal menu items */}
-            {isLoggedIn && (
-              <>
-                <button onClick={() => navigate("/dashboard")} className={`transition-colors ${isActive("/dashboard") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Dashboard</button>
-                <button onClick={() => navigate("/careerarcv2")} className={`transition-colors ${isActive("/careerarcv2") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Career Arc</button>
-                <button onClick={() => navigate("/my-cvs-new")} className={`transition-colors ${isActive("/my-cvs-new") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>My CVs</button>
-                <button onClick={() => navigate("/account-new")} className={`transition-colors ${isActive("/account-new") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Account</button>
-                <button onClick={() => navigate("/apply")} className={`transition-colors ${isActive("/apply") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Apply</button>
-                <Button variant="outline" size="sm" onClick={handleLogout}>Log Out</Button>
-              </>
-            )}
-          </div>
+          {/* Hamburger menu for logged-in users */}
+          {isLoggedIn ? (
+            <div className="flex items-center space-x-3">
+              <button
+                className="flex items-center px-3 py-2 rounded hover:bg-accent focus:outline-none"
+                onClick={() => setShowMenu((prev) => !prev)}
+                aria-label="Open menu"
+              >
+                <Menu className="h-6 w-6" />
+                <span className="ml-2 text-base font-medium">Dashboard</span>
+              </button>
+              {showMenu && (
+                <div className="absolute right-4 top-16 bg-background border rounded shadow-lg z-50 min-w-[180px]">
+                  <button onClick={() => { navigate("/dashboard"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/dashboard") ? "text-primary font-medium" : "text-foreground"}`}>Dashboard</button>
+                  <button onClick={() => { navigate("/careerarcv2"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/careerarcv2") ? "text-primary font-medium" : "text-foreground"}`}>Career Arc</button>
+                  <button onClick={() => { navigate("/my-cvs-new"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/my-cvs-new") ? "text-primary font-medium" : "text-foreground"}`}>My CVs</button>
+                  <button onClick={() => { navigate("/account-new"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/account-new") ? "text-primary font-medium" : "text-foreground"}`}>Account</button>
+                  <button onClick={() => { navigate("/apply"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/apply") ? "text-primary font-medium" : "text-foreground"}`}>Apply</button>
+                  <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => { handleLogout(); setShowMenu(false); }}>Log Out</Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center space-x-8">
+              {/* Public menu items */}
+              <button onClick={() => navigate("/")} className={`transition-colors ${isActive("/") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Home</button>
+              <button onClick={() => navigate("/pricing")} className={`transition-colors ${isActive("/pricing") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Pricing</button>
+              <button onClick={() => navigate("/privacy-policy")} className={`transition-colors ${isActive("/privacy-policy") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Privacy</button>
+              <button onClick={() => navigate("/terms")} className={`transition-colors ${isActive("/terms") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Terms</button>
+              <button onClick={() => navigate("/login")} className={`transition-colors ${isActive("/login") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Login</button>
+              <button onClick={() => navigate("/signup")} className={`transition-colors ${isActive("/signup") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Sign Up</button>
+            </div>
+          )}
         </div>
       </div>
     </nav>
