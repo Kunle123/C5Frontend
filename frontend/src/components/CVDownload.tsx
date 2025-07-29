@@ -32,8 +32,32 @@ export function CVDownload() {
     // eslint-disable-next-line
   }, [token]);
 
-  const handleDownload = (url: string) => {
-    window.open(url, '_blank');
+  const handleDownload = async (url: string, filename?: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        alert('Download failed: ' + text);
+        return;
+      }
+      const disposition = res.headers.get('Content-Disposition');
+      let suggestedFilename = filename || 'download';
+      if (disposition && disposition.includes('filename=')) {
+        suggestedFilename = disposition.split('filename=')[1].replace(/"/g, '').split(';')[0];
+      }
+      const blob = await res.blob();
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = suggestedFilename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      alert('Download failed.');
+    }
   };
 
   return (
@@ -75,15 +99,15 @@ export function CVDownload() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {cvs.map((cv: any) => (
-                <Card key={cv.cv_id || cv.id} className="hover:shadow-lg transition-shadow duration-200">
+                <Card key={cv.id} className="hover:shadow-lg transition-shadow duration-200">
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <CardTitle className="text-lg text-card-foreground line-clamp-2">
-                          {cv.job_title || cv.name || 'CV'}
+                          {cv.job_title || cv.metadata?.name || 'CV'}
                         </CardTitle>
                         <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
-                          {cv.company_name || cv.company || ''}
+                          {cv.company_name || ''}
                         </p>
                       </div>
                       <Badge variant={cv.status === 'final' ? 'success' : 'secondary'} className="ml-2 text-xs">
@@ -91,20 +115,22 @@ export function CVDownload() {
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
-                      Created: {cv.created ? new Date(cv.created).toLocaleString() : ''}
+                      Created: {cv.created_at ? new Date(cv.created_at).toLocaleString() : ''}
                     </p>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-3">
-                      <Button className="w-full" size="sm" onClick={() => handleDownload(`/api/cv/${cv.cv_id || cv.id}/download`)}>
+                      <Button className="w-full" size="sm" onClick={() => handleDownload(`/api/cv/${cv.id}/download`, `${cv.job_title || cv.metadata?.name || 'cv'}.docx`)}>
                         <Download className="h-4 w-4 mr-2" />
                         Download CV
                       </Button>
-                      {cv.cover_letter_id && (
-                        <Button variant="outline" className="w-full" size="sm" onClick={() => handleDownload(`/api/cover-letter/${cv.cover_letter_id}/download`)}>
+                      {cv.cover_letter_available && cv.cover_letter_download_url ? (
+                        <Button variant="outline" className="w-full" size="sm" onClick={() => handleDownload(cv.cover_letter_download_url, `cover_letter_${cv.id}.docx`)}>
                           <FileText className="h-4 w-4 mr-2" />
                           Download Cover Letter
                         </Button>
+                      ) : (
+                        <div className="w-full h-9" />
                       )}
                     </div>
                   </CardContent>
