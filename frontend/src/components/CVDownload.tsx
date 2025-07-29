@@ -10,6 +10,7 @@ export function CVDownload() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+  const isAuthenticated = !!token;
 
   useEffect(() => {
     const fetchCVs = async () => {
@@ -32,9 +33,14 @@ export function CVDownload() {
     // eslint-disable-next-line
   }, [token]);
 
+  // Helper for authenticated download (fetch+blob)
   const handleDownload = async (url: string, filename?: string) => {
     try {
-      const token = localStorage.getItem('token');
+      if (!isAuthenticated) {
+        // If not authenticated, just open the link
+        window.open(url, '_blank');
+        return;
+      }
       const res = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -126,15 +132,42 @@ export function CVDownload() {
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-3">
-                      <Button className="w-full" size="sm" onClick={() => handleDownload(`/api/cv/${cv.id}/download`, `${cv.job_title || cv.metadata?.name || 'cv'}.docx`)}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Download CV
-                      </Button>
-                      {cv.cover_letter_available && cv.cover_letter_download_url ? (
-                        <Button variant="outline" className="w-full" size="sm" onClick={() => handleDownload(cv.cover_letter_download_url, `cover_letter_${cv.id}.docx`)}>
-                          <FileText className="h-4 w-4 mr-2" />
-                          Download Cover Letter
+                      {/* Use a direct <a> link if not authenticated, otherwise use the button with fetch+blob */}
+                      {isAuthenticated ? (
+                        <Button className="w-full" size="sm" onClick={() => handleDownload(`/api/cv/${cv.id}/download`, `${cv.job_title || cv.metadata?.name || 'cv'}.docx`)}>
+                          <Download className="h-4 w-4 mr-2" />
+                          Download CV
                         </Button>
+                      ) : (
+                        <a
+                          href={`/api/cv/${cv.id}/download`}
+                          className="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download CV
+                        </a>
+                      )}
+                      {cv.cover_letter_available && cv.cover_letter_download_url ? (
+                        isAuthenticated ? (
+                          <Button variant="outline" className="w-full" size="sm" onClick={() => handleDownload(cv.cover_letter_download_url, `cover_letter_${cv.id}.docx`)}>
+                            <FileText className="h-4 w-4 mr-2" />
+                            Download Cover Letter
+                          </Button>
+                        ) : (
+                          <a
+                            href={cv.cover_letter_download_url}
+                            className="w-full inline-flex items-center justify-center px-4 py-2 border border-primary text-primary rounded hover:bg-primary/10 transition"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            Download Cover Letter
+                          </a>
+                        )
                       ) : (
                         <div className="w-full h-9" />
                       )}
