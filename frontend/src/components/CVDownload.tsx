@@ -54,6 +54,9 @@ export function CVDownload() {
     window.URL.revokeObjectURL(url);
   };
 
+  // Filter to only show CVs with cover letters
+  const filteredCVs = cvs.filter(cv => cv.cover_letter_available && cv.cover_letter_download_url);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -76,7 +79,7 @@ export function CVDownload() {
             </div>
           ) : error ? (
             <div className="text-center text-red-500 py-8">{error}</div>
-          ) : cvs.length === 0 ? (
+          ) : filteredCVs.length === 0 ? (
             <div className="text-center py-12">
               <div className="max-w-md mx-auto">
                 <div className="bg-muted/50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -92,7 +95,7 @@ export function CVDownload() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cvs.map((cv: any) => (
+              {filteredCVs.map((cv: any) => (
                 <Card key={cv.id} className="hover:shadow-lg transition-shadow duration-200">
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
