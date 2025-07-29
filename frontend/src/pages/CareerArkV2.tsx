@@ -57,12 +57,31 @@ function convertToMonthInput(dateStr: string) {
   return "";
 }
 
+function safeParseDate(dateStr: string) {
+  if (!dateStr || dateStr === 'Present') return new Date();
+  // YYYY-MM
+  if (/^\d{4}-\d{2}$/.test(dateStr)) {
+    const [year, month] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, 1);
+  }
+  // YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return new Date(dateStr);
+  }
+  // Try 'Jan 2020'
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const match = dateStr.match(/^(\w{3}) (\d{4})$/);
+  if (match) return new Date(Number(match[2]), months.indexOf(match[1]), 1);
+  // Fallback
+  return new Date(dateStr);
+}
+
 function getUniqueMonths(workExperiences: any[]) {
   const months = new Set<string>();
   workExperiences.forEach(exp => {
-    const start = exp.start_date ? new Date(exp.start_date) : null;
-    const end = exp.end_date && exp.end_date !== 'Present' ? new Date(exp.end_date) : new Date();
-    if (!start || !end) return;
+    const start = exp.start_date ? safeParseDate(exp.start_date) : null;
+    const end = exp.end_date && exp.end_date !== 'Present' ? safeParseDate(exp.end_date) : new Date();
+    if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) return;
     let current = new Date(start.getFullYear(), start.getMonth(), 1);
     const last = new Date(end.getFullYear(), end.getMonth(), 1);
     while (current <= last) {
@@ -217,13 +236,13 @@ const CareerArkV2: React.FC = () => {
                     toast({ title: 'CV imported and processed!', description: 'CV imported and processed!' });
                   } else if (statusData.status === 'completed_with_errors') {
                     setUploadError('CV processed with errors: ' + (statusData.error || 'Unknown error'));
-                    setSummary(statusData.extractedDataSummary || null);
+                  setSummary(statusData.extractedDataSummary || null);
                     await new Promise(res => setTimeout(res, 2000));
                     await fetchArcData();
                     setRefreshKey(k => k + 1);
                     setShowPollingModal(false);
-                  } else if (statusData.status === 'failed') {
-                    setUploadError(statusData.error || 'CV extraction failed.');
+                } else if (statusData.status === 'failed') {
+                  setUploadError(statusData.error || 'CV extraction failed.');
                   }
                 } else if (pollCount >= 20) { // ~1 minute
                   setPolling(false);
