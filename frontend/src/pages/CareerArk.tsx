@@ -246,60 +246,35 @@ const CareerArk: React.FC = () => {
                   setPolling(false);
                   setSummary(statusData.extractedDataSummary || null);
                   clearInterval(interval);
-                  let effectiveProfileId = profileId;
-                  if (!effectiveProfileId) {
-                    try {
-                      const profileRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                      });
-                      if (profileRes.ok) {
-                        const profile = await profileRes.json();
-                        effectiveProfileId = profile.id;
-                        setProfileId(profile.id);
-                      } else {
-                        setUploadError('Failed to refresh Ark: could not fetch profile');
-                        return;
+                  // Refresh Ark data, bypassing cache
+                  const arcRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/all_sections`, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      'Cache-Control': 'no-cache',
+                    },
+                  });
+                  if (arcRes.ok) {
+                    const arcData = await arcRes.json();
+                    setAllSections(arcData);
+                    setWorkExperience(Array.isArray(arcData.work_experience) ? arcData.work_experience : []);
+                    setEducation(Array.isArray(arcData.education) ? arcData.education : []);
+                    setTraining(Array.isArray(arcData.training) ? arcData.training : []);
+                    setSkills(Array.isArray(arcData.skills) ? arcData.skills : []);
+                    setProjects(Array.isArray(arcData.projects) ? arcData.projects : []);
+                    setCertifications(Array.isArray(arcData.certifications) ? arcData.certifications : []);
+                    // Auto-select first available entry
+                    const sectionOrder = ['work_experience', 'education', 'training', 'skills', 'projects', 'certifications'];
+                    for (const sec of sectionOrder) {
+                      const arr = arcData[sec];
+                      if (Array.isArray(arr) && arr.length > 0) {
+                        setSelectedSection(sec);
+                        setSelectedIdx(arr[0].id || '0');
+                        break;
                       }
-                    } catch (err) {
-                      setUploadError('Failed to refresh Ark: error fetching profile');
-                      console.error('Error fetching profile for Ark refresh:', err);
-                      return;
                     }
-                  }
-                  try {
-                    const arcRes = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${effectiveProfileId}/all_sections`, {
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Cache-Control': 'no-cache',
-                      },
-                    });
-                    if (arcRes.ok) {
-                      const arcData = await arcRes.json();
-                      setAllSections(arcData);
-                      setWorkExperience(Array.isArray(arcData.work_experience) ? arcData.work_experience : []);
-                      setEducation(Array.isArray(arcData.education) ? arcData.education : []);
-                      setTraining(Array.isArray(arcData.training) ? arcData.training : []);
-                      setSkills(Array.isArray(arcData.skills) ? arcData.skills : []);
-                      setProjects(Array.isArray(arcData.projects) ? arcData.projects : []);
-                      setCertifications(Array.isArray(arcData.certifications) ? arcData.certifications : []);
-                      // Auto-select first available entry
-                      const sectionOrder = ['work_experience', 'education', 'training', 'skills', 'projects', 'certifications'];
-                      for (const sec of sectionOrder) {
-                        const arr = arcData[sec];
-                        if (Array.isArray(arr) && arr.length > 0) {
-                          setSelectedSection(sec);
-                          setSelectedIdx(arr[0].id || '0');
-                          break;
-                        }
-                      }
-                      toast({ status: 'success', title: 'CV imported and Ark updated! Your data is now available.' });
-                    } else {
-                      setUploadError('Failed to update Ark');
-                      console.error('Failed to fetch Ark sections after CV import:', arcRes.status);
-                    }
-                  } catch (err) {
-                    setUploadError('Failed to refresh Ark: error fetching sections');
-                    console.error('Error fetching Ark sections after CV import:', err);
+                    toast({ status: 'success', title: 'CV imported and Ark updated! Your data is now available.' });
+                  } else {
+                    setUploadError('Failed to update Ark');
                   }
                 } else if (statusData.status === 'failed') {
                   setPolling(false);

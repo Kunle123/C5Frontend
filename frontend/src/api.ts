@@ -257,4 +257,22 @@ export async function deleteAccount(token: string) {
   if (!res) throw new Error('Unauthorized or network error');
   if (!res.ok) throw await res.json();
   return res.json();
+}
+
+export async function registerAndLoginTestUser(email: string, password: string, name: string = "Test User") {
+  // Register
+  await fetch('https://api-gw-production.up.railway.app/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password })
+  });
+  // Login
+  const res = await fetch('https://api-gw-production.up.railway.app/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  if (!res.ok) throw new Error('Login failed');
+  const data = await res.json();
+  return data.token;
 } 

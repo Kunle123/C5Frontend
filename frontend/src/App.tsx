@@ -75,25 +75,25 @@ function App() {
           {/* Chakra-based pages - wrap with ChakraProvider and Layout */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard-new" element={<DashboardNew />} />
-          <Route path="/cvs" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></Layout></ChakraProvider>} />
-          <Route path="/pricing" element={<ChakraProvider theme={theme}><Layout><Pricing /></Layout></ChakraProvider>} />
-          <Route path="/account" element={<ChakraProvider theme={theme}><Layout><Account /></Layout></ChakraProvider>} />
+          <Route path="/cvs" element={<ChakraProvider theme={theme}><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></ChakraProvider>} />
+          <Route path="/pricing" element={<ChakraProvider theme={theme}><Pricing /></ChakraProvider>} />
+          <Route path="/account" element={<ChakraProvider theme={theme}><Account /></ChakraProvider>} />
           <Route path="/account-new" element={<ProtectedRoute><AccountNew /></ProtectedRoute>} />
           <Route path="/apply" element={<ProtectedRoute><Apply /></ProtectedRoute>} />
-          <Route path="/subscription-success" element={<ChakraProvider theme={theme}><Layout><SubscriptionSuccess /></Layout></ChakraProvider>} />
-          <Route path="/subscription-cancel" element={<ChakraProvider theme={theme}><Layout><SubscriptionCancel /></Layout></ChakraProvider>} />
-          <Route path="/test" element={<ChakraProvider theme={theme}><Layout><TestAppJourneys /></Layout></ChakraProvider>} />
-          <Route path="/download-cvs" element={<ChakraProvider theme={theme}><Layout><ProtectedRoute><DownloadCVs /></ProtectedRoute></Layout></ChakraProvider>} />
-          <Route path="/privacy-policy" element={<ChakraProvider theme={theme}><Layout><PrivacyPolicy /></Layout></ChakraProvider>} />
-          <Route path="/terms" element={<ChakraProvider theme={theme}><Layout><Terms /></Layout></ChakraProvider>} />
-          <Route path="/faq" element={<ChakraProvider theme={theme}><Layout><FAQ /></Layout></ChakraProvider>} />
-          <Route path="/debug-cv-ai" element={<ChakraProvider theme={theme}><Layout><DebugCVAIResponse /></Layout></ChakraProvider>} />
-          <Route path="/search-jobs" element={<ChakraProvider theme={theme}><Layout><SearchJobs /></Layout></ChakraProvider>} />
+          <Route path="/subscription-success" element={<ChakraProvider theme={theme}><SubscriptionSuccess /></ChakraProvider>} />
+          <Route path="/subscription-cancel" element={<ChakraProvider theme={theme}><SubscriptionCancel /></ChakraProvider>} />
+          <Route path="/test" element={<ChakraProvider theme={theme}><TestAppJourneys /></ChakraProvider>} />
+          <Route path="/download-cvs" element={<ChakraProvider theme={theme}><ProtectedRoute><DownloadCVs /></ProtectedRoute></ChakraProvider>} />
+          <Route path="/privacy-policy" element={<ChakraProvider theme={theme}><PrivacyPolicy /></ChakraProvider>} />
+          <Route path="/terms" element={<ChakraProvider theme={theme}><Terms /></ChakraProvider>} />
+          <Route path="/faq" element={<ChakraProvider theme={theme}><FAQ /></ChakraProvider>} />
+          <Route path="/debug-cv-ai" element={<ChakraProvider theme={theme}><DebugCVAIResponse /></ChakraProvider>} />
+          <Route path="/search-jobs" element={<ChakraProvider theme={theme}><SearchJobs /></ChakraProvider>} />
           <Route path="/colortest" element={<ColorTest />} />
           <Route path="/tailwinduitest" element={<TailwindUiTest />} />
           <Route path="/my-cvs-new" element={<MyCVsNew />} />
           <Route path="/careerarcv2" element={<CareerArkV2 />} />
-          <Route path="*" element={<ChakraProvider theme={theme}><Layout><NotFound /></Layout></ChakraProvider>} />
+          <Route path="*" element={<ChakraProvider theme={theme}><NotFound /></ChakraProvider>} />
         </Routes>
       </Router>
     </NotificationContext.Provider>

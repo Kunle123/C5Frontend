@@ -1,105 +1,89 @@
-import React from 'react';
+import { Navigation } from "../components/Navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
-const today = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
-
-const Terms: React.FC = () => (
-  <div style={{ maxWidth: 800, margin: '0 auto', padding: 32, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-    <h1 style={{ fontSize: '2.2rem', fontWeight: 800, marginBottom: 8, color: '#2D3748' }}>Terms and Conditions</h1>
-    <p style={{ color: '#718096', marginBottom: 24 }}>Last updated: {today}</p>
-    <section style={{ marginBottom: 32 }}>
-      <p>
-        Welcome to Candidate 5. By accessing or using our website and services, you agree to be bound by these Terms and Conditions. If you do not agree, please do not use our services.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>1. About Us</h2>
-      <p>
-        Candidate 5 is a UK-based organisation providing CV and job application support services. For enquiries, contact <a href="mailto:enquiries@candidate5.co.uk">enquiries@candidate5.co.uk</a>.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>2. Definitions</h2>
-      <ul style={{ marginLeft: 24 }}>
-        <li><b>"Service"</b> means the Candidate 5 website and related services.</li>
-        <li><b>"User"</b> means any person who accesses or uses the Service.</li>
-        <li><b>"Content"</b> means all information, data, text, images, and other material provided through the Service.</li>
-      </ul>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>3. Use of Service</h2>
-      <ul style={{ marginLeft: 24 }}>
-        <li>You must be at least 18 years old or have parental consent to use our services.</li>
-        <li>You agree to provide accurate information and not use the service for unlawful purposes.</li>
-        <li>We may suspend or terminate your access if you breach these terms.</li>
-      </ul>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>4. Account Security</h2>
-      <p>
-        You are responsible for maintaining the confidentiality of your account and password. You agree to notify us immediately of any unauthorised use of your account.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>5. Intellectual Property</h2>
-      <p>
-        All content and materials on this site are the property of Candidate 5 or its licensors. You may not copy, reproduce, or distribute any content without permission.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>6. Limitation of Liability</h2>
-      <p>
-        We provide our services "as is" and make no guarantees regarding accuracy or suitability. To the fullest extent permitted by law, Candidate 5 is not liable for any loss or damage arising from your use of our services.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>7. User Content</h2>
-      <p>
-        You retain ownership of content you submit but grant us a licence to use it for providing our services.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>8. Termination</h2>
-      <p>
-        We reserve the right to suspend or terminate your account at our discretion, including for breach of these terms or misuse of the Service.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>9. Changes to Service</h2>
-      <p>
-        We may modify, suspend, or discontinue any part of the Service at any time, with or without notice.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>10. Dispute Resolution</h2>
-      <p>
-        Any disputes arising from these Terms will be governed by the laws of England and Wales. We encourage you to contact us first to resolve any issues amicably.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>11. Privacy</h2>
-      <p>
-        Please refer to our <a href="/privacy-policy">Privacy Policy</a> for information on how we handle your data.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>12. Changes to Terms</h2>
-      <p>
-        We may update these Terms from time to time. Continued use of our services constitutes acceptance of the new terms.
-      </p>
-    </section>
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>13. Governing Law</h2>
-      <p>
-        These Terms are governed by the laws of England and Wales.
-      </p>
-    </section>
-    <section>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#2B6CB0', marginBottom: 8 }}>14. Contact</h2>
-      <p>
-        For any questions about these Terms, please contact <a href="mailto:enquiries@candidate5.co.uk">enquiries@candidate5.co.uk</a>.
-      </p>
-    </section>
-  </div>
-);
+const Terms = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl font-bold text-center">
+              Terms and Conditions
+            </CardTitle>
+            <p className="text-muted-foreground text-center">
+              Last updated: 27 July 2025
+            </p>
+          </CardHeader>
+          <CardContent className="prose prose-slate max-w-none space-y-6">
+            <p className="text-foreground">
+              Welcome to Candidate 5. By accessing or using our website and services, you agree to be bound by these Terms and Conditions. If you do not agree, please do not use our services.
+            </p>
+            <div className="space-y-6">
+              <section>
+                <h2 className="text-xl font-semibold text-primary mb-3">1. About Us</h2>
+                <p className="text-foreground">
+                  Candidate 5 is a UK-based organisation providing CV and job application support services. For enquiries, contact enquiries@candidate5.co.uk.
+                </p>
+              </section>
+              <section>
+                <h2 className="text-xl font-semibold text-primary mb-3">2. Definitions</h2>
+                <div className="space-y-2">
+                  <p className="text-foreground">
+                    <strong>"Service"</strong> means the Candidate 5 website and related services.
+                  </p>
+                  <p className="text-foreground">
+                    <strong>"User"</strong> means any person who accesses or uses the Service.
+                  </p>
+                  <p className="text-foreground">
+                    <strong>"Content"</strong> means all information, data, text, images, and other material provided through the Service.
+                  </p>
+                </div>
+              </section>
+              <section>
+                <h2 className="text-xl font-semibold text-primary mb-3">3. Use of Service</h2>
+                <ul className="space-y-2 list-disc list-inside text-foreground">
+                  <li>You must be at least 18 years old or have parental consent to use our services.</li>
+                  <li>You agree to provide accurate information and not use the service for unlawful purposes.</li>
+                  <li>We may suspend or terminate your access if you breach these terms.</li>
+                </ul>
+              </section>
+              <section>
+                <h2 className="text-xl font-semibold text-primary mb-3">4. Account Security</h2>
+                <p className="text-foreground">
+                  You are responsible for maintaining the confidentiality of your account and password. You agree to notify us immediately of any unauthorised use of your account.
+                </p>
+              </section>
+              <section>
+                <h2 className="text-xl font-semibold text-primary mb-3">5. Intellectual Property</h2>
+                <p className="text-foreground">
+                  All content and materials on this site are the property of Candidate 5 or its licensors. You may not copy, reproduce, or distribute any content without permission.
+                </p>
+              </section>
+              <section>
+                <h2 className="text-xl font-semibold text-primary mb-3">6. Limitation of Liability</h2>
+                <p className="text-foreground">
+                  We provide our services "as is" and make no guarantees regarding accuracy or suitability. To the fullest extent permitted by law, Candidate 5 is not liable for any loss or damage arising from your use of our services.
+                </p>
+              </section>
+              <section>
+                <h2 className="text-xl font-semibold text-primary mb-3">7. User Content</h2>
+                <p className="text-foreground">
+                  You retain ownership of content you submit but grant us a licence to use it for providing our services.
+                </p>
+              </section>
+              <section>
+                <h2 className="text-xl font-semibold text-primary mb-3">8. Termination</h2>
+                <p className="text-foreground">
+                  Either party may terminate this agreement at any time. Upon termination, your right to use our services will cease immediately.
+                </p>
+              </section>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
 
 export default Terms; 
