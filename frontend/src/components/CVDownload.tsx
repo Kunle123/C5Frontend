@@ -34,42 +34,24 @@ export function CVDownload() {
   }, [token]);
 
   // Helper for authenticated download (fetch+blob)
-  const handleDownload = async (url: string, filename?: string) => {
-    try {
-      if (!isAuthenticated) {
-        // If not authenticated, just open the link
-        window.open(url, '_blank');
-        return;
-      }
-      const res = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        alert('Download failed: ' + text);
-        return;
-      }
-      // Check Content-Type
-      const contentType = res.headers.get('Content-Type');
-      if (!contentType || !contentType.includes('officedocument')) {
-        alert('Warning: The file is not a valid DOCX. Please contact support.\nContent-Type: ' + contentType);
-        return;
-      }
-      const disposition = res.headers.get('Content-Disposition');
-      let suggestedFilename = filename || 'download.docx';
-      if (disposition && disposition.includes('filename=')) {
-        suggestedFilename = disposition.split('filename=')[1].replace(/"/g, '').split(';')[0];
-      }
-      const blob = await res.blob();
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = suggestedFilename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (err) {
-      alert('Download failed.');
+  const handleDownload = async (cvId: string) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`/api/cv/${cvId}/download`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) {
+      alert('Download failed');
+      return;
     }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cv.docx'; // Optionally, parse Content-Disposition for filename
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
   };
 
   return (
@@ -134,7 +116,7 @@ export function CVDownload() {
                     <div className="space-y-3">
                       {/* Use a direct <a> link if not authenticated, otherwise use the button with fetch+blob */}
                       {isAuthenticated ? (
-                        <Button className="w-full" size="sm" onClick={() => handleDownload(`/api/cv/${cv.id}/download`, `${cv.job_title || cv.metadata?.name || 'cv'}.docx`)}>
+                        <Button className="w-full" size="sm" onClick={() => handleDownload(cv.id)}>
                           <Download className="h-4 w-4 mr-2" />
                           Download CV
                         </Button>
@@ -152,7 +134,7 @@ export function CVDownload() {
                       )}
                       {cv.cover_letter_available && cv.cover_letter_download_url ? (
                         isAuthenticated ? (
-                          <Button variant="outline" className="w-full" size="sm" onClick={() => handleDownload(cv.cover_letter_download_url, `cover_letter_${cv.id}.docx`)}>
+                          <Button variant="outline" className="w-full" size="sm" onClick={() => handleDownload(cv.id)}>
                             <FileText className="h-4 w-4 mr-2" />
                             Download Cover Letter
                           </Button>
