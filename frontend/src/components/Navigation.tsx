@@ -35,19 +35,24 @@ export function Navigation() {
           >
             CandidateV
           </div>
-          {/* Hamburger menu for logged-in users */}
           {isLoggedIn ? (
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 relative">
               <button
-                className="flex items-center px-3 py-2 rounded hover:bg-accent focus:outline-none"
+                className="text-base font-medium px-2 py-1 rounded hover:bg-accent focus:outline-none"
+                onClick={() => { navigate("/dashboard"); setShowMenu(false); }}
+                aria-label="Go to Dashboard"
+              >
+                Dashboard
+              </button>
+              <button
+                className="flex items-center px-2 py-2 rounded hover:bg-accent focus:outline-none"
                 onClick={() => setShowMenu((prev) => !prev)}
                 aria-label="Open menu"
               >
                 <Menu className="h-6 w-6" />
-                <span className="ml-2 text-base font-medium">Dashboard</span>
               </button>
               {showMenu && (
-                <div className="absolute right-4 top-16 bg-background border rounded shadow-lg z-50 min-w-[180px]">
+                <div className="absolute right-0 top-12 bg-background border rounded shadow-lg z-50 min-w-[180px]">
                   <button onClick={() => { navigate("/dashboard"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/dashboard") ? "text-primary font-medium" : "text-foreground"}`}>Dashboard</button>
                   <button onClick={() => { navigate("/careerarcv2"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/careerarcv2") ? "text-primary font-medium" : "text-foreground"}`}>Career Arc</button>
                   <button onClick={() => { navigate("/my-cvs-new"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/my-cvs-new") ? "text-primary font-medium" : "text-foreground"}`}>My CVs</button>
