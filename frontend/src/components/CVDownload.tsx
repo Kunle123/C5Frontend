@@ -54,8 +54,19 @@ export function CVDownload() {
     window.URL.revokeObjectURL(url);
   };
 
-  // Filter to only show CVs from the new service (those with a metadata field)
-  const filteredCVs = cvs.filter(cv => cv.metadata);
+  // Deduplicate by job_title + company_name, prefer the one with a cover letter or latest created_at
+  const uniqueCVsMap: Record<string, any> = {};
+  cvs.forEach(cv => {
+    const key = (cv.job_title || '') + '|' + (cv.company_name || '');
+    if (
+      !uniqueCVsMap[key] ||
+      (cv.cover_letter_available && !uniqueCVsMap[key].cover_letter_available) ||
+      (cv.created_at && uniqueCVsMap[key].created_at && new Date(cv.created_at) > new Date(uniqueCVsMap[key].created_at))
+    ) {
+      uniqueCVsMap[key] = cv;
+    }
+  });
+  const filteredCVs = Object.values(uniqueCVsMap);
 
   return (
     <div className="min-h-screen bg-background">
