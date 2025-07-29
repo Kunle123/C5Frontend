@@ -69,9 +69,15 @@ function safeParseDate(dateStr: string) {
     return new Date(dateStr);
   }
   // Try 'Jan 2020'
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const match = dateStr.match(/^(\w{3}) (\d{4})$/);
-  if (match) return new Date(Number(match[2]), months.indexOf(match[1]), 1);
+  const monthsShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const matchShort = dateStr.match(/^(\w{3}) (\d{4})$/);
+  if (matchShort) return new Date(Number(matchShort[2]), monthsShort.indexOf(matchShort[1]), 1);
+  // Try 'March 2016' (full month name)
+  const monthsLong = [
+    "January","February","March","April","May","June","July","August","September","October","November","December"
+  ];
+  const matchLong = dateStr.match(/^([A-Za-z]+) (\d{4})$/);
+  if (matchLong) return new Date(Number(matchLong[2]), monthsLong.indexOf(matchLong[1]), 1);
   // Fallback
   return new Date(dateStr);
 }
