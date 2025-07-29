@@ -483,9 +483,6 @@ const CareerArk: React.FC = () => {
 
   return (
     <Box minH="100vh" bg="gray.50">
-      <div style={{ background: '#fbbf24', color: '#1e293b', padding: '8px', fontWeight: 'bold', textAlign: 'center', fontSize: '18px' }}>
-        Career Ark Page 1
-      </div>
       {/* User Info Header */}
       <Box w="100%" bg="white" py={3} boxShadow="sm" borderBottom="1px solid #e2e8f0">
         <Flex align="center" justify="space-between" maxW="1200px" mx="auto">
