@@ -128,10 +128,13 @@ export const Dashboard = () => {
   const personalDetailsComplete = userProfile && userProfile.name && userProfile.email;
   const careerHistoryComplete = arcData && Array.isArray(arcData.work_experience) && arcData.work_experience.length > 0;
 
+  // Read application submission flag from localStorage
+  const hasSubmittedApplication = localStorage.getItem('hasSubmittedApplication') === 'true';
+
   const userProgress = {
     personalDetails: !!personalDetailsComplete,
     careerHistory: !!careerHistoryComplete,
-    applicationReady: !!careerHistoryComplete,
+    applicationReady: hasSubmittedApplication,
     hasDownloads: hasDownloads
   };
 

@@ -100,6 +100,8 @@ const ApplicationWizard = () => {
     if (!jobDescription.trim()) return;
     setIsAnalyzing(true);
     setError(null);
+    // Mark application as submitted in localStorage
+    localStorage.setItem('hasSubmittedApplication', 'true');
     setCurrentStep(2);
     try {
       const token = localStorage.getItem('token');
