@@ -353,6 +353,22 @@ const ApplicationWizard = () => {
             </Card>
           </div>
         )}
+        {isGenerating && currentStep === 2 && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center min-w-[320px]">
+              <svg className="animate-spin h-8 w-8 text-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+              <div className="space-y-2 text-center">
+                <div className="font-semibold text-lg">Generating your application...</div>
+                <ul className="text-sm text-muted-foreground space-y-1 mt-2">
+                  <li>• Curating expertise</li>
+                  <li>• Comparing expertise to job advert</li>
+                  <li>• Generating CV</li>
+                  <li>• Generating cover letter</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Step 4: Review & Download */}
         {currentStep === 4 && (
           <div className="space-y-6">
