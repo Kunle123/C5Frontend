@@ -81,6 +81,15 @@ function getUniqueMonths(workExperiences: any[]) {
   workExperiences.forEach(exp => {
     const start = exp.start_date ? safeParseDate(exp.start_date) : null;
     const end = exp.end_date && exp.end_date !== 'Present' ? safeParseDate(exp.end_date) : new Date();
+    // Debug log for browser comparison
+    console.log('[getUniqueMonths] exp:', exp, {
+      start_date: exp.start_date,
+      end_date: exp.end_date,
+      parsed_start: start,
+      parsed_end: end,
+      valid_start: start && !isNaN(start.getTime()),
+      valid_end: end && !isNaN(end.getTime())
+    });
     if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) return;
     let current = new Date(start.getFullYear(), start.getMonth(), 1);
     const last = new Date(end.getFullYear(), end.getMonth(), 1);
