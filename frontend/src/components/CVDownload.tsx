@@ -54,8 +54,8 @@ export function CVDownload() {
     window.URL.revokeObjectURL(url);
   };
 
-  // Filter to only show CVs with cover letters
-  const filteredCVs = cvs.filter(cv => cv.cover_letter_available && cv.cover_letter_download_url);
+  // Filter to only show CVs from the new service (those with a metadata field)
+  const filteredCVs = cvs.filter(cv => cv.metadata);
 
   return (
     <div className="min-h-screen bg-background">
