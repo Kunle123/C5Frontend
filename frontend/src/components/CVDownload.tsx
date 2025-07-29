@@ -14,7 +14,6 @@ export function CVDownload() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
 
   const fetchCVs = async () => {
@@ -66,19 +65,6 @@ export function CVDownload() {
     }
   };
 
-  const handleDelete = async (cvId: string) => {
-    setDeletingId(cvId);
-    setError(null);
-    try {
-      await deleteCV(cvId, token!);
-      await fetchCVs();
-    } catch (err: any) {
-      setError(err.message || 'Delete failed');
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -120,36 +106,34 @@ export function CVDownload() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {cvs.map((cv: any) => (
-                <Card key={cv.cv_id || cv.id}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="w-5 h-5" />
+                <Card key={cv.cv_id || cv.id} className="shadow-md border border-gray-200 rounded-xl p-6 flex flex-col items-start bg-white">
+                  <CardHeader className="w-full pb-2">
+                    <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
+                      <FileText className="w-5 h-5 text-primary" />
                       {cv.job_title || cv.name || 'CV'}
                     </CardTitle>
                     <div className="text-sm text-muted-foreground mt-1">
                       {cv.created ? `Created: ${new Date(cv.created).toLocaleString()}` : ''}
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Button className="w-full" onClick={() => handleDownload(`/api/cv/${cv.cv_id || cv.id}/download`)}>
+                  <CardContent className="w-full flex flex-col gap-3 pt-2">
+                    <Button
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                      onClick={() => handleDownload(`/api/cv/${cv.cv_id || cv.id}/download`)}
+                    >
                       <Download className="w-4 h-4 mr-2" />
                       Download CV
                     </Button>
                     {cv.cover_letter_id && (
-                      <Button className="w-full" variant="outline" onClick={() => handleDownload(`/api/cover-letter/${cv.cover_letter_id}/download`)}>
+                      <Button
+                        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+                        variant="outline"
+                        onClick={() => handleDownload(`/api/cover-letter/${cv.cover_letter_id}/download`)}
+                      >
                         <Download className="w-4 h-4 mr-2" />
                         Download Cover Letter
                       </Button>
                     )}
-                    <Button
-                      className="w-full"
-                      variant="destructive"
-                      onClick={() => handleDelete(cv.cv_id || cv.id)}
-                      disabled={deletingId === (cv.cv_id || cv.id)}
-                    >
-                      {deletingId === (cv.cv_id || cv.id) ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
-                      Delete
-                    </Button>
                   </CardContent>
                 </Card>
               ))}
