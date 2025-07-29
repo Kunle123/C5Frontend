@@ -135,9 +135,10 @@ const Signup = () => {
                     <CaptchaComponent ref={captchaRef} siteKey="6LcjwIsrAAAAAB0gcJBueXnRM-5QJM_GOdckHwAy" onChange={handleCaptchaChange} onError={handleCaptchaError} theme="light" />
                   )}
                 </div>
+                {/* Button should always be visible after CAPTCHA */}
                 <Button
                   type="submit"
-                  className="w-full bg-auth-gradient border-0 shadow-soft transition-all duration-300"
+                  className="w-full bg-auth-gradient border-0 shadow-soft transition-all duration-300 mt-6 min-h-12 block border-4 border-red-500 bg-yellow-100"
                   disabled={isLoading}
                 >
                   {isLoading ? (
