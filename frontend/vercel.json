@@ -6,8 +6,7 @@
     },
     {
       "source": "/api/cv/:path*",
-      "destination": "https://cvservice-production.up.railway.app/api/cv/:path*",
-      "force": true
+      "destination": "https://cvservice-production.up.railway.app/api/cv/:path*"
     },
     {
       "source": "/api/:path*",
