@@ -1,12 +1,14 @@
 {
   "rewrites": [
     {
-      "source": "/api/cv/:cvId/download",
-      "destination": "/api/proxy-cv?cvId=:cvId"
+      "source": "/api/cv",
+      "destination": "https://cvservice-production.up.railway.app/api/cv",
+      "force": true
     },
     {
       "source": "/api/cv/:path*",
-      "destination": "https://cvservice-production.up.railway.app/api/cv/:path*"
+      "destination": "https://cvservice-production.up.railway.app/api/cv/:path*",
+      "force": true
     },
     {
       "source": "/api/:path*",
