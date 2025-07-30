@@ -19,7 +19,7 @@ interface LinkedInOAuthConfig extends OAuthConfig {
 class OAuthService {
   // Google OAuth configuration
   private googleConfig: GoogleOAuthConfig = {
-    clientId: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com", // Replace with your Google Client ID
+    clientId: "425401566082-eie01hplk2hm2mgd04cqk509orfmipi2.apps.googleusercontent.com", // Real Google Client ID
     redirectUri: `${window.location.origin}/auth/google/callback`,
     scope: "openid email profile",
     responseType: "code",
