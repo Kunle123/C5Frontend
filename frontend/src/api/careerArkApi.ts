@@ -178,7 +178,7 @@ export async function addWorkExperience(data: any) {
   const profile = await profileRes.json();
   const userId = profile.id;
   // Now POST to the correct endpoint
-  const res = await fetch(`${API_GATEWAY_BASE}/api/users/${userId}/work_experience`, {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${userId}/work_experience`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
@@ -200,7 +200,7 @@ export async function updateWorkExperience(id: string, data: any) {
   if (!profileRes.ok) throw new Error('Failed to fetch profile');
   const profile = await profileRes.json();
   const userId = profile.id;
-  const res = await fetch(`${API_GATEWAY_BASE}/api/users/${userId}/work_experience/${id}`, {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${userId}/work_experience/${id}`, {
     method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -222,7 +222,7 @@ export async function deleteWorkExperience(id: string) {
   if (!profileRes.ok) throw new Error('Failed to fetch profile');
   const profile = await profileRes.json();
   const userId = profile.id;
-  const res = await fetch(`${API_GATEWAY_BASE}/api/users/${userId}/work_experience/${id}`, {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${userId}/work_experience/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
