@@ -29,7 +29,7 @@ class OAuthService {
 
   // LinkedIn OAuth configuration
   private linkedinConfig: LinkedInOAuthConfig = {
-    clientId: "YOUR_LINKEDIN_CLIENT_ID", // Replace with your LinkedIn Client ID
+    clientId: "78dpf66evefqj5", // Real LinkedIn Client ID
     redirectUri: `${window.location.origin}/auth/linkedin/callback`,
     scope: "openid profile email",
     state: this.generateState()
