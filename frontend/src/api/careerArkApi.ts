@@ -215,14 +215,7 @@ export async function updateWorkExperience(id: string, data: any) {
 // Work Experience
 export async function deleteWorkExperience(id: string) {
   const token = localStorage.getItem('token') || '';
-  // Fetch the user's profile to get the user_id
-  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!profileRes.ok) throw new Error('Failed to fetch profile');
-  const profile = await profileRes.json();
-  const userId = profile.id;
-  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${userId}/work_experience/${id}`, {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/work_experience/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
