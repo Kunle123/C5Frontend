@@ -50,7 +50,7 @@ class OAuthService {
       prompt: this.googleConfig.prompt!
     });
 
-    const authUrl = `https://accounts.google.com/oauth/authorize?${params.toString()}`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
     window.location.href = authUrl;
   }
 
