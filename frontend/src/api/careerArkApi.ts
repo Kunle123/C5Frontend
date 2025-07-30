@@ -1,5 +1,5 @@
-const API_BASE = 'https://api-gw-production.up.railway.app/api/career-ark';
-export const API_GATEWAY_BASE = import.meta.env.VITE_API_GATEWAY_BASE || 'https://api-gw-production.up.railway.app';
+const API_BASE = 'https://api-gw-production.up.railway.app/api/arc';
+export const API_GATEWAY_BASE = 'https://api-gw-production.up.railway.app';
 const API_CAREER_ARK = 'https://api-gw-production.up.railway.app/api/career-ark';
 
 function getAuthHeaders() {
@@ -169,7 +169,16 @@ export async function downloadProcessedCV(taskId: string) {
 
 // Add Work Experience
 export async function addWorkExperience(data: any) {
-  const res = await fetch(`${API_CAREER_ARK}/work_experience`, {
+  const token = localStorage.getItem('token') || '';
+  // Fetch the user's profile to get the user_id
+  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!profileRes.ok) throw new Error('Failed to fetch profile');
+  const profile = await profileRes.json();
+  const userId = profile.id;
+  // Now POST to the correct endpoint
+  const res = await fetch(`${API_GATEWAY_BASE}/api/users/${userId}/work_experience`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
@@ -184,8 +193,14 @@ export async function addWorkExperience(data: any) {
 // Update Work Experience (Career Ark)
 export async function updateWorkExperience(id: string, data: any) {
   const token = localStorage.getItem('token') || '';
-  console.log('PATCH payload for updateWorkExperience:', id, data);
-  const res = await fetch(`${API_CAREER_ARK}/work_experience/${id}`, {
+  // Fetch the user's profile to get the user_id
+  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!profileRes.ok) throw new Error('Failed to fetch profile');
+  const profile = await profileRes.json();
+  const userId = profile.id;
+  const res = await fetch(`${API_GATEWAY_BASE}/api/users/${userId}/work_experience/${id}`, {
     method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -199,7 +214,15 @@ export async function updateWorkExperience(id: string, data: any) {
 
 // Work Experience
 export async function deleteWorkExperience(id: string) {
-  const res = await fetch(`${API_CAREER_ARK}/work_experience/${id}`, {
+  const token = localStorage.getItem('token') || '';
+  // Fetch the user's profile to get the user_id
+  const profileRes = await fetch(`${API_GATEWAY_BASE}/api/user/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!profileRes.ok) throw new Error('Failed to fetch profile');
+  const profile = await profileRes.json();
+  const userId = profile.id;
+  const res = await fetch(`${API_GATEWAY_BASE}/api/users/${userId}/work_experience/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -209,7 +232,7 @@ export async function deleteWorkExperience(id: string) {
 
 // Add Education
 export async function addEducation(data: any) {
-  const res = await fetch(`${API_CAREER_ARK}/education`, {
+  const res = await fetch(`${API_BASE}/education`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
@@ -225,7 +248,7 @@ export async function addEducation(data: any) {
 export async function updateEducation(id: string, data: any) {
   const token = localStorage.getItem('token') || '';
   const res = await fetch(`${API_CAREER_ARK}/education/${id}`, {
-    method: 'PATCH',
+    method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -238,7 +261,7 @@ export async function updateEducation(id: string, data: any) {
 
 // Add Training
 export async function addTraining(data: any) {
-  const res = await fetch(`${API_CAREER_ARK}/training`, {
+  const res = await fetch(`${API_BASE}/training`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
@@ -254,7 +277,7 @@ export async function addTraining(data: any) {
 export async function updateTraining(id: string, data: any) {
   const token = localStorage.getItem('token') || '';
   const res = await fetch(`${API_CAREER_ARK}/training/${id}`, {
-    method: 'PATCH',
+    method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -267,7 +290,7 @@ export async function updateTraining(id: string, data: any) {
 
 // Delete Education
 export async function deleteEducation(id: string) {
-  const res = await fetch(`${API_CAREER_ARK}/education/${id}`, {
+  const res = await fetch(`${API_BASE}/education/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -277,7 +300,7 @@ export async function deleteEducation(id: string) {
 
 // Delete Training
 export async function deleteTraining(id: string) {
-  const res = await fetch(`${API_CAREER_ARK}/training/${id}`, {
+  const res = await fetch(`${API_BASE}/training/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -287,7 +310,7 @@ export async function deleteTraining(id: string) {
 
 // Delete Skill
 export async function deleteSkill(id: string) {
-  const res = await fetch(`${API_CAREER_ARK}/skills/${id}`, {
+  const res = await fetch(`${API_BASE}/skills/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -297,7 +320,7 @@ export async function deleteSkill(id: string) {
 
 // Delete Project
 export async function deleteProject(id: string) {
-  const res = await fetch(`${API_CAREER_ARK}/projects/${id}`, {
+  const res = await fetch(`${API_BASE}/projects/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -307,7 +330,7 @@ export async function deleteProject(id: string) {
 
 // Delete Certification
 export async function deleteCertification(id: string) {
-  const res = await fetch(`${API_CAREER_ARK}/certifications/${id}`, {
+  const res = await fetch(`${API_BASE}/certifications/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -317,7 +340,7 @@ export async function deleteCertification(id: string) {
 
 // Add Skill
 export async function addSkill(data: { name: string }) {
-  const res = await fetch(`${API_CAREER_ARK}/skills`, {
+  const res = await fetch(`${API_BASE}/skills`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
@@ -330,7 +353,7 @@ export async function addSkill(data: { name: string }) {
 }
 // Add Project
 export async function addProject(data: { name: string; description?: string }) {
-  const res = await fetch(`${API_CAREER_ARK}/projects`, {
+  const res = await fetch(`${API_BASE}/projects`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
@@ -343,7 +366,7 @@ export async function addProject(data: { name: string; description?: string }) {
 }
 // Add Certification
 export async function addCertification(data: { name: string; issuer?: string; year?: string }) {
-  const res = await fetch(`${API_CAREER_ARK}/certifications`, {
+  const res = await fetch(`${API_BASE}/certifications`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
@@ -357,7 +380,7 @@ export async function addCertification(data: { name: string; issuer?: string; ye
 
 // Update Skill
 export async function updateSkill(id: string, data: any) {
-  const res = await fetch(`${API_CAREER_ARK}/skills/${id}`, {
+  const res = await fetch(`${API_BASE}/skills/${id}`, {
     method: 'PUT',
     headers: {
       ...getAuthHeaders(),
@@ -370,7 +393,7 @@ export async function updateSkill(id: string, data: any) {
 }
 // Update Project
 export async function updateProject(id: string, data: any) {
-  const res = await fetch(`${API_CAREER_ARK}/projects/${id}`, {
+  const res = await fetch(`${API_BASE}/projects/${id}`, {
     method: 'PUT',
     headers: {
       ...getAuthHeaders(),
@@ -383,7 +406,7 @@ export async function updateProject(id: string, data: any) {
 }
 // Update Certification
 export async function updateCertification(id: string, data: any) {
-  const res = await fetch(`${API_CAREER_ARK}/certifications/${id}`, {
+  const res = await fetch(`${API_BASE}/certifications/${id}`, {
     method: 'PUT',
     headers: {
       ...getAuthHeaders(),
