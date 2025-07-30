@@ -604,7 +604,7 @@ const CareerArk: React.FC = () => {
                                 description: editDetails,
                               });
                               // Always re-fetch latest work experience after update
-                              const res = await fetch(`${API_GATEWAY_BASE}/api/users/${profileId}/work_experience`, {
+                              const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${profileId}/work_experience`, {
                                 headers: { Authorization: `Bearer ${token}` },
                               });
                               const latest = await res.json();
@@ -616,7 +616,7 @@ const CareerArk: React.FC = () => {
                               if (err?.status === 404 || err?.message?.includes('404')) {
                                 toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
                                 // Auto-refresh
-                                const res = await fetch(`${API_GATEWAY_BASE}/api/users/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
+                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
                                 const latest = await res.json();
                                 setWorkExperience(Array.isArray(latest) ? latest : []);
                                 setEditMode(false);
@@ -748,7 +748,7 @@ const CareerArk: React.FC = () => {
                             try {
                               console.log('Deleting work experience', item.id);
                               await deleteWorkExperience(item.id);
-                              const res = await fetch(`${API_GATEWAY_BASE}/api/users/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
+                              const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
                               const latest = await res.json();
                               setWorkExperience(Array.isArray(latest) ? latest : []);
                               setSelectedIdx(latest[0]?.id || null);
@@ -757,7 +757,7 @@ const CareerArk: React.FC = () => {
                               console.log('Delete error', err);
                               if (err?.status === 404 || err?.message?.includes('404')) {
                                 toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
-                                const res = await fetch(`${API_GATEWAY_BASE}/api/users/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
+                                const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
                                 const latest = await res.json();
                                 setWorkExperience(Array.isArray(latest) ? latest : []);
                                 setSelectedIdx(latest[0]?.id || null);
