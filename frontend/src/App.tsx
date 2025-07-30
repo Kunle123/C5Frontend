@@ -6,9 +6,7 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
-import CVs from './pages/CVs';
 import Pricing from './pages/Pricing';
-import Account from './pages/Account';
 import NotFound from './pages/NotFound';
 import SubscriptionSuccess from './pages/SubscriptionSuccess';
 import SubscriptionCancel from './pages/SubscriptionCancel';
@@ -16,9 +14,7 @@ import CVsAndCoverLetters from './pages/CVsAndCoverLetters';
 import CareerArk from './pages/CareerArk';
 import ProtectedRoute from './components/ProtectedRoute';
 import TestAppJourneys from './pages/TestAppJourneys';
-import DownloadCVs from './pages/DownloadCVs';
 import { checkTokenExpiration } from './utils/auth';
-import CareerArkDemo from './pages/CareerArkDemo';
 import HighConvertingLanding from './pages/HighConvertingLanding';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
@@ -77,13 +73,11 @@ function App() {
           <Route path="/dashboard-new" element={<DashboardNew />} />
           <Route path="/cvs" element={<ChakraProvider theme={theme}><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></ChakraProvider>} />
           <Route path="/pricing" element={<ChakraProvider theme={theme}><Pricing /></ChakraProvider>} />
-          <Route path="/account" element={<ChakraProvider theme={theme}><Account /></ChakraProvider>} />
           <Route path="/account-new" element={<ProtectedRoute><AccountNew /></ProtectedRoute>} />
           <Route path="/apply" element={<ProtectedRoute><Apply /></ProtectedRoute>} />
           <Route path="/subscription-success" element={<ChakraProvider theme={theme}><SubscriptionSuccess /></ChakraProvider>} />
           <Route path="/subscription-cancel" element={<ChakraProvider theme={theme}><SubscriptionCancel /></ChakraProvider>} />
           <Route path="/test" element={<ChakraProvider theme={theme}><TestAppJourneys /></ChakraProvider>} />
-          <Route path="/download-cvs" element={<ChakraProvider theme={theme}><ProtectedRoute><DownloadCVs /></ProtectedRoute></ChakraProvider>} />
           <Route path="/privacy-policy" element={<ChakraProvider theme={theme}><PrivacyPolicy /></ChakraProvider>} />
           <Route path="/terms" element={<ChakraProvider theme={theme}><Terms /></ChakraProvider>} />
           <Route path="/faq" element={<ChakraProvider theme={theme}><FAQ /></ChakraProvider>} />
