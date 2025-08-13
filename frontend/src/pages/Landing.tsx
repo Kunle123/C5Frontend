@@ -66,7 +66,7 @@ export default function Landing() {
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground">
-                Join 10,000+ job seekers already optimizing their applications!
+                Join job seekers already optimizing their applications!
               </p>
             </div>
             <div className="relative">

@@ -115,7 +115,7 @@ const HighConvertingLanding: React.FC = () => {
             <Button colorScheme="brand" variant="outline" size={{ base: 'md', md: 'lg' }} borderRadius="md" leftIcon={<FaPlay />}>See How It Works (60s Video)</Button>
           </HStack>
           <Text fontSize={{ base: 'xs', md: 'sm' }} color="text.placeholder" mt={2}>
-            Join 10,000+ job seekers already optimizing their applications!
+            Join job seekers already optimizing their applications!
           </Text>
         </VStack>
         <Box flex={1} display="flex" justifyContent="center" alignItems="center" mt={{ base: 10, md: 0 }} w="100%">

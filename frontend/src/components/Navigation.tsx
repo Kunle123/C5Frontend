@@ -63,7 +63,7 @@ export function Navigation() {
               )}
             </div>
           ) : (
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="flex items-center space-x-8">
               {/* Public menu items */}
               <button onClick={() => navigate("/")} className={`transition-colors ${isActive("/") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Home</button>
               <button onClick={() => navigate("/pricing")} className={`transition-colors ${isActive("/pricing") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Pricing</button>
