@@ -103,13 +103,13 @@ export const Dashboard = () => {
         const arc = await arcRes.json();
         setArcData(arc);
         // Fetch available downloads (CVs/cover letters)
-        const downloadsRes = await fetch(`https://api-gw-production.up.railway.app/api/mega-cv`, {
+        const downloadsRes = await fetch(`https://api-gw-production.up.railway.app/api/cv`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         let hasDownloadsFlag = false;
         if (downloadsRes.ok) {
           const downloads = await downloadsRes.json();
-          hasDownloadsFlag = Array.isArray(downloads.megaCVs) && downloads.megaCVs.length > 0;
+          hasDownloadsFlag = Array.isArray(downloads) && downloads.length > 0;
         }
         setHasDownloads(hasDownloadsFlag);
       } catch (err: any) {
