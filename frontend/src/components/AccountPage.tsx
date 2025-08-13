@@ -1,0 +1,525 @@
+import React, { useState, useEffect } from "react";
+import { Navigation } from "./Navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Badge } from "./ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Separator } from "./ui/separator";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
+import { useToast } from "../hooks/use-toast";
+import { Loader2, Camera, Mail, Phone, User, CreditCard, Download, Shield, Trash2 } from "lucide-react";
+
+const API_BASE = "https://api-gw-production.up.railway.app";
+
+export function AccountPage() {
+  const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [error, setError] = useState("");
+
+  // Profile state
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    phone_number: "",
+    linkedin: "",
+    address_line1: "",
+    city_state_postal: "",
+    emailVerified: false,
+    avatarUrl: "",
+  });
+  const [editedProfile, setEditedProfile] = useState(profile);
+
+  // Password change state
+  const [passwordData, setPasswordData] = useState({
+    current: "",
+    new: "",
+    confirm: "",
+  });
+
+  // Subscription state (static for now)
+  const [subscription] = useState({
+    plan: "Professional",
+    status: "Active",
+    nextBilling: "February 15, 2025",
+    amount: "$29.99/month",
+  });
+
+  // Fetch user profile on mount
+  useEffect(() => {
+    async function fetchProfile() {
+      setLoadingProfile(true);
+      setError("");
+      try {
+        const token = localStorage.getItem("token") || "";
+        const res = await fetch(`${API_BASE}/api/user/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch profile");
+        const data = await res.json();
+        setProfile({
+          name: data.name || "",
+          email: data.email || "",
+          phone_number: data.phone_number || "",
+          linkedin: data.linkedin || "",
+          address_line1: data.address_line1 || "",
+          city_state_postal: data.city_state_postal || "",
+          emailVerified: !!data.email_verified,
+          avatarUrl: "",
+        });
+        setEditedProfile({
+          name: data.name || "",
+          email: data.email || "",
+          phone_number: data.phone_number || "",
+          linkedin: data.linkedin || "",
+          address_line1: data.address_line1 || "",
+          city_state_postal: data.city_state_postal || "",
+          emailVerified: !!data.email_verified,
+          avatarUrl: "",
+        });
+      } catch (err: any) {
+        setError(err.message || "Failed to load profile");
+      } finally {
+        setLoadingProfile(false);
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  const handleEditProfile = () => {
+    setEditedProfile(profile);
+    setIsEditing(true);
+  };
+
+  const handleSaveProfile = async () => {
+    setIsLoading(true);
+    setError("");
+    // Validate phone number format
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    if (editedProfile.phone_number && !phoneRegex.test(editedProfile.phone_number)) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter phone number in international format (e.g., +447966461005)",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token") || "";
+      const res = await fetch(`${API_BASE}/api/user/profile`, {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: editedProfile.name,
+          phone_number: editedProfile.phone_number,
+          linkedin: editedProfile.linkedin,
+          address_line1: editedProfile.address_line1,
+          city_state_postal: editedProfile.city_state_postal,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to update profile");
+      const data = await res.json();
+      setProfile({
+        ...profile,
+        name: data.name || editedProfile.name,
+        phone_number: data.phone_number || editedProfile.phone_number,
+        linkedin: data.linkedin || editedProfile.linkedin,
+        address_line1: data.address_line1 || editedProfile.address_line1,
+        city_state_postal: data.city_state_postal || editedProfile.city_state_postal,
+      });
+      setIsEditing(false);
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (err: any) {
+      setError(err.message || "Failed to update profile");
+      toast({
+        title: "Update failed",
+        description: err.message || "Failed to update profile",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditedProfile(profile);
+    setIsEditing(false);
+  };
+
+  const handleResendVerification = async () => {
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
+    toast({
+      title: "Verification email sent",
+      description: "Please check your inbox for the verification link.",
+    });
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordData.new !== passwordData.confirm) {
+      toast({
+        title: "Passwords don't match",
+        description: "New password and confirmation must match.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (passwordData.new.length < 8) {
+      toast({
+        title: "Password too short",
+        description: "New password must be at least 8 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
+    setIsPasswordModalOpen(false);
+    setPasswordData({ current: "", new: "", confirm: "" });
+    toast({
+      title: "Password changed",
+      description: "Your password has been successfully updated.",
+    });
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
+    toast({
+      title: "Account deleted",
+      description: "Your account has been permanently deleted.",
+    });
+    // In a real app, this would redirect to login or logout
+  };
+
+  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setEditedProfile({ ...editedProfile, avatarUrl: url });
+      toast({
+        title: "Avatar updated",
+        description: "Your profile picture has been updated.",
+      });
+    }
+  };
+
+  if (loadingProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/50">
+        <Loader2 className="h-8 w-8 animate-spin mr-2" />
+        <span>Loading profile...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/50">
+      <Navigation />
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold text-foreground">Account Settings</h1>
+          <p className="text-muted-foreground">Manage your profile and subscription preferences</p>
+          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+        </div>
+        <div className="grid gap-8 md:grid-cols-2">
+          {/* Profile Section */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                Profile Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Avatar */}
+              <div className="flex flex-col items-center space-y-4">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={editedProfile.avatarUrl} />
+                  <AvatarFallback className="text-lg">
+                    {editedProfile.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                {isEditing && (
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <Button variant="outline" size="sm">
+                      <Camera className="h-4 w-4 mr-2" />
+                      Change Photo
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={editedProfile.name}
+                    onChange={(e) => setEditedProfile({ ...editedProfile, name: e.target.value })}
+                    disabled={!isEditing}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Email Address
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="email"
+                      value={editedProfile.email}
+                      disabled
+                      className="flex-1"
+                    />
+                    {profile.emailVerified ? (
+                      <Badge variant="default" className="bg-success text-success-foreground">
+                        Verified
+                      </Badge>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleResendVerification}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify"}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone_number" className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
+                    Phone Number
+                  </Label>
+                  <Input
+                    id="phone_number"
+                    value={editedProfile.phone_number}
+                    onChange={(e) => setEditedProfile({ ...editedProfile, phone_number: e.target.value })}
+                    disabled={!isEditing}
+                    placeholder="+447966461005"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="linkedin">LinkedIn</Label>
+                  <Input
+                    id="linkedin"
+                    value={editedProfile.linkedin}
+                    onChange={(e) => setEditedProfile({ ...editedProfile, linkedin: e.target.value })}
+                    disabled={!isEditing}
+                    placeholder="https://linkedin.com/in/your-profile"
+                    type="url"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address_line1">Address Line 1</Label>
+                  <Input
+                    id="address_line1"
+                    value={editedProfile.address_line1}
+                    onChange={(e) => setEditedProfile({ ...editedProfile, address_line1: e.target.value })}
+                    disabled={!isEditing}
+                    placeholder="123 Main St"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="city_state_postal">City, State, Postal</Label>
+                  <Input
+                    id="city_state_postal"
+                    value={editedProfile.city_state_postal}
+                    onChange={(e) => setEditedProfile({ ...editedProfile, city_state_postal: e.target.value })}
+                    disabled={!isEditing}
+                    placeholder="London, UK, SW1A 1AA"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                {isEditing ? (
+                  <div className="flex gap-2">
+                    <Button onClick={handleSaveProfile} disabled={isLoading} className="flex-1">
+                      {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      Save Changes
+                    </Button>
+                    <Button variant="outline" onClick={handleCancelEdit} disabled={isLoading}>
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <Button onClick={handleEditProfile} variant="outline">
+                    Edit Profile
+                  </Button>
+                )}
+                <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Change Password
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Change Password</DialogTitle>
+                      <DialogDescription>
+                        Enter your current password and choose a new one.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="current-password">Current Password</Label>
+                        <Input
+                          id="current-password"
+                          type="password"
+                          value={passwordData.current}
+                          onChange={(e) => setPasswordData({ ...passwordData, current: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="new-password">New Password</Label>
+                        <Input
+                          id="new-password"
+                          type="password"
+                          value={passwordData.new}
+                          onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="confirm-password">Confirm New Password</Label>
+                        <Input
+                          id="confirm-password"
+                          type="password"
+                          value={passwordData.confirm}
+                          onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsPasswordModalOpen(false)}
+                        disabled={isLoading}
+                      >
+                        Cancel
+                      </Button>
+                      <Button onClick={handlePasswordChange} disabled={isLoading}>
+                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                        Change Password
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="flex items-center gap-2">
+                      <Trash2 className="h-4 w-4" />
+                      Delete Account
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete your account
+                        and remove all your data from our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        Delete Account
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </CardContent>
+          </Card>
+          {/* Subscription & Billing Section */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-primary" />
+                Subscription & Billing
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Current Plan</span>
+                  <Badge variant="default">{subscription.plan}</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Status</span>
+                  <Badge variant="default" className="bg-success text-success-foreground">
+                    {subscription.status}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Next Billing</span>
+                  <span className="text-sm font-medium">{subscription.nextBilling}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Amount</span>
+                  <span className="text-sm font-medium">{subscription.amount}</span>
+                </div>
+              </div>
+              <Separator />
+              <div className="space-y-3">
+                <Button variant="outline" className="w-full">
+                  Upgrade Plan
+                </Button>
+                <Button variant="outline" className="w-full">
+                  Manage Payment Methods
+                </Button>
+                <Button variant="outline" className="w-full flex items-center gap-2">
+                  <Download className="h-4 w-4" />
+                  Download Invoice
+                </Button>
+                <Button variant="destructive" className="w-full">
+                  Cancel Subscription
+                </Button>
+              </div>
+              <Separator />
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium">Billing History</h4>
+                <div className="text-sm text-muted-foreground">
+                  No billing history available
+                </div>
+              </div>
+              <Separator />
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium">Privacy & Data</h4>
+                <Button variant="outline" className="w-full flex items-center gap-2">
+                  <Download className="h-4 w-4" />
+                  Download My Data
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
