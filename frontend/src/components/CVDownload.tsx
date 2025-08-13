@@ -34,9 +34,9 @@ export function CVDownload() {
   }, [token]);
 
   // Helper for authenticated download (fetch+blob)
-  const handleDownload = async (cvId: string) => {
+  const handleDownload = async (docId: string) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`/api/cv/${cvId}/download`, {
+    const res = await fetch(`/api/cv/${docId}/download`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) {
@@ -148,7 +148,21 @@ export function CVDownload() {
                       )}
                       {cv.cover_letter_available && cv.cover_letter_download_url ? (
                         isAuthenticated ? (
-                          <Button variant="outline" className="w-full" size="sm" onClick={() => handleDownload(cv.id)}>
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            size="sm"
+                            onClick={() => {
+                              // Extract the cover letter ID from the download URL
+                              const match = cv.cover_letter_download_url.match(/\/api\/cv\/(.+)\/download/);
+                              const coverLetterId = match ? match[1] : null;
+                              if (coverLetterId) {
+                                handleDownload(coverLetterId);
+                              } else {
+                                alert('Cover letter ID not found');
+                              }
+                            }}
+                          >
                             <FileText className="h-4 w-4 mr-2" />
                             Download Cover Letter
                           </Button>
