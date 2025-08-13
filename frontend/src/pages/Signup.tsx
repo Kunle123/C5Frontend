@@ -17,6 +17,7 @@ const Signup = () => {
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     code: ""
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -43,8 +44,9 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      setErrorMessage("Passwords don't match! Please check and try again.");
-      toast({ title: "Password mismatch", description: "Passwords don't match! Please check and try again.", variant: "destructive" });
+      setErrorMessage("Passwords do not match");
+      toast({ title: "Password mismatch", description: "Passwords do not match", variant: "destructive" });
+      setIsLoading(false);
       return;
     }
     if (!agreeToTerms) {
@@ -136,12 +138,16 @@ const Signup = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-foreground font-medium">Confirm Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password" value={formData.confirmPassword} onChange={(e) => { handleChange(e); setErrorMessage(null); }} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
-                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
-                  </div>
+                  <Label htmlFor="confirmPassword" className="font-medium text-foreground">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="code" className="font-medium text-foreground">6-Digit Code</Label>
