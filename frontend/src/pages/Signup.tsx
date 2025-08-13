@@ -13,7 +13,12 @@ import { useToast } from "../hooks/use-toast";
 import NavBanner from "../components/NavBanner";
 
 const Signup = () => {
-  const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    code: ""
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
@@ -137,6 +142,19 @@ const Signup = () => {
                     <Input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password" value={formData.confirmPassword} onChange={(e) => { handleChange(e); setErrorMessage(null); }} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
                     <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="code" className="font-medium text-foreground">6-Digit Code</Label>
+                  <Input
+                    id="code"
+                    name="code"
+                    type="text"
+                    maxLength={6}
+                    placeholder="6-digit code"
+                    value={formData.code || ""}
+                    onChange={e => setFormData({ ...formData, code: e.target.value })}
+                    required
+                  />
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox id="terms" checked={agreeToTerms} onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)} />
