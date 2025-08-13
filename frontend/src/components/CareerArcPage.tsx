@@ -99,7 +99,7 @@ export function CareerArcPage() {
   const handleDeleteExperience = async (id: string) => {
     try {
       await deleteWorkExperience(id);
-      toast({ title: "Experience deleted", description: "The experience has been removed from your Career Arc™." });
+      toast({ title: "Experience deleted", description: "The experience has been removed from your Career Ark™." });
       setRefreshFlag(f => f + 1);
     } catch (err: any) {
       toast({ title: "Delete failed", description: err?.message || "Could not delete experience", variant: "destructive" });
@@ -131,7 +131,7 @@ export function CareerArcPage() {
           if (statusData.status === 'completed') {
             setIsImporting(false);
             setRefreshFlag(f => f + 1);
-            toast({ title: "CV imported successfully", description: "New experience has been added to your Career Arc™." });
+            toast({ title: "CV imported successfully", description: "New experience has been added to your Career Ark™." });
           } else if (statusData.status === 'failed') {
             setIsImporting(false);
             toast({ title: "Import failed", description: statusData.error || 'CV extraction failed.', variant: 'destructive' });
