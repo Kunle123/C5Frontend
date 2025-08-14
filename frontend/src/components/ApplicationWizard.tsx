@@ -75,6 +75,22 @@ const ApplicationWizard = () => {
     fetchProfileAndArc();
   }, []);
 
+  // Reset to step 1 if coming from menu
+  useEffect(() => {
+    if (localStorage.getItem('resetApplyStep') === 'true') {
+      setCurrentStep(1);
+      setJobDescription('');
+      setExtractedKeywords([]);
+      setMatchScore(0);
+      setJobTitle('');
+      setCompanyName('');
+      setGeneratedCV('');
+      setGeneratedCoverLetter('');
+      setThreadId(null);
+      localStorage.removeItem('resetApplyStep');
+    }
+  }, []);
+
   // Helper to merge profile and arc data
   const getMergedProfile = () => {
     if (!profile || !arcData) return null;
