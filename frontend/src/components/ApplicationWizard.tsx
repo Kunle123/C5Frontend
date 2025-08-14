@@ -133,6 +133,9 @@ const ApplicationWizard = () => {
       const mergedProfile = getMergedProfile();
       if (!mergedProfile) throw new Error('Profile data not loaded');
       let payload;
+      // Debug log jobDescription and threadId
+      console.log('[ApplicationWizard] threadId:', threadId);
+      console.log('[ApplicationWizard] jobDescription:', jobDescription);
       if (threadId) {
         payload = {
           action: 'generate_cv',
@@ -502,11 +505,11 @@ const ApplicationWizard = () => {
       </div>
       {/* Generation Options Modal */}
       <Dialog open={showOptionsModal} onOpenChange={setShowOptionsModal}>
-        <DialogContent>
+        <DialogContent aria-describedby="application-wizard-modal-desc">
           <DialogHeader>
             <DialogTitle>Generation Options</DialogTitle>
           </DialogHeader>
-          <div className="space-y-6 py-4">
+          <div id="application-wizard-modal-desc" className="space-y-6 py-4">
             <div>
               <h4 className="font-medium mb-3">Number of Pages</h4>
               <div className="flex gap-2">
