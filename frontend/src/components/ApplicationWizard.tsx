@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -45,6 +45,7 @@ const ApplicationWizard = () => {
   const [profile, setProfile] = useState<any>(null);
   const [arcData, setArcData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [threadId, setThreadId] = useState<string | null>(null);
 
   // Fetch user profile and arc data on mount
   useEffect(() => {
@@ -131,6 +132,19 @@ const ApplicationWizard = () => {
       if (!token) throw new Error('Not authenticated');
       const mergedProfile = getMergedProfile();
       if (!mergedProfile) throw new Error('Profile data not loaded');
+      let payload;
+      if (threadId) {
+        payload = {
+          action: 'generate_cv',
+          thread_id: threadId
+        };
+      } else {
+        payload = {
+          action: 'generate_cv',
+          profile: mergedProfile,
+          job_description: jobDescription
+        };
+      }
       // Generate both CV and Cover Letter in one call
       const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
         method: 'POST',
@@ -138,15 +152,11 @@ const ApplicationWizard = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          action: 'generate_cv',
-          profile: mergedProfile,
-          job_description: jobDescription,
-          // Optionally add keywords/cv_length if needed
-        }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Failed to generate documents');
       const data = await res.json();
+      if (data.thread_id && !threadId) setThreadId(data.thread_id);
       setGeneratedCV(data.cv || '');
       setGeneratedCoverLetter(data.cover_letter || '');
       setJobTitle(data.job_title || '');
@@ -184,6 +194,45 @@ const ApplicationWizard = () => {
       toast({ title: 'Error', description: err.message || 'Document generation or save failed' });
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  // Keyword extraction handler
+  const handleExtractKeywords = async (profile: any, jobDescription: string) => {
+    setIsAnalyzing(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
+      let payload;
+      if (threadId) {
+        payload = {
+          action: 'extract_keywords',
+          thread_id: threadId
+        };
+      } else {
+        payload = {
+          action: 'extract_keywords',
+          profile,
+          job_description: jobDescription
+        };
+      }
+      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Keyword extraction failed');
+      const data = await res.json();
+      if (data.thread_id && !threadId) setThreadId(data.thread_id);
+      setExtractedKeywords(data.keywords || []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to extract keywords');
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
