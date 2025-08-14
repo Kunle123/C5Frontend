@@ -110,6 +110,10 @@ const ApplicationWizard = () => {
       const mergedProfile = getMergedProfile();
       if (!mergedProfile) throw new Error('Profile data not loaded');
       const result = await extractKeywords(mergedProfile, jobDescription, token);
+      if (result.thread_id && !threadId) {
+        setThreadId(result.thread_id);
+        console.log('[ApplicationWizard] threadId set from extractKeywords:', result.thread_id);
+      }
       setExtractedKeywords((result.keywords || []).map((text: string) => ({ text, status: 'match' })));
       setMatchScore(result.match_percentage || 0);
       setJobTitle(result.job_title || '');
