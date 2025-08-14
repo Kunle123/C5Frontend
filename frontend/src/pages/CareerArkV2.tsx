@@ -363,11 +363,7 @@ const CareerArkV2: React.FC = () => {
   };
 
   // Identifier banner for debugging
-  const banner = (
-    <div style={{ background: '#38bdf8', color: '#1e293b', padding: '8px', fontWeight: 'bold', textAlign: 'center', fontSize: '18px' }}>
-      Career Ark Page 2 (Zen Design)
-    </div>
-  );
+  // Remove any {banner} or blue/info banner JSX from the render output.
 
   const workExps = Array.isArray(arcData?.work_experience) ? arcData.work_experience : [];
   const uniqueMonths = getUniqueMonths(workExps);
@@ -379,7 +375,6 @@ const CareerArkV2: React.FC = () => {
   console.log('arcData for debug:', arcData);
   return (
     <div className="min-h-screen bg-background" key={refreshKey}>
-      {banner}
       <Navigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ position: 'relative' }}>
         {arcLoading && (
