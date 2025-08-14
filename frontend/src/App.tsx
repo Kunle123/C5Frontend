@@ -28,10 +28,9 @@ import AuthCallback from './pages/AuthCallback';
 import CareerArcV2 from './pages/CareerArcV2';
 import DashboardNew from './pages/DashboardNew';
 import MyCVsNew from './pages/MyCVsNew';
-import AccountNew from './pages/AccountNew';
+import Account from './pages/Account';
 import CareerArkV2 from './pages/CareerArkV2';
 import Apply from './pages/Apply';
-import Account from './pages/Account';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -74,7 +73,6 @@ function App() {
           <Route path="/dashboard-new" element={<DashboardNew />} />
           <Route path="/cvs" element={<ChakraProvider theme={theme}><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></ChakraProvider>} />
           <Route path="/pricing" element={<ChakraProvider theme={theme}><Pricing /></ChakraProvider>} />
-          <Route path="/account-new" element={<ProtectedRoute><AccountNew /></ProtectedRoute>} />
           <Route path="/apply" element={<ProtectedRoute><Apply /></ProtectedRoute>} />
           <Route path="/subscription-success" element={<ChakraProvider theme={theme}><SubscriptionSuccess /></ChakraProvider>} />
           <Route path="/subscription-cancel" element={<ChakraProvider theme={theme}><SubscriptionCancel /></ChakraProvider>} />
