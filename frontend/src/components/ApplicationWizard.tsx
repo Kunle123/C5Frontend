@@ -175,6 +175,26 @@ const ApplicationWizard = () => {
       setCompanyName(data.company_name || '');
       // Persist the generated CV and cover letter
       if (data.cv && data.cv.trim()) {
+        // Fetch existing CVs to determine if a duplicate job_title|company_name exists
+        let uniqueJobTitle = data.job_title || '';
+        let companyName = data.company_name || '';
+        try {
+          const existingRes = await fetch('/api/cv', {
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+          if (existingRes.ok) {
+            const existingCVs = await existingRes.json();
+            // Count how many CVs have the same job_title and company_name
+            const sameTitleCount = existingCVs.filter((cv: any) =>
+              (cv.job_title || '') === uniqueJobTitle && (cv.company_name || '') === companyName
+            ).length;
+            if (sameTitleCount > 0) {
+              uniqueJobTitle = `${uniqueJobTitle} (${sameTitleCount + 1})`;
+            }
+          }
+        } catch (e) {
+          // If fetch fails, just proceed with the original job title
+        }
         const persistRes = await fetch('/api/cv', {
           method: 'POST',
           headers: {
@@ -184,8 +204,8 @@ const ApplicationWizard = () => {
           body: JSON.stringify({
             cv: data.cv,
             cover_letter: data.cover_letter || '',
-            job_title: data.job_title || '',
-            company_name: data.company_name || ''
+            job_title: uniqueJobTitle,
+            company_name: companyName
           })
         });
         if (!persistRes.ok) {
