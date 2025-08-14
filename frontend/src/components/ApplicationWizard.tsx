@@ -145,6 +145,8 @@ const ApplicationWizard = () => {
           job_description: jobDescription
         };
       }
+      // Debug log
+      console.log('[ApplicationWizard] handleGenerate payload:', payload);
       // Generate both CV and Cover Letter in one call
       const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
         method: 'POST',
@@ -156,7 +158,10 @@ const ApplicationWizard = () => {
       });
       if (!res.ok) throw new Error('Failed to generate documents');
       const data = await res.json();
-      if (data.thread_id && !threadId) setThreadId(data.thread_id);
+      if (data.thread_id && !threadId) {
+        setThreadId(data.thread_id);
+        console.log('[ApplicationWizard] threadId set:', data.thread_id);
+      }
       setGeneratedCV(data.cv || '');
       setGeneratedCoverLetter(data.cover_letter || '');
       setJobTitle(data.job_title || '');
