@@ -112,7 +112,6 @@ const ApplicationWizard = () => {
       const result = await extractKeywords(mergedProfile, jobDescription, token);
       if (result.thread_id && !threadId) {
         setThreadId(result.thread_id);
-        console.log('[ApplicationWizard] threadId set from extractKeywords:', result.thread_id);
       }
       setExtractedKeywords((result.keywords || []).map((text: string) => ({ text, status: 'match' })));
       setMatchScore(result.match_percentage || 0);
@@ -137,9 +136,6 @@ const ApplicationWizard = () => {
       const mergedProfile = getMergedProfile();
       if (!mergedProfile) throw new Error('Profile data not loaded');
       let payload;
-      // Debug log jobDescription and threadId
-      console.log('[ApplicationWizard] threadId:', threadId);
-      console.log('[ApplicationWizard] jobDescription:', jobDescription);
       if (threadId) {
         payload = {
           action: 'generate_cv',
@@ -152,8 +148,6 @@ const ApplicationWizard = () => {
           job_description: jobDescription
         };
       }
-      // Debug log
-      console.log('[ApplicationWizard] handleGenerate payload:', payload);
       // Generate both CV and Cover Letter in one call
       const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
         method: 'POST',
@@ -167,7 +161,6 @@ const ApplicationWizard = () => {
       const data = await res.json();
       if (data.thread_id && !threadId) {
         setThreadId(data.thread_id);
-        console.log('[ApplicationWizard] threadId set:', data.thread_id);
       }
       setGeneratedCV(data.cv || '');
       setGeneratedCoverLetter(data.cover_letter || '');
