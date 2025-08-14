@@ -279,14 +279,7 @@ const ApplicationWizard = () => {
   };
 
   // Add useEffect to handle redirect after generation
-  useEffect(() => {
-    if (currentStep === 4 && !isGenerating && !error) {
-      const timeout = setTimeout(() => {
-        window.location.href = '/my-cvs-new';
-      }, 2000); // Give user a moment to see the result before redirect
-      return () => clearTimeout(timeout);
-    }
-  }, [currentStep, isGenerating, error]);
+  // Remove the useEffect that auto-redirects after generation
 
   return (
     <div className="min-h-screen bg-background">
@@ -470,10 +463,7 @@ const ApplicationWizard = () => {
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
                       <pre className="whitespace-pre-wrap text-sm">{generatedCV}</pre>
                     </div>
-                    <Button className="w-full">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download CV
-                    </Button>
+                    {/* Download CV button removed */}
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
