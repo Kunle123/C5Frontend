@@ -1,90 +1,242 @@
-import React from 'react';
-import { Box, Heading, Text, Button, SimpleGrid, VStack, Stack, useColorModeValue, Divider } from '@chakra-ui/react';
+import Navigation from "../components/Navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Check } from "lucide-react";
 
-const plans = [
-  {
-    name: 'Free',
-    price: '£0',
-    description: 'Get started with 3 credits per month. Ideal for occasional users.',
-    cta: 'Start Free',
-    color: 'blue',
-    credits: '3 credits/month',
-    type: 'free',
-  },
-  {
-    name: 'Top-up',
-    price: '£29.99',
-    description: 'One-off purchase. Instantly add 50 credits to your account. No subscription required.',
-    cta: 'Buy 50 Credits',
-    color: 'teal',
-    credits: '50 credits (one-off)',
-    type: 'topup',
-  },
-  {
-    name: 'Monthly',
-    price: '£24.99/mo',
-    description: 'Receive 50 credits immediately, plus 3 credits per day. Perfect for active job seekers.',
-    cta: 'Subscribe Monthly',
-    color: 'purple',
-    credits: '50 credits + 3/day',
-    type: 'monthly',
-  },
-  {
-    name: 'Annual',
-    price: '£199/year',
-    description: '33% discount. Receive 50 credits per month plus 5 credits per day. Best value for power users.',
-    cta: 'Subscribe Annually',
-    color: 'orange',
-    credits: '50/month + 5/day',
-    type: 'annual',
-  },
-];
+const Pricing = () => {
+  const mainPlans = [
+    {
+      name: "Free",
+      price: "£0",
+      period: "",
+      description: "Get started with basic access",
+      features: [
+        "3 credits per month",
+        "Up to 3 CVs per month",
+        "Every CV comes with a tailored cover letter",
+        "Every CV tailored to every job",
+        "Keep an archive of your complete career history",
+        "Basic access",
+        "DocX CV downloads",
+        "Email support"
+      ],
+      recommended: false,
+      buttonText: "Get Started Free",
+      buttonVariant: "default" as const
+    },
+    {
+      name: "Monthly",
+      price: "£24.99",
+      period: "per month",
+      description: "Perfect for career focused professionals",
+      features: [
+        "50 credits monthly recurring",
+        "3 credits per day",
+        "Create up to 140 CVs per month",
+        "Every CV comes with a tailored cover letter",
+        "Every CV tailored to every job",
+        "Keep an archive of your complete career history",
+        "Priority support",
+        "Advanced features",
+        "DocX CV downloads",
+        "Cancel anytime"
+      ],
+      recommended: true,
+      buttonText: "Start Monthly Plan",
+      buttonVariant: "default" as const
+    },
+    {
+      name: "Annual",
+      price: "£199",
+      period: "per year",
+      description: "Best value with 33% discount",
+      features: [
+        "50 credits monthly recurring",
+        "5 credits per day",
+        "Create up to 200 CVs per month",
+        "Every CV comes with a tailored cover letter",
+        "Every CV tailored to every job",
+        "Keep an archive of your complete career history",
+        "Priority support",
+        "Advanced features",
+        "DocX CV downloads",
+        "33% discount",
+        "Cancel anytime"
+      ],
+      recommended: false,
+      buttonText: "Choose Annual - Save 33%!",
+      buttonVariant: "default" as const
+    }
+  ];
 
-const Pricing: React.FC = () => {
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const cardBorder = useColorModeValue('gray.200', 'gray.700');
+  const topUpPlan = {
+    name: "Top-up",
+    price: "£29.99",
+    period: "one-off",
+    description: "Pay as you go with no subscription",
+    features: [
+      "50 credits (one-off purchase)",
+      "No subscription required",
+      "Credits expire after 1 month",
+      "Can be added to any plan",
+      "Every CV comes with a tailored cover letter",
+      "Every CV tailored to every job",
+      "Keep an archive of your complete career history",
+      "DocX CV downloads",
+      "Email support"
+    ],
+    buttonText: "Buy Credits",
+    buttonVariant: "default" as const
+  };
+
   return (
-    <Box py={8} maxW="1100px" mx="auto">
-      <Heading as="h2" size="xl" textAlign="center" mb={2}>Pricing Plans</Heading>
-      <Text fontSize="lg" textAlign="center" color="gray.500" mb={6}>
-      Choose the plan that fits your job search needs. Upgrade anytime.
-      </Text>
-      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={6}>
-      {plans.map(plan => (
-          <Box
-            key={plan.name}
-            bg={cardBg}
-            borderWidth={plan.name === 'Pro' ? '2px' : '1px'}
-            borderColor={plan.name === 'Pro' ? 'purple.500' : cardBorder}
-            borderRadius="lg"
-            boxShadow={plan.name === 'Pro' ? 'lg' : 'md'}
-            p={6}
-            maxW={{ base: '100%', md: '400px' }}
-            mx="auto"
-          >
-            <VStack spacing={3} align="stretch">
-              <Heading as="h3" size="md" color={plan.color + '.500'}>{plan.name}</Heading>
-              <Text fontSize="3xl" color="blue.500" fontWeight="bold">{plan.price}</Text>
-              <Text>{plan.description}</Text>
-              <Button
-                colorScheme={plan.color}
-                variant={plan.name === 'Pro' ? 'solid' : 'outline'}
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
+            Choose Your Plan
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Select the perfect plan for your career journey. All plans include our AI-powered CV and cover letter generation.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          {mainPlans.map((plan, index) => (
+            <Card key={index} className={`relative flex flex-col ${plan.recommended ? 'border-primary shadow-lg scale-105' : ''}`}>
+              {plan.recommended && (
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
+                  Most Popular
+                </Badge>
+              )}
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-2xl font-bold text-foreground">
+                  {plan.name}
+                </CardTitle>
+                <div className="space-y-2">
+                  <div className="text-4xl font-bold text-primary">
+                    {plan.price}
+                  </div>
+                  <p className="text-muted-foreground">{plan.period}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {plan.description}
+                  </p>
+                </div>
+              </CardHeader>
+              <CardContent className="flex flex-col flex-1 justify-between space-y-6">
+                <ul className="space-y-3">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-center space-x-3">
+                      <Check className="h-5 w-5 text-success flex-shrink-0" />
+                      <span className="text-foreground text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button 
+                  variant={plan.buttonVariant} 
+                  className="w-full"
+                  size="lg"
+                >
+                  {plan.buttonText}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="max-w-md mx-auto mb-12">
+          <Card className="border-dashed border-2">
+            <CardHeader className="text-center pb-4">
+              <CardTitle className="text-xl font-bold text-foreground">
+                {topUpPlan.name}
+              </CardTitle>
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-primary">
+                  {topUpPlan.price}
+                </div>
+                <p className="text-muted-foreground">{topUpPlan.period}</p>
+                <p className="text-sm text-muted-foreground">
+                  {topUpPlan.description}
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ul className="space-y-3">
+                {topUpPlan.features.map((feature, featureIndex) => (
+                  <li key={featureIndex} className="flex items-center space-x-3">
+                    <Check className="h-5 w-5 text-success flex-shrink-0" />
+                    <span className="text-foreground text-sm">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button 
+                variant={topUpPlan.buttonVariant} 
+                className="w-full"
                 size="lg"
-                fontWeight={600}
-                w="100%"
               >
-                {plan.cta}
+                {topUpPlan.buttonText}
               </Button>
-            </VStack>
-          </Box>
-      ))}
-      </SimpleGrid>
-      <Box mt={8} p={8} bg={useColorModeValue('gray.100', 'gray.700')} borderRadius="lg" textAlign="center">
-        <Heading as="h4" size="md" mb={2}>Questions about pricing or need a custom plan?</Heading>
-        <Button colorScheme="blue" variant="outline" size="lg">Contact Us</Button>
-      </Box>
-  </Box>
-);
+            </CardContent>
+          </Card>
+        </div>
+        <Card className="max-w-4xl mx-auto">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">
+              All Plans Include
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <Check className="h-5 w-5 text-success" />
+                  <span className="text-foreground">AI-powered CV generation</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Check className="h-5 w-5 text-success" />
+                  <span className="text-foreground">Tailored cover letters</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Check className="h-5 w-5 text-success" />
+                  <span className="text-foreground">Keyword matching analysis</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Check className="h-5 w-5 text-success" />
+                  <span className="text-foreground">Career Arc profile management</span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <Check className="h-5 w-5 text-success" />
+                  <span className="text-foreground">Professional DocX exports</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Check className="h-5 w-5 text-success" />
+                  <span className="text-foreground">Mobile-responsive interface</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Check className="h-5 w-5 text-success" />
+                  <span className="text-foreground">Secure data storage</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Check className="h-5 w-5 text-success" />
+                  <span className="text-foreground">Regular platform updates</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <div className="text-center mt-12">
+          <p className="text-muted-foreground mb-4">
+            Questions about our pricing? <a href="/faq" className="text-primary hover:underline">Check our FAQ</a> or contact us.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            All prices are in GBP. Cancel anytime. 30-day money-back guarantee.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Pricing; 
