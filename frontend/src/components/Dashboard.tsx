@@ -80,6 +80,9 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasDownloads, setHasDownloads] = useState(false);
+  const [credits, setCredits] = useState<any>(null);
+  const [creditsLoading, setCreditsLoading] = useState(true);
+  const [creditsError, setCreditsError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchArcData = async () => {
@@ -121,6 +124,28 @@ export const Dashboard = () => {
     fetchArcData();
   }, []);
 
+  useEffect(() => {
+    const fetchCredits = async () => {
+      setCreditsLoading(true);
+      setCreditsError(null);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Not authenticated');
+        const res = await fetch('https://api-gw-production.up.railway.app/api/user/credits', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Failed to fetch credits');
+        const data = await res.json();
+        setCredits(data);
+      } catch (err: any) {
+        setCreditsError(err.message || 'Failed to load credits');
+      } finally {
+        setCreditsLoading(false);
+      }
+    };
+    fetchCredits();
+  }, []);
+
   // Determine if user has at least 1 work experience
   const hasWorkExperience = arcData && Array.isArray(arcData.work_experience) && arcData.work_experience.length > 0;
 
@@ -154,7 +179,7 @@ export const Dashboard = () => {
       description: "Set up your profile with personal information, contact details, and preferences.",
       icon: <User className="h-6 w-6" />,
       actionText: userProgress.personalDetails ? "Edit Profile" : "Complete Profile",
-      actionPath: "/account-new"
+      actionPath: "/account"
     },
     {
       number: 2,
@@ -199,6 +224,30 @@ export const Dashboard = () => {
             Follow these steps to set up your profile and start creating professional 
             CVs and cover letters tailored to your dream jobs.
           </p>
+        </div>
+
+        {/* Credits Display */}
+        <div className="flex flex-col items-center mb-8">
+          <Card className="w-full max-w-md text-center">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-bold text-foreground">Credits Remaining</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {creditsLoading ? (
+                <span>Loading credits...</span>
+              ) : creditsError ? (
+                <span className="text-red-500">{creditsError}</span>
+              ) : credits ? (
+                <div className="space-y-2">
+                  <div>Daily Credits: <span className="font-semibold">{credits.daily_credits_remaining}</span></div>
+                  <div>Monthly Credits: <span className="font-semibold">{credits.monthly_credits_remaining}</span></div>
+                  {typeof credits.topup_credits_remaining === 'number' && (
+                    <div>Top-up Credits: <span className="font-semibold">{credits.topup_credits_remaining}</span></div>
+                  )}
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Progress Steps */}
