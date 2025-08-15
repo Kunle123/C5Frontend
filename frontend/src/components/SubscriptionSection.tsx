@@ -200,6 +200,32 @@ const SubscriptionSection: React.FC = () => {
         </Table>
       </Box>
       <Divider my={4} />
+      <Box mb={6}>
+        <Heading as="h4" size="sm" mb={2}>Available Products</Heading>
+        <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
+          <Box p={4} borderWidth={1} borderRadius="md" boxShadow="sm">
+            <Text fontWeight="bold">Free</Text>
+            <Text fontSize="sm">3 credits/month</Text>
+            <Button size="sm" colorScheme="blue" mt={2} isDisabled>Current Plan</Button>
+          </Box>
+          <Box p={4} borderWidth={1} borderRadius="md" boxShadow="sm">
+            <Text fontWeight="bold">Top-up</Text>
+            <Text fontSize="sm">50 credits for £29.99</Text>
+            <Button size="sm" colorScheme="teal" mt={2}>Buy 50 Credits</Button> {/* TODO: Integrate with backend */}
+          </Box>
+          <Box p={4} borderWidth={1} borderRadius="md" boxShadow="sm">
+            <Text fontWeight="bold">Monthly</Text>
+            <Text fontSize="sm">50 credits + 3/day for £24.99/mo</Text>
+            <Button size="sm" colorScheme="purple" mt={2}>Subscribe Monthly</Button> {/* TODO: Integrate with backend */}
+          </Box>
+          <Box p={4} borderWidth={1} borderRadius="md" boxShadow="sm">
+            <Text fontWeight="bold">Annual</Text>
+            <Text fontSize="sm">50/month + 5/day for £199/year (33% off)</Text>
+            <Button size="sm" colorScheme="orange" mt={2}>Subscribe Annually</Button> {/* TODO: Integrate with backend */}
+          </Box>
+        </Stack>
+      </Box>
+      <Divider my={4} />
       <Box>
         <Heading as="h4" size="sm" mb={2}>Payment Methods</Heading>
         <Button colorScheme="blue" onClick={handleAddPaymentMethod} isLoading={pmLoading} mb={2}>
