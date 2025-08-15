@@ -222,6 +222,37 @@ export function AccountPage() {
     }
   };
 
+  // Payment handler for Upgrade Plan
+  const handleUpgradePlan = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const token = localStorage.getItem("token") || "";
+      const user_id = profile.email; // or use a unique user ID if available
+      const return_url = window.location.origin + "/payment-success";
+      const res = await fetch("/api/payments/methods/add", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_id, return_url }),
+      });
+      if (!res.ok) throw new Error("Failed to initiate payment");
+      const { checkout_url } = await res.json();
+      window.location.href = checkout_url;
+    } catch (err: any) {
+      setError(err.message || "Failed to start payment");
+      toast({
+        title: "Payment Error",
+        description: err.message || "Failed to start payment",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (loadingProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/50">
@@ -487,7 +518,8 @@ export function AccountPage() {
               </div>
               <Separator />
               <div className="space-y-3">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={handleUpgradePlan} disabled={isLoading}>
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                   Upgrade Plan
                 </Button>
                 <Button variant="outline" className="w-full">
