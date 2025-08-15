@@ -1,13 +1,16 @@
 import { Button } from "./ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Menu } from "lucide-react";
+import { Badge } from "./ui/badge";
+import { CreditsContext } from "../context/CreditsContext";
 
 export function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const { credits, refreshCredits } = useContext(CreditsContext);
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
@@ -16,6 +19,23 @@ export function Navigation() {
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
   }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const fetchCredits = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await fetch("https://api-gw-production.up.railway.app/api/user/credits", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        refreshCredits(data); // Use refreshCredits from context
+      } catch {}
+    };
+    fetchCredits();
+  }, [isLoggedIn, refreshCredits]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -29,11 +49,22 @@ export function Navigation() {
     <nav className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div 
-            className="text-2xl font-bold text-primary cursor-pointer" 
-            onClick={() => navigate("/")}
-          >
-            Candidate 5
+          <div className="flex items-center gap-2">
+            <div 
+              className="text-2xl font-bold text-primary cursor-pointer" 
+              onClick={() => navigate("/")}
+            >
+              Candidate 5
+            </div>
+            {isLoggedIn && credits && (
+              <Badge variant="outline" className="ml-2 text-base px-3 py-1">
+                Credits: {(
+                  (credits.daily_credits_remaining || 0) +
+                  (credits.monthly_credits_remaining || 0) +
+                  (credits.topup_credits_remaining || 0)
+                )}
+              </Badge>
+            )}
           </div>
           {isLoggedIn ? (
             <div className="flex items-center space-x-2 relative">

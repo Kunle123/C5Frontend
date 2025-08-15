@@ -32,6 +32,7 @@ import Account from './pages/Account';
 import CareerArkV2 from './pages/CareerArkV2';
 import Apply from './pages/Apply';
 import PaymentSuccess from './pages/PaymentSuccess';
+import { CreditsProvider } from './context/CreditsContext';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -60,38 +61,40 @@ function App() {
 
   return (
     <NotificationContext.Provider value={{ notify }}>
-      <Router>
-        <Routes>
-          {/* Tailwind/shadcn/ui landing and auth pages - NO ChakraProvider */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/auth/google/callback" element={<AuthCallback />} />
-          <Route path="/auth/linkedin/callback" element={<AuthCallback />} />
+      <CreditsProvider>
+        <Router>
+          <Routes>
+            {/* Tailwind/shadcn/ui landing and auth pages - NO ChakraProvider */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/auth/google/callback" element={<AuthCallback />} />
+            <Route path="/auth/linkedin/callback" element={<AuthCallback />} />
 
-          {/* Chakra-based pages - wrap with ChakraProvider and Layout */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/dashboard-new" element={<DashboardNew />} />
-          <Route path="/cvs" element={<ChakraProvider theme={theme}><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></ChakraProvider>} />
-          <Route path="/pricing" element={<ChakraProvider theme={theme}><Pricing /></ChakraProvider>} />
-          <Route path="/apply" element={<ProtectedRoute><Apply /></ProtectedRoute>} />
-          <Route path="/subscription-success" element={<ChakraProvider theme={theme}><SubscriptionSuccess /></ChakraProvider>} />
-          <Route path="/subscription-cancel" element={<ChakraProvider theme={theme}><SubscriptionCancel /></ChakraProvider>} />
-          <Route path="/test" element={<ChakraProvider theme={theme}><TestAppJourneys /></ChakraProvider>} />
-          <Route path="/privacy-policy" element={<ChakraProvider theme={theme}><PrivacyPolicy /></ChakraProvider>} />
-          <Route path="/terms" element={<ChakraProvider theme={theme}><Terms /></ChakraProvider>} />
-          <Route path="/faq" element={<ChakraProvider theme={theme}><FAQ /></ChakraProvider>} />
-          <Route path="/debug-cv-ai" element={<ChakraProvider theme={theme}><DebugCVAIResponse /></ChakraProvider>} />
-          <Route path="/search-jobs" element={<ChakraProvider theme={theme}><SearchJobs /></ChakraProvider>} />
-          <Route path="/colortest" element={<ColorTest />} />
-          <Route path="/tailwinduitest" element={<TailwindUiTest />} />
-          <Route path="/my-cvs-new" element={<MyCVsNew />} />
-          <Route path="/careerarcv2" element={<CareerArkV2 />} />
-          <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
-          <Route path="/payment-success" element={<ChakraProvider theme={theme}><PaymentSuccess /></ChakraProvider>} />
-          <Route path="*" element={<ChakraProvider theme={theme}><NotFound /></ChakraProvider>} />
-        </Routes>
-      </Router>
+            {/* Chakra-based pages - wrap with ChakraProvider and Layout */}
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/dashboard-new" element={<DashboardNew />} />
+            <Route path="/cvs" element={<ChakraProvider theme={theme}><ProtectedRoute><CVsAndCoverLetters /></ProtectedRoute></ChakraProvider>} />
+            <Route path="/pricing" element={<ChakraProvider theme={theme}><Pricing /></ChakraProvider>} />
+            <Route path="/apply" element={<ProtectedRoute><Apply /></ProtectedRoute>} />
+            <Route path="/subscription-success" element={<ChakraProvider theme={theme}><SubscriptionSuccess /></ChakraProvider>} />
+            <Route path="/subscription-cancel" element={<ChakraProvider theme={theme}><SubscriptionCancel /></ChakraProvider>} />
+            <Route path="/test" element={<ChakraProvider theme={theme}><TestAppJourneys /></ChakraProvider>} />
+            <Route path="/privacy-policy" element={<ChakraProvider theme={theme}><PrivacyPolicy /></ChakraProvider>} />
+            <Route path="/terms" element={<ChakraProvider theme={theme}><Terms /></ChakraProvider>} />
+            <Route path="/faq" element={<ChakraProvider theme={theme}><FAQ /></ChakraProvider>} />
+            <Route path="/debug-cv-ai" element={<ChakraProvider theme={theme}><DebugCVAIResponse /></ChakraProvider>} />
+            <Route path="/search-jobs" element={<ChakraProvider theme={theme}><SearchJobs /></ChakraProvider>} />
+            <Route path="/colortest" element={<ColorTest />} />
+            <Route path="/tailwinduitest" element={<TailwindUiTest />} />
+            <Route path="/my-cvs-new" element={<MyCVsNew />} />
+            <Route path="/careerarcv2" element={<CareerArkV2 />} />
+            <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+            <Route path="/payment-success" element={<ChakraProvider theme={theme}><PaymentSuccess /></ChakraProvider>} />
+            <Route path="*" element={<ChakraProvider theme={theme}><NotFound /></ChakraProvider>} />
+          </Routes>
+        </Router>
+      </CreditsProvider>
     </NotificationContext.Provider>
   );
 }

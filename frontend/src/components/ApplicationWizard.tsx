@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -12,6 +12,7 @@ import { useToast } from '../hooks/use-toast';
 import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
 import { extractKeywords, generateCV } from '../api/aiApi';
 import { useEffect } from 'react';
+import { CreditsContext } from '../context/CreditsContext';
 
 interface Keyword {
   text: string;
@@ -26,6 +27,7 @@ interface GenerationOptions {
 
 const ApplicationWizard = () => {
   const { toast } = useToast();
+  const { refreshCredits } = useContext(CreditsContext);
   const [currentStep, setCurrentStep] = useState(1);
   const [jobDescription, setJobDescription] = useState('');
   const [extractedKeywords, setExtractedKeywords] = useState<Keyword[]>([]);
@@ -46,6 +48,7 @@ const ApplicationWizard = () => {
   const [arcData, setArcData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [threadId, setThreadId] = useState<string | null>(null);
+  const [showOutOfCreditsModal, setShowOutOfCreditsModal] = useState(false);
 
   // Fetch user profile and arc data on mount
   useEffect(() => {
@@ -90,6 +93,21 @@ const ApplicationWizard = () => {
       localStorage.removeItem('resetApplyStep');
     }
   }, []);
+
+  // Fetch credits on mount and after generation
+  const fetchCredits = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
+      const res = await fetch('https://api-gw-production.up.railway.app/api/user/credits', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to fetch credits');
+      const data = await res.json();
+      // setCredits(data); // This line is removed as credits are now managed by context
+    } catch {}
+  };
+  useEffect(() => { fetchCredits(); }, []);
 
   // Helper to merge profile and arc data
   const getMergedProfile = () => {
@@ -227,6 +245,22 @@ const ApplicationWizard = () => {
         }
         toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
         setCurrentStep(4);
+        // Deduct a credit after successful generation
+        try {
+          const creditRes = await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'generate_cv' }),
+          });
+          if (!creditRes.ok) {
+            setShowOutOfCreditsModal(true);
+            await refreshCredits();
+            return;
+          }
+          await refreshCredits();
+        } catch {
+          setShowOutOfCreditsModal(true);
+        }
       } else {
         throw new Error('Generated CV is empty. Please try again.');
       }
@@ -576,6 +610,19 @@ const ApplicationWizard = () => {
             <Button onClick={handleGenerate} className="w-full">
               Generate Documents
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Out of Credits Modal */}
+      <Dialog open={showOutOfCreditsModal} onOpenChange={setShowOutOfCreditsModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Out of Credits</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4 text-center">
+            <p className="text-lg text-destructive font-semibold">You have run out of credits.</p>
+            <p className="text-muted-foreground">Please visit the pricing page to top up or upgrade your plan.</p>
+            <Button className="w-full" onClick={() => window.location.href = '/pricing'}>Go to Pricing</Button>
           </div>
         </DialogContent>
       </Dialog>
