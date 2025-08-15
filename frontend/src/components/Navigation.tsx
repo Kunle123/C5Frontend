@@ -31,7 +31,7 @@ export function Navigation() {
         });
         if (!res.ok) return;
         const data = await res.json();
-        refreshCredits(data); // Use refreshCredits from context
+        refreshCredits(); // Use refreshCredits from context, no arguments
       } catch {}
     };
     fetchCredits();
