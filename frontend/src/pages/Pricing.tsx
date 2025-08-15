@@ -18,13 +18,14 @@ const Pricing = () => {
       const token = localStorage.getItem("token") || "";
       const user_id = localStorage.getItem("user_email") || ""; // fallback to empty if not found
       const return_url = window.location.origin + "/payment-success";
-      const res = await fetch("/api/payments/methods/add", {
+      // Send all params as query parameters
+      const query = `?user_id=${encodeURIComponent(user_id)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
+      const res = await fetch(`/api/payments/methods/add${query}`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user_id, return_url, plan }),
       });
       if (!res.ok) throw new Error("Failed to initiate payment");
       const { checkout_url } = await res.json();
