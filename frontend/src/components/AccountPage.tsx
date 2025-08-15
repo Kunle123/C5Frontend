@@ -518,8 +518,7 @@ export function AccountPage() {
               </div>
               <Separator />
               <div className="space-y-3">
-                <Button variant="outline" className="w-full" onClick={handleUpgradePlan} disabled={isLoading}>
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                <Button variant="outline" className="w-full" onClick={() => window.location.href = '/pricing'} disabled={isLoading}>
                   Upgrade Plan
                 </Button>
                 <Button variant="outline" className="w-full">

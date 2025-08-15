@@ -3,8 +3,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Check } from "lucide-react";
+import { useState } from "react";
+import { toast } from "../hooks/use-toast";
 
 const Pricing = () => {
+  const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
+  const [loadingTopUp, setLoadingTopUp] = useState(false);
+
+  // Payment handler for paid plans and top-up
+  const handlePayment = async (plan: string, index?: number) => {
+    if (typeof index === 'number') setLoadingIndex(index);
+    if (plan === 'Top-up') setLoadingTopUp(true);
+    try {
+      const token = localStorage.getItem("token") || "";
+      const user_id = localStorage.getItem("user_email") || ""; // fallback to empty if not found
+      const return_url = window.location.origin + "/payment-success";
+      const res = await fetch("/api/payments/methods/add", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_id, return_url, plan }),
+      });
+      if (!res.ok) throw new Error("Failed to initiate payment");
+      const { checkout_url } = await res.json();
+      window.location.href = checkout_url;
+    } catch (err: any) {
+      toast({
+        title: "Payment Error",
+        description: err.message || "Failed to start payment",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingIndex(null);
+      setLoadingTopUp(false);
+    }
+  };
+
   const mainPlans = [
     {
       name: "Free",
@@ -137,7 +173,10 @@ const Pricing = () => {
                   variant={plan.buttonVariant} 
                   className="w-full"
                   size="lg"
+                  disabled={plan.name !== 'Free' && loadingIndex === index}
+                  onClick={plan.name === 'Free' ? undefined : () => handlePayment(plan.name, index)}
                 >
+                  {plan.name !== 'Free' && loadingIndex === index ? <span className="animate-spin mr-2">⏳</span> : null}
                   {plan.buttonText}
                 </Button>
               </CardContent>
@@ -173,7 +212,10 @@ const Pricing = () => {
                 variant={topUpPlan.buttonVariant} 
                 className="w-full"
                 size="lg"
+                disabled={loadingTopUp}
+                onClick={() => handlePayment('Top-up')}
               >
+                {loadingTopUp ? <span className="animate-spin mr-2">⏳</span> : null}
                 {topUpPlan.buttonText}
               </Button>
             </CardContent>
