@@ -8,7 +8,10 @@ import {
   FileText,
   Download,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Coins,
+  Calendar,
+  Clock
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
@@ -226,29 +229,76 @@ export const Dashboard = () => {
           </p>
         </div>
 
-        {/* Credits Display */}
-        <div className="flex flex-col items-center mb-8">
-          <Card className="w-full max-w-md text-center">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold text-foreground">Credits Remaining</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {creditsLoading ? (
-                <span>Loading credits...</span>
-              ) : creditsError ? (
-                <span className="text-red-500">{creditsError}</span>
-              ) : credits ? (
-                <div className="space-y-2">
-                  <div>Daily Credits: <span className="font-semibold">{credits.daily_credits_remaining}</span></div>
-                  <div>Monthly Credits: <span className="font-semibold">{credits.monthly_credits_remaining}</span></div>
-                  {typeof credits.topup_credits_remaining === 'number' && (
-                    <div>Top-up Credits: <span className="font-semibold">{credits.topup_credits_remaining}</span></div>
-                  )}
+        {/* Credits Overview (new design) */}
+        <Card className="mb-8 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Coins className="h-5 w-5 text-primary" />
+              Your Credits
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {creditsLoading ? (
+              <span>Loading credits...</span>
+            ) : creditsError ? (
+              <span className="text-red-500">{creditsError}</span>
+            ) : credits ? (
+              <>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {/* Daily Credits */}
+                  <div className="p-4 bg-background/80 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Clock className="h-4 w-4 text-warning" />
+                      <span className="font-medium text-sm">Daily Credits</span>
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">
+                      {credits.daily_credits_remaining ?? 0}
+                      <span className="text-sm font-normal text-muted-foreground">/3</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Expires end of day
+                    </p>
+                  </div>
+                  {/* Monthly Credits */}
+                  <div className="p-4 bg-background/80 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      <span className="font-medium text-sm">Monthly Credits</span>
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">
+                      {credits.monthly_credits_remaining ?? 0}
+                      <span className="text-sm font-normal text-muted-foreground">/50</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Renews monthly
+                    </p>
+                  </div>
+                  {/* Top-up Credits */}
+                  <div className="p-4 bg-background/80 rounded-lg border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Coins className="h-4 w-4 text-success" />
+                      <span className="font-medium text-sm">Top-up Credits</span>
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">
+                      {credits.topup_credits_remaining ?? 0}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Expires after 1 month
+                    </p>
+                  </div>
                 </div>
-              ) : null}
-            </CardContent>
-          </Card>
-        </div>
+                <div className="flex justify-between items-center mt-4 pt-4 border-t">
+                  <p className="text-sm text-muted-foreground">
+                    Total available: <span className="font-medium">
+                      {(credits.daily_credits_remaining ?? 0) + (credits.monthly_credits_remaining ?? 0) + (credits.topup_credits_remaining ?? 0)} credits
+                    </span>
+                  </p>
+                  <Button variant="outline" size="sm" onClick={() => navigate("/pricing")}>Buy More Credits</Button>
+                </div>
+              </>
+            ) : null}
+          </CardContent>
+        </Card>
 
         {/* Progress Steps */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 mb-12">
