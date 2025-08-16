@@ -56,15 +56,7 @@ export function Navigation() {
             >
               Candidate 5
             </div>
-            {isLoggedIn && credits && (
-              <Badge variant="outline" className="ml-2 text-base px-3 py-1">
-                Credits: {(
-                  (credits.daily_credits_remaining || 0) +
-                  (credits.monthly_credits_remaining || 0) +
-                  (credits.topup_credits_remaining || 0)
-                )}
-              </Badge>
-            )}
+            {/* Removed credits badge from navbar */}
           </div>
           {isLoggedIn ? (
             <div className="flex items-center space-x-2 relative">
