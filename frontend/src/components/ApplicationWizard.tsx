@@ -25,6 +25,19 @@ interface GenerationOptions {
   includeRelevantExperience: boolean;
 }
 
+// Utility to sanitize experience descriptions
+function sanitizeExperienceDescriptions(experiences: any[]): any[] {
+  return experiences.map(exp => {
+    let desc = exp.description;
+    if (Array.isArray(desc)) {
+      desc = desc.map((d: string) => d.replace(/•/g, '').trim());
+    } else if (typeof desc === 'string') {
+      desc = desc.replace(/•/g, '').trim();
+    }
+    return { ...exp, description: desc };
+  });
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
@@ -202,6 +215,10 @@ const ApplicationWizard = () => {
       setCompanyName(data.company_name || '');
       // Persist the generated CV and cover letter
       if (data.cv && data.cv.trim()) {
+        // Sanitize experience descriptions before saving
+        if (mergedProfile && Array.isArray(mergedProfile.work_experience)) {
+          mergedProfile.work_experience = sanitizeExperienceDescriptions(mergedProfile.work_experience);
+        }
         // Fetch existing CVs to determine if a duplicate job_title|company_name exists
         let uniqueJobTitle = data.job_title || '';
         let companyName = data.company_name || '';
