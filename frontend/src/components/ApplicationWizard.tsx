@@ -609,29 +609,14 @@ const ApplicationWizard = () => {
                         ))}
                       </div>
                     </div>
-                    <div className="flex gap-4">
-                      <Button
-                        variant="outline"
-                        onClick={() => setCurrentStep(1)}
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => window.open('/career-arc', '_blank')}
-                      >
-                        <Edit3 className="w-4 h-4 mr-2" />
-                        Edit Arc Data
-                      </Button>
-                      <Button
-                        onClick={() => setShowOptionsModal(true)}
-                        className="flex-1"
-                      >
-                        Generate CV & Cover Letter
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={handleGenerate}
+                      className="w-full"
+                      disabled={isGenerating}
+                    >
+                      Generate CV & Cover Letter
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
                   </div>
                 )}
               </CardContent>
