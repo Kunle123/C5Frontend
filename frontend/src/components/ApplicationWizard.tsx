@@ -77,6 +77,72 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+// Add a utility to render the structured CV as JSX
+function renderStructuredCV(cvData: any) {
+  if (!cvData) return <div>No CV data available.</div>;
+  return (
+    <div className="space-y-4">
+      {cvData.name && <h2 className="text-2xl font-bold">{cvData.name}</h2>}
+      {cvData.contact_info && Array.isArray(cvData.contact_info) && (
+        <div className="text-sm text-muted-foreground">{cvData.contact_info.filter(Boolean).join(' | ')}</div>
+      )}
+      {cvData.summary && <p className="mt-2 text-base">{cvData.summary}</p>}
+      {cvData.experience && Array.isArray(cvData.experience) && cvData.experience.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Professional Experience</h3>
+          <ul className="space-y-2">
+            {cvData.experience.map((exp: any, idx: number) => (
+              <li key={idx}>
+                <div className="font-medium">{exp.job_title}{exp.company ? `, ${exp.company}` : ''}{exp.dates ? `, ${exp.dates}` : ''}</div>
+                {exp.bullets && Array.isArray(exp.bullets) && (
+                  <ul className="list-disc list-inside ml-4">
+                    {exp.bullets.map((b: string, i: number) => (
+                      <li key={i}>{b}</li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {cvData.education && Array.isArray(cvData.education) && cvData.education.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Education</h3>
+          <ul className="space-y-2">
+            {cvData.education.map((edu: any, idx: number) => (
+              <li key={idx}>
+                <div className="font-medium">{edu.degree}{edu.institution ? `, ${edu.institution}` : ''}{edu.year ? `, ${edu.year}` : ''}</div>
+                {edu.location && <div className="text-sm text-muted-foreground">{edu.location}</div>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {cvData.certifications && Array.isArray(cvData.certifications) && cvData.certifications.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Certifications</h3>
+          <ul className="list-disc list-inside ml-4">
+            {cvData.certifications.map((cert: string, idx: number) => (
+              <li key={idx}>{cert}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {cvData.core_competencies && Array.isArray(cvData.core_competencies) && cvData.core_competencies.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Core Competencies</h3>
+          <div className="flex flex-wrap gap-2">
+            {cvData.core_competencies.map((comp: string, idx: number) => (
+              <span key={idx} className="bg-muted px-2 py-1 rounded text-xs">{comp}</span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
@@ -101,6 +167,8 @@ const ApplicationWizard = () => {
   const [error, setError] = useState<string | null>(null);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [showOutOfCreditsModal, setShowOutOfCreditsModal] = useState(false);
+  // Add a new state to hold the structured CV data
+  const [structuredCV, setStructuredCV] = useState<any>(null);
 
   // Fetch user profile and arc data on mount
   useEffect(() => {
@@ -252,6 +320,7 @@ const ApplicationWizard = () => {
       setGeneratedCoverLetter(data.cover_letter || '');
       setJobTitle(data.job_title || '');
       setCompanyName(data.company_name || '');
+      setStructuredCV(data); // Store structured data
       // Advance to preview step (step 3)
       setCurrentStep(3);
     } catch (err: any) {
@@ -607,9 +676,7 @@ const ApplicationWizard = () => {
                     <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
                   </TabsList>
                   <TabsContent value="cv" className="space-y-4">
-                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                      <pre className="whitespace-pre-wrap text-sm">{generatedCV}</pre>
-                    </div>
+                    {renderStructuredCV(structuredCV)}
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
