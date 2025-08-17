@@ -342,17 +342,8 @@ const ApplicationWizard = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Not authenticated');
-      // Use the latest generatedCV, generatedCoverLetter, jobTitle, companyName
-      // Sanitize and transform as before
-      const data = {
-        cv: generatedCV,
-        cover_letter: generatedCoverLetter,
-        job_title: jobTitle,
-        company_name: companyName
-      };
-      // Sanitize experience descriptions if needed (if you have structured data)
-      // 1. Transform the generated CV data to structured JSON (sections array)
-      const structuredCV = transformCVResponseToSections(data);
+      // Use the latest structuredCV from state for DOCX generation
+      if (!structuredCV) throw new Error('No structured CV data available');
       // 2. POST structured JSON to /api/cv/generate-docx to get the DOCX
       let docxBlob = null;
       try {
