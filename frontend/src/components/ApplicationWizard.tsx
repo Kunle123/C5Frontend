@@ -783,7 +783,7 @@ const ApplicationWizard = () => {
               <CardContent>
                 {/* Info message about placeholders */}
                 <div className="mb-4 text-info text-sm font-semibold bg-blue-50 border border-blue-200 rounded p-2">
-                  For your privacy, personal details like your name and contact info are never sent to our AI provider. Placeholders (e.g., {{CANDIDATE_NAME}}) will be replaced with your real details in the final document.
+                  For your privacy, personal details like your name and contact info are never sent to our AI provider. Placeholders (e.g., {'{{CANDIDATE_NAME}}'}) will be replaced with your real details in the final document.
                 </div>
                 {error && (
                   <div className="mb-4 text-destructive text-sm font-semibold">{error}</div>
