@@ -169,6 +169,7 @@ const ApplicationWizard = () => {
   const [showOutOfCreditsModal, setShowOutOfCreditsModal] = useState(false);
   // Add a new state to hold the structured CV data
   const [structuredCV, setStructuredCV] = useState<any>(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   // Fetch user profile and arc data on mount
   useEffect(() => {
@@ -672,10 +673,10 @@ const ApplicationWizard = () => {
                 <div className="flex gap-4 mt-6">
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentStep(2)}
+                    onClick={() => setShowUpdateModal(true)}
+                    className="flex-1"
                   >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Analysis
+                    Request Updates
                   </Button>
                   <Button
                     onClick={handleSaveAndDownload}
