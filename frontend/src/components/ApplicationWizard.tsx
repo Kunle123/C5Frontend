@@ -438,25 +438,20 @@ const ApplicationWizard = () => {
       if (!token) throw new Error('Not authenticated');
       // Debug log the payload
       console.log('Sending structuredCV to /api/cv/generate-docx:', structuredCV);
-      // Debug log for persist payload
-      const persistPayload = {
-        cv_docx_b64: await blobToBase64(await (await fetch('/api/cv/generate-docx', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(structuredCV),
-        })).blob()),
-        ...structuredCV,
-        name: jobTitle || structuredCV?.name || '',
-        job_title: uniqueJobTitle,
-        company_name: uniqueCompanyName,
-      };
-      console.log('Persist payload for /api/cv:', persistPayload);
-      // Ensure uniqueJobTitle and uniqueCompanyName are defined and checked for duplicates
-      let uniqueJobTitle = jobTitle || '';
-      let uniqueCompanyName = companyName || '';
+      // 1. Generate DOCX blob
+      const docxRes = await fetch('/api/cv/generate-docx', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(structuredCV),
+      });
+      if (!docxRes.ok) throw new Error('Failed to generate DOCX');
+      const docxBlob = await docxRes.blob();
+      // 2. Ensure uniqueJobTitle and uniqueCompanyName are defined and checked for duplicates
+      let uniqueJobTitle = jobTitle || structuredCV?.name || '';
+      let uniqueCompanyName = companyName || structuredCV?.company_name || '';
       try {
         const existingRes = await fetch('/api/cv', {
           headers: { 'Authorization': `Bearer ${token}` },
@@ -473,25 +468,23 @@ const ApplicationWizard = () => {
       } catch (e) {
         // If fetch fails, just proceed with the original job title
       }
-      // Convert DOCX Blob to base64
-      const cvDocxB64 = await blobToBase64(docxBlob);
-      // If you have a cover letter DOCX, convert and add cover_letter_docx_b64 as well
-      // Build payload for persistence: include all required fields from structuredCV
-      const payload: any = {
-        cv_docx_b64: cvDocxB64,
+      // 3. Build persist payload
+      const persistPayload = {
+        cv_docx_b64: await blobToBase64(docxBlob),
         ...structuredCV,
         name: jobTitle || structuredCV?.name || '',
         job_title: uniqueJobTitle,
         company_name: uniqueCompanyName,
       };
-      // POST the JSON payload to /api/cv
+      console.log('Persist payload for /api/cv:', persistPayload);
+      // 4. Persist the CV
       const persistRes = await fetch('/api/cv', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(persistPayload),
       });
       if (!persistRes.ok) {
         let errorMsg = 'Failed to save CV';
@@ -509,7 +502,7 @@ const ApplicationWizard = () => {
       try {
         const creditRes = await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          headers: { 'Authorization': `Bearer ${token}`,'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'generate_cv' }),
         });
         if (!creditRes.ok) {
@@ -629,7 +622,7 @@ const ApplicationWizard = () => {
       if (!res.ok) throw new Error('Failed to update documents');
       const data = await res.json();
       // Defensive merge: always preserve previous structuredCV fields
-      setStructuredCV(prev => ({
+      setStructuredCV((prev: any) => ({
         ...prev,
         ...data,
       }));
