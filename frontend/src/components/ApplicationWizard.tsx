@@ -773,8 +773,8 @@ const ApplicationWizard = () => {
                   </TabsList>
                   <TabsContent value="cv" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                      {generatedCV ? (
-                        <pre className="whitespace-pre-wrap text-sm">{generatedCV}</pre>
+                      {structuredCV ? (
+                        renderStructuredCV(structuredCV)
                       ) : (
                         <div className="text-muted-foreground text-sm">No CV available.</div>
                       )}
