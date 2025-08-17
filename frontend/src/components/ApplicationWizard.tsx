@@ -439,7 +439,7 @@ const ApplicationWizard = () => {
       // Debug log the payload
       console.log('Sending structuredCV to /api/cv/generate-docx:', structuredCV);
       // 1. Generate DOCX blob
-      const docxRes = await fetch('/api/cv/generate-docx', {
+      const docxRes = await fetch('https://api-gw-production.up.railway.app/api/cv/generate-docx', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
