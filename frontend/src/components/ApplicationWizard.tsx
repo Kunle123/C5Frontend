@@ -403,9 +403,11 @@ const ApplicationWizard = () => {
       // Convert DOCX Blob to base64
       const cvDocxB64 = await blobToBase64(docxBlob);
       // If you have a cover letter DOCX, convert and add cover_letter_docx_b64 as well
+      // Build payload for persistence: include all required fields from structuredCV
       const payload: any = {
         cv_docx_b64: cvDocxB64,
-        name: jobTitle || '',
+        ...structuredCV,
+        name: jobTitle || structuredCV?.name || '',
         job_title: uniqueJobTitle,
         company_name: uniqueCompanyName,
       };
