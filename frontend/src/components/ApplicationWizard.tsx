@@ -198,7 +198,7 @@ const ApplicationWizard = () => {
     }
   };
 
-  // Replace handleGenerate with real API call for both CV and cover letter
+  // Refactored handleGenerate: only generate and preview, do not upload DOCX yet
   const handleGenerate = async () => {
     setIsGenerating(true);
     setShowOptionsModal(false);
@@ -239,95 +239,112 @@ const ApplicationWizard = () => {
       setGeneratedCoverLetter(data.cover_letter || '');
       setJobTitle(data.job_title || '');
       setCompanyName(data.company_name || '');
-      // Persist the generated CV and cover letter
-      if (data.cv && data.cv.trim()) {
-        // Sanitize experience descriptions before saving
-        if (mergedProfile && Array.isArray(mergedProfile.work_experience)) {
-          mergedProfile.work_experience = sanitizeExperienceDescriptions(mergedProfile.work_experience);
-        }
-        // 1. Transform the generated CV data to structured JSON (sections array)
-        const structuredCV = transformCVResponseToSections(data); // You may need to implement this utility
-        // 2. POST structured JSON to /api/cv/generate-docx to get the DOCX
-        let docxBlob = null;
-        try {
-          const docxRes = await fetch('/api/cv/generate-docx', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(structuredCV),
-          });
-          if (!docxRes.ok) throw new Error('Failed to generate DOCX');
-          docxBlob = await docxRes.blob();
-        } catch (e) {
-          setError('Failed to generate DOCX');
-          setIsGenerating(false);
-          return;
-        }
-        // Ensure uniqueJobTitle and companyName are defined and checked for duplicates
-        let uniqueJobTitle = data.job_title || '';
-        let companyName = data.company_name || '';
-        try {
-          const existingRes = await fetch('/api/cv', {
-            headers: { 'Authorization': `Bearer ${token}` },
-          });
-          if (existingRes.ok) {
-            const existingCVs = await existingRes.json();
-            const sameTitleCount = existingCVs.filter((cv: any) =>
-              (cv.job_title || '') === uniqueJobTitle && (cv.company_name || '') === companyName
-            ).length;
-            if (sameTitleCount > 0) {
-              uniqueJobTitle = `${uniqueJobTitle} (${sameTitleCount + 1})`;
-            }
-          }
-        } catch (e) {
-          // If fetch fails, just proceed with the original job title
-        }
-        // 3. POST the DOCX to /api/cv as before (using FormData)
-        const formData = new FormData();
-        formData.append('file', docxBlob, 'cv.docx');
-        formData.append('job_title', uniqueJobTitle);
-        formData.append('company_name', companyName);
-        const persistRes = await fetch('/api/cv', {
+      // Advance to preview step (step 3)
+      setCurrentStep(3);
+    } catch (err: any) {
+      setError(err.message || 'Document generation failed');
+      toast({ title: 'Error', description: err.message || 'Document generation failed' });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // New handler: after preview, user clicks 'Save & Download' to generate/upload DOCX and persist CV
+  const handleSaveAndDownload = async () => {
+    setIsGenerating(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
+      // Use the latest generatedCV, generatedCoverLetter, jobTitle, companyName
+      // Sanitize and transform as before
+      const data = {
+        cv: generatedCV,
+        cover_letter: generatedCoverLetter,
+        job_title: jobTitle,
+        company_name: companyName
+      };
+      // Sanitize experience descriptions if needed (if you have structured data)
+      // 1. Transform the generated CV data to structured JSON (sections array)
+      const structuredCV = transformCVResponseToSections(data);
+      // 2. POST structured JSON to /api/cv/generate-docx to get the DOCX
+      let docxBlob = null;
+      try {
+        const docxRes = await fetch('/api/cv/generate-docx', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
-          body: formData,
+          body: JSON.stringify(structuredCV),
         });
-        if (!persistRes.ok) {
-          let errorMsg = 'Failed to save CV';
-          try {
-            const error = await persistRes.json();
-            errorMsg = error.detail || error.message || errorMsg;
-          } catch {}
-          throw new Error(errorMsg);
-        }
-        toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
-        setCurrentStep(4);
-        // Deduct a credit after successful generation
-        try {
-          const creditRes = await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'generate_cv' }),
-          });
-          if (!creditRes.ok) {
-            setShowOutOfCreditsModal(true);
-            await refreshCredits();
-            return;
+        if (!docxRes.ok) throw new Error('Failed to generate DOCX');
+        docxBlob = await docxRes.blob();
+      } catch (e) {
+        setError('Failed to generate DOCX');
+        setIsGenerating(false);
+        return;
+      }
+      // Ensure uniqueJobTitle and companyName are defined and checked for duplicates
+      let uniqueJobTitle = jobTitle || '';
+      let companyName = companyName || '';
+      try {
+        const existingRes = await fetch('/api/cv', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (existingRes.ok) {
+          const existingCVs = await existingRes.json();
+          const sameTitleCount = existingCVs.filter((cv: any) =>
+            (cv.job_title || '') === uniqueJobTitle && (cv.company_name || '') === companyName
+          ).length;
+          if (sameTitleCount > 0) {
+            uniqueJobTitle = `${uniqueJobTitle} (${sameTitleCount + 1})`;
           }
-          await refreshCredits();
-        } catch {
-          setShowOutOfCreditsModal(true);
         }
-      } else {
-        throw new Error('Generated CV is empty. Please try again.');
+      } catch (e) {
+        // If fetch fails, just proceed with the original job title
+      }
+      // 3. POST the DOCX to /api/cv as before (using FormData)
+      const formData = new FormData();
+      formData.append('file', docxBlob, 'cv.docx');
+      formData.append('job_title', uniqueJobTitle);
+      formData.append('company_name', companyName);
+      const persistRes = await fetch('/api/cv', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      if (!persistRes.ok) {
+        let errorMsg = 'Failed to save CV';
+        try {
+          const error = await persistRes.json();
+          errorMsg = error.detail || error.message || errorMsg;
+        } catch {}
+        throw new Error(errorMsg);
+      }
+      toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
+      setCurrentStep(4);
+      // Deduct a credit after successful generation
+      try {
+        const creditRes = await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'generate_cv' }),
+        });
+        if (!creditRes.ok) {
+          setShowOutOfCreditsModal(true);
+          await refreshCredits();
+          return;
+        }
+        await refreshCredits();
+      } catch {
+        setShowOutOfCreditsModal(true);
       }
     } catch (err: any) {
-      setError(err.message || 'Document generation or save failed');
-      toast({ title: 'Error', description: err.message || 'Document generation or save failed' });
+      setError(err.message || 'Document save failed');
+      toast({ title: 'Error', description: err.message || 'Document save failed' });
     } finally {
       setIsGenerating(false);
     }
@@ -547,6 +564,59 @@ const ApplicationWizard = () => {
                 </ul>
               </div>
             </div>
+          </div>
+        )}
+        {/* Step 3: Preview Generated Documents */}
+        {currentStep === 3 && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Preview Generated Documents</span>
+                  {jobTitle && (
+                    <div className="text-right">
+                      <div className="text-sm font-medium">{jobTitle}</div>
+                      <div className="text-sm text-muted-foreground">{companyName}</div>
+                    </div>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="cv" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="cv">Optimized CV</TabsTrigger>
+                    <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="cv" className="space-y-4">
+                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
+                      <pre className="whitespace-pre-wrap text-sm">{generatedCV}</pre>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="cover-letter" className="space-y-4">
+                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
+                      <pre className="whitespace-pre-wrap text-sm">{generatedCoverLetter}</pre>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+                <div className="flex gap-4 mt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentStep(2)}
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Analysis
+                  </Button>
+                  <Button
+                    onClick={handleSaveAndDownload}
+                    className="flex-1"
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? 'Saving...' : 'Save & Download'}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
         {/* Step 4: Review & Download */}
