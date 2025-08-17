@@ -915,6 +915,7 @@ const ApplicationWizard = () => {
                   value={cvUpdateRequest}
                   onChange={(e) => setCvUpdateRequest(e.target.value)}
                   className="min-h-[100px]"
+                  disabled={isUpdating}
                 />
               </div>
               <div>
@@ -926,14 +927,21 @@ const ApplicationWizard = () => {
                   value={coverLetterUpdateRequest}
                   onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
                   className="min-h-[100px]"
+                  disabled={isUpdating}
                 />
               </div>
             </div>
+            {isUpdating && (
+              <div className="flex flex-col items-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+                <div className="text-muted-foreground text-sm">Applying your updates, please wait...</div>
+              </div>
+            )}
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setShowUpdateModal(false)} className="flex-1" type="button">
+              <Button variant="outline" onClick={() => setShowUpdateModal(false)} className="flex-1" type="button" disabled={isUpdating}>
                 Cancel
               </Button>
-              <Button onClick={handleApplyUpdates} disabled={!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()} className="flex-1" type="button">
+              <Button onClick={handleApplyUpdates} disabled={isUpdating || !cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()} className="flex-1" type="button">
                 Apply Updates
               </Button>
             </div>
