@@ -265,6 +265,25 @@ const ApplicationWizard = () => {
           setIsGenerating(false);
           return;
         }
+        // Ensure uniqueJobTitle and companyName are defined and checked for duplicates
+        let uniqueJobTitle = data.job_title || '';
+        let companyName = data.company_name || '';
+        try {
+          const existingRes = await fetch('/api/cv', {
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+          if (existingRes.ok) {
+            const existingCVs = await existingRes.json();
+            const sameTitleCount = existingCVs.filter((cv: any) =>
+              (cv.job_title || '') === uniqueJobTitle && (cv.company_name || '') === companyName
+            ).length;
+            if (sameTitleCount > 0) {
+              uniqueJobTitle = `${uniqueJobTitle} (${sameTitleCount + 1})`;
+            }
+          }
+        } catch (e) {
+          // If fetch fails, just proceed with the original job title
+        }
         // 3. POST the DOCX to /api/cv as before (using FormData)
         const formData = new FormData();
         formData.append('file', docxBlob, 'cv.docx');
