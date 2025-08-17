@@ -143,6 +143,15 @@ function renderStructuredCV(cvData: any) {
   );
 }
 
+// Add a validation utility for structuredCV
+function validateCVData(cv: any): string | null {
+  if (!cv) return 'No CV data available';
+  if (!cv.name) return 'Missing candidate name';
+  if (!cv.contact_info || !Array.isArray(cv.contact_info) || cv.contact_info.length === 0) return 'Missing contact information';
+  if (!cv.experience || !Array.isArray(cv.experience) || cv.experience.length === 0) return 'Missing work experience';
+  return null;
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
@@ -337,10 +346,12 @@ const ApplicationWizard = () => {
 
   // New handler: after preview, user clicks 'Save & Download' to generate/upload DOCX and persist CV
   const handleSaveAndDownload = async () => {
-    // Content validation: ensure structuredCV is present and has experience or summary
-    if (!structuredCV || (!structuredCV.experience || structuredCV.experience.length === 0) && !structuredCV.summary) {
-      setError('No CV data available. Please generate your CV first.');
-      toast({ title: 'Error', description: 'No CV data available. Please generate your CV first.' });
+    // Validate all required fields before proceeding
+    const validationError = validateCVData(structuredCV);
+    if (validationError) {
+      setError(validationError);
+      toast({ title: 'Error', description: validationError });
+      console.error('CV validation failed:', validationError, structuredCV);
       return;
     }
     setIsGenerating(true);
@@ -348,6 +359,8 @@ const ApplicationWizard = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Not authenticated');
+      // Debug log the payload
+      console.log('Sending structuredCV to /api/cv/generate-docx:', structuredCV);
       // Use the latest structuredCV from state for DOCX generation
       // 2. POST structured JSON to /api/cv/generate-docx to get the DOCX
       let docxBlob = null;
@@ -741,7 +754,7 @@ const ApplicationWizard = () => {
                   <Button
                     onClick={handleSaveAndDownload}
                     className="flex-1"
-                    disabled={isGenerating || !structuredCV || ((!structuredCV.experience || structuredCV.experience.length === 0) && !structuredCV.summary)}
+                    disabled={isGenerating || !!validateCVData(structuredCV)}
                     type="button"
                   >
                     {isGenerating ? 'Saving...' : 'Save & Download'}
