@@ -170,6 +170,8 @@ const ApplicationWizard = () => {
   // Add a new state to hold the structured CV data
   const [structuredCV, setStructuredCV] = useState<any>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [cvUpdateRequest, setCvUpdateRequest] = useState('');
+  const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
 
   // Fetch user profile and arc data on mount
   useEffect(() => {
@@ -498,6 +500,59 @@ const ApplicationWizard = () => {
   // Add useEffect to handle redirect after generation
   // Remove the useEffect that auto-redirects after generation
 
+  const handleApplyUpdates = async () => {
+    setIsGenerating(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
+      const mergedProfile = getMergedProfile();
+      if (!mergedProfile) throw new Error('Profile data not loaded');
+
+      let payload: any = {
+        action: 'apply_updates',
+        thread_id: threadId,
+        cv_updates: cvUpdateRequest,
+        cover_letter_updates: coverLetterUpdateRequest,
+      };
+
+      if (threadId) {
+        payload.thread_id = threadId;
+      } else {
+        payload.profile = mergedProfile;
+        payload.job_description = jobDescription;
+      }
+
+      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.detail || error.message || 'Failed to apply updates');
+      }
+
+      const data = await res.json();
+      setGeneratedCV(data.cv || '');
+      setGeneratedCoverLetter(data.cover_letter || '');
+      setStructuredCV(data); // Update structured data
+      toast({ title: 'Updates Applied', description: 'Your CV and cover letter have been updated!' });
+      setShowUpdateModal(false);
+      setCvUpdateRequest('');
+      setCoverLetterUpdateRequest('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to apply updates');
+      toast({ title: 'Error', description: err.message || 'Failed to apply updates' });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -675,6 +730,7 @@ const ApplicationWizard = () => {
                     variant="outline"
                     onClick={() => setShowUpdateModal(true)}
                     className="flex-1"
+                    type="button"
                   >
                     Request Updates
                   </Button>
@@ -682,6 +738,7 @@ const ApplicationWizard = () => {
                     onClick={handleSaveAndDownload}
                     className="flex-1"
                     disabled={isGenerating}
+                    type="button"
                   >
                     {isGenerating ? 'Saving...' : 'Save & Download'}
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -826,6 +883,51 @@ const ApplicationWizard = () => {
             <p className="text-lg text-destructive font-semibold">You have run out of credits.</p>
             <p className="text-muted-foreground">Please visit the pricing page to top up or upgrade your plan.</p>
             <Button className="w-full" onClick={() => window.location.href = '/pricing'}>Go to Pricing</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Request Updates Modal */}
+      <Dialog open={showUpdateModal} onOpenChange={setShowUpdateModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Request Document Updates</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <p className="text-muted-foreground">
+              Provide specific updates you'd like to see in your CV and cover letter. The AI will incorporate your requests into the documents.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  CV Updates
+                </label>
+                <Textarea
+                  placeholder="e.g., Please include worked at Space X on a project whilst at NASA..."
+                  value={cvUpdateRequest}
+                  onChange={(e) => setCvUpdateRequest(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Cover Letter Updates
+                </label>
+                <Textarea
+                  placeholder="e.g., Mention my experience with machine learning projects..."
+                  value={coverLetterUpdateRequest}
+                  onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setShowUpdateModal(false)} className="flex-1" type="button">
+                Cancel
+              </Button>
+              <Button onClick={handleApplyUpdates} disabled={!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()} className="flex-1" type="button">
+                Apply Updates
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
