@@ -38,6 +38,32 @@ function sanitizeExperienceDescriptions(experiences: any[]): any[] {
   });
 }
 
+// Add the transformCVResponseToSections utility at the top or in a utils file
+function transformCVResponseToSections(data: any) {
+  const sections = [];
+  if (data.experience && Array.isArray(data.experience)) {
+    sections.push({
+      type: 'experience',
+      title: 'Professional Experience',
+      items: data.experience.map((exp: any) => ({
+        ...exp,
+        bullets: Array.isArray(exp.description)
+          ? exp.description.map((b: string) => b.replace(/•/g, '').trim())
+          : (exp.description ? [exp.description.replace(/•/g, '').trim()] : [])
+      }))
+    });
+  }
+  if (data.education && Array.isArray(data.education)) {
+    sections.push({
+      type: 'education',
+      title: 'Education',
+      items: data.education
+    });
+  }
+  // Add more sections as needed
+  return { sections };
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
@@ -219,38 +245,37 @@ const ApplicationWizard = () => {
         if (mergedProfile && Array.isArray(mergedProfile.work_experience)) {
           mergedProfile.work_experience = sanitizeExperienceDescriptions(mergedProfile.work_experience);
         }
-        // Fetch existing CVs to determine if a duplicate job_title|company_name exists
-        let uniqueJobTitle = data.job_title || '';
-        let companyName = data.company_name || '';
+        // 1. Transform the generated CV data to structured JSON (sections array)
+        const structuredCV = transformCVResponseToSections(data); // You may need to implement this utility
+        // 2. POST structured JSON to /api/cv/generate-docx to get the DOCX
+        let docxBlob = null;
         try {
-          const existingRes = await fetch('/api/cv', {
-            headers: { 'Authorization': `Bearer ${token}` },
+          const docxRes = await fetch('/api/cv/generate-docx', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(structuredCV),
           });
-          if (existingRes.ok) {
-            const existingCVs = await existingRes.json();
-            // Count how many CVs have the same job_title and company_name
-            const sameTitleCount = existingCVs.filter((cv: any) =>
-              (cv.job_title || '') === uniqueJobTitle && (cv.company_name || '') === companyName
-            ).length;
-            if (sameTitleCount > 0) {
-              uniqueJobTitle = `${uniqueJobTitle} (${sameTitleCount + 1})`;
-            }
-          }
+          if (!docxRes.ok) throw new Error('Failed to generate DOCX');
+          docxBlob = await docxRes.blob();
         } catch (e) {
-          // If fetch fails, just proceed with the original job title
+          setError('Failed to generate DOCX');
+          setIsGenerating(false);
+          return;
         }
+        // 3. POST the DOCX to /api/cv as before (using FormData)
+        const formData = new FormData();
+        formData.append('file', docxBlob, 'cv.docx');
+        formData.append('job_title', uniqueJobTitle);
+        formData.append('company_name', companyName);
         const persistRes = await fetch('/api/cv', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            cv: data.cv,
-            cover_letter: data.cover_letter || '',
-            job_title: uniqueJobTitle,
-            company_name: companyName
-          })
+          body: formData,
         });
         if (!persistRes.ok) {
           let errorMsg = 'Failed to save CV';
