@@ -773,13 +773,20 @@ const ApplicationWizard = () => {
                   </TabsList>
                   <TabsContent value="cv" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                      <pre className="whitespace-pre-wrap text-sm">{generatedCV}</pre>
+                      {generatedCV ? (
+                        <pre className="whitespace-pre-wrap text-sm">{generatedCV}</pre>
+                      ) : (
+                        <div className="text-muted-foreground text-sm">No CV available.</div>
+                      )}
                     </div>
-                    {/* Download CV button removed */}
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                      <pre className="whitespace-pre-wrap text-sm">{generatedCoverLetter}</pre>
+                      {generatedCoverLetter ? (
+                        <pre className="whitespace-pre-wrap text-sm">{generatedCoverLetter}</pre>
+                      ) : (
+                        <div className="text-muted-foreground text-sm">No cover letter available.</div>
+                      )}
                     </div>
                     <Button className="w-full">
                       <Download className="w-4 h-4 mr-2" />
