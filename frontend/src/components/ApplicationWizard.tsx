@@ -172,6 +172,7 @@ const ApplicationWizard = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [cvUpdateRequest, setCvUpdateRequest] = useState('');
   const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Fetch user profile and arc data on mount
   useEffect(() => {
@@ -501,55 +502,56 @@ const ApplicationWizard = () => {
   // Remove the useEffect that auto-redirects after generation
 
   const handleApplyUpdates = async () => {
-    setIsGenerating(true);
-    setError(null);
+    setIsUpdating(true);
+    // Do not close the modal immediately
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Not authenticated');
-      const mergedProfile = getMergedProfile();
-      if (!mergedProfile) throw new Error('Profile data not loaded');
-
-      let payload: any = {
-        action: 'apply_updates',
+      if (!threadId) throw new Error('No thread ID available');
+      // Prepare keypoints arrays
+      const cv_keypoints = cvUpdateRequest
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+      const cover_letter_keypoints = coverLetterUpdateRequest
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+      // Map generationOptions.pages to string
+      let cv_length = '2_to_3_pages';
+      if (generationOptions.pages === 2) cv_length = '2_pages';
+      if (generationOptions.pages === 3) cv_length = '3_pages';
+      if (generationOptions.pages === 4) cv_length = '4_pages';
+      // Build payload
+      const payload = {
+        action: 'update_cv',
         thread_id: threadId,
-        cv_updates: cvUpdateRequest,
-        cover_letter_updates: coverLetterUpdateRequest,
+        cv_keypoints,
+        cover_letter_keypoints,
+        cv_length,
       };
-
-      if (threadId) {
-        payload.thread_id = threadId;
-      } else {
-        payload.profile = mergedProfile;
-        payload.job_description = jobDescription;
-      }
-
+      // Send to backend
       const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.detail || error.message || 'Failed to apply updates');
-      }
-
+      if (!res.ok) throw new Error('Failed to update documents');
       const data = await res.json();
       setGeneratedCV(data.cv || '');
       setGeneratedCoverLetter(data.cover_letter || '');
-      setStructuredCV(data); // Update structured data
-      toast({ title: 'Updates Applied', description: 'Your CV and cover letter have been updated!' });
+      setStructuredCV(data); // update preview
       setShowUpdateModal(false);
       setCvUpdateRequest('');
       setCoverLetterUpdateRequest('');
+      toast({ title: 'Documents Updated', description: 'Your CV and cover letter have been updated with your requests!' });
     } catch (err: any) {
-      setError(err.message || 'Failed to apply updates');
-      toast({ title: 'Error', description: err.message || 'Failed to apply updates' });
+      toast({ title: 'Error', description: err.message || 'Failed to update documents' });
     } finally {
-      setIsGenerating(false);
+      setIsUpdating(false);
     }
   };
 
