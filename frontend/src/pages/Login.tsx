@@ -113,7 +113,7 @@ const Login = () => {
                   <Label htmlFor="password" className="font-medium text-foreground">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={(e) => { setPassword(e.target.value); setErrorMessage(null); }} className="pl-10 pr-10 border-input bg-input text-base placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 transition-all duration-300" required />
+                    <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={(e) => { setPassword(e.target.value); setErrorMessage(null); }} className="pl-10 pr-10 border-input bg-input text-base placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 transition-all duration-300" required autocomplete="current-password" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
