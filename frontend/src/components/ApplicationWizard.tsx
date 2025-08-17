@@ -337,13 +337,18 @@ const ApplicationWizard = () => {
 
   // New handler: after preview, user clicks 'Save & Download' to generate/upload DOCX and persist CV
   const handleSaveAndDownload = async () => {
+    // Content validation: ensure structuredCV is present and has experience or summary
+    if (!structuredCV || (!structuredCV.experience || structuredCV.experience.length === 0) && !structuredCV.summary) {
+      setError('No CV data available. Please generate your CV first.');
+      toast({ title: 'Error', description: 'No CV data available. Please generate your CV first.' });
+      return;
+    }
     setIsGenerating(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Not authenticated');
       // Use the latest structuredCV from state for DOCX generation
-      if (!structuredCV) throw new Error('No structured CV data available');
       // 2. POST structured JSON to /api/cv/generate-docx to get the DOCX
       let docxBlob = null;
       try {
@@ -360,6 +365,7 @@ const ApplicationWizard = () => {
       } catch (e) {
         setError('Failed to generate DOCX');
         setIsGenerating(false);
+        toast({ title: 'Error', description: 'Failed to generate DOCX' });
         return;
       }
       // Ensure uniqueJobTitle and uniqueCompanyName are defined and checked for duplicates
@@ -405,6 +411,8 @@ const ApplicationWizard = () => {
           const error = await persistRes.json();
           errorMsg = error.detail || error.message || errorMsg;
         } catch {}
+        setError(errorMsg);
+        toast({ title: 'Error', description: errorMsg });
         throw new Error(errorMsg);
       }
       toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
@@ -704,6 +712,9 @@ const ApplicationWizard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {error && (
+                  <div className="mb-4 text-destructive text-sm font-semibold">{error}</div>
+                )}
                 <Tabs defaultValue="cv" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="cv">Optimized CV</TabsTrigger>
@@ -730,7 +741,7 @@ const ApplicationWizard = () => {
                   <Button
                     onClick={handleSaveAndDownload}
                     className="flex-1"
-                    disabled={isGenerating}
+                    disabled={isGenerating || !structuredCV || ((!structuredCV.experience || structuredCV.experience.length === 0) && !structuredCV.summary)}
                     type="button"
                   >
                     {isGenerating ? 'Saving...' : 'Save & Download'}
