@@ -25,6 +25,29 @@ interface GenerationOptions {
   includeRelevantExperience: boolean;
 }
 
+// TypeScript types for PII-free profile and assistant response
+interface PIIFreeProfile {
+  experience?: any[];
+  education?: any[];
+  skills?: any[];
+  certifications?: any[];
+  projects?: any[];
+  training?: any[];
+  // Add other non-PII fields as needed
+}
+
+interface AssistantResponse {
+  name: string;
+  contact_info: string[] | string;
+  summary?: string;
+  experience?: any[];
+  education?: any[];
+  certifications?: any[];
+  core_competencies?: string[];
+  cover_letter?: string;
+  // ...other fields
+}
+
 // Utility to sanitize experience descriptions
 function sanitizeExperienceDescriptions(experiences: any[]): any[] {
   return experiences.map(exp => {
@@ -152,6 +175,30 @@ function validateCVData(cv: any): string | null {
   return null;
 }
 
+// Utility to build a PII-free profile
+function buildPIIFreeProfile(profile: any, arcData: any): PIIFreeProfile {
+  return {
+    experience: arcData?.work_experience || [],
+    education: arcData?.education || [],
+    skills: arcData?.skills || [],
+    certifications: arcData?.certifications || [],
+    projects: arcData?.projects || [],
+    training: arcData?.training || [],
+    // Add other non-PII fields as needed
+  };
+}
+
+// Utility to check for PII in outgoing assistant payload (dev only)
+function containsPII(obj: any): boolean {
+  if (!obj) return false;
+  const piiFields = ['name', 'email', 'phone', 'address', 'linkedin', 'address_line1', 'city_state_postal'];
+  for (const key of Object.keys(obj)) {
+    if (piiFields.includes(key.toLowerCase())) return true;
+    if (typeof obj[key] === 'object' && containsPII(obj[key])) return true;
+  }
+  return false;
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
@@ -276,7 +323,14 @@ const ApplicationWizard = () => {
       if (!token) throw new Error('Not authenticated');
       const mergedProfile = getMergedProfile();
       if (!mergedProfile) throw new Error('Profile data not loaded');
-      const result = await extractKeywords(mergedProfile, jobDescription, token);
+      // Build PII-free profile for assistant
+      const piiFreeProfile = buildPIIFreeProfile(profile, arcData);
+      // Dev-mode validation for PII
+      if (process.env.NODE_ENV === 'development' && containsPII(piiFreeProfile)) {
+        // eslint-disable-next-line no-console
+        console.warn('PII detected in assistant payload!', piiFreeProfile);
+      }
+      const result = await extractKeywords(piiFreeProfile, jobDescription, token);
       if (result.thread_id && !threadId) {
         setThreadId(result.thread_id);
       }
@@ -727,6 +781,10 @@ const ApplicationWizard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {/* Info message about placeholders */}
+                <div className="mb-4 text-info text-sm font-semibold bg-blue-50 border border-blue-200 rounded p-2">
+                  For your privacy, personal details like your name and contact info are never sent to our AI provider. Placeholders (e.g., {{CANDIDATE_NAME}}) will be replaced with your real details in the final document.
+                </div>
                 {error && (
                   <div className="mb-4 text-destructive text-sm font-semibold">{error}</div>
                 )}
