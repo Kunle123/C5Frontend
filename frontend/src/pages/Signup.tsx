@@ -133,7 +133,7 @@ const Signup = () => {
                   <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="password" name="password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={formData.password} onChange={(e) => { handleChange(e); setErrorMessage(null); }} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required autocomplete="new-password" />
+                    <Input id="password" name="password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={formData.password} onChange={(e) => { handleChange(e); setErrorMessage(null); }} className="pl-10 pr-10 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-300" required autoComplete="new-password" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                   </div>
                 </div>
@@ -147,7 +147,7 @@ const Signup = () => {
                     value={formData.confirmPassword}
                     onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
                     required
-                    autocomplete="current-password"
+                    autoComplete="current-password"
                   />
                 </div>
                 <div className="space-y-2">
