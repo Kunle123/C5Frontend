@@ -199,6 +199,26 @@ function containsPII(obj: any): boolean {
   return false;
 }
 
+// Validation for assistant payload (PII-free)
+function validatePIIFreeProfile(profile: any): string | null {
+  if (!profile) return 'No profile data available';
+  if (profile.name) return 'PII detected: name should not be sent to assistant';
+  if (profile.contact_info) return 'PII detected: contact_info should not be sent to assistant';
+  return null;
+}
+
+// Validation for final CV (for persist/download)
+function validateFinalCV(cv: any): string | null {
+  if (!cv) return 'No CV data available';
+  if (!cv.name) return 'Missing candidate name';
+  if (!cv.contact_info || !Array.isArray(cv.contact_info) || cv.contact_info.length === 0) return 'Missing contact information';
+  if (!cv.experience || !Array.isArray(cv.experience) || cv.experience.length === 0) return 'Missing work experience';
+  for (let i = 0; i < (cv.experience?.length || 0); i++) {
+    if (!cv.experience[i].job_title) return `Missing job title for experience ${i + 1}`;
+  }
+  return null;
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
@@ -326,9 +346,12 @@ const ApplicationWizard = () => {
       // Build PII-free profile for assistant
       const piiFreeProfile = buildPIIFreeProfile(profile, arcData);
       // Dev-mode validation for PII
-      if (process.env.NODE_ENV === 'development' && containsPII(piiFreeProfile)) {
-        // eslint-disable-next-line no-console
-        console.warn('PII detected in assistant payload!', piiFreeProfile);
+      if (process.env.NODE_ENV === 'development') {
+        const piiError = validatePIIFreeProfile(piiFreeProfile);
+        if (piiError) {
+          // eslint-disable-next-line no-console
+          console.warn('PII validation failed:', piiError, piiFreeProfile);
+        }
       }
       const result = await extractKeywords(piiFreeProfile, jobDescription, token);
       if (result.thread_id && !threadId) {
@@ -401,7 +424,7 @@ const ApplicationWizard = () => {
   // New handler: after preview, user clicks 'Save & Download' to generate/upload DOCX and persist CV
   const handleSaveAndDownload = async () => {
     // Validate all required fields before proceeding
-    const validationError = validateCVData(structuredCV);
+    const validationError = validateFinalCV(structuredCV);
     if (validationError) {
       setError(validationError);
       toast({ title: 'Error', description: validationError });
@@ -785,6 +808,12 @@ const ApplicationWizard = () => {
                 <div className="mb-4 text-info text-sm font-semibold bg-blue-50 border border-blue-200 rounded p-2">
                   For your privacy, personal details like your name and contact info are never sent to our AI provider. Placeholders (e.g., {'{{CANDIDATE_NAME}}'}) will be replaced with your real details in the final document.
                 </div>
+                {/* Show validation error if Save & Download is disabled */}
+                {validateFinalCV(structuredCV) && (
+                  <div className="mb-2 text-destructive text-sm font-semibold">
+                    {validateFinalCV(structuredCV)}
+                  </div>
+                )}
                 {error && (
                   <div className="mb-4 text-destructive text-sm font-semibold">{error}</div>
                 )}
@@ -814,7 +843,7 @@ const ApplicationWizard = () => {
                   <Button
                     onClick={handleSaveAndDownload}
                     className="flex-1"
-                    disabled={isGenerating || !!validateCVData(structuredCV)}
+                    disabled={isGenerating || !!validateFinalCV(structuredCV)}
                     type="button"
                   >
                     {isGenerating ? 'Saving...' : 'Save & Download'}
