@@ -64,6 +64,19 @@ function transformCVResponseToSections(data: any) {
   return { sections };
 }
 
+// Utility to convert Blob to base64
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      resolve(result.split(',')[1]); // Remove data:...;base64, prefix
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
@@ -304,17 +317,23 @@ const ApplicationWizard = () => {
       } catch (e) {
         // If fetch fails, just proceed with the original job title
       }
-      // 3. POST the DOCX to /api/cv as before (using FormData)
-      const formData = new FormData();
-      formData.append('file', docxBlob, 'cv.docx');
-      formData.append('job_title', uniqueJobTitle);
-      formData.append('company_name', uniqueCompanyName);
+      // Convert DOCX Blob to base64
+      const cvDocxB64 = await blobToBase64(docxBlob);
+      // If you have a cover letter DOCX, convert and add cover_letter_docx_b64 as well
+      const payload: any = {
+        cv_docx_b64: cvDocxB64,
+        name: jobTitle || '',
+        job_title: uniqueJobTitle,
+        company_name: uniqueCompanyName,
+      };
+      // POST the JSON payload to /api/cv
       const persistRes = await fetch('/api/cv', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify(payload),
       });
       if (!persistRes.ok) {
         let errorMsg = 'Failed to save CV';
