@@ -438,26 +438,22 @@ const ApplicationWizard = () => {
       if (!token) throw new Error('Not authenticated');
       // Debug log the payload
       console.log('Sending structuredCV to /api/cv/generate-docx:', structuredCV);
-      // Use the latest structuredCV from state for DOCX generation
-      // 2. POST structured JSON to /api/cv/generate-docx to get the DOCX
-      let docxBlob = null;
-      try {
-        const docxRes = await fetch('/api/cv/generate-docx', {
+      // Debug log for persist payload
+      const persistPayload = {
+        cv_docx_b64: await blobToBase64(await (await fetch('/api/cv/generate-docx', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(structuredCV),
-        });
-        if (!docxRes.ok) throw new Error('Failed to generate DOCX');
-        docxBlob = await docxRes.blob();
-      } catch (e) {
-        setError('Failed to generate DOCX');
-        setIsGenerating(false);
-        toast({ title: 'Error', description: 'Failed to generate DOCX' });
-        return;
-      }
+        })).blob()),
+        ...structuredCV,
+        name: jobTitle || structuredCV?.name || '',
+        job_title: uniqueJobTitle,
+        company_name: uniqueCompanyName,
+      };
+      console.log('Persist payload for /api/cv:', persistPayload);
       // Ensure uniqueJobTitle and uniqueCompanyName are defined and checked for duplicates
       let uniqueJobTitle = jobTitle || '';
       let uniqueCompanyName = companyName || '';
@@ -632,9 +628,13 @@ const ApplicationWizard = () => {
       });
       if (!res.ok) throw new Error('Failed to update documents');
       const data = await res.json();
+      // Defensive merge: always preserve previous structuredCV fields
+      setStructuredCV(prev => ({
+        ...prev,
+        ...data,
+      }));
       setGeneratedCV(data.cv || '');
       setGeneratedCoverLetter(data.cover_letter || '');
-      setStructuredCV(data); // update preview
       setShowUpdateModal(false);
       setCvUpdateRequest('');
       setCoverLetterUpdateRequest('');
