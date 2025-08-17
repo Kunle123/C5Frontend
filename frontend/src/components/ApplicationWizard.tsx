@@ -766,6 +766,15 @@ const ApplicationWizard = () => {
                       Generate CV & Cover Letter
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
+                    {/* Exit button for low score or user cancellation */}
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2"
+                      onClick={() => window.location.href = '/dashboard'}
+                      type="button"
+                    >
+                      Exit
+                    </Button>
                   </div>
                 )}
               </CardContent>
