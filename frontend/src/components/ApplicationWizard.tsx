@@ -285,9 +285,9 @@ const ApplicationWizard = () => {
         setIsGenerating(false);
         return;
       }
-      // Ensure uniqueJobTitle and companyName are defined and checked for duplicates
+      // Ensure uniqueJobTitle and uniqueCompanyName are defined and checked for duplicates
       let uniqueJobTitle = jobTitle || '';
-      let companyName = companyName || '';
+      let uniqueCompanyName = companyName || '';
       try {
         const existingRes = await fetch('/api/cv', {
           headers: { 'Authorization': `Bearer ${token}` },
@@ -295,7 +295,7 @@ const ApplicationWizard = () => {
         if (existingRes.ok) {
           const existingCVs = await existingRes.json();
           const sameTitleCount = existingCVs.filter((cv: any) =>
-            (cv.job_title || '') === uniqueJobTitle && (cv.company_name || '') === companyName
+            (cv.job_title || '') === uniqueJobTitle && (cv.company_name || '') === uniqueCompanyName
           ).length;
           if (sameTitleCount > 0) {
             uniqueJobTitle = `${uniqueJobTitle} (${sameTitleCount + 1})`;
@@ -308,7 +308,7 @@ const ApplicationWizard = () => {
       const formData = new FormData();
       formData.append('file', docxBlob, 'cv.docx');
       formData.append('job_title', uniqueJobTitle);
-      formData.append('company_name', companyName);
+      formData.append('company_name', uniqueCompanyName);
       const persistRes = await fetch('/api/cv', {
         method: 'POST',
         headers: {
