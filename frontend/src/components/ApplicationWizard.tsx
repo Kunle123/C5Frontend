@@ -481,7 +481,8 @@ const ApplicationWizard = () => {
       const persistPayload = {
         cv_docx_b64: await blobToBase64(docxBlob),
         ...structuredCV,
-        name: jobTitle || structuredCV?.name || '',
+        // Use the real user name from the profile, not the job title
+        name: profile?.name || structuredCV?.name || '',
         job_title: uniqueJobTitle,
         company_name: uniqueCompanyName,
         // If contact_info is present and not a string placeholder, ensure it's an array
