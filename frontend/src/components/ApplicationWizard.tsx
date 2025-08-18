@@ -221,6 +221,13 @@ function validateFinalCV(cv: any): string | null {
   return null;
 }
 
+// Utility to inject real name into cover letter signature
+function injectNameInCoverLetter(coverLetter: string, realName: string | undefined): string {
+  if (!coverLetter) return '';
+  if (!realName) return coverLetter;
+  return coverLetter.replace(/\{\{CANDIDATE_NAME\}\}/g, realName);
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
@@ -490,7 +497,9 @@ const ApplicationWizard = () => {
           ? "{{CONTACT_INFO}}"
           : Array.isArray(structuredCV?.contact_info)
             ? structuredCV.contact_info
-            : []
+            : [],
+        // Inject real name in cover letter signature
+        cover_letter: injectNameInCoverLetter(structuredCV?.cover_letter, profile?.name),
       };
       console.log('Persist payload for /api/cv:', persistPayload);
       // 4. Persist the CV
@@ -845,7 +854,7 @@ const ApplicationWizard = () => {
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                      <pre className="whitespace-pre-wrap text-sm">{generatedCoverLetter}</pre>
+                      <pre className="whitespace-pre-wrap text-sm">{injectNameInCoverLetter(generatedCoverLetter, profile?.name)}</pre>
                     </div>
                   </TabsContent>
                 </Tabs>
