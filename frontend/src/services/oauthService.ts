@@ -41,17 +41,8 @@ class OAuthService {
 
   // Initiate Google OAuth flow
   initiateGoogleAuth(): void {
-    const params = new URLSearchParams({
-      client_id: this.googleConfig.clientId,
-      redirect_uri: this.googleConfig.redirectUri,
-      scope: this.googleConfig.scope,
-      response_type: this.googleConfig.responseType!,
-      access_type: this.googleConfig.accessType!,
-      prompt: this.googleConfig.prompt!
-    });
-
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-    window.location.href = authUrl;
+    // Redirect to backend's Google OAuth endpoint to ensure correct redirect_uri
+    window.location.href = "https://candidatev-auth-production.up.railway.app/auth/google";
   }
 
   // Initiate LinkedIn OAuth flow
