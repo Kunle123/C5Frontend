@@ -56,16 +56,8 @@ class OAuthService {
 
   // Initiate LinkedIn OAuth flow
   initiateLinkedInAuth(): void {
-    const params = new URLSearchParams({
-      response_type: "code",
-      client_id: this.linkedinConfig.clientId,
-      redirect_uri: this.linkedinConfig.redirectUri,
-      scope: this.linkedinConfig.scope,
-      state: this.linkedinConfig.state!
-    });
-
-    const authUrl = `https://www.linkedin.com/oauth/v2/authorization?${params.toString()}`;
-    window.location.href = authUrl;
+    // Redirect to backend's LinkedIn OAuth endpoint to ensure correct redirect_uri
+    window.location.href = "https://candidatev-auth-production.up.railway.app/auth/linkedin";
   }
 
   // Handle OAuth callback (call this from your callback route)
