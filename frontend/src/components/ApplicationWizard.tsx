@@ -269,6 +269,7 @@ const ApplicationWizard = () => {
         // 1. Get user profile
         const profileRes = await fetch('https://api-gw-production.up.railway.app/api/user/profile', {
           headers: { 'Authorization': `Bearer ${token}` },
+          credentials: 'include',
         });
         if (!profileRes.ok) throw new Error('Failed to fetch user profile');
         const userProfile = await profileRes.json();
@@ -276,6 +277,7 @@ const ApplicationWizard = () => {
         // 2. Get arc data
         const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfile.id}/all_sections`, {
           headers: { 'Authorization': `Bearer ${token}` },
+          credentials: 'include',
         });
         if (!arcRes.ok) throw new Error('Failed to fetch arc data');
         const arc = await arcRes.json();
@@ -310,6 +312,7 @@ const ApplicationWizard = () => {
       if (!token) throw new Error('Not authenticated');
       const res = await fetch('https://api-gw-production.up.railway.app/api/user/credits', {
         headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
       });
       if (!res.ok) throw new Error('Failed to fetch credits');
       const data = await res.json();
@@ -416,6 +419,7 @@ const ApplicationWizard = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload),
+        credentials: 'include',
       });
       if (!res.ok) throw new Error('Failed to generate documents');
       const data = await res.json();
@@ -462,6 +466,7 @@ const ApplicationWizard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(structuredCV),
+        credentials: 'include',
       });
       if (!docxRes.ok) throw new Error('Failed to generate DOCX');
       const docxBlob = await docxRes.blob();
@@ -471,6 +476,7 @@ const ApplicationWizard = () => {
       try {
         const existingRes = await fetch('/api/cv', {
           headers: { 'Authorization': `Bearer ${token}` },
+          credentials: 'include',
         });
         if (existingRes.ok) {
           const existingCVs = await existingRes.json();
@@ -510,6 +516,7 @@ const ApplicationWizard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(persistPayload),
+        credentials: 'include',
       });
       if (!persistRes.ok) {
         let errorMsg = 'Failed to save CV';
@@ -529,6 +536,7 @@ const ApplicationWizard = () => {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`,'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'generate_cv' }),
+          credentials: 'include',
         });
         if (!creditRes.ok) {
           setShowOutOfCreditsModal(true);
@@ -574,6 +582,7 @@ const ApplicationWizard = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload),
+        credentials: 'include',
       });
       if (!res.ok) throw new Error('Keyword extraction failed');
       const data = await res.json();
@@ -643,6 +652,7 @@ const ApplicationWizard = () => {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
+        credentials: 'include',
       });
       if (!res.ok) throw new Error('Failed to update documents');
       const data = await res.json();
