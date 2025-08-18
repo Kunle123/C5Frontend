@@ -177,6 +177,8 @@ function validateCVData(cv: any): string | null {
 
 // Utility to build a PII-free profile
 function buildPIIFreeProfile(profile: any, arcData: any): PIIFreeProfile {
+  // When sending to the assistant, always use the placeholder for contact_info
+  // per frontend guidance: send as a string, not an array
   return {
     experience: arcData?.work_experience || [],
     education: arcData?.education || [],
@@ -184,7 +186,7 @@ function buildPIIFreeProfile(profile: any, arcData: any): PIIFreeProfile {
     certifications: arcData?.certifications || [],
     projects: arcData?.projects || [],
     training: arcData?.training || [],
-    // Add other non-PII fields as needed
+    // contact_info is omitted here; handled in payload below if needed
   };
 }
 
@@ -386,9 +388,16 @@ const ApplicationWizard = () => {
           thread_id: threadId
         };
       } else {
+        // When sending to the assistant, use the placeholder for name and contact_info
+        // per frontend guidance: send as strings, not arrays
+        const profileForAI = {
+          ...buildPIIFreeProfile(profile, arcData),
+          name: "{{CANDIDATE_NAME}}",
+          contact_info: "{{CONTACT_INFO}}"
+        };
         payload = {
           action: 'generate_cv',
-          profile: mergedProfile,
+          profile: profileForAI,
           job_description: jobDescription
         };
       }
@@ -475,6 +484,12 @@ const ApplicationWizard = () => {
         name: jobTitle || structuredCV?.name || '',
         job_title: uniqueJobTitle,
         company_name: uniqueCompanyName,
+        // If contact_info is present and not a string placeholder, ensure it's an array
+        contact_info: (structuredCV && typeof structuredCV.contact_info === 'string' && structuredCV.contact_info === "{{CONTACT_INFO}}")
+          ? "{{CONTACT_INFO}}"
+          : Array.isArray(structuredCV?.contact_info)
+            ? structuredCV.contact_info
+            : []
       };
       console.log('Persist payload for /api/cv:', persistPayload);
       // 4. Persist the CV
