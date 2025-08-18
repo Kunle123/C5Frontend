@@ -77,7 +77,8 @@ class OAuthService {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ code })
+        body: JSON.stringify({ code }),
+        credentials: "include" // Ensure cookies are sent/received
       });
 
       if (!response.ok) {
@@ -104,7 +105,8 @@ class OAuthService {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ code, state })
+        body: JSON.stringify({ code, state }),
+        credentials: "include" // Ensure cookies are sent/received
       });
 
       if (!response.ok) {
