@@ -14,7 +14,15 @@ const AuthCallback = () => {
     const params = new URLSearchParams(location.search);
     const code = params.get("code");
     const state = params.get("state");
+    const token = params.get("token"); // NEW: get token from URL
     const pathname = location.pathname;
+
+    if (token) {
+      localStorage.setItem("token", token);
+      toast({ title: "Authentication successful!", description: "You are now logged in." });
+      navigate("/dashboard");
+      return;
+    }
 
     const handleOAuth = async () => {
       try {
