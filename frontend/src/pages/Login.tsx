@@ -148,7 +148,7 @@ const Login = () => {
               </div>
               <div className="space-y-3">
                 <SocialAuthButton provider="google" onClick={handleGoogleAuth} disabled={isLoading} />
-                <SocialAuthButton provider="linkedin" onClick={handleLinkedInAuth} disabled={isLoading} />
+                {/* <SocialAuthButton provider="linkedin" onClick={handleLinkedInAuth} disabled={isLoading} /> */}
               </div>
               <p className="text-center text-sm text-muted-foreground">Don't have an account?{" "}<Link to="/signup" className="text-primary font-medium underline-offset-4 hover:underline transition-colors">Sign up</Link></p>
             </CardContent>
