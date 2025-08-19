@@ -170,6 +170,19 @@ const CareerArkV2: React.FC = () => {
   const [pollingSteps, setPollingSteps] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Add state for import modal
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importDots, setImportDots] = useState('');
+
+  // Animate dots for the import modal
+  useEffect(() => {
+    if (!showImportModal) return;
+    const interval = setInterval(() => {
+      setImportDots(dots => dots.length < 3 ? dots + '.' : '');
+    }, 500);
+    return () => clearInterval(interval);
+  }, [showImportModal]);
+
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
@@ -184,6 +197,7 @@ const CareerArkV2: React.FC = () => {
       return;
     }
     setUploading(true);
+    setShowImportModal(true);
     setUploadError('');
     setUploadProgress(10);
     try {
@@ -201,12 +215,14 @@ const CareerArkV2: React.FC = () => {
       if (!response.ok) {
         setUploadError('CV import failed. Please try again.');
         setUploading(false);
+        setShowImportModal(false);
         return;
       }
       const result = await response.json();
       if (!result.success) {
         setUploadError('CV import failed. Please try again.');
         setUploading(false);
+        setShowImportModal(false);
         return;
       }
       // Use result.data to populate the UI with the parsed CV information
@@ -217,6 +233,7 @@ const CareerArkV2: React.FC = () => {
       setUploadError(err?.error || err?.message || 'CV import failed. Please try again.');
     } finally {
       setUploading(false);
+      setShowImportModal(false);
     }
   };
 
@@ -943,6 +960,16 @@ const CareerArkV2: React.FC = () => {
                         ))}
                       </ul>
               <p className="text-muted-foreground mt-2">This could take several minutes. Please do not close the page.</p>
+            </div>
+          </DialogContent>
+        </Dialog>
+        {/* Import Modal */}
+        <Dialog open={showImportModal}>
+          <DialogContent className="max-w-md text-center">
+            <div className="flex flex-col items-center gap-4 py-4">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+              <h2 className="text-lg font-semibold">Importing your CV<span>{importDots}</span></h2>
+              <p className="text-muted-foreground mt-2">Please wait while we process your document.</p>
             </div>
           </DialogContent>
         </Dialog>
