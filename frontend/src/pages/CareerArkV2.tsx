@@ -177,113 +177,45 @@ const CareerArkV2: React.FC = () => {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // File type validation
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadError('Unsupported file type. Please upload a PDF, DOC, or DOCX file.');
+      return;
+    }
     setUploading(true);
     setUploadError('');
-    setTaskId(null);
-    setStatus('');
-    setSummary(null);
     setUploadProgress(10);
     try {
+      const token = localStorage.getItem('token') || '';
       const formData = new FormData();
       formData.append('file', file);
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/career-ark/cv', true);
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          setUploadProgress(Math.round((event.loaded / event.total) * 60));
-        }
-      };
-      xhr.onreadystatechange = async () => {
-        if (xhr.readyState === 4) {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            setUploadProgress(70);
-            const data = JSON.parse(xhr.responseText);
-            setTaskId(data.taskId);
-            setStatus('pending');
-            setPolling(true);
-            setShowPollingModal(true);
-            setPollingSteps(["Uploading CV...", "Extracting job titles...", "Extracting experience details...", "Extracting education..."]);
-            // Poll for extraction completion using setInterval
-            let pollCount = 0;
-            const interval = setInterval(async () => {
-              try {
-                const res = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/cv/status/${data.taskId}`, {
-                  headers: { Authorization: `Bearer ${token}` },
-                });
-                const statusData = await res.json();
-                setStatus(statusData.status);
-                // Update polling steps for UI
-                if (statusData.status === 'metadata_extracted' && statusData.extractedDataSummary) {
-                  const jobs = statusData.extractedDataSummary.work_experience_count || 0;
-                  const edu = statusData.extractedDataSummary.education_count || 0;
-                  setPollingSteps([
-                    `Job titles loaded (${jobs})`,
-                    `Loading experience details (${jobs})...`,
-                    `Loading education (${edu})...`
-                  ]);
-                } else if (statusData.status === 'completed' && statusData.extractedDataSummary) {
-                  const jobs = statusData.extractedDataSummary.work_experience_count || 0;
-                  const edu = statusData.extractedDataSummary.education_count || 0;
-                  setPollingSteps([
-                    `Job titles loaded (${jobs})`,
-                    `Experience details loaded (${jobs})`,
-                    `Education loaded (${edu})`,
-                    'Done!'
-                  ]);
-                }
-                if (
-                  statusData.status === 'completed' ||
-                  statusData.status === 'completed_with_errors' ||
-                  statusData.status === 'failed'
-                ) {
-                  setPolling(false);
-                  setShowPollingModal(false);
-                  clearInterval(interval);
-                  if (statusData.status === 'completed') {
-                    setUploadProgress(100);
-                    setSummary(statusData.extractedDataSummary || null);
-                    // Keep modal open during delay
-                    await new Promise(res => setTimeout(res, 2000)); // 2 second delay
-                    await fetchArcData(); // Ensure arcData is refreshed after import
-                    setRefreshKey(k => k + 1); // Force UI refresh
-                    setShowPollingModal(false); // Only close modal after refresh
-                    toast({ title: 'CV imported and processed!', description: 'CV imported and processed!' });
-                  } else if (statusData.status === 'completed_with_errors') {
-                    setUploadError('CV processed with errors: ' + (statusData.error || 'Unknown error'));
-                  setSummary(statusData.extractedDataSummary || null);
-                    await new Promise(res => setTimeout(res, 2000));
-                    await fetchArcData();
-                    setRefreshKey(k => k + 1);
-                    setShowPollingModal(false);
-                } else if (statusData.status === 'failed') {
-                  setUploadError(statusData.error || 'CV extraction failed.');
-                  }
-                } else if (pollCount >= 20) { // ~1 minute
-                  setPolling(false);
-                  setShowPollingModal(false);
-                  setUploadError('CV extraction timed out.');
-                  clearInterval(interval);
-                }
-                pollCount++;
-              } catch {
-                setPolling(false);
-                setShowPollingModal(false);
-                setUploadError('Failed to check CV extraction status.');
-                clearInterval(interval);
-              } finally {
-                setUploading(false);
-              }
-            }, 3000); // poll every 3 seconds
-          } else {
-            setUploadError('Upload failed');
-            setUploading(false);
-          }
-        }
-      };
-      xhr.send(formData);
+      const response = await fetch('/api/career-ark/importassistant', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      setUploadProgress(60);
+      if (!response.ok) {
+        setUploadError('CV import failed. Please try again.');
+        setUploading(false);
+        return;
+      }
+      const result = await response.json();
+      if (!result.success) {
+        setUploadError('CV import failed. Please try again.');
+        setUploading(false);
+        return;
+      }
+      // Use result.data to populate the UI with the parsed CV information
+      setArcData(result.data);
+      setUploadProgress(100);
+      toast({ title: 'CV imported and parsed! Your data is now available.' });
     } catch (err: any) {
-      setUploadError(err?.error || err?.message || 'Upload failed');
+      setUploadError(err?.error || err?.message || 'CV import failed. Please try again.');
+    } finally {
       setUploading(false);
     }
   };
