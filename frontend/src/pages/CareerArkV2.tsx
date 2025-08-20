@@ -240,7 +240,7 @@ const CareerArkV2: React.FC = () => {
       const token = localStorage.getItem('token') || '';
       const formData = new FormData();
       formData.append('file', file);
-      const response = await fetch('/api/career-ark/importassistant', {
+      const response = await fetch(`${API_GATEWAY_BASE}/api/career-ark/importassistant`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
