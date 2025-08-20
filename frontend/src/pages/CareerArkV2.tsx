@@ -107,6 +107,42 @@ function getUniqueMonths(workExperiences: any[]) {
   return months;
 }
 
+const persistImportedCVData = async (data: any) => {
+  // Persist each section if present
+  if (data.work_experience && Array.isArray(data.work_experience)) {
+    for (const exp of data.work_experience) {
+      try { await addWorkExperience(exp); } catch (e) { console.error('Failed to save work experience', e); }
+    }
+  }
+  if (data.education && Array.isArray(data.education)) {
+    for (const edu of data.education) {
+      try { await addEducation(edu); } catch (e) { console.error('Failed to save education', e); }
+    }
+  }
+  if (data.training && Array.isArray(data.training)) {
+    for (const training of data.training) {
+      try { await addTraining(training); } catch (e) { console.error('Failed to save training', e); }
+    }
+  }
+  if (data.skills && Array.isArray(data.skills)) {
+    for (const skill of data.skills) {
+      // Skill may be a string or object
+      const skillObj = typeof skill === 'string' ? { name: skill } : skill;
+      try { await addSkill(skillObj); } catch (e) { console.error('Failed to save skill', e); }
+    }
+  }
+  if (data.projects && Array.isArray(data.projects)) {
+    for (const project of data.projects) {
+      try { await addProject(project); } catch (e) { console.error('Failed to save project', e); }
+    }
+  }
+  if (data.certifications && Array.isArray(data.certifications)) {
+    for (const cert of data.certifications) {
+      try { await addCertification(cert); } catch (e) { console.error('Failed to save certification', e); }
+    }
+  }
+};
+
 const CareerArkV2: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -227,8 +263,11 @@ const CareerArkV2: React.FC = () => {
       }
       // Use result.data to populate the UI with the parsed CV information
       setArcData(result.data);
+      setUploadProgress(80);
+      await persistImportedCVData(result.data);
       setUploadProgress(100);
-      toast({ title: 'CV imported and parsed! Your data is now available.' });
+      toast({ title: 'CV imported, parsed, and saved! Your data is now available.' });
+      fetchArcData(); // Refresh UI with persisted data
     } catch (err: any) {
       setUploadError(err?.error || err?.message || 'CV import failed. Please try again.');
     } finally {
