@@ -162,7 +162,7 @@ const Signup = () => {
                     name="code"
                     type="text"
                     maxLength={6}
-                    placeholder="6-digit code"
+                    placeholder="Enter your passcode"
                     value={formData.code || ""}
                     onChange={e => setFormData({ ...formData, code: e.target.value })}
                     required
