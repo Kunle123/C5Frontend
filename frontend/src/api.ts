@@ -298,4 +298,62 @@ export async function registerAndLoginTestUser(email: string, password: string, 
   if (!res.ok) throw new Error('Login failed');
   const data = await res.json();
   return data.token;
+}
+
+// Application History API (new)
+const APPLICATION_HISTORY_API_BASE = 'https://api-gw-production.up.railway.app/api/application-history';
+
+export interface ApplicationHistory {
+  id?: string;
+  job_title: string;
+  company_name?: string;
+  job_description?: string;
+  applied_at?: string;
+  salary?: string;
+  contact_name?: string;
+  contact_number?: string;
+  organisation?: string;
+  created_at?: string;
+}
+
+export async function fetchApplicationHistory(token: string): Promise<ApplicationHistory[]> {
+  const res = await fetch(`${APPLICATION_HISTORY_API_BASE}`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+export async function createApplicationHistory(application: ApplicationHistory, token: string): Promise<ApplicationHistory> {
+  const res = await fetch(`${APPLICATION_HISTORY_API_BASE}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(application),
+  });
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+export async function updateApplicationHistory(id: string, application: Partial<ApplicationHistory>, token: string): Promise<ApplicationHistory> {
+  const res = await fetch(`${APPLICATION_HISTORY_API_BASE}/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(application),
+  });
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+export async function deleteApplicationHistory(id: string, token: string): Promise<void> {
+  const res = await fetch(`${APPLICATION_HISTORY_API_BASE}/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!res.ok) throw await res.json();
 } 
