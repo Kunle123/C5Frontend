@@ -13,6 +13,7 @@ import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRigh
 import { extractKeywords, generateCV } from '../api/aiApi';
 import { useEffect } from 'react';
 import { CreditsContext } from '../context/CreditsContext';
+import { saveJobApplication } from '../api';
 
 interface Keyword {
   text: string;
@@ -546,6 +547,18 @@ const ApplicationWizard = () => {
         await refreshCredits();
       } catch {
         setShowOutOfCreditsModal(true);
+      }
+      // In handleSaveAndDownload, after successful save (after toast for Documents Generated & Saved)
+      // Save job application to backend (jobTitle, companyName, jobDescription, appliedAt)
+      try {
+        await saveJobApplication({
+          jobTitle: uniqueJobTitle,
+          companyName: uniqueCompanyName,
+          jobDescription,
+          appliedAt: new Date().toISOString(),
+        }, token);
+      } catch (e) {
+        console.error('Failed to save job application history', e);
       }
     } catch (err: any) {
       setError(err.message || 'Document save failed');

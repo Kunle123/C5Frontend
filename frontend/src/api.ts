@@ -214,6 +214,29 @@ export async function listPreviousCVs(token: string) {
   return res.json();
 }
 
+export async function saveJobApplication(application: { jobTitle: string; companyName: string; jobDescription: string; appliedAt?: string }, token: string) {
+  const res = await fetch(`${APPLICATIONS_API_BASE}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(application),
+  });
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+export async function fetchJobApplications(token: string) {
+  const res = await fetch(`${APPLICATIONS_API_BASE}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
 // Update user profile
 export async function updateUser(data: { name?: string; email?: string; phone_number?: string }, token: string) {
   const res = await authFetch(`${API_GATEWAY_BASE}/api/user/profile`, {

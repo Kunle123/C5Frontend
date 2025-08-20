@@ -33,6 +33,7 @@ import CareerArkV2 from './pages/CareerArkV2';
 import Apply from './pages/Apply';
 import PaymentSuccess from './pages/PaymentSuccess';
 import { CreditsProvider } from './context/CreditsContext';
+import ApplicationHistory from './components/ApplicationHistory';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -91,6 +92,7 @@ function App() {
             <Route path="/careerarcv2" element={<CareerArkV2 />} />
             <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
             <Route path="/payment-success" element={<ChakraProvider theme={theme}><PaymentSuccess /></ChakraProvider>} />
+            <Route path="/application-history" element={<ApplicationHistory />} />
             <Route path="*" element={<ChakraProvider theme={theme}><NotFound /></ChakraProvider>} />
           </Routes>
         </Router>
