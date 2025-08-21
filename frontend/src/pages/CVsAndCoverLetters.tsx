@@ -583,7 +583,7 @@ const Application: React.FC = () => {
               minH={100}
               required
             />
-            <Button colorScheme="blue" onClick={handleNextFromJobDesc} isDisabled={!jobDesc.trim() || loading || extracting}>
+            <Button onClick={handleNextFromJobDesc} disabled={!jobDesc.trim() || loading || extracting}>
               {(loading || extracting) && <Spinner size="sm" mr={2} />}Next: Review Arc Data
             </Button>
           </Stack>
@@ -619,7 +619,7 @@ const Application: React.FC = () => {
                   </HStack>
                 </Box>
               )}
-              <Button variant="outline" colorScheme="gray" onClick={() => {
+              <Button variant="outline" onClick={() => {
                 if (Array.isArray(keywordAnalysis)) {
                   const missing = keywordAnalysis.filter(k => k.status === 'red').map(k => k.keyword);
                   localStorage.setItem('ark-missing-keywords', JSON.stringify(missing));
@@ -630,12 +630,12 @@ const Application: React.FC = () => {
               }}>
                 Edit Ark Data
               </Button>
-              <Button colorScheme="blue" isDisabled={optimizing} onClick={() => {
+              <Button onClick={() => {
                 setModalNumPages(numPages);
                 setModalIncludeKeywords(includeKeywords);
                 setModalIncludeRelevantExperience(includeRelevantExperience);
                 onOpen();
-              }}>
+              }} disabled={optimizing}>
                 {optimizing ? <Spinner size="sm" mr={2} /> : null}Generate CV & Cover Letter
               </Button>
             </Stack>
@@ -645,10 +645,10 @@ const Application: React.FC = () => {
                 <AlertIcon />You need to create your Career Ark profile before generating applications.<br />
                 Please go to Career Ark and complete your profile.
               </Alert>
-              <Button colorScheme="blue" onClick={() => window.open('/career-ark', '_blank')}>
+              <Button onClick={() => window.open('/career-ark', '_blank')}>
                 Go to Career Ark
               </Button>
-              <Button variant="outline" colorScheme="gray" onClick={() => setStep(0)}>
+              <Button variant="outline" onClick={() => setStep(0)}>
                 Back
               </Button>
             </Stack>
@@ -705,7 +705,7 @@ const Application: React.FC = () => {
                 </TabPanels>
               </Tabs>
             </Box>
-            <Button colorScheme="green" size="lg" mt={2} onClick={() => navigate('/download-cvs')}>
+            <Button className="bg-green-600 text-white text-lg mt-2" onClick={() => navigate('/download-cvs')}>
               Go to Download CVs Page
             </Button>
           </Stack>
