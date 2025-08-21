@@ -370,7 +370,7 @@ const Application: React.FC = () => {
         profile,
         jobDesc,
         keywords,
-        threadId,
+        threadId || undefined,
         { numPages, language }
       );
       if (result.error) throw new Error(result.error);
