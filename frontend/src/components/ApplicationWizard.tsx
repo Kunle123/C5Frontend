@@ -147,8 +147,12 @@ function renderStructuredCV(cvData: any) {
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Certifications</h3>
           <ul className="list-disc list-inside ml-4">
-            {cvData.certifications.map((cert: string, idx: number) => (
-              <li key={idx}>{cert}</li>
+            {cvData.certifications.map((cert: any, idx: number) => (
+              <li key={idx}>
+                {typeof cert === 'string'
+                  ? cert
+                  : `${cert.name || ''}${cert.issuer ? ' (' + cert.issuer + ')' : ''}${cert.year ? ' - ' + cert.year : ''}`}
+              </li>
             ))}
           </ul>
         </div>
