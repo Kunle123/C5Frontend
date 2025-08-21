@@ -712,7 +712,7 @@ const Application: React.FC = () => {
         {error && <Alert status="error" mt={2}><AlertIcon />{error}</Alert>}
       </Box>
       {/* CV Options Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} isCentered closeOnOverlayClick={false}>
+      <Modal isOpen={true} onClose={onClose} isCentered closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>CV Options</ModalHeader>
