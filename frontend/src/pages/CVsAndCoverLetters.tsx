@@ -37,6 +37,9 @@ import { optimizeCV as aiOptimizeCV, extractKeywords, analyzeCV as aiAnalyzeCV }
 import { useNavigate } from 'react-router-dom';
 import { getArcData, generateApplicationMaterials } from '../api/careerArkApi';
 import { FiKey } from 'react-icons/fi';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
+import { Switch } from '../components/ui/switch';
+import { Button } from '../components/ui/button';
 
 const steps = [
   'Paste Job Description',
@@ -712,50 +715,65 @@ const Application: React.FC = () => {
         {error && <Alert status="error" mt={2}><AlertIcon />{error}</Alert>}
       </Box>
       {/* CV Options Modal */}
-      <Modal isOpen={true} onClose={onClose} isCentered closeOnOverlayClick={false}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>CV Options</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack spacing={4}>
-              <Stack direction="row" spacing={4} align="center">
-                <Text>Pages:</Text>
-                <Button colorScheme={modalNumPages === 2 ? 'blue' : 'gray'} onClick={() => setModalNumPages(2)}>2</Button>
-                <Button colorScheme={modalNumPages === 3 ? 'blue' : 'gray'} onClick={() => setModalNumPages(3)}>3</Button>
-                <Button colorScheme={modalNumPages === 4 ? 'blue' : 'gray'} onClick={() => setModalNumPages(4)}>4</Button>
-              </Stack>
-              <Stack direction="row" spacing={4} align="center">
-                <Text>Include Keywords:</Text>
-                <Button colorScheme={modalIncludeKeywords ? 'blue' : 'gray'} variant={modalIncludeKeywords ? 'solid' : 'outline'} onClick={() => setModalIncludeKeywords(true)}>Yes</Button>
-                <Button colorScheme={!modalIncludeKeywords ? 'blue' : 'gray'} variant={!modalIncludeKeywords ? 'solid' : 'outline'} onClick={() => setModalIncludeKeywords(false)}>No</Button>
-              </Stack>
-              <Stack direction="row" spacing={4} align="center">
-                <Text>Include Relevant Experience:</Text>
-                <Button colorScheme={modalIncludeRelevantExperience ? 'blue' : 'gray'} variant={modalIncludeRelevantExperience ? 'solid' : 'outline'} onClick={() => setModalIncludeRelevantExperience(true)}>Yes</Button>
-                <Button colorScheme={!modalIncludeRelevantExperience ? 'blue' : 'gray'} variant={!modalIncludeRelevantExperience ? 'solid' : 'outline'} onClick={() => setModalIncludeRelevantExperience(false)}>No</Button>
-              </Stack>
-              <Stack direction="row" spacing={4} align="center">
-                <Text>Language:</Text>
+      <Dialog open={isOpen} onOpenChange={onOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>CV Options</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div>
+              <h4 className="font-medium mb-3">Number of Pages</h4>
+              <div className="flex gap-2">
+                {[2, 3, 4].map((pages) => (
+                  <Button
+                    key={pages}
+                    variant={modalNumPages === pages ? "default" : "outline"}
+                    onClick={() => setModalNumPages(pages)}
+                  >
+                    {pages} Pages
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label htmlFor="keywords" className="font-medium">Include Keywords</label>
+                <Switch
+                  id="keywords"
+                  checked={modalIncludeKeywords}
+                  onCheckedChange={checked => setModalIncludeKeywords(checked)}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <label htmlFor="experience" className="font-medium">Include Relevant Experience</label>
+                <Switch
+                  id="experience"
+                  checked={modalIncludeRelevantExperience}
+                  onCheckedChange={checked => setModalIncludeRelevantExperience(checked)}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <label htmlFor="language" className="font-medium">Language</label>
                 <select
+                  id="language"
                   value={modalLanguage}
                   onChange={e => setModalLanguage(e.target.value)}
-                  style={{ padding: '6px 12px', borderRadius: 4, border: '1px solid #ccc' }}
+                  className="border rounded px-2 py-1"
                 >
                   {supportedLanguages.map(lang => (
                     <option key={lang} value={lang}>{lang}</option>
                   ))}
                 </select>
-              </Stack>
-            </Stack>
-          </ModalBody>
-          <ModalFooter justifyContent="center">
-            <Button colorScheme="blue" onClick={handleModalOk}>
-              OK
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleModalOk} className="w-full">
+                OK
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
