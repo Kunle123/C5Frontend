@@ -158,6 +158,16 @@ export function CareerArcPage() {
   const totalRoles = experiences.length;
   const allSkills = [...new Set(experiences.flatMap(exp => exp.skills))];
 
+  function sortExperiences(exps: Experience[]) {
+    return [...exps].sort((a, b) => {
+      if (a.endDate === 'Present') return -1;
+      if (b.endDate === 'Present') return 1;
+      const aDate = new Date(a.endDate || a.startDate || '');
+      const bDate = new Date(b.endDate || b.startDate || '');
+      return bDate.getTime() - aDate.getTime();
+    });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -322,7 +332,7 @@ export function CareerArcPage() {
                   {/* Timeline Line */}
                   <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
                   
-                  {experiences.map((experience, index) => (
+                  {sortExperiences(experiences).map((experience, index) => (
                   <div key={experience.id} className="relative flex gap-6 pb-8">
                     {/* Timeline Node */}
                     <div className="relative">
