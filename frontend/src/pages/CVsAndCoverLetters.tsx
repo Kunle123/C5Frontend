@@ -369,7 +369,9 @@ const Application: React.FC = () => {
       let result = await generateApplicationMaterials(
         profile,
         jobDesc,
-        keywords
+        keywords,
+        threadId,
+        { numPages, language }
       );
       if (result.error) throw new Error(result.error);
       setOptimizedCV(result.cv || '');
@@ -510,11 +512,28 @@ const Application: React.FC = () => {
     // eslint-disable-next-line
   }, [step]);
 
+  // Add supported languages
+  const supportedLanguages = [
+    'UK English', 'US English', 'Canadian English', 'Australian English',
+    'French', 'German', 'Spanish', 'Italian', 'Portuguese', 'Dutch',
+    'Swedish', 'Norwegian', 'Danish', 'Finnish'
+  ];
+
+  // Add state for language
+  const [language, setLanguage] = useState(() => localStorage.getItem('cv_language') || 'UK English');
+  const [modalLanguage, setModalLanguage] = useState(language);
+
+  // Persist language selection
+  useEffect(() => {
+    localStorage.setItem('cv_language', language);
+  }, [language]);
+
   // When modal is confirmed, update main options and proceed
   const handleModalOk = () => {
     setNumPages(modalNumPages);
     setIncludeKeywords(modalIncludeKeywords);
     setIncludeRelevantExperience(modalIncludeRelevantExperience);
+    setLanguage(modalLanguage);
     onClose();
     setTimeout(() => handleAnalyzeAndOptimize(), 0); // Proceed with generation
   };
@@ -715,6 +734,18 @@ const Application: React.FC = () => {
                 <Text>Include Relevant Experience:</Text>
                 <Button colorScheme={modalIncludeRelevantExperience ? 'blue' : 'gray'} variant={modalIncludeRelevantExperience ? 'solid' : 'outline'} onClick={() => setModalIncludeRelevantExperience(true)}>Yes</Button>
                 <Button colorScheme={!modalIncludeRelevantExperience ? 'blue' : 'gray'} variant={!modalIncludeRelevantExperience ? 'solid' : 'outline'} onClick={() => setModalIncludeRelevantExperience(false)}>No</Button>
+              </Stack>
+              <Stack direction="row" spacing={4} align="center">
+                <Text>Language:</Text>
+                <select
+                  value={modalLanguage}
+                  onChange={e => setModalLanguage(e.target.value)}
+                  style={{ padding: '6px 12px', borderRadius: 4, border: '1px solid #ccc' }}
+                >
+                  {supportedLanguages.map(lang => (
+                    <option key={lang} value={lang}>{lang}</option>
+                  ))}
+                </select>
               </Stack>
             </Stack>
           </ModalBody>
