@@ -263,10 +263,8 @@ const CareerArkV2: React.FC = () => {
       }
       // Use result.data to populate the UI with the parsed CV information
       setArcData(result.data);
-      setUploadProgress(80);
-      await persistImportedCVData(result.data);
       setUploadProgress(100);
-      toast({ title: 'CV imported, parsed, and saved! Your data is now available.' });
+      toast({ title: 'CV imported and saved! Your data is now available.' });
       fetchArcData(); // Refresh UI with persisted data
     } catch (err: any) {
       setUploadError(err?.error || err?.message || 'CV import failed. Please try again.');
