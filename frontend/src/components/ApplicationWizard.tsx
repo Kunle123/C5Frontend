@@ -263,6 +263,7 @@ const ApplicationWizard = () => {
   const [cvUpdateRequest, setCvUpdateRequest] = useState('');
   const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('UK English');
 
   // Fetch user profile and arc data on mount
   useEffect(() => {
@@ -691,6 +692,65 @@ const ApplicationWizard = () => {
     }
   };
 
+  const handleGenerateWithLanguage = async () => {
+    setIsGenerating(true);
+    setShowOptionsModal(false);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
+      const mergedProfile = getMergedProfile();
+      if (!mergedProfile) throw new Error('Profile data not loaded');
+      let payload;
+      if (threadId) {
+        payload = {
+          action: 'generate_cv',
+          thread_id: threadId,
+          language: selectedLanguage,
+          numPages: generationOptions.pages,
+        };
+      } else {
+        const profileForAI = {
+          ...buildPIIFreeProfile(profile, arcData),
+          name: "{{CANDIDATE_NAME}}",
+          contact_info: "{{CONTACT_INFO}}"
+        };
+        payload = {
+          action: 'generate_cv',
+          profile: profileForAI,
+          job_description: jobDescription,
+          language: selectedLanguage,
+          numPages: generationOptions.pages,
+        };
+      }
+      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to generate documents');
+      const data = await res.json();
+      if (data.thread_id && !threadId) {
+        setThreadId(data.thread_id);
+      }
+      setGeneratedCV(data.cv || '');
+      setGeneratedCoverLetter(data.cover_letter || '');
+      setJobTitle(data.job_title || '');
+      setCompanyName(data.company_name || '');
+      setStructuredCV(data);
+      setCurrentStep(3);
+    } catch (err: any) {
+      setError(err.message || 'Document generation failed');
+      toast({ title: 'Error', description: err.message || 'Document generation failed' });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -1008,6 +1068,29 @@ const ApplicationWizard = () => {
                 ))}
               </div>
             </div>
+            <div>
+              <h4 className="font-medium mb-3">Language</h4>
+              <select
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                value={selectedLanguage}
+                onChange={e => setSelectedLanguage(e.target.value)}
+              >
+                <option>UK English</option>
+                <option>US English</option>
+                <option>Canadian English</option>
+                <option>Australian English</option>
+                <option>French</option>
+                <option>German</option>
+                <option>Spanish</option>
+                <option>Italian</option>
+                <option>Portuguese</option>
+                <option>Dutch</option>
+                <option>Swedish</option>
+                <option>Norwegian</option>
+                <option>Danish</option>
+                <option>Finnish</option>
+              </select>
+            </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <label htmlFor="keywords" className="font-medium">
@@ -1034,7 +1117,7 @@ const ApplicationWizard = () => {
                 />
               </div>
             </div>
-            <Button onClick={handleGenerate} className="w-full">
+            <Button onClick={handleGenerateWithLanguage} className="w-full">
               Generate Documents
             </Button>
           </div>
