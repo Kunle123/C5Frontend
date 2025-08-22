@@ -804,7 +804,7 @@ const ApplicationWizard = () => {
                       </div>
                     </div>
                     <Button
-                      onClick={handleGenerate}
+                      onClick={() => setShowOptionsModal(true)}
                       className="w-full"
                       disabled={isGenerating}
                     >
