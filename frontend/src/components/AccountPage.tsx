@@ -11,6 +11,7 @@ import { Separator } from "./ui/separator";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import { useToast } from "../hooks/use-toast";
 import { Loader2, Camera, Mail, Phone, User, CreditCard, Download, Shield, Trash2, Coins, Calendar, Clock } from "lucide-react";
+import { getUserIdFromToken, getSubscription, getPaymentMethods } from '../api';
 
 const API_BASE = "https://api-gw-production.up.railway.app";
 
@@ -43,12 +44,14 @@ export function AccountPage() {
   });
 
   // Subscription state (static for now)
-  const [subscription] = useState({
-    plan: "Professional",
-    status: "Active",
-    nextBilling: "February 15, 2025",
-    amount: "$29.99/month",
+  const [subscription, setSubscription] = useState({
+    plan: '',
+    status: '',
+    nextBilling: '',
+    amount: '',
   });
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
+  const [subscriptionError, setSubscriptionError] = useState('');
 
   // Credits state
   const [credits, setCredits] = useState<any>(null);
@@ -74,6 +77,53 @@ export function AccountPage() {
       }
     };
     fetchCredits();
+  }, []);
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      setSubscriptionLoading(true);
+      setSubscriptionError('');
+      try {
+        const token = localStorage.getItem('token') || '';
+        const userId = getUserIdFromToken(token);
+        if (!userId) throw new Error('Not authenticated');
+        const sub = await getSubscription(userId, token);
+        setSubscription({
+          plan: sub?.plan_name || 'N/A',
+          status: sub?.status || 'N/A',
+          nextBilling: sub?.renewal_date || 'N/A',
+          amount: sub?.amount ? `$${sub.amount}/month` : 'N/A',
+        });
+      } catch (err) {
+        setSubscriptionError((err && (err as any).message) || 'Failed to load subscription');
+      } finally {
+        setSubscriptionLoading(false);
+      }
+    };
+    fetchSubscription();
+  }, []);
+
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+  const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(true);
+  const [paymentMethodsError, setPaymentMethodsError] = useState('');
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      setPaymentMethodsLoading(true);
+      setPaymentMethodsError('');
+      try {
+        const token = localStorage.getItem('token') || '';
+        const userId = getUserIdFromToken(token);
+        if (!userId) throw new Error('Not authenticated');
+        const methods = await getPaymentMethods(userId, token);
+        setPaymentMethods(Array.isArray(methods) ? methods : []);
+      } catch (err) {
+        setPaymentMethodsError((err && (err as any).message) || 'Failed to load payment methods');
+      } finally {
+        setPaymentMethodsLoading(false);
+      }
+    };
+    fetchPaymentMethods();
   }, []);
 
   // Fetch user profile on mount
@@ -522,26 +572,32 @@ export function AccountPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Current Plan</span>
-                  <Badge variant="default">{subscription.plan}</Badge>
+              {subscriptionLoading ? (
+                <span>Loading subscription...</span>
+              ) : subscriptionError ? (
+                <span className="text-red-500">{subscriptionError}</span>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Current Plan</span>
+                    <Badge variant="default">{subscription.plan}</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    <Badge variant="default" className="bg-success text-success-foreground">
+                      {subscription.status}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Next Billing</span>
+                    <span className="text-sm font-medium">{subscription.nextBilling}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Amount</span>
+                    <span className="text-sm font-medium">{subscription.amount}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Status</span>
-                  <Badge variant="default" className="bg-success text-success-foreground">
-                    {subscription.status}
-                  </Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Next Billing</span>
-                  <span className="text-sm font-medium">{subscription.nextBilling}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Amount</span>
-                  <span className="text-sm font-medium">{subscription.amount}</span>
-                </div>
-              </div>
+              )}
               {/* Credit Balance Section (moved here) */}
               <div className="mt-6">
                 {creditsLoading ? (
@@ -630,6 +686,39 @@ export function AccountPage() {
                   Download My Data
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+          {/* Payment Methods Section */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-primary" />
+                Payment Methods
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {paymentMethodsLoading ? (
+                <span>Loading payment methods...</span>
+              ) : paymentMethodsError ? (
+                <span className="text-red-500">{paymentMethodsError}</span>
+              ) : paymentMethods.length === 0 ? (
+                <span className="text-muted-foreground">No payment methods on file.</span>
+              ) : (
+                <div className="space-y-4">
+                  {paymentMethods.map((pm, idx) => (
+                    <div key={pm.id || idx} className="flex justify-between items-center border rounded-lg p-3 bg-muted/50">
+                      <div>
+                        <div className="font-medium">{pm.brand ? pm.brand.toUpperCase() : 'Card'}</div>
+                        <div className="text-sm text-muted-foreground">**** **** **** {pm.last4}</div>
+                        <div className="text-xs text-muted-foreground">Exp: {pm.exp_month}/{pm.exp_year}</div>
+                      </div>
+                      {pm.is_default && (
+                        <Badge variant="default">Default</Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
