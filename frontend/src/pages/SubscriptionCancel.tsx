@@ -1,11 +1,32 @@
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Navigation } from "../components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 const SubscriptionCancel = () => {
-  const handleReturnToPricing = () => {
-    window.location.href = "/";
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [status, setStatus] = useState<'success' | 'canceled' | 'unknown'>('unknown');
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('success') === 'true') {
+      setStatus('success');
+    } else if (params.get('canceled') === 'true' || params.get('session_id')) {
+      setStatus('canceled');
+    } else {
+      setStatus('canceled'); // fallback for legacy/old links
+    }
+  }, [location.search]);
+
+  const handleGoToDashboard = () => {
+    navigate("/dashboard");
+  };
+
+  const handleRetry = () => {
+    navigate("/pricing");
   };
 
   return (
@@ -16,25 +37,43 @@ const SubscriptionCancel = () => {
           <Card className="w-full max-w-md text-center">
             <CardHeader className="pb-4">
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="w-8 h-8 text-warning" />
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${status === 'success' ? 'bg-success/10' : 'bg-destructive/10'}`}>
+                  <CheckCircle className={`w-8 h-8 ${status === 'success' ? 'text-success' : 'text-destructive'}`} />
                 </div>
               </div>
               <CardTitle className="text-2xl font-bold text-foreground">
-                Subscription Not Completed
+                {status === 'success' ? 'Subscription Successful!' : status === 'canceled' ? 'Subscription Canceled' : 'Processing...'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <p className="text-muted-foreground">
-                Your subscription was not completed. You can try again or choose a different plan.
-              </p>
-              <Button 
-                onClick={handleReturnToPricing}
-                className="w-full"
-                size="lg"
-              >
-                Return to Pricing
-              </Button>
+              {status === 'success' && (
+                <>
+                  <p className="text-muted-foreground">
+                    Thank you for subscribing! Your account has been upgraded and you now have access to premium features.
+                  </p>
+                  <Button 
+                    onClick={handleGoToDashboard}
+                    className="w-full"
+                    size="lg"
+                  >
+                    Go to Dashboard
+                  </Button>
+                </>
+              )}
+              {status === 'canceled' && (
+                <>
+                  <p className="text-muted-foreground">
+                    Your subscription payment was canceled. No charges were made. You can retry your subscription below.
+                  </p>
+                  <Button 
+                    onClick={handleRetry}
+                    className="w-full"
+                    size="lg"
+                  >
+                    Retry Subscription
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
