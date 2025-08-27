@@ -456,8 +456,6 @@ const ApplicationWizard = () => {
       console.error('CV validation failed:', validationError, structuredCV);
       return;
     }
-    // Navigate immediately to downloads page
-    window.location.href = '/my-cvs-new';
     setIsGenerating(true);
     setError(null);
     try {
@@ -565,6 +563,8 @@ const ApplicationWizard = () => {
       } catch (e) {
         console.error('Failed to save job application history', e);
       }
+      // Navigate to downloads page after successful save
+      window.location.href = '/my-cvs-new';
     } catch (err: any) {
       setError(err.message || 'Document save failed');
       toast({ title: 'Error', description: err.message || 'Document save failed' });
