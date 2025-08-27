@@ -456,6 +456,8 @@ const ApplicationWizard = () => {
       console.error('CV validation failed:', validationError, structuredCV);
       return;
     }
+    // Navigate immediately to downloads page
+    window.location.href = '/my-cvs-new';
     setIsGenerating(true);
     setError(null);
     try {
@@ -534,7 +536,6 @@ const ApplicationWizard = () => {
         throw new Error(errorMsg);
       }
       toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
-      setCurrentStep(4);
       // Deduct a credit after successful generation
       try {
         const creditRes = await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
