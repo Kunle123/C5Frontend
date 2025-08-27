@@ -344,8 +344,7 @@ const ApplicationWizard = () => {
   const steps = [
     { number: 1, title: 'Paste Job Description' },
     { number: 2, title: 'Review Arc Data & Keywords' },
-    { number: 3, title: 'Generate Documents' },
-    { number: 4, title: 'Review & Download' },
+    { number: 3, title: 'Review & Download' },
   ];
 
   // Replace handleJobDescriptionNext with real API call
@@ -960,71 +959,7 @@ const ApplicationWizard = () => {
                     disabled={isGenerating || !!validateFinalCV(structuredCV)}
                     type="button"
                   >
-                    {isGenerating ? 'Saving...' : 'Save & Download'}
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-        {/* Step 4: Review & Download */}
-        {currentStep === 4 && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Generated Documents</span>
-                  {jobTitle && (
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{jobTitle}</div>
-                      <div className="text-sm text-muted-foreground">{companyName}</div>
-                    </div>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="cv" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="cv">Optimized CV</TabsTrigger>
-                    <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="cv" className="space-y-4">
-                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                      {structuredCV ? (
-                        renderStructuredCV(structuredCV)
-                      ) : (
-                        <div className="text-muted-foreground text-sm">No CV available.</div>
-                      )}
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="cover-letter" className="space-y-4">
-                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                      {generatedCoverLetter ? (
-                        <pre className="whitespace-pre-wrap text-sm">{generatedCoverLetter}</pre>
-                      ) : (
-                        <div className="text-muted-foreground text-sm">No cover letter available.</div>
-                      )}
-                    </div>
-                    <Button className="w-full">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download Cover Letter
-                    </Button>
-                  </TabsContent>
-                </Tabs>
-                <div className="flex gap-4 mt-6">
-                  <Button
-                    variant="outline"
-                    onClick={() => setCurrentStep(2)}
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Analysis
-                  </Button>
-                  <Button
-                    onClick={() => window.location.href = '/my-cvs-new'}
-                    className="flex-1"
-                  >
-                    Go to Download CVs Page
+                    {isGenerating ? 'Saving...' : 'Go to Download CVs Page'}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
