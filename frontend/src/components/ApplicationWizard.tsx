@@ -701,28 +701,20 @@ const ApplicationWizard = () => {
       if (!token) throw new Error('Not authenticated');
       const mergedProfile = getMergedProfile();
       if (!mergedProfile) throw new Error('Profile data not loaded');
-      let payload;
-      if (threadId) {
-        payload = {
-          action: 'generate_cv',
-          thread_id: threadId,
-          language: selectedLanguage,
-          numPages: generationOptions.pages,
-        };
-      } else {
-        const profileForAI = {
-          ...buildPIIFreeProfile(profile, arcData),
-          name: "{{CANDIDATE_NAME}}",
-          contact_info: "{{CONTACT_INFO}}"
-        };
-        payload = {
-          action: 'generate_cv',
-          profile: profileForAI,
-          job_description: jobDescription,
-          language: selectedLanguage,
-          numPages: generationOptions.pages,
-        };
-      }
+      // Always include profile and job_description, even if threadId is present
+      const profileForAI = {
+        ...buildPIIFreeProfile(profile, arcData),
+        name: "{{CANDIDATE_NAME}}",
+        contact_info: "{{CONTACT_INFO}}"
+      };
+      const payload = {
+        action: 'generate_cv',
+        thread_id: threadId || undefined,
+        profile: profileForAI,
+        job_description: jobDescription,
+        language: selectedLanguage,
+        numPages: generationOptions.pages,
+      };
       const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
         method: 'POST',
         headers: {
