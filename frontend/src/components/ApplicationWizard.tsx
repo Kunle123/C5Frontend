@@ -13,7 +13,7 @@ import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRigh
 import { extractKeywords, generateCV } from '../api/aiApi';
 import { useEffect } from 'react';
 import { CreditsContext } from '../context/CreditsContext';
-import { saveJobApplication } from '../api';
+import { saveJobApplication, createApplicationHistory } from '../api';
 
 interface Keyword {
   text: string;
@@ -565,7 +565,6 @@ const ApplicationWizard = () => {
         }, token);
         // Also create application history record (only job application fields, no experience)
         if (uniqueJobTitle && uniqueCompanyName && jobDescription) {
-          const { createApplicationHistory } = await import('../api');
           const applicationHistoryPayload = {
             job_title: uniqueJobTitle,
             company_name: uniqueCompanyName,
@@ -573,11 +572,15 @@ const ApplicationWizard = () => {
             applied_at: new Date().toISOString(),
           };
           console.log('About to POST to application-history:', applicationHistoryPayload);
-          const response = await createApplicationHistory(applicationHistoryPayload, token);
-          console.log('POST to application-history completed:', response);
+          try {
+            const response = await createApplicationHistory(applicationHistoryPayload, token);
+            console.log('POST to application-history completed:', response);
+          } catch (e) {
+            console.error('POST to application-history failed:', e);
+          }
         }
       } catch (e) {
-        console.error('POST to application-history failed', e);
+        console.error('Failed to save job application history', e);
       }
       // Temporarily comment out navigation for debugging
       // window.location.href = '/my-cvs-new';
