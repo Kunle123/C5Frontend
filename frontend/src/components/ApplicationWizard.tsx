@@ -571,7 +571,9 @@ const ApplicationWizard = () => {
             job_description: jobDescription,
             applied_at: new Date().toISOString(),
           };
-          console.log('About to POST to application-history:', applicationHistoryPayload);
+          // Log the endpoint and payload
+          console.log('POST to application-history endpoint:', require('../api').APPLICATION_HISTORY_API_BASE);
+          console.log('POST to application-history payload:', applicationHistoryPayload);
           try {
             const response = await createApplicationHistory(applicationHistoryPayload, token);
             console.log('POST to application-history completed:', response);
