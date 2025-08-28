@@ -560,16 +560,19 @@ const ApplicationWizard = () => {
           jobDescription,
           appliedAt: new Date().toISOString(),
         }, token);
-        // Also create application history record
+        // Also create application history record (only job application fields, no experience)
         if (uniqueJobTitle && uniqueCompanyName && jobDescription) {
           const { createApplicationHistory } = await import('../api');
-          await createApplicationHistory({
+          const applicationHistoryPayload = {
             job_title: uniqueJobTitle,
             company_name: uniqueCompanyName,
             job_description: jobDescription,
             applied_at: new Date().toISOString(),
-            // Optionally add more fields if available
-          }, token);
+            // Optionally add more fields if available (salary, contact_name, etc.)
+          };
+          console.log('Creating application history:', applicationHistoryPayload);
+          const response = await createApplicationHistory(applicationHistoryPayload, token);
+          console.log('Application history response:', response);
         }
       } catch (e) {
         console.error('Failed to save job application history', e);
