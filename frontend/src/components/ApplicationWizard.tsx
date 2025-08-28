@@ -563,24 +563,7 @@ const ApplicationWizard = () => {
           jobDescription,
           appliedAt: new Date().toISOString(),
         }, token);
-        // Also create application history record (only job application fields, no experience)
-        if (uniqueJobTitle && uniqueCompanyName && jobDescription) {
-          const applicationHistoryPayload = {
-            job_title: uniqueJobTitle,
-            company_name: uniqueCompanyName,
-            job_description: jobDescription,
-            applied_at: new Date().toISOString(),
-          };
-          // Log the endpoint and payload
-          console.log('POST to application-history endpoint:', require('../api').APPLICATION_HISTORY_API_BASE);
-          console.log('POST to application-history payload:', applicationHistoryPayload);
-          try {
-            const response = await createApplicationHistory(applicationHistoryPayload, token);
-            console.log('POST to application-history completed:', response);
-          } catch (e) {
-            console.error('POST to application-history failed:', e);
-          }
-        }
+        // Removed application-history POST logic
       } catch (e) {
         console.error('Failed to save job application history', e);
       }
