@@ -554,16 +554,16 @@ const ApplicationWizard = () => {
       // In handleSaveAndDownload, after successful save (after toast for Documents Generated & Saved)
       // Save job application to backend (jobTitle, companyName, jobDescription, appliedAt)
       try {
-        console.log('DEBUG uniqueJobTitle:', uniqueJobTitle);
-        console.log('DEBUG uniqueCompanyName:', uniqueCompanyName);
-        console.log('DEBUG jobDescription:', jobDescription);
-        await saveJobApplication({
-          jobTitle: uniqueJobTitle,
-          companyName: uniqueCompanyName,
-          jobDescription,
-          appliedAt: new Date().toISOString(),
-        }, token);
-        // Removed application-history POST logic
+        const applicationHistoryPayload = {
+          job_title: uniqueJobTitle,
+          company_name: uniqueCompanyName,
+          job_description: jobDescription,
+          applied_at: new Date().toISOString(),
+        };
+        console.log('POST to application-history endpoint:', 'https://api-gw-production.up.railway.app/api/application-history');
+        console.log('POST to application-history payload:', applicationHistoryPayload);
+        const response = await createApplicationHistory(applicationHistoryPayload, token);
+        console.log('Application history response:', response);
       } catch (e) {
         console.error('Failed to save job application history', e);
       }
