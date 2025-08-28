@@ -3,6 +3,7 @@ import { fetchApplicationHistory, ApplicationHistory, updateApplicationHistory, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
+import { Navigation } from './Navigation';
 
 const ApplicationHistoryPage: React.FC = () => {
   const [applications, setApplications] = useState<ApplicationHistory[]>([]);
@@ -72,71 +73,74 @@ const ApplicationHistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <h1 className="text-2xl font-bold mb-6">Application History</h1>
-      <div className="overflow-x-auto">
-        <table className="min-w-full border text-sm">
-          <thead>
-            <tr className="bg-muted">
-              <th className="p-2 border">Job Title</th>
-              <th className="p-2 border">Company/Org</th>
-              <th className="p-2 border">Contact Name</th>
-              <th className="p-2 border">Contact Number</th>
-              <th className="p-2 border">Salary</th>
-              <th className="p-2 border">Applied At</th>
-              <th className="p-2 border">Created</th>
-              <th className="p-2 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={8} className="p-4 text-center">Loading...</td></tr>
-            ) : error ? (
-              <tr><td colSpan={8} className="p-4 text-red-500 text-center">{error}</td></tr>
-            ) : applications.length === 0 ? (
-              <tr><td colSpan={8} className="p-4 text-center">No previous job applications found.</td></tr>
-            ) : (
-              applications.map(app => (
-                <tr key={app.id} className="hover:bg-accent cursor-pointer" onClick={() => openEditModal(app)}>
-                  <td className="p-2 border font-medium">{app.job_title}</td>
-                  <td className="p-2 border">{app.company_name || app.organisation}</td>
-                  <td className="p-2 border">{app.contact_name}</td>
-                  <td className="p-2 border">{app.contact_number}</td>
-                  <td className="p-2 border">{app.salary}</td>
-                  <td className="p-2 border">{app.applied_at ? new Date(app.applied_at).toLocaleDateString() : ''}</td>
-                  <td className="p-2 border">{app.created_at ? new Date(app.created_at).toLocaleDateString() : ''}</td>
-                  <td className="p-2 border"><button className="text-blue-600 underline" onClick={e => { e.stopPropagation(); openEditModal(app); }}>Edit</button></td>
-                </tr>
-              ))
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        <h1 className="text-2xl font-bold mb-6">Application History</h1>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border text-sm">
+            <thead>
+              <tr className="bg-muted">
+                <th className="p-2 border">Job Title</th>
+                <th className="p-2 border">Company/Org</th>
+                <th className="p-2 border">Contact Name</th>
+                <th className="p-2 border">Contact Number</th>
+                <th className="p-2 border">Salary</th>
+                <th className="p-2 border">Applied At</th>
+                <th className="p-2 border">Created</th>
+                <th className="p-2 border">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={8} className="p-4 text-center">Loading...</td></tr>
+              ) : error ? (
+                <tr><td colSpan={8} className="p-4 text-red-500 text-center">{error}</td></tr>
+              ) : applications.length === 0 ? (
+                <tr><td colSpan={8} className="p-4 text-center">No previous job applications found.</td></tr>
+              ) : (
+                applications.map(app => (
+                  <tr key={app.id} className="hover:bg-accent cursor-pointer" onClick={() => openEditModal(app)}>
+                    <td className="p-2 border font-medium">{app.job_title}</td>
+                    <td className="p-2 border">{app.company_name || app.organisation}</td>
+                    <td className="p-2 border">{app.contact_name}</td>
+                    <td className="p-2 border">{app.contact_number}</td>
+                    <td className="p-2 border">{app.salary}</td>
+                    <td className="p-2 border">{app.applied_at ? new Date(app.applied_at).toLocaleDateString() : ''}</td>
+                    <td className="p-2 border">{app.created_at ? new Date(app.created_at).toLocaleDateString() : ''}</td>
+                    <td className="p-2 border"><button className="text-blue-600 underline" onClick={e => { e.stopPropagation(); openEditModal(app); }}>Edit</button></td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        {/* Edit/Delete Modal */}
+        <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Application</DialogTitle>
+            </DialogHeader>
+            {selected && (
+              <form className="space-y-3" onSubmit={e => { e.preventDefault(); handleSave(); }}>
+                <Input value={editForm.job_title || ''} onChange={e => handleEditChange('job_title', e.target.value)} placeholder="Job Title" required />
+                <Input value={editForm.company_name || ''} onChange={e => handleEditChange('company_name', e.target.value)} placeholder="Company Name" />
+                <Input value={editForm.organisation || ''} onChange={e => handleEditChange('organisation', e.target.value)} placeholder="Organisation" />
+                <Input value={editForm.salary || ''} onChange={e => handleEditChange('salary', e.target.value)} placeholder="Salary" />
+                <Input value={editForm.contact_name || ''} onChange={e => handleEditChange('contact_name', e.target.value)} placeholder="Contact Name" />
+                <Input value={editForm.contact_number || ''} onChange={e => handleEditChange('contact_number', e.target.value)} placeholder="Contact Number" />
+                <Input value={editForm.applied_at || ''} onChange={e => handleEditChange('applied_at', e.target.value)} placeholder="Applied At (YYYY-MM-DD)" />
+                <textarea className="w-full border rounded p-2" value={editForm.job_description || ''} onChange={e => handleEditChange('job_description', e.target.value)} placeholder="Job Description" rows={3} />
+                <div className="flex gap-2 mt-4">
+                  <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
+                  <Button type="button" variant="destructive" onClick={handleDelete} disabled={deleting}>{deleting ? 'Deleting...' : 'Delete'}</Button>
+                  <Button type="button" variant="outline" onClick={() => setEditModalOpen(false)}>Cancel</Button>
+                </div>
+              </form>
             )}
-          </tbody>
-        </table>
+          </DialogContent>
+        </Dialog>
       </div>
-      {/* Edit/Delete Modal */}
-      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Application</DialogTitle>
-          </DialogHeader>
-          {selected && (
-            <form className="space-y-3" onSubmit={e => { e.preventDefault(); handleSave(); }}>
-              <Input value={editForm.job_title || ''} onChange={e => handleEditChange('job_title', e.target.value)} placeholder="Job Title" required />
-              <Input value={editForm.company_name || ''} onChange={e => handleEditChange('company_name', e.target.value)} placeholder="Company Name" />
-              <Input value={editForm.organisation || ''} onChange={e => handleEditChange('organisation', e.target.value)} placeholder="Organisation" />
-              <Input value={editForm.salary || ''} onChange={e => handleEditChange('salary', e.target.value)} placeholder="Salary" />
-              <Input value={editForm.contact_name || ''} onChange={e => handleEditChange('contact_name', e.target.value)} placeholder="Contact Name" />
-              <Input value={editForm.contact_number || ''} onChange={e => handleEditChange('contact_number', e.target.value)} placeholder="Contact Number" />
-              <Input value={editForm.applied_at || ''} onChange={e => handleEditChange('applied_at', e.target.value)} placeholder="Applied At (YYYY-MM-DD)" />
-              <textarea className="w-full border rounded p-2" value={editForm.job_description || ''} onChange={e => handleEditChange('job_description', e.target.value)} placeholder="Job Description" rows={3} />
-              <div className="flex gap-2 mt-4">
-                <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
-                <Button type="button" variant="destructive" onClick={handleDelete} disabled={deleting}>{deleting ? 'Deleting...' : 'Delete'}</Button>
-                <Button type="button" variant="outline" onClick={() => setEditModalOpen(false)}>Cancel</Button>
-              </div>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
