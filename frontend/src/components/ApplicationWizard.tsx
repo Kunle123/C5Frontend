@@ -567,8 +567,7 @@ const ApplicationWizard = () => {
       } catch (e) {
         console.error('Failed to save job application history', e);
       }
-      // Temporarily comment out navigation for debugging
-      // window.location.href = '/my-cvs-new';
+      window.location.href = '/my-cvs-new';
     } catch (err: any) {
       setError(err.message || 'Document save failed');
       toast({ title: 'Error', description: err.message || 'Document save failed' });
