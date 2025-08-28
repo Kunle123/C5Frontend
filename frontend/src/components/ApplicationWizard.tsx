@@ -554,6 +554,9 @@ const ApplicationWizard = () => {
       // In handleSaveAndDownload, after successful save (after toast for Documents Generated & Saved)
       // Save job application to backend (jobTitle, companyName, jobDescription, appliedAt)
       try {
+        console.log('DEBUG uniqueJobTitle:', uniqueJobTitle);
+        console.log('DEBUG uniqueCompanyName:', uniqueCompanyName);
+        console.log('DEBUG jobDescription:', jobDescription);
         await saveJobApplication({
           jobTitle: uniqueJobTitle,
           companyName: uniqueCompanyName,
@@ -568,17 +571,16 @@ const ApplicationWizard = () => {
             company_name: uniqueCompanyName,
             job_description: jobDescription,
             applied_at: new Date().toISOString(),
-            // Optionally add more fields if available (salary, contact_name, etc.)
           };
-          console.log('Creating application history:', applicationHistoryPayload);
+          console.log('About to POST to application-history:', applicationHistoryPayload);
           const response = await createApplicationHistory(applicationHistoryPayload, token);
-          console.log('Application history response:', response);
+          console.log('POST to application-history completed:', response);
         }
       } catch (e) {
-        console.error('Failed to save job application history', e);
+        console.error('POST to application-history failed', e);
       }
-      // Navigate to downloads page after successful save
-      window.location.href = '/my-cvs-new';
+      // Temporarily comment out navigation for debugging
+      // window.location.href = '/my-cvs-new';
     } catch (err: any) {
       setError(err.message || 'Document save failed');
       toast({ title: 'Error', description: err.message || 'Document save failed' });
