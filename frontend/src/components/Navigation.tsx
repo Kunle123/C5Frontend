@@ -50,12 +50,7 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-2">
-            <div 
-              className="text-2xl font-bold text-primary cursor-pointer" 
-              onClick={() => navigate("/")}
-            >
-              Candidate 5
-            </div>
+            <img src="/C5LogoWhite.png" alt="CV Logo" className="h-8 w-auto mr-2" />
             {/* Removed credits badge from navbar */}
           </div>
           {isLoggedIn ? (
@@ -93,12 +88,4 @@ export function Navigation() {
               <button onClick={() => navigate("/pricing")} className={`transition-colors ${isActive("/pricing") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Pricing</button>
               <button onClick={() => navigate("/privacy-policy")} className={`transition-colors ${isActive("/privacy-policy") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Privacy</button>
               <button onClick={() => navigate("/terms")} className={`transition-colors ${isActive("/terms") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Terms</button>
-              <button onClick={() => navigate("/login")} className={`transition-colors ${isActive("/login") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Login</button>
-              <button onClick={() => navigate("/signup")} className={`transition-colors ${isActive("/signup") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Sign Up</button>
-            </div>
-          )}
-        </div>
-      </div>
-    </nav>
-  );
-} 
+              <button onClick={() => navigate("/login")} className={`transition-colors ${isActive("/login") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`
