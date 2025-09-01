@@ -419,26 +419,6 @@ export default function Landing() {
                 </ul>
               </CardContent>
             </Card>
-            {/* Top-up */}
-            <Card className="shadow-card">
-              <CardContent className="p-8 space-y-6">
-                <div>
-                  <h3 className="text-2xl font-bold text-card-foreground">Top-up</h3>
-                  <div className="text-3xl font-bold text-primary mt-2">£29.99</div>
-                </div>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />50 credits (one-off purchase)</li>
-                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />No subscription required</li>
-                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Credits expire after 1 month</li>
-                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Can be added to any plan</li>
-                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV comes with a tailored cover letter</li>
-                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV tailored to every job</li>
-                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Keep an archive of your complete career history</li>
-                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />DocX CV downloads</li>
-                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Email support</li>
-                </ul>
-              </CardContent>
-            </Card>
             {/* Monthly */}
             <Card className="shadow-card border-2 border-primary relative">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
