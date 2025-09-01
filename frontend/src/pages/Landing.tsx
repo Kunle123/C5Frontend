@@ -191,18 +191,29 @@ export default function Landing() {
                 </ul>
               </CardContent>
             </Card>
-            {/* Feature 3: Track Applications */}
+            {/* Feature 3: Keep a record of your application history */}
             <Card className="border-2 border-transparent hover:border-primary/20 transition-all duration-300 shadow-card hover:shadow-elevated">
               <CardContent className="p-8 space-y-6">
                 <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center">
                   <Users className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="text-2xl font-semibold text-card-foreground">
-                  Track Your Applications
+                  Keep a record of your application history
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Candidate 5 allows you to track your job applications, storing salary, the advertised role, and contact details for each application.
-                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Track applications started on other websites.
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Generate interview questions (and model answers) in preparation for the role.
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Retain a record of salary and important contacts
+                  </li>
+                </ul>
               </CardContent>
             </Card>
           </div>
