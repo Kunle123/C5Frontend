@@ -18,7 +18,7 @@ const Signup = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    code: ""
+    // code: "", // 6-digit code field (commented out)
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -155,6 +155,7 @@ const Signup = () => {
                     <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors">{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                   </div>
                 </div>
+                {/*
                 <div className="space-y-2">
                   <Label htmlFor="code" className="font-medium text-foreground">6-Digit Code</Label>
                   <Input
@@ -168,6 +169,7 @@ const Signup = () => {
                     required
                   />
                 </div>
+                */}
                 <div className="flex items-center space-x-2">
                   <Checkbox id="terms" checked={agreeToTerms} onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)} />
                   <Label htmlFor="terms" className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">I agree to the{" "}<Link to="/terms" className="text-primary hover:text-primary-glow underline">Terms of Service</Link>{" "}and{" "}<Link to="/privacy" className="text-primary hover:text-primary-glow underline">Privacy Policy</Link></Label>
