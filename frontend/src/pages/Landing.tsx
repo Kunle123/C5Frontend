@@ -191,6 +191,20 @@ export default function Landing() {
                 </ul>
               </CardContent>
             </Card>
+            {/* Feature 3: Track Applications */}
+            <Card className="border-2 border-transparent hover:border-primary/20 transition-all duration-300 shadow-card hover:shadow-elevated">
+              <CardContent className="p-8 space-y-6">
+                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                  <Users className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-semibold text-card-foreground">
+                  Track Your Applications
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Candidate 5 allows you to track your job applications, storing salary, the advertised role, and contact details for each application.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -349,7 +363,7 @@ export default function Landing() {
                   ))}
                 </div>
                 <p className="text-muted-foreground">
-                  "The Career Arc keeps all my experience organized. I feel so much more confident applying!"
+                  "The Career Arc keeps all my experience organised. I feel so much more confident applying!"
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
