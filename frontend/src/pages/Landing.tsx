@@ -191,35 +191,6 @@ export default function Landing() {
                 </ul>
               </CardContent>
             </Card>
-            {/* Feature 3 */}
-            <Card className="border-2 border-transparent hover:border-primary/20 transition-all duration-300 shadow-card hover:shadow-elevated">
-              <CardContent className="p-8 space-y-6">
-                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center">
-                  <FileText className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-2xl font-semibold text-card-foreground">
-                  Your Master Career Profile, Always Ready
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  The Mega CV draws from your Arc™ to create a comprehensive master version of your resume, 
-                  perfect for networking and speculative applications.
-                </p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-success" />
-                    Complete, always-current master document
-                  </li>
-                  <li className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-success" />
-                    Ideal for diverse application needs
-                  </li>
-                  <li className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-success" />
-                    Showcase the full breadth of experience
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>
@@ -412,14 +383,14 @@ export default function Landing() {
                   <div className="text-3xl font-bold text-primary mt-2">£0</div>
                 </div>
                 <ul className="space-y-3">
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />3 credits per month</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Up to 3 CVs per month</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Every CV comes with a tailored cover letter</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Every CV tailored to every job</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Keep an archive of your complete career history</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Basic access</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />DocX CV downloads</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Email support</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />3 credits per month</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Up to 3 CVs per month</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV comes with a tailored cover letter</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV tailored to every job</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Keep an archive of your complete career history</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Basic access</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />DocX CV downloads</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Email support</li>
                 </ul>
               </CardContent>
             </Card>
@@ -431,15 +402,15 @@ export default function Landing() {
                   <div className="text-3xl font-bold text-primary mt-2">£29.99</div>
                 </div>
                 <ul className="space-y-3">
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />50 credits (one-off purchase)</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />No subscription required</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Credits expire after 1 month</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Can be added to any plan</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Every CV comes with a tailored cover letter</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Every CV tailored to every job</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Keep an archive of your complete career history</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />DocX CV downloads</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Email support</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />50 credits (one-off purchase)</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />No subscription required</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Credits expire after 1 month</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Can be added to any plan</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV comes with a tailored cover letter</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV tailored to every job</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Keep an archive of your complete career history</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />DocX CV downloads</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Email support</li>
                 </ul>
               </CardContent>
             </Card>
@@ -454,16 +425,16 @@ export default function Landing() {
                   <div className="text-3xl font-bold text-primary mt-2">£24.99<span className="text-lg text-muted-foreground">/mo</span></div>
                 </div>
                 <ul className="space-y-3">
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />50 credits monthly recurring</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />3 credits per day</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Create up to 140 CVs per month</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Every CV comes with a tailored cover letter</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Every CV tailored to every job</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Keep an archive of your complete career history</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Priority support</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Advanced features</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />DocX CV downloads</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Cancel anytime</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />50 credits monthly recurring</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />3 credits per day</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Create up to 140 CVs per month</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV comes with a tailored cover letter</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV tailored to every job</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Keep an archive of your complete career history</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Priority support</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Advanced features</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />DocX CV downloads</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Cancel anytime</li>
                 </ul>
               </CardContent>
             </Card>
@@ -475,17 +446,17 @@ export default function Landing() {
                   <div className="text-3xl font-bold text-primary mt-2">£199<span className="text-lg text-muted-foreground">/year</span></div>
                 </div>
                 <ul className="space-y-3">
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />50 credits monthly recurring</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />5 credits per day</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Create up to 200 CVs per month</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Every CV comes with a tailored cover letter</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Every CV tailored to every job</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Keep an archive of your complete career history</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Priority support</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Advanced features</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />DocX CV downloads</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />33% discount</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" />Cancel anytime</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />50 credits monthly recurring</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />5 credits per day</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Create up to 200 CVs per month</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV comes with a tailored cover letter</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Every CV tailored to every job</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Keep an archive of your complete career history</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Priority support</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Advanced features</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />DocX CV downloads</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />33% discount</li>
+                  <li className="flex items-center gap-2 text-sm"><CheckCircle className="h-4 w-4 text-success" />Cancel anytime</li>
                 </ul>
               </CardContent>
             </Card>
