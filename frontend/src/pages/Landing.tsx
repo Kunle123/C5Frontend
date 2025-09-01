@@ -98,18 +98,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-12 border-y border-border/50 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4">
-          <p className="text-center text-muted-foreground mb-8">As seen on</p>
-          <div className="flex justify-center items-center gap-12 opacity-60">
-            <div className="h-8 w-24 bg-muted rounded"></div>
-            <div className="h-8 w-24 bg-muted rounded"></div>
-            <div className="h-8 w-24 bg-muted rounded"></div>
-          </div>
-        </div>
-      </section>
-
       {/* Problem Statement */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">
