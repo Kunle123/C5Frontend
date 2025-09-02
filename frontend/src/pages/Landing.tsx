@@ -387,7 +387,7 @@ export default function Landing() {
               Find the Perfect Plan to Launch Your Next Career Move
             </h2>
           </div>
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {/* Free Plan */}
             <Card className="shadow-card">
               <CardContent className="p-8 space-y-6">
