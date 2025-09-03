@@ -746,6 +746,39 @@ const ApplicationWizard = () => {
     }
   };
 
+  // 1. Add useEffect to deduct credits when entering step 3
+  useEffect(() => {
+    if (currentStep === 3) {
+      const deductCredits = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) return;
+          await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'generate_cv' }),
+            credentials: 'include',
+          });
+          await refreshCredits();
+        } catch {}
+      };
+      deductCredits();
+    }
+  }, [currentStep, refreshCredits]);
+
+  // 2. Add beforeunload warning on step 3 if not saved
+  useEffect(() => {
+    if (currentStep === 3) {
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = "Are you sure you want to leave this page before this CV is saved - you won't be able to access it again.";
+        return e.returnValue;
+      };
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
+  }, [currentStep]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
