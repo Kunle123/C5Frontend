@@ -850,13 +850,12 @@ const ApplicationWizard = () => {
                           <Badge
                             key={index}
                             className={`flex items-center gap-1 border ${
-                              keyword.status === 'match' ? 'bg-green-100 text-green-800 border-green-400' :
-                              keyword.status === 'partial' ? 'bg-yellow-100 text-yellow-800 border-yellow-400' :
-                              keyword.status === 'missing' ? 'bg-red-100 text-red-800 border-red-400' :
+                              keyword.status === 'green' ? 'bg-green-100 text-green-800 border-green-400' :
+                              keyword.status === 'amber' ? 'bg-yellow-100 text-yellow-800 border-yellow-400' :
+                              keyword.status === 'red' ? 'bg-red-100 text-red-800 border-red-400' :
                               'bg-muted'
                             }`}
                           >
-                            {getKeywordIcon(keyword.status)}
                             {keyword.text}
                           </Badge>
                         ))}
