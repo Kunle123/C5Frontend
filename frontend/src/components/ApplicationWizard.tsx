@@ -17,7 +17,7 @@ import { saveJobApplication, createApplicationHistory } from '../api';
 
 interface Keyword {
   text: string;
-  status: 'match' | 'partial' | 'missing';
+  status: 'green' | 'amber' | 'red';
 }
 
 interface GenerationOptions {
@@ -618,18 +618,18 @@ const ApplicationWizard = () => {
 
   const getKeywordColor = (status: Keyword['status']) => {
     switch (status) {
-      case 'match': return 'success';
-      case 'partial': return 'warning';
-      case 'missing': return 'destructive';
+      case 'green': return 'success';
+      case 'amber': return 'warning';
+      case 'red': return 'destructive';
       default: return 'secondary';
     }
   };
 
   const getKeywordIcon = (status: Keyword['status']) => {
     switch (status) {
-      case 'match': return <CheckCircle className="w-3 h-3" />;
-      case 'partial': return <AlertCircle className="w-3 h-3" />;
-      case 'missing': return <XCircle className="w-3 h-3" />;
+      case 'green': return <CheckCircle className="w-3 h-3" />;
+      case 'amber': return <AlertCircle className="w-3 h-3" />;
+      case 'red': return <XCircle className="w-3 h-3" />;
     }
   };
 
