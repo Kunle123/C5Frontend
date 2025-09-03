@@ -375,7 +375,7 @@ const ApplicationWizard = () => {
         setThreadId(result.thread_id);
       }
       setExtractedKeywords((result.keywords || []).map((kw: any) => ({ text: kw.keyword, status: kw.status })));
-      setMatchScore(result.match_percentage || 0);
+      setMatchScore(result.overall_match_percentage || 0);
       setJobTitle(result.job_title || '');
       setCompanyName(result.company_name || '');
     } catch (err: any) {
