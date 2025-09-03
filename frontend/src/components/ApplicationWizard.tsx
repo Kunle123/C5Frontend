@@ -190,7 +190,7 @@ function buildPIIFreeProfile(profile: any, arcData: any): PIIFreeProfile {
     skills: arcData?.skills || [],
     certifications: arcData?.certifications || [],
     projects: arcData?.projects || [],
-    training: arcData?.training || [],
+    training: arcData.training || [],
     // contact_info is omitted here; handled in payload below if needed
   };
 }
@@ -374,7 +374,7 @@ const ApplicationWizard = () => {
       if (result.thread_id && !threadId) {
         setThreadId(result.thread_id);
       }
-      setExtractedKeywords((result.keywords || []).map((text: string) => ({ text, status: 'match' })));
+      setExtractedKeywords((result.keywords || []).map((kw: any) => ({ text: kw.keyword, status: kw.status })));
       setMatchScore(result.match_percentage || 0);
       setJobTitle(result.job_title || '');
       setCompanyName(result.company_name || '');
