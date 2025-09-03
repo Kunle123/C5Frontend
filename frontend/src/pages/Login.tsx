@@ -18,7 +18,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [showCaptcha, setShowCaptcha] = useState(false);
+  const [showCaptcha, setShowCaptcha] = useState(true);
   const captchaRef = useRef<CaptchaRef>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -36,15 +36,6 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!showCaptcha) {
-      setShowCaptcha(true);
-      setErrorMessage('Please complete the CAPTCHA below to continue.');
-      toast({
-        title: "Security verification required",
-        description: "Please complete the CAPTCHA below to continue."
-      });
-      return;
-    }
     if (!captchaToken) {
       setErrorMessage('Please complete the CAPTCHA verification.');
       toast({
