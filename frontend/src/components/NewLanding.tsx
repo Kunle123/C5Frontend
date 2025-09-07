@@ -20,8 +20,11 @@ export const NewLanding = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              <Button variant="golden">
-                Start Free - Build My CV
+              <Button asChild variant="golden">
+                <Link to="/signup">Start Free - Build My CV</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/login">Login</Link>
               </Button>
             </div>
           </div>
@@ -85,8 +88,13 @@ export const NewLanding = () => {
                 The <strong>28 days spent searching</strong> can be costly, is often fraught and is very intense work.
               </p>
             </div>
-            <div className="flex justify-center mt-8">
-              <Button variant="golden" size="lg">Get My Free CVs</Button>
+            <div className="flex justify-center mt-8 flex-col items-center">
+              <Button asChild variant="golden" size="lg">
+                <Link to="/signup">Get My Free CVs</Link>
+              </Button>
+              <p className="text-sm text-muted-foreground mt-2">
+                Already have an account? <Link to="/login" className="underline">Log in</Link>
+              </p>
             </div>
           </div>
         </div>
@@ -184,10 +192,17 @@ export const NewLanding = () => {
           <p className="text-xl text-muted-foreground mb-8">
             Instantly tailor. Start for free.
           </p>
-          <Button variant="golden" size="lg" className="text-lg px-8 py-6">
-            Start Free - Build My CV
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <div className="flex flex-col items-center">
+            <Button asChild variant="golden" size="lg" className="text-lg px-8 py-6">
+              <Link to="/signup" className="flex items-center justify-center">
+                Start Free - Build My CV
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <p className="text-sm text-muted-foreground mt-2">
+              Already have an account? <Link to="/login" className="underline">Log in</Link>
+            </p>
+          </div>
         </div>
       </section>
 
