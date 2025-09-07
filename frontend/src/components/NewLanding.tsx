@@ -35,10 +35,11 @@ export const NewLanding = () => {
             <h1 className="text-4xl md:text-6xl font-bold mb-8">
               Land Interviews Twice as Fast...
             </h1>
-            <div className="flex justify-center mb-4">
+            <div className="flex flex-col items-center justify-center mb-4">
               <Link to="/signup" className="rounded-full px-4 py-2 text-base shadow-sm font-semibold transition-colors duration-200" style={{ background: 'rgba(255, 215, 0, 0.15)', color: '#111' }}>
-                3 bespoke CVs per month. No signup needed
+                Signup today and get 3 Bespoke CVs per month - Free!
               </Link>
+              <span className="text-xs text-muted-foreground mt-1">No credit card required.</span>
             </div>
             
             {/* Hero Image */}
