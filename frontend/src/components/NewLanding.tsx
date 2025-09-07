@@ -20,9 +20,6 @@ export const NewLanding = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              <Button asChild variant="golden">
-                <Link to="/signup">Start Free - Build My CV</Link>
-              </Button>
               <Button asChild variant="outline">
                 <Link to="/login">Login</Link>
               </Button>
@@ -56,6 +53,11 @@ export const NewLanding = () => {
             <h2 className="text-2xl md:text-3xl text-muted-foreground mb-16 max-w-4xl mx-auto">
               Generic CVs get ignored. Candidate 5 tailors your CV in minutes, making you over 100% more likely to land an interview.
             </h2>
+            <div className="flex justify-center mb-8">
+              <Button asChild variant="golden" size="lg">
+                <Link to="/signup">Start Free - Build My CV</Link>
+              </Button>
+            </div>
           </div>
 
           {/* Stats Section */}
