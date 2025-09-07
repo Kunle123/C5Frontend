@@ -547,3 +547,4 @@ export function CandidateLanding() {
     </div>
   );
 }
+
