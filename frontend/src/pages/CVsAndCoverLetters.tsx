@@ -768,8 +768,8 @@ const Application: React.FC = () => {
             </div>
             <DialogFooter>
               <Button onClick={handleModalOk} className="w-full">
-                OK
-              </Button>
+              OK
+            </Button>
             </DialogFooter>
           </div>
         </DialogContent>

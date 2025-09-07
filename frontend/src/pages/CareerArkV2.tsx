@@ -250,14 +250,14 @@ const CareerArkV2: React.FC = () => {
       setUploadProgress(60);
       if (!response.ok) {
         setUploadError('CV import failed. Please try again.');
-        setUploading(false);
+                setUploading(false);
         setShowImportModal(false);
         return;
       }
       const result = await response.json();
       if (!result.success) {
         setUploadError('CV import failed. Please try again.');
-        setUploading(false);
+            setUploading(false);
         setShowImportModal(false);
         return;
       }
