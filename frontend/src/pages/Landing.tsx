@@ -1,5 +1,5 @@
-import { CandidateLanding } from "../components/CandidateLanding";
+import { NewLanding } from "../components/NewLanding";
 
 export default function Landing() {
-  return <CandidateLanding />;
+  return <NewLanding />;
 }
