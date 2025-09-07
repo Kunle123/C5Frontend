@@ -39,9 +39,9 @@ export const NewLanding = () => {
               Land Interviews Twice as Fast...
             </h1>
             <div className="flex justify-center mb-4">
-              <span className="bg-primary/10 text-primary font-semibold rounded-full px-4 py-2 text-base shadow-sm">
+              <Link to="/signup" className="rounded-full px-4 py-2 text-base shadow-sm font-semibold transition-colors duration-200" style={{ background: 'rgba(255, 215, 0, 0.15)', color: '#111' }}>
                 3 bespoke CVs per month. No signup needed
-              </span>
+              </Link>
             </div>
             
             {/* Hero Image */}
