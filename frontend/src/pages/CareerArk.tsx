@@ -445,8 +445,8 @@ const CareerArk: React.FC = () => {
   return (
     <Box minH="100vh" bg="gray.50">
       {/* User Info Header */}
-      <Box w="100%" bg="white" py={3} boxShadow="sm" borderBottom="1px solid #e2e8f0">
-        <Flex align="center" justify="space-between" maxW="1200px" mx="auto">
+      <Box w="100%" bg="white" py={{ base: 2, md: 3 }} boxShadow="sm" borderBottom="1px solid #e2e8f0">
+        <Flex align="center" justify="space-between" maxW="1200px" mx="auto" px={{ base: 4, md: 0 }}>
           <Box>
             <Heading size="md">{user?.name || ''}</Heading>
             <Text fontSize="sm">{user?.address || ''}</Text>
@@ -463,7 +463,7 @@ const CareerArk: React.FC = () => {
       </Box>
       <Flex maxW="1200px" mx="auto" flex={1} h="calc(100vh - 80px)" minH="calc(100vh - 80px)" gap={6} direction={{ base: 'column', md: 'row' }}>
         {/* Sidebar */}
-        <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={4} h="100%" minH={0} display="flex" flexDirection="column" maxH="100%">
+        <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={{ base: 3, md: 4 }} h="100%" minH={0} display="flex" flexDirection="column" maxH="100%">
           <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
           {uploading && <Progress value={uploadProgress} size="sm" colorScheme="blue" mb={2} />}
           {uploading && (
@@ -531,7 +531,7 @@ const CareerArk: React.FC = () => {
           </Box>
         </Box>
         {/* Detail View */}
-        <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={8} minH={0} h="100%" overflowY="auto">
+        <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={{ base: 4, md: 8 }} minH={0} h="100%" overflowY="auto">
           {sectionError && <Alert status="error" mb={4}><AlertIcon />{sectionError}</Alert>}
           {loading ? <Spinner /> : (
             selectedIdx && (() => {

@@ -270,7 +270,7 @@ const Application: React.FC = () => {
       try {
         data = await getArcData();
       } catch (err: any) {
-        setError('Sorry, we could not load your Career Ark profile. Please try again later.');
+        setError('Sorry, we could not load your Career Arc profile. Please try again later.');
         console.error('Arc data fetch failed:', err);
         setLoading(false);
         return;
@@ -642,11 +642,11 @@ const Application: React.FC = () => {
           ) : (
             <Stack spacing={3}>
               <Alert status="warning">
-                <AlertIcon />You need to create your Career Ark profile before generating applications.<br />
-                Please go to Career Ark and complete your profile.
+                <AlertIcon />You need to create your Career Arc profile before generating applications.<br />
+                Please go to Career Arc and complete your profile.
               </Alert>
               <Button onClick={() => window.open('/career-ark', '_blank')}>
-                Go to Career Ark
+                Go to Career Arc
               </Button>
               <Button variant="outline" onClick={() => setStep(0)}>
                 Back
@@ -656,7 +656,7 @@ const Application: React.FC = () => {
         )}
         {step === 2 && arcData && (
           <Stack spacing={3}>
-            <Text fontWeight="semibold">Ready to generate your optimised CV and cover letter using your Career Ark profile and the job description?</Text>
+            <Text fontWeight="semibold">Ready to generate your optimised CV and cover letter using your Career Arc profile and the job description?</Text>
           </Stack>
         )}
         {step === 3 && (

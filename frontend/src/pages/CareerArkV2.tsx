@@ -386,7 +386,7 @@ const CareerArkV2: React.FC = () => {
               <TrendingUp className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-card-foreground">Your Career Ark™</h1>
+              <h1 className="text-4xl font-bold text-card-foreground">Your Career Arc™</h1>
               <p className="text-lg text-muted-foreground mt-2">
                 A complete, evolving record of your professional journey. Add, edit, and organize your experiences to power tailored applications.
               </p>
@@ -408,7 +408,7 @@ const CareerArkV2: React.FC = () => {
                 <DialogHeader>
                   <DialogTitle>{editItem ? 'Edit Experience' : 'Add New Experience'}</DialogTitle>
                   <DialogDescription>
-                    {editItem ? 'Update your experience details' : 'Add a new role to your Career Ark™'}
+                    {editItem ? 'Update your experience details' : 'Add a new role to your Career Arc™'}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={async (e) => {
@@ -822,7 +822,7 @@ const CareerArkV2: React.FC = () => {
                   <DialogHeader>
                     <DialogTitle>{editEduItem ? 'Edit Education' : 'Add New Education'}</DialogTitle>
                     <DialogDescription>
-                      {editEduItem ? 'Update your education details' : 'Add a new education entry to your Career Ark™'}
+                      {editEduItem ? 'Update your education details' : 'Add a new education entry to your Career Arc™'}
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={async (e) => {
