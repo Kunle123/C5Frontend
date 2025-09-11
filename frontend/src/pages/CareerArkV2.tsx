@@ -362,7 +362,7 @@ const CareerArkV2: React.FC = () => {
   return (
     <div className="min-h-screen bg-background" key={refreshKey}>
       <Navigation />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ position: 'relative' }}>
+      <div className="w-full max-w-full pt-[56px] px-2 md:px-8 mx-auto">
         {arcLoading && (
           <div style={{
             position: 'absolute',

@@ -443,7 +443,7 @@ const CareerArk: React.FC = () => {
   }, [isOpen]);
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box minH="100vh" bg="gray.50" pt={{ base: '56px', md: 0 }}>
       {/* User Info Header */}
       <Box w="100%" bg="white" py={{ base: 2, md: 3 }} boxShadow="sm" borderBottom="1px solid #e2e8f0">
         <Flex align="center" justify="space-between" maxW="1200px" mx="auto" px={{ base: 4, md: 0 }}>
@@ -461,7 +461,7 @@ const CareerArk: React.FC = () => {
           </Box>
         </Flex>
       </Box>
-      <Flex maxW="1200px" mx="auto" flex={1} h="calc(100vh - 80px)" minH="calc(100vh - 80px)" gap={6} direction={{ base: 'column', md: 'row' }}>
+      <Flex maxW="1200px" mx="auto" flex={1} h="calc(100vh - 80px)" minH="calc(100vh - 80px)" gap={6} direction={{ base: 'column', md: 'row' }} w="full" maxW="full">
         {/* Sidebar */}
         <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={{ base: 3, md: 4 }} h="100%" minH={0} display="flex" flexDirection="column" maxH="100%">
           <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
@@ -531,7 +531,7 @@ const CareerArk: React.FC = () => {
           </Box>
         </Box>
         {/* Detail View */}
-        <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={{ base: 4, md: 8 }} minH={0} h="100%" overflowY="auto">
+        <Box flex={1} bg="white" borderRadius="lg" boxShadow="md" p={{ base: 4, md: 8 }} minH={0} h="100%" overflowY="auto" w="full" maxW="full">
           {sectionError && <Alert status="error" mb={4}><AlertIcon />{sectionError}</Alert>}
           {loading ? <Spinner /> : (
             selectedIdx && (() => {
