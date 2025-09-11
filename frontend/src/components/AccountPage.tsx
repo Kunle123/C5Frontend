@@ -126,6 +126,26 @@ export function AccountPage() {
     fetchPaymentMethods();
   }, []);
 
+  const [planIdMap, setPlanIdMap] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    async function fetchPlans() {
+      try {
+        const res = await fetch("/api/subscriptions/plans");
+        if (!res.ok) throw new Error("Failed to fetch plans");
+        const plans = await res.json();
+        const map: { [key: string]: string } = {};
+        plans.forEach((plan: any) => {
+          if (plan.name && plan.id) map[plan.name] = plan.id;
+        });
+        setPlanIdMap(map);
+      } catch (err) {
+        // Optionally handle error
+      }
+    }
+    fetchPlans();
+  }, []);
+
   // Fetch user profile on mount
   useEffect(() => {
     async function fetchProfile() {
@@ -298,23 +318,50 @@ export function AccountPage() {
     }
   };
 
-  // Payment handler for Upgrade Plan
   const handleUpgradePlan = async (plan: string) => {
     setIsLoading(true);
     setError("");
     try {
       const token = localStorage.getItem("token") || "";
-      const user_id = profile.email; // or use a unique user ID if available
+      const email = localStorage.getItem("user_email") || localStorage.getItem("email") || profile.email || "";
+      const user_id = localStorage.getItem("user_id") || localStorage.getItem("userId") || localStorage.getItem("id") || profile.email || "";
+      if (!token || !email) {
+        toast({
+          title: "Not logged in",
+          description: "You must be logged in to purchase or upgrade a plan.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
       const return_url = window.location.origin + "/payment-success";
-      const res = await fetch("/api/subscriptions/checkout", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ user_id, return_url, plan }),
-      });
-      if (!res.ok) throw new Error("Failed to initiate payment");
+      let res;
+      if (plan === 'Monthly' || plan === 'Annual') {
+        const PLAN_NAME_MAP = {
+          Monthly: "Monthly Subscription",
+          Annual: "Annual Subscription"
+        };
+        const plan_id = planIdMap[PLAN_NAME_MAP[plan] || plan];
+        if (!plan_id) throw new Error("Plan ID not found for selected plan");
+        res = await fetch(`/api/subscriptions/checkout`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ plan_id, email, user_id, return_url }),
+        });
+      } else if (plan === 'Top-up') {
+        const query = `?user_id=${encodeURIComponent(email)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
+        res = await fetch(`/api/payments/methods/add${query}`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
+      if (!res || !res.ok) throw new Error("Failed to initiate payment");
       const { checkout_url } = await res.json();
       window.location.href = checkout_url;
     } catch (err: any) {
@@ -698,27 +745,46 @@ export function AccountPage() {
                         {(credits.daily_credits_remaining ?? 0) + (credits.monthly_credits_remaining ?? 0) + (credits.topup_credits_remaining ?? 0)} credits
                       </span>
                     </div>
-                    <Button variant="outline" className="w-full mt-4" onClick={() => window.location.href = '/pricing'}>
-                      Buy More Credits
-                    </Button>
                   </>
                 ) : null}
               </div>
-              <Separator />
-              <div className="space-y-4 mt-6">
-                <h4 className="text-sm font-medium">Choose Your Plan</h4>
-                <div className="grid gap-3">
-                  {/* Monthly Plan */}
-                  <Button variant="default" size="sm" className="w-full text-xs" onClick={() => handleUpgradePlan('Monthly')} disabled={isLoading}>
-                    Upgrade to Monthly (£24.99)
+              {/* Plan Tiles Section */}
+              <div className="space-y-6 mt-6">
+                {/* Monthly Plan Tile */}
+                <div className="border rounded-xl p-6 bg-white/90 shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <div>
+                      <div className="font-semibold text-lg">Monthly</div>
+                      <div className="text-blue-700 font-bold text-xl">£24.99<span className="text-base font-normal">/month</span></div>
+                    </div>
+                    <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">Popular</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground mb-4">50 credits monthly, 3 daily, priority support</div>
+                  <Button variant="default" size="lg" className="w-full" onClick={() => handleUpgradePlan('Monthly')} disabled={isLoading}>
+                    Upgrade to Monthly
                   </Button>
-                  {/* Annual Plan */}
-                  <Button variant="default" size="sm" className="w-full text-xs" onClick={() => handleUpgradePlan('Annual')} disabled={isLoading}>
-                    Upgrade to Annual (£199)
+                </div>
+                {/* Annual Plan Tile */}
+                <div className="border rounded-xl p-6 bg-white/90 shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <div>
+                      <div className="font-semibold text-lg">Annual</div>
+                      <div className="text-blue-700 font-bold text-xl">£199<span className="text-base font-normal">/year</span></div>
+                    </div>
+                    <span className="bg-gray-100 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full">Save 33%</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground mb-4">50 credits monthly, 5 daily, priority support</div>
+                  <Button variant="default" size="lg" className="w-full" onClick={() => handleUpgradePlan('Annual')} disabled={isLoading}>
+                    Upgrade to Annual
                   </Button>
-                  {/* Top-up Plan */}
-                  <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => handleUpgradePlan('Top-up')} disabled={isLoading}>
-                    Buy Credits (£29.99)
+                </div>
+                {/* Top-up Plan Tile */}
+                <div className="border rounded-xl p-6 bg-white/90 shadow-sm">
+                  <div className="font-semibold text-lg mb-1">Top-up</div>
+                  <div className="text-blue-700 font-bold text-xl">£29.99<span className="text-base font-normal"> one-off</span></div>
+                  <div className="text-sm text-muted-foreground mb-4">50 credits, no subscription, expires in 1 month</div>
+                  <Button variant="outline" size="lg" className="w-full" onClick={() => handleUpgradePlan('Top-up')} disabled={isLoading}>
+                    Buy Credits
                   </Button>
                 </div>
               </div>
