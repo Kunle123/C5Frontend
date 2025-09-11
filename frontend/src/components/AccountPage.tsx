@@ -686,10 +686,25 @@ export function AccountPage() {
                 ) : null}
               </div>
               <Separator />
+              <div className="space-y-4 mt-6">
+                <h4 className="text-sm font-medium">Choose Your Plan</h4>
+                <div className="grid gap-3">
+                  {/* Monthly Plan */}
+                  <Button variant="default" size="sm" className="w-full text-xs" onClick={() => handleUpgradePlan('Monthly')} disabled={isLoading}>
+                    Upgrade to Monthly (£24.99)
+                  </Button>
+                  {/* Annual Plan */}
+                  <Button variant="default" size="sm" className="w-full text-xs" onClick={() => handleUpgradePlan('Annual')} disabled={isLoading}>
+                    Upgrade to Annual (£199)
+                  </Button>
+                  {/* Top-up Plan */}
+                  <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => handleUpgradePlan('Top-up')} disabled={isLoading}>
+                    Buy Credits (£29.99)
+                  </Button>
+                </div>
+              </div>
+              <Separator />
               <div className="space-y-3">
-                <Button variant="outline" className="w-full" onClick={handleUpgradePlan} disabled={isLoading}>
-                  Upgrade Plan
-                </Button>
                 <Button variant="outline" className="w-full" onClick={handleManagePaymentMethods} disabled={isLoading}>
                   Manage Payment Methods
                 </Button>

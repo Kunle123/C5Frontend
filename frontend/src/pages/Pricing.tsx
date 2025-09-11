@@ -59,13 +59,14 @@ const Pricing = () => {
         const plan_id = planIdMap[PLAN_NAME_MAP[plan] || plan];
         console.log('Selected plan_id:', plan_id);
         if (!plan_id) throw new Error("Plan ID not found for selected plan");
+        const user_id = localStorage.getItem("user_id") || localStorage.getItem("userId") || localStorage.getItem("id") || "";
         res = await fetch(`/api/subscriptions/checkout`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ plan_id, email, return_url }),
+          body: JSON.stringify({ plan_id, email, user_id, return_url }),
         });
       } else if (plan === 'Top-up') {
         const query = `?user_id=${encodeURIComponent(email)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
