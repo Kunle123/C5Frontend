@@ -461,7 +461,7 @@ const CareerArk: React.FC = () => {
           </Box>
         </Flex>
       </Box>
-      <Flex maxW="1200px" mx="auto" flex={1} h="calc(100vh - 80px)" minH="calc(100vh - 80px)" gap={6} direction={{ base: 'column', md: 'row' }} w="full" maxW="full">
+      <Flex maxW="full" mx="auto" flex={1} h="calc(100vh - 80px)" minH="calc(100vh - 80px)" gap={6} direction={{ base: 'column', md: 'row' }} w="full">
         {/* Sidebar */}
         <Box w={{ base: '100%', md: '320px' }} bg="white" borderRadius="lg" boxShadow="md" p={{ base: 3, md: 4 }} h="100%" minH={0} display="flex" flexDirection="column" maxH="100%">
           <Button variant="outline" colorScheme="blue" w="100%" mb={4} onClick={handleUploadClick} isLoading={uploading}>Import a CV</Button>
