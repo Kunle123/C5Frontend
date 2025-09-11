@@ -37,6 +37,16 @@ const Pricing = () => {
     try {
       const token = localStorage.getItem("token") || "";
       const email = localStorage.getItem("user_email") || "";
+      if (!token || !email) {
+        toast({
+          title: "Not logged in",
+          description: "You must be logged in to purchase or upgrade a plan.",
+          variant: "destructive",
+        });
+        setLoadingIndex(null);
+        setLoadingTopUp(false);
+        return;
+      }
       const return_url = window.location.origin + "/payment-success";
       let res;
       if (plan === 'Monthly' || plan === 'Annual') {
