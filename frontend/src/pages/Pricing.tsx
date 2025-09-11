@@ -3,12 +3,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "../hooks/use-toast";
 
 const Pricing = () => {
   const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
   const [loadingTopUp, setLoadingTopUp] = useState(false);
+  const [planIdMap, setPlanIdMap] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    async function fetchPlans() {
+      try {
+        const res = await fetch("/api/subscriptions/plans");
+        if (!res.ok) throw new Error("Failed to fetch plans");
+        const plans = await res.json();
+        // Assume each plan has a name and id
+        const map: { [key: string]: string } = {};
+        plans.forEach((plan: any) => {
+          if (plan.name && plan.id) map[plan.name] = plan.id;
+        });
+        setPlanIdMap(map);
+      } catch (err) {
+        // Optionally handle error
+      }
+    }
+    fetchPlans();
+  }, []);
 
   // Payment handler for paid plans and top-up
   const handlePayment = async (plan: string, index?: number) => {
@@ -16,22 +36,22 @@ const Pricing = () => {
     if (plan === 'Top-up') setLoadingTopUp(true);
     try {
       const token = localStorage.getItem("token") || "";
-      const user_id = localStorage.getItem("user_email") || "";
+      const email = localStorage.getItem("user_email") || "";
       const return_url = window.location.origin + "/payment-success";
       let res;
       if (plan === 'Monthly' || plan === 'Annual') {
-        // Use subscriptions/checkout endpoint for recurring plans
+        const plan_id = planIdMap[plan];
+        if (!plan_id) throw new Error("Plan ID not found for selected plan");
         res = await fetch(`/api/subscriptions/checkout`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ user_id, plan, return_url }),
+          body: JSON.stringify({ plan_id, email, return_url }),
         });
       } else if (plan === 'Top-up') {
-        // Use payments/methods/add for top-up
-        const query = `?user_id=${encodeURIComponent(user_id)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
+        const query = `?user_id=${encodeURIComponent(email)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
         res = await fetch(`/api/payments/methods/add${query}`, {
           method: "POST",
           headers: {

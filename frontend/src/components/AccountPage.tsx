@@ -329,6 +329,24 @@ export function AccountPage() {
     }
   };
 
+  // Handler for Stripe Customer Portal
+  const handleManagePaymentMethods = async () => {
+    const token = localStorage.getItem("token") || "";
+    const res = await fetch("/api/payments/customer-portal", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      alert("Could not open Stripe Customer Portal. Please try again.");
+      return;
+    }
+    const { url } = await res.json();
+    window.location.href = url;
+  };
+
   if (loadingProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/50">
@@ -657,10 +675,10 @@ export function AccountPage() {
               </div>
               <Separator />
               <div className="space-y-3">
-                <Button variant="outline" className="w-full" onClick={() => window.location.href = '/pricing'} disabled={isLoading}>
+                <Button variant="outline" className="w-full" onClick={handleUpgradePlan} disabled={isLoading}>
                   Upgrade Plan
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={handleManagePaymentMethods} disabled={isLoading}>
                   Manage Payment Methods
                 </Button>
                 <Button variant="outline" className="w-full flex items-center gap-2">
