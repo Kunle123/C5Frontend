@@ -32,6 +32,8 @@ const Pricing = () => {
 
   // Payment handler for paid plans and top-up
   const handlePayment = async (plan: string, index?: number) => {
+    console.log('handlePayment called with:', plan, index);
+    console.log('Current planIdMap:', planIdMap);
     if (typeof index === 'number') setLoadingIndex(index);
     if (plan === 'Top-up') setLoadingTopUp(true);
     try {
@@ -51,6 +53,7 @@ const Pricing = () => {
       let res;
       if (plan === 'Monthly' || plan === 'Annual') {
         const plan_id = planIdMap[plan];
+        console.log('Selected plan_id:', plan_id);
         if (!plan_id) throw new Error("Plan ID not found for selected plan");
         res = await fetch(`/api/subscriptions/checkout`, {
           method: "POST",
