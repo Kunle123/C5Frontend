@@ -88,11 +88,14 @@ export function AccountPage() {
         const userId = getUserIdFromToken(token);
         if (!userId) throw new Error('Not authenticated');
         const sub = await getSubscription(userId, token);
+        // Fallbacks for empty/null/N/A
+        const plan = sub?.plan_name && sub.plan_name !== 'N/A' ? sub.plan_name : 'Free';
+        const status = sub?.status && sub.status !== 'N/A' ? sub.status : 'Active';
         setSubscription({
-          plan: sub?.plan_name || 'N/A',
-          status: sub?.status || 'N/A',
+          plan,
+          status,
           nextBilling: sub?.renewal_date || 'N/A',
-          amount: sub?.amount ? `$${sub.amount}/month` : 'N/A',
+          amount: sub?.amount ? `£${sub.amount}/month` : '£0',
         });
       } catch (err) {
         setSubscriptionError((err && (err as any).message) || 'Failed to load subscription');
@@ -324,11 +327,12 @@ export function AccountPage() {
     try {
       const token = localStorage.getItem("token") || "";
       const email = localStorage.getItem("user_email") || localStorage.getItem("email") || profile.email || "";
-      const user_id = localStorage.getItem("user_id") || localStorage.getItem("userId") || localStorage.getItem("id") || profile.email || "";
-      if (!token || !email) {
+      // Only use UUID for user_id, never email
+      const user_id = localStorage.getItem("user_id") || localStorage.getItem("userId") || localStorage.getItem("id");
+      if (!token || !email || !user_id) {
         toast({
-          title: "Not logged in",
-          description: "You must be logged in to purchase or upgrade a plan.",
+          title: "Missing user ID",
+          description: "Could not find your user ID. Please log in again or contact support.",
           variant: "destructive",
         });
         setIsLoading(false);
@@ -352,7 +356,7 @@ export function AccountPage() {
           body: JSON.stringify({ plan_id, email, user_id, return_url }),
         });
       } else if (plan === 'Top-up') {
-        const query = `?user_id=${encodeURIComponent(email)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
+        const query = `?user_id=${encodeURIComponent(user_id)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
         res = await fetch(`/api/payments/methods/add${query}`, {
           method: "POST",
           headers: {
