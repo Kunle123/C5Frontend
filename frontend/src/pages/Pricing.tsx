@@ -225,7 +225,7 @@ const Pricing = () => {
                   className="w-full"
                   size="lg"
                   disabled={plan.name !== 'Free' && loadingIndex === index}
-                  onClick={plan.name === 'Free' ? undefined : () => handlePayment(plan.name, index)}
+                  onClick={plan.name === 'Free' ? undefined : () => { console.log('Button onClick fired for', plan.name, index); handlePayment(plan.name, index); }}
                 >
                   {plan.name !== 'Free' && loadingIndex === index ? <span className="animate-spin mr-2">⏳</span> : null}
                   {plan.buttonText}
