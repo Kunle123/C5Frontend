@@ -52,7 +52,11 @@ const Pricing = () => {
       const return_url = window.location.origin + "/payment-success";
       let res;
       if (plan === 'Monthly' || plan === 'Annual') {
-        const plan_id = planIdMap[plan];
+        const PLAN_NAME_MAP = {
+          Monthly: "Monthly Subscription",
+          Annual: "Annual Subscription"
+        };
+        const plan_id = planIdMap[PLAN_NAME_MAP[plan] || plan];
         console.log('Selected plan_id:', plan_id);
         if (!plan_id) throw new Error("Plan ID not found for selected plan");
         res = await fetch(`/api/subscriptions/checkout`, {
