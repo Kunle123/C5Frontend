@@ -299,7 +299,7 @@ export function AccountPage() {
   };
 
   // Payment handler for Upgrade Plan
-  const handleUpgradePlan = async () => {
+  const handleUpgradePlan = async (plan: string) => {
     setIsLoading(true);
     setError("");
     try {
@@ -312,7 +312,7 @@ export function AccountPage() {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user_id, return_url }),
+        body: JSON.stringify({ user_id, return_url, plan }),
       });
       if (!res.ok) throw new Error("Failed to initiate payment");
       const { checkout_url } = await res.json();
