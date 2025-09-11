@@ -16,18 +16,31 @@ const Pricing = () => {
     if (plan === 'Top-up') setLoadingTopUp(true);
     try {
       const token = localStorage.getItem("token") || "";
-      const user_id = localStorage.getItem("user_email") || ""; // fallback to empty if not found
+      const user_id = localStorage.getItem("user_email") || "";
       const return_url = window.location.origin + "/payment-success";
-      // Send all params as query parameters
-      const query = `?user_id=${encodeURIComponent(user_id)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
-      const res = await fetch(`/api/payments/methods/add${query}`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (!res.ok) throw new Error("Failed to initiate payment");
+      let res;
+      if (plan === 'Monthly' || plan === 'Annual') {
+        // Use subscriptions/checkout endpoint for recurring plans
+        res = await fetch(`/api/subscriptions/checkout`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_id, plan, return_url }),
+        });
+      } else if (plan === 'Top-up') {
+        // Use payments/methods/add for top-up
+        const query = `?user_id=${encodeURIComponent(user_id)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
+        res = await fetch(`/api/payments/methods/add${query}`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
+      if (!res || !res.ok) throw new Error("Failed to initiate payment");
       const { checkout_url } = await res.json();
       window.location.href = checkout_url;
     } catch (err: any) {

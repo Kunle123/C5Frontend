@@ -306,7 +306,7 @@ export function AccountPage() {
       const token = localStorage.getItem("token") || "";
       const user_id = profile.email; // or use a unique user ID if available
       const return_url = window.location.origin + "/payment-success";
-      const res = await fetch("/api/payments/methods/add", {
+      const res = await fetch("/api/subscriptions/checkout", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
