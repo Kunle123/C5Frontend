@@ -359,6 +359,25 @@ export function AccountPage() {
     window.location.href = url;
   };
 
+  // Handler for Download Invoice
+  const handleDownloadInvoice = () => {
+    toast({
+      title: "Download initiated",
+      description: "Your invoice is being downloaded.",
+    });
+    // In a real app, this would trigger a backend API call to generate and serve the invoice
+  };
+
+  // Handler for Cancel Subscription
+  const handleCancelSubscription = () => {
+    toast({
+      title: "Subscription cancelled",
+      description: "Your subscription has been cancelled. You will lose access to premium features.",
+      variant: "destructive",
+    });
+    // In a real app, this would trigger a backend API call to cancel the subscription
+  };
+
   if (loadingProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/50">
@@ -708,11 +727,11 @@ export function AccountPage() {
                 <Button variant="outline" className="w-full" onClick={handleManagePaymentMethods} disabled={isLoading}>
                   Manage Payment Methods
                 </Button>
-                <Button variant="outline" className="w-full flex items-center gap-2">
+                <Button variant="outline" className="w-full flex items-center gap-2" onClick={handleDownloadInvoice} disabled={isLoading}>
                   <Download className="h-4 w-4" />
                   Download Invoice
                 </Button>
-                <Button variant="destructive" className="w-full">
+                <Button variant="destructive" className="w-full" onClick={handleCancelSubscription} disabled={isLoading}>
                   Cancel Subscription
                 </Button>
               </div>
