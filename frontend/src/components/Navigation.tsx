@@ -46,52 +46,33 @@ export function Navigation() {
   };
 
   return (
-    <nav className="w-full bg-white shadow-sm fixed top-0 left-0 z-50 min-h-[56px] flex items-center px-4 py-2 md:py-3">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-2">
-            <img src="/C5Logo.png" alt="CV Logo" className="h-8 w-auto mr-2" />
-            <span className="text-2xl font-bold text-primary">Candidate 5</span>
+    <nav className="w-full bg-white shadow-sm fixed top-0 left-0 z-50 min-h-[56px] flex items-center justify-between px-4 py-2 md:py-3">
+      <div className="flex items-center gap-2">
+        {/* Logo */}
+        <img src="/C5Logo.png" alt="Candidate 5 Logo" className="h-8 w-auto" />
+        <span className="font-bold text-lg text-primary">Candidate 5</span>
+      </div>
+      <div className="flex items-center gap-4">
+        <span className="hidden md:inline text-base text-foreground">Dashboard</span>
+        {/* Menu icon/button here */}
+        <button
+          className="flex items-center px-2 py-2 rounded hover:bg-accent focus:outline-none"
+          onClick={() => setShowMenu((prev) => !prev)}
+          aria-label="Open menu"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        {showMenu && (
+          <div className="absolute right-0 top-12 bg-background border rounded shadow-lg z-50 min-w-[180px]">
+            <button onClick={() => { navigate("/dashboard"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/dashboard") ? "text-primary font-medium" : "text-foreground"}`}>Dashboard</button>
+            <button onClick={() => { navigate("/careerarcv2"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/careerarcv2") ? "text-primary font-medium" : "text-foreground"}`}>Career Arc</button>
+            <button onClick={() => { localStorage.setItem('resetApplyStep', 'true'); navigate("/apply"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/apply") ? "text-primary font-medium" : "text-foreground"}`}>Apply</button>
+            <button onClick={() => { navigate("/my-cvs-new"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/my-cvs-new") ? "text-primary font-medium" : "text-foreground"}`}>My CVs</button>
+            <button onClick={() => { navigate("/application-history"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/application-history") ? "text-primary font-medium" : "text-foreground"}`}>Application History</button>
+            <button onClick={() => { navigate("/account"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/account") ? "text-primary font-medium" : "text-foreground"}`}>Account</button>
+            <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => { handleLogout(); setShowMenu(false); }}>Log Out</Button>
           </div>
-          {isLoggedIn ? (
-            <div className="flex items-center space-x-2 relative">
-              <button
-                className="text-base font-medium px-2 py-1 rounded hover:bg-accent focus:outline-none"
-                onClick={() => { navigate("/dashboard"); setShowMenu(false); }}
-                aria-label="Go to Dashboard"
-              >
-                Dashboard
-              </button>
-              <button
-                className="flex items-center px-2 py-2 rounded hover:bg-accent focus:outline-none"
-                onClick={() => setShowMenu((prev) => !prev)}
-                aria-label="Open menu"
-              >
-                <Menu className="h-6 w-6" />
-              </button>
-              {showMenu && (
-                <div className="absolute right-0 top-12 bg-background border rounded shadow-lg z-50 min-w-[180px]">
-                  <button onClick={() => { navigate("/dashboard"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/dashboard") ? "text-primary font-medium" : "text-foreground"}`}>Dashboard</button>
-                  <button onClick={() => { navigate("/careerarcv2"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/careerarcv2") ? "text-primary font-medium" : "text-foreground"}`}>Career Arc</button>
-                  <button onClick={() => { localStorage.setItem('resetApplyStep', 'true'); navigate("/apply"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/apply") ? "text-primary font-medium" : "text-foreground"}`}>Apply</button>
-                  <button onClick={() => { navigate("/my-cvs-new"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/my-cvs-new") ? "text-primary font-medium" : "text-foreground"}`}>My CVs</button>
-                  <button onClick={() => { navigate("/application-history"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/application-history") ? "text-primary font-medium" : "text-foreground"}`}>Application History</button>
-                  <button onClick={() => { navigate("/account"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/account") ? "text-primary font-medium" : "text-foreground"}`}>Account</button>
-                  <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => { handleLogout(); setShowMenu(false); }}>Log Out</Button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center space-x-8">
-              {/* Public menu items */}
-              <button onClick={() => navigate("/")} className={`transition-colors ${isActive("/") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Home</button>
-              <button onClick={() => navigate("/pricing")} className={`transition-colors ${isActive("/pricing") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Pricing</button>
-              <button onClick={() => navigate("/privacy-policy")} className={`transition-colors ${isActive("/privacy-policy") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Privacy</button>
-              <button onClick={() => navigate("/terms")} className={`transition-colors ${isActive("/terms") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Terms</button>
-              <button onClick={() => navigate("/login")} className={`transition-colors ${isActive("/login") ? "text-primary font-medium" : "text-foreground hover:text-primary"}`}>Login</button>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </nav>
   );
