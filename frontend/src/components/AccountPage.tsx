@@ -332,6 +332,14 @@ export function AccountPage() {
   // Handler for Stripe Customer Portal
   const handleManagePaymentMethods = async () => {
     const token = localStorage.getItem("token") || "";
+    if (!token) {
+      toast({
+        title: "Not logged in",
+        description: "You must be logged in to manage payment methods.",
+        variant: "destructive",
+      });
+      return;
+    }
     const res = await fetch("/api/payments/customer-portal", {
       method: "POST",
       headers: {
@@ -340,7 +348,11 @@ export function AccountPage() {
       },
     });
     if (!res.ok) {
-      alert("Could not open Stripe Customer Portal. Please try again.");
+      toast({
+        title: "Access denied",
+        description: "Could not open Stripe Customer Portal. Please log in again or contact support.",
+        variant: "destructive",
+      });
       return;
     }
     const { url } = await res.json();
