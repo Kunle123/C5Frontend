@@ -49,6 +49,12 @@ export function AuthToggle() {
       }
       const data = await res.json();
       localStorage.setItem("token", data.token);
+      if (data.user && data.user.id) {
+        localStorage.setItem("user_id", data.user.id);
+      }
+      if (data.user && data.user.email) {
+        localStorage.setItem("user_email", data.user.email);
+      }
       toast({ title: "Login successful!", description: "Welcome back!" });
       window.location.href = "/dashboard";
     } catch (err) {
