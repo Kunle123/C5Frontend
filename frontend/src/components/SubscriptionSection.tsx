@@ -210,12 +210,12 @@ const SubscriptionSection: React.FC = () => {
           </Box>
           <Box p={4} borderWidth={1} borderRadius="md" boxShadow="sm">
             <Text fontWeight="bold">Top-up</Text>
-            <Text fontSize="sm">50 credits for £29.99</Text>
+            <Text fontSize="sm">100 credits for £29.99</Text>
             <Button size="sm" colorScheme="teal" mt={2}>Buy 50 Credits</Button> {/* TODO: Integrate with backend */}
           </Box>
           <Box p={4} borderWidth={1} borderRadius="md" boxShadow="sm">
             <Text fontWeight="bold">Monthly</Text>
-            <Text fontSize="sm">50 credits + 3/day for £24.99/mo</Text>
+            <Text fontSize="sm">100 credits + 3/day for £24.99/mo</Text>
             <Button size="sm" colorScheme="purple" mt={2}>Subscribe Monthly</Button> {/* TODO: Integrate with backend */}
           </Box>
           <Box p={4} borderWidth={1} borderRadius="md" boxShadow="sm">

@@ -57,53 +57,45 @@ export function AccountPage() {
   const [credits, setCredits] = useState<any>(null);
   const [creditsLoading, setCreditsLoading] = useState(true);
   const [creditsError, setCreditsError] = useState<string | null>(null);
-  useEffect(() => {
-    const fetchCredits = async () => {
-      setCreditsLoading(true);
-      setCreditsError(null);
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('Not authenticated');
-        const res = await fetch('https://api-gw-production.up.railway.app/api/user/credits', {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error('Failed to fetch credits');
-        const data = await res.json();
-        setCredits(data);
-      } catch (err: any) {
-        setCreditsError(err.message || 'Failed to load credits');
-      } finally {
-        setCreditsLoading(false);
-      }
-    };
-    fetchCredits();
-  }, []);
+
+  // Fetch both credits and subscription in sync
+  const fetchAccountData = async () => {
+    setCreditsLoading(true);
+    setSubscriptionLoading(true);
+    setCreditsError(null);
+    setSubscriptionError('');
+    try {
+      const token = localStorage.getItem('token') || '';
+      const userId = getUserIdFromToken(token);
+      if (!userId) throw new Error('Not authenticated');
+      // Fetch credits
+      const creditsRes = await fetch('https://api-gw-production.up.railway.app/api/user/credits', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!creditsRes.ok) throw new Error('Failed to fetch credits');
+      const creditsData = await creditsRes.json();
+      setCredits(creditsData);
+      // Fetch subscription
+      const sub = await getSubscription(userId, token);
+      const plan = sub?.plan_name && sub.plan_name !== 'N/A' ? sub.plan_name : 'Free';
+      const status = sub?.status && sub.status !== 'N/A' ? sub.status : 'Active';
+      setSubscription({
+        plan,
+        status,
+        nextBilling: sub?.renewal_date || 'N/A',
+        amount: sub?.amount ? `£${sub.amount}/month` : '£0',
+      });
+    } catch (err: any) {
+      setCreditsError(err.message || 'Failed to load credits');
+      setSubscriptionError(err.message || 'Failed to load subscription');
+    } finally {
+      setCreditsLoading(false);
+      setSubscriptionLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSubscription = async () => {
-      setSubscriptionLoading(true);
-      setSubscriptionError('');
-      try {
-        const token = localStorage.getItem('token') || '';
-        const userId = getUserIdFromToken(token);
-        if (!userId) throw new Error('Not authenticated');
-        const sub = await getSubscription(userId, token);
-        // Fallbacks for empty/null/N/A
-        const plan = sub?.plan_name && sub.plan_name !== 'N/A' ? sub.plan_name : 'Free';
-        const status = sub?.status && sub.status !== 'N/A' ? sub.status : 'Active';
-        setSubscription({
-          plan,
-          status,
-          nextBilling: sub?.renewal_date || 'N/A',
-          amount: sub?.amount ? `£${sub.amount}/month` : '£0',
-        });
-      } catch (err) {
-        setSubscriptionError((err && (err as any).message) || 'Failed to load subscription');
-      } finally {
-        setSubscriptionLoading(false);
-      }
-    };
-    fetchSubscription();
+    fetchAccountData();
   }, []);
 
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
@@ -367,6 +359,8 @@ export function AccountPage() {
       }
       if (!res || !res.ok) throw new Error("Failed to initiate payment");
       const { checkout_url } = await res.json();
+      // After payment, refresh credits/subscription
+      await fetchAccountData();
       window.location.href = checkout_url;
     } catch (err: any) {
       setError(err.message || "Failed to start payment");
@@ -765,7 +759,7 @@ export function AccountPage() {
                     </div>
                     <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">Popular</span>
                   </div>
-                  <div className="text-sm text-muted-foreground mb-4">50 credits monthly, 3 daily, priority support</div>
+                  <div className="text-sm text-muted-foreground mb-4">100 credits monthly, 3 daily, priority support</div>
                   <Button variant="default" size="lg" className="w-full" onClick={() => handleUpgradePlan('Monthly')} disabled={isLoading}>
                     Upgrade to Monthly
                   </Button>
@@ -779,7 +773,7 @@ export function AccountPage() {
                     </div>
                     <span className="bg-gray-100 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full">Save 33%</span>
                   </div>
-                  <div className="text-sm text-muted-foreground mb-4">50 credits monthly, 5 daily, priority support</div>
+                  <div className="text-sm text-muted-foreground mb-4">100 credits monthly, 5 daily, priority support</div>
                   <Button variant="default" size="lg" className="w-full" onClick={() => handleUpgradePlan('Annual')} disabled={isLoading}>
                     Upgrade to Annual
                   </Button>
@@ -788,7 +782,7 @@ export function AccountPage() {
                 <div className="border rounded-xl p-6 bg-white/90 shadow-sm">
                   <div className="font-semibold text-lg mb-1">Top-up</div>
                   <div className="text-blue-700 font-bold text-xl">£29.99<span className="text-base font-normal"> one-off</span></div>
-                  <div className="text-sm text-muted-foreground mb-4">50 credits, no subscription, expires in 1 month</div>
+                  <div className="text-sm text-muted-foreground mb-4">100 credits, no subscription, expires in 1 month</div>
                   <Button variant="outline" size="lg" className="w-full" onClick={() => handleUpgradePlan('Top-up')} disabled={isLoading}>
                     Buy Credits
                   </Button>

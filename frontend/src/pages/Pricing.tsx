@@ -122,7 +122,7 @@ const Pricing = () => {
       period: "per month",
       description: "Perfect for career focused professionals",
       features: [
-        "50 credits monthly recurring",
+        "100 credits monthly recurring",
         "3 credits per day",
         "Create up to 140 CVs per month",
         "Every CV comes with a tailored cover letter",
@@ -143,7 +143,7 @@ const Pricing = () => {
       period: "per year",
       description: "Best value with 33% discount",
       features: [
-        "50 credits monthly recurring",
+        "100 credits monthly recurring",
         "5 credits per day",
         "Create up to 200 CVs per month",
         "Every CV comes with a tailored cover letter",
@@ -167,7 +167,7 @@ const Pricing = () => {
     period: "one-off",
     description: "Pay as you go with no subscription",
     features: [
-      "50 credits (one-off purchase)",
+      "100 credits (one-off purchase)",
       "No subscription required",
       "Credits expire after 1 month",
       "Can be added to any plan",
