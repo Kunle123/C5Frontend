@@ -34,6 +34,11 @@ import Apply from './pages/Apply';
 import PaymentSuccess from './pages/PaymentSuccess';
 import { CreditsProvider } from './context/CreditsContext';
 import ApplicationHistory from './components/ApplicationHistory';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import ATSProof from './pages/ATSProof';
+import CareerArcInfo from './pages/CareerArcInfo';
+import ApplicationTracker from './pages/ApplicationTracker';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -93,6 +98,11 @@ function App() {
             <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
             <Route path="/payment-success" element={<ChakraProvider theme={theme}><PaymentSuccess /></ChakraProvider>} />
             <Route path="/application-history" element={<ApplicationHistory />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/ats-proof" element={<ATSProof />} />
+            <Route path="/career-arc" element={<CareerArcInfo />} />
+            <Route path="/application-tracker" element={<ApplicationTracker />} />
             <Route path="*" element={<ChakraProvider theme={theme}><NotFound /></ChakraProvider>} />
           </Routes>
         </Router>
