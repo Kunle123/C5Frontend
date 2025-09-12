@@ -356,7 +356,7 @@ export function AccountPage() {
           body: JSON.stringify({ plan_id, email, user_id, return_url }),
         });
       } else if (plan === 'Top-up') {
-        res = await fetch(`/api/payments/methods/add`, {
+        res = await fetch(`${process.env.REACT_APP_API_GATEWAY_BASE || 'https://api-gw-production.up.railway.app'}/api/payments/methods/add`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
