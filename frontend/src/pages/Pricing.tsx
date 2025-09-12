@@ -72,7 +72,7 @@ const Pricing = () => {
         });
       } else if (plan === 'Top-up') {
         const user_id = localStorage.getItem("user_id") || localStorage.getItem("userId") || localStorage.getItem("id") || "";
-        res = await fetch(`/api/payments/methods/add`, {
+        res = await fetch(`/api/payments/topup`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,

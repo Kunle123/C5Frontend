@@ -356,7 +356,7 @@ export function AccountPage() {
           body: JSON.stringify({ plan_id, email, user_id, return_url }),
         });
       } else if (plan === 'Top-up') {
-        res = await fetch(`/api/payments/methods/add`, {
+        res = await fetch(`/api/payments/topup`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -715,7 +715,9 @@ export function AccountPage() {
                         </div>
                         <div className="text-2xl font-bold text-foreground">
                           {credits.daily_credits_remaining ?? 0}
-                          <span className="text-sm font-normal text-muted-foreground">/3</span>
+                          <span className="text-sm font-normal text-muted-foreground">{
+                            subscription.plan === 'Annual' ? '/5' : subscription.plan === 'Monthly' ? '/3' : '/0'
+                          }</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">Expires end of day</p>
                       </div>
