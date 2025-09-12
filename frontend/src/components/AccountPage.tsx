@@ -356,13 +356,13 @@ export function AccountPage() {
           body: JSON.stringify({ plan_id, email, user_id, return_url }),
         });
       } else if (plan === 'Top-up') {
-        const query = `?user_id=${encodeURIComponent(user_id)}&plan=${encodeURIComponent(plan)}&return_url=${encodeURIComponent(return_url)}`;
-        res = await fetch(`/api/payments/methods/add${query}`, {
+        res = await fetch(`/api/payments/methods/add`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ user_id, email, return_url }),
         });
       }
       if (!res || !res.ok) throw new Error("Failed to initiate payment");
