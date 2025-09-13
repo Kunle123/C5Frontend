@@ -723,7 +723,9 @@ export function AccountPage() {
                         </div>
                         <div className="text-2xl font-bold text-foreground">
                           {credits.monthly_credits_remaining ?? 0}
-                          <span className="text-sm font-normal text-muted-foreground">/50</span>
+                          <span className="text-sm font-normal text-muted-foreground">{
+                            subscription.plan === 'Annual' || subscription.plan === 'Monthly' ? '/50' : '/0'
+                          }</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">Renews monthly</p>
                       </div>
