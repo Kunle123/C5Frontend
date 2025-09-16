@@ -1,8 +1,13 @@
 import React from "react";
+import { StatsTiles } from "../components/landing/StatsTiles";
 
 export default function Landing() {
   return (
-    <main className="bg-white w-full min-h-screen">
+    <main className="bg-white w-full min-h-screen flex flex-col items-center justify-start">
+      {/* 888 Stats Tile Row */}
+      <div className="mt-12">
+        <StatsTiles />
+      </div>
       {/* Hero Section */}
       <section className="w-full flex flex-col items-center pt-12 pb-16 px-4 md:px-8 lg:px-0">
         <div className="max-w-7xl w-full flex flex-col lg:flex-row items-center gap-12">
