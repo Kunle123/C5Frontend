@@ -47,10 +47,6 @@ export default function ApplicationTracker() {
       <h3 className="text-xl font-semibold mt-6 mb-2">Getting Started</h3>
       <p className="mb-4">Most users spend about 10 minutes setting up their tracker, then just 2-3 minutes per application to keep it updated. The time investment is minimal, but the peace of mind and improved organization are significant.</p>
       <p className="mb-4">You can import existing applications from your email or start fresh. Either way, you'll quickly wonder how you managed job searching without it.</p>
-      <h3 className="text-xl font-semibold mt-6 mb-2">Success Stories</h3>
-      <blockquote className="mb-4 border-l-4 border-primary pl-4 italic">"I went from feeling completely overwhelmed to having total control over my job search. I could see exactly where I stood with each opportunity and never missed a follow-up again." - Michael R., Financial Analyst</blockquote>
-      <blockquote className="mb-4 border-l-4 border-primary pl-4 italic">"The analytics feature was eye-opening. I realized I was applying to too many senior roles and not enough mid-level positions. Adjusting my strategy based on the data led to much better results." - Lisa T., UX Designer</blockquote>
-      <p className="mb-4">Application Tracker isn't just about organization – it's about approaching your job search like the professional you are.</p>
     </div>
   );
 }

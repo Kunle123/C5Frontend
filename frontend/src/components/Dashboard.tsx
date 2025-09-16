@@ -253,7 +253,9 @@ export const Dashboard = () => {
                     </div>
                     <div className="text-2xl font-bold text-foreground">
                       {credits.daily_credits_remaining ?? 0}
-                      <span className="text-sm font-normal text-muted-foreground">/3</span>
+                      <span className="text-sm font-normal text-muted-foreground">{
+                        userProfile?.plan === 'Annual' ? '/5' : userProfile?.plan === 'Monthly' ? '/3' : '/0'
+                      }</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       Expires end of day

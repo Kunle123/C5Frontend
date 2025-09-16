@@ -16,9 +16,6 @@ export default function ATSProof() {
         <li className="mb-2"><b>Skills Matching:</b> Our system compares your experience against the job requirements and highlights the most relevant qualifications. This helps the ATS understand why you're a good fit.</li>
         <li className="mb-2"><b>Section Optimization:</b> We structure your CV with clear headings and logical flow that ATS systems can easily navigate. No hidden text, no fancy graphics that confuse the software.</li>
       </ul>
-      <h3 className="text-xl font-semibold mt-6 mb-2">Real Results from Real People</h3>
-      <blockquote className="mb-4 border-l-4 border-primary pl-4 italic">"I was applying for months with no luck. After using Candidate5, I got three interview requests in the first week. Turns out my old CV was being filtered out before anyone saw it." - Sarah M., Marketing Manager</blockquote>
-      <blockquote className="mb-4 border-l-4 border-primary pl-4 italic">"The difference was incredible. Same qualifications, same experience, but suddenly I was getting responses. It's like I finally learned to speak the language these systems understand." - James K., Software Developer</blockquote>
       <h3 className="text-xl font-semibold mt-6 mb-2">The Technical Stuff (For Those Who Want to Know)</h3>
       <ul className="mb-4 list-disc pl-6">
         <li>Parsing simulation using the same algorithms as major ATS platforms</li>
