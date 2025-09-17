@@ -49,3 +49,4 @@ export const StatisticsCards: React.FC = () => {
     </div>
   );
 };
+

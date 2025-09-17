@@ -20,26 +20,27 @@ export const StatsTiles: React.FC = () => (
         >
           %
         </span>
+        <span
+          className="flex items-end ml-2"
+          style={{ height: '100%', alignItems: 'flex-end' }}
+        >
+          <span
+            style={{
+              fontFamily: "'Anton', sans-serif",
+              fontSize: '60px',
+              color: '#fff',
+              lineHeight: '60px',
+              fontWeight: 400,
+              transform: 'rotate(90deg)',
+              display: 'inline-block',
+              whiteSpace: 'nowrap',
+              zIndex: 2,
+            }}
+          >
+            CVs
+          </span>
+        </span>
       </div>
-      {/* Rotated CVs, absolutely positioned so 's' baseline aligns with bottom of 80, not overlapping icon */}
-      <span
-        className="absolute"
-        style={{
-          fontFamily: "'Anton', sans-serif",
-          fontSize: '60px',
-          color: '#fff',
-          lineHeight: '60px',
-          fontWeight: 400,
-          transform: 'rotate(90deg)',
-          left: '140px', // move closer to number group
-          bottom: '37px', // aligns with bottom of 80
-          display: 'inline-block',
-          whiteSpace: 'nowrap',
-          zIndex: 2,
-        }}
-      >
-        CVs
-      </span>
       {/* never seen by a recruiter */}
       <span
         className="absolute left-6"
