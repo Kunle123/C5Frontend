@@ -717,6 +717,8 @@ const ApplicationWizard = () => {
         job_description: jobDescription,
         language: selectedLanguage,
         numPages: generationOptions.pages,
+        includeKeywords: generationOptions.includeKeywords,
+        includeRelevantExperience: generationOptions.includeRelevantExperience,
       };
       const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
         method: 'POST',
