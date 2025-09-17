@@ -749,24 +749,7 @@ const ApplicationWizard = () => {
   };
 
   // 1. Add useEffect to deduct credits when entering step 3
-  useEffect(() => {
-    if (currentStep === 3) {
-      const deductCredits = async () => {
-        try {
-          const token = localStorage.getItem('token');
-          if (!token) return;
-          await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'generate_cv' }),
-            credentials: 'include',
-          });
-          await refreshCredits();
-        } catch {}
-      };
-      deductCredits();
-    }
-  }, [currentStep, refreshCredits]);
+  // (Removed to prevent double deduction)
 
   // 2. Add beforeunload warning on step 3 if not saved
   useEffect(() => {
