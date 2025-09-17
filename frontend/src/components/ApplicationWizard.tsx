@@ -264,6 +264,10 @@ const ApplicationWizard = () => {
   const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('UK English');
+  // Add state for salary, contactName, and contactNumber
+  const [salary, setSalary] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
 
   // Fetch user profile and arc data on mount
   useEffect(() => {
@@ -378,6 +382,9 @@ const ApplicationWizard = () => {
       setMatchScore(result.overall_match_percentage || 0);
       setJobTitle(result.job_title || '');
       setCompanyName(result.company_name || '');
+      setSalary(result.salary || '');
+      setContactName(result.contact_name || '');
+      setContactNumber(result.contact_number || '');
     } catch (err: any) {
       setError(err.message || 'Keyword extraction failed');
       toast({ title: 'Error', description: err.message || 'Keyword extraction failed' });
@@ -559,6 +566,9 @@ const ApplicationWizard = () => {
           company_name: uniqueCompanyName,
           job_description: jobDescription,
           applied_at: new Date().toISOString(),
+          salary,
+          contact_name: contactName,
+          contact_number: contactNumber,
         };
         console.log('POST to application-history endpoint:', 'https://api-gw-production.up.railway.app/api/application-history');
         console.log('POST to application-history payload:', applicationHistoryPayload);
