@@ -117,11 +117,11 @@ function renderStructuredCV(cvData: any) {
           <ul className="space-y-2">
             {cvData.experience.map((exp: any, idx: number) => (
               <li key={idx}>
-                <div className="font-medium">{exp.job_title}{exp.company ? `, ${exp.company}` : ''}{exp.dates ? `, ${exp.dates}` : ''}</div>
-                {exp.bullets && Array.isArray(exp.bullets) && (
+                <div className="font-medium">{exp.job_title}{exp.company_name ? `, ${exp.company_name}` : ''}{exp.dates ? `, ${exp.dates}` : ''}</div>
+                {exp.responsibilities && Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
                   <ul className="list-disc list-inside ml-4">
-                    {exp.bullets.map((b: string, i: number) => (
-                      <li key={i}>{b}</li>
+                    {exp.responsibilities.map((resp: string, i: number) => (
+                      <li key={i}>{resp}</li>
                     ))}
                   </ul>
                 )}
