@@ -534,15 +534,19 @@ const ApplicationWizard = () => {
       });
       if (!res.ok) throw new Error('Failed to generate documents');
       const data = await res.json();
-      if (data.thread_id && !threadId) {
-        setThreadId(data.thread_id);
+      const normalizedData = {
+        ...data,
+        relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
+      };
+      if (normalizedData.thread_id && !threadId) {
+        setThreadId(normalizedData.thread_id);
       }
-      setGeneratedCV(data.cv || '');
-      setGeneratedCoverLetter(data.cover_letter || '');
-      setJobTitle(data.job_title || '');
-      setCompanyName(data.company_name || '');
-      setStructuredCV(data); // Store structured data
-      console.log('Generated CV data:', data);
+      setGeneratedCV(normalizedData.cv || '');
+      setGeneratedCoverLetter(normalizedData.cover_letter || '');
+      setJobTitle(normalizedData.job_title || '');
+      setCompanyName(normalizedData.company_name || '');
+      setStructuredCV(normalizedData); // Store structured data
+      console.log('Generated CV data:', normalizedData);
       // Advance to preview step (step 3)
       setCurrentStep(3);
     } catch (err: any) {
@@ -791,13 +795,17 @@ const ApplicationWizard = () => {
       });
       if (!res.ok) throw new Error('Failed to update documents');
       const data = await res.json();
+      const normalizedData = {
+        ...data,
+        relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
+      };
       // Defensive merge: always preserve previous structuredCV fields
       setStructuredCV((prev: any) => ({
         ...prev,
-        ...data,
+        ...normalizedData,
       }));
-      setGeneratedCV(data.cv || '');
-      setGeneratedCoverLetter(data.cover_letter || '');
+      setGeneratedCV(normalizedData.cv || '');
+      setGeneratedCoverLetter(normalizedData.cover_letter || '');
       setShowUpdateModal(false);
       setCvUpdateRequest('');
       setCoverLetterUpdateRequest('');
@@ -845,14 +853,18 @@ const ApplicationWizard = () => {
       });
       if (!res.ok) throw new Error('Failed to generate documents');
       const data = await res.json();
-      if (data.thread_id && !threadId) {
-        setThreadId(data.thread_id);
+      const normalizedData = {
+        ...data,
+        relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
+      };
+      if (normalizedData.thread_id && !threadId) {
+        setThreadId(normalizedData.thread_id);
       }
-      setGeneratedCV(data.cv || '');
-      setGeneratedCoverLetter(data.cover_letter || '');
-      setJobTitle(data.job_title || '');
-      setCompanyName(data.company_name || '');
-      setStructuredCV(data);
+      setGeneratedCV(normalizedData.cv || '');
+      setGeneratedCoverLetter(normalizedData.cover_letter || '');
+      setJobTitle(normalizedData.job_title || '');
+      setCompanyName(normalizedData.company_name || '');
+      setStructuredCV(normalizedData);
       setCurrentStep(3);
     } catch (err: any) {
       setError(err.message || 'Document generation failed');
