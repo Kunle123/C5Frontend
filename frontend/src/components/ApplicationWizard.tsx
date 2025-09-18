@@ -857,11 +857,6 @@ const ApplicationWizard = () => {
     });
   }
 
-  // Defensive check at the top of the component
-  if (!structuredCV || typeof structuredCV !== 'object') {
-    return <div>Loading CV data...</div>;
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -1045,57 +1040,64 @@ const ApplicationWizard = () => {
                 {error && (
                   <div className="mb-4 text-destructive text-sm font-semibold">{error}</div>
                 )}
-                {/* 4. Add UI controls to preview pane in step 3 */}
-                <div className="flex flex-col md:flex-row gap-4 mb-4">
-                  <div>
-                    <label className="font-medium mr-2">CV Length:</label>
-                    {[2, 3, 4].map(p => (
-                      <label key={p} className="mr-2">
-                        <input type="radio" name="cv-length" value={p} checked={maxPriority === p} onChange={() => setMaxPriority(p)} />
-                        {p} Page{p > 1 ? 's' : ''}
-                      </label>
-                    ))}
-                  </div>
-                  <div className="flex gap-4">
-                    <label><input type="checkbox" checked={showAchievements} onChange={e => setShowAchievements(e.target.checked)} /> Achievements</label>
-                    <label><input type="checkbox" checked={showCompetencies} onChange={e => setShowCompetencies(e.target.checked)} /> Competencies</label>
-                    <label><input type="checkbox" checked={showCertifications} onChange={e => setShowCertifications(e.target.checked)} /> Certifications</label>
-                    <label><input type="checkbox" checked={showEducation} onChange={e => setShowEducation(e.target.checked)} /> Education</label>
-                  </div>
-                </div>
-                <Tabs defaultValue="cv" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="cv">Optimized CV</TabsTrigger>
-                    <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="cv" className="space-y-4">
-                    {renderFilteredCV()}
-                  </TabsContent>
-                  <TabsContent value="cover-letter" className="space-y-4">
-                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                      <pre className="whitespace-pre-wrap text-sm">{injectNameInCoverLetter(generatedCoverLetter, profile?.name)}</pre>
+                {/* Defensive check for structuredCV here: */}
+                {!structuredCV || typeof structuredCV !== 'object' ? (
+                  <div>Loading CV data...</div>
+                ) : (
+                  <>
+                    {/* 4. Add UI controls to preview pane in step 3 */}
+                    <div className="flex flex-col md:flex-row gap-4 mb-4">
+                      <div>
+                        <label className="font-medium mr-2">CV Length:</label>
+                        {[2, 3, 4].map(p => (
+                          <label key={p} className="mr-2">
+                            <input type="radio" name="cv-length" value={p} checked={maxPriority === p} onChange={() => setMaxPriority(p)} />
+                            {p} Page{p > 1 ? 's' : ''}
+                          </label>
+                        ))}
+                      </div>
+                      <div className="flex gap-4">
+                        <label><input type="checkbox" checked={showAchievements} onChange={e => setShowAchievements(e.target.checked)} /> Achievements</label>
+                        <label><input type="checkbox" checked={showCompetencies} onChange={e => setShowCompetencies(e.target.checked)} /> Competencies</label>
+                        <label><input type="checkbox" checked={showCertifications} onChange={e => setShowCertifications(e.target.checked)} /> Certifications</label>
+                        <label><input type="checkbox" checked={showEducation} onChange={e => setShowEducation(e.target.checked)} /> Education</label>
+                      </div>
                     </div>
-                  </TabsContent>
-                </Tabs>
-                <div className="flex gap-4 mt-6">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowUpdateModal(true)}
-                    className="flex-1"
-                    type="button"
-                  >
-                    Request Updates
-                  </Button>
-                  <Button
-                    onClick={handleSaveAndDownload}
-                    className="flex-1"
-                    disabled={isGenerating || !!validateFinalCV(structuredCV)}
-                    type="button"
-                  >
-                    {isGenerating ? 'Saving...' : 'Go to Download CVs Page'}
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </div>
+                    <Tabs defaultValue="cv" className="w-full">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="cv">Optimized CV</TabsTrigger>
+                        <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="cv" className="space-y-4">
+                        {renderFilteredCV()}
+                      </TabsContent>
+                      <TabsContent value="cover-letter" className="space-y-4">
+                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
+                          <pre className="whitespace-pre-wrap text-sm">{injectNameInCoverLetter(generatedCoverLetter, profile?.name)}</pre>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                    <div className="flex gap-4 mt-6">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowUpdateModal(true)}
+                        className="flex-1"
+                        type="button"
+                      >
+                        Request Updates
+                      </Button>
+                      <Button
+                        onClick={handleSaveAndDownload}
+                        className="flex-1"
+                        disabled={isGenerating || !!validateFinalCV(structuredCV)}
+                        type="button"
+                      >
+                        {isGenerating ? 'Saving...' : 'Go to Download CVs Page'}
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
