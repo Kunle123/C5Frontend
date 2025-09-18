@@ -847,13 +847,13 @@ const ApplicationWizard = () => {
 
   const filteredCV = filterByPriority(structuredCV, maxPriority);
   function renderFilteredCV() {
-    if (!filteredCV) return <div>No CV data available.</div>;
+    if (!filteredCV || typeof filteredCV !== 'object') return <div>No CV data available.</div>;
     return renderStructuredCV({
       ...filteredCV,
-      relevant_achievements: showAchievements ? (filteredCV.relevant_achievements ?? []) : [],
-      core_competencies: showCompetencies ? (filteredCV.core_competencies ?? []) : [],
-      certifications: showCertifications ? (filteredCV.certifications ?? []) : [],
-      education: showEducation ? (filteredCV.education ?? []) : [],
+      relevant_achievements: showAchievements && Array.isArray(filteredCV.relevant_achievements) ? filteredCV.relevant_achievements : [],
+      core_competencies: showCompetencies && Array.isArray(filteredCV.core_competencies) ? filteredCV.core_competencies : [],
+      certifications: showCertifications && Array.isArray(filteredCV.certifications) ? filteredCV.certifications : [],
+      education: showEducation && Array.isArray(filteredCV.education) ? filteredCV.education : [],
     });
   }
 
