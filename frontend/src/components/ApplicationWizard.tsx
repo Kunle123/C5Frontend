@@ -857,6 +857,10 @@ const ApplicationWizard = () => {
     });
   }
 
+  if (!structuredCV || typeof structuredCV !== 'object') {
+    return <div>Loading CV data...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
