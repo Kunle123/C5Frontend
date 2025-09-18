@@ -233,6 +233,52 @@ function injectNameInCoverLetter(coverLetter: string, realName: string | undefin
   return coverLetter.replace(/\{\{CANDIDATE_NAME\}\}/g, realName);
 }
 
+// 1. TypeScript interfaces for new CV structure
+interface PriorityContent {
+  content: string;
+  priority: number;
+}
+interface ExperienceEntry {
+  job_title: string;
+  company_name?: string;
+  dates?: string;
+  responsibilities: PriorityContent[];
+}
+interface EducationEntry extends PriorityContent {
+  degree?: string;
+  institution?: string;
+  year?: string;
+}
+interface CVData {
+  name: string;
+  contact_info: string[];
+  summary: PriorityContent;
+  relevant_achievements?: PriorityContent[];
+  experience: ExperienceEntry[];
+  core_competencies?: PriorityContent[];
+  education?: EducationEntry[];
+  certifications?: PriorityContent[];
+  cover_letter: PriorityContent;
+  trimming_guide?: {
+    [key: string]: string;
+  };
+}
+
+// 2. Filtering utility
+function filterByPriority(data: CVData, maxPriority: number): CVData {
+  return {
+    ...data,
+    relevant_achievements: (data.relevant_achievements || []).filter(item => item.priority <= maxPriority),
+    experience: (data.experience || []).map(role => ({
+      ...role,
+      responsibilities: (role.responsibilities || []).filter(item => item.priority <= maxPriority)
+    })),
+    core_competencies: (data.core_competencies || []).filter(item => item.priority <= maxPriority),
+    certifications: (data.certifications || []).filter(item => item.priority <= maxPriority),
+    education: (data.education || []).filter(item => item.priority <= maxPriority)
+  };
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
@@ -268,6 +314,13 @@ const ApplicationWizard = () => {
   const [salary, setSalary] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
+
+  // 3. Add state for maxPriority and section toggles
+  const [maxPriority, setMaxPriority] = useState(2);
+  const [showAchievements, setShowAchievements] = useState(true);
+  const [showCompetencies, setShowCompetencies] = useState(true);
+  const [showCertifications, setShowCertifications] = useState(true);
+  const [showEducation, setShowEducation] = useState(true);
 
   // Fetch user profile and arc data on mount
   useEffect(() => {
@@ -957,12 +1010,31 @@ const ApplicationWizard = () => {
                 {error && (
                   <div className="mb-4 text-destructive text-sm font-semibold">{error}</div>
                 )}
+                {/* 4. Add UI controls to preview pane in step 3 */}
+                <div className="flex flex-col md:flex-row gap-4 mb-4">
+                  <div>
+                    <label className="font-medium mr-2">CV Length:</label>
+                    {[2, 3, 4].map(p => (
+                      <label key={p} className="mr-2">
+                        <input type="radio" name="cv-length" value={p} checked={maxPriority === p} onChange={() => setMaxPriority(p)} />
+                        {p} Page{p > 1 ? 's' : ''}
+                      </label>
+                    ))}
+                  </div>
+                  <div className="flex gap-4">
+                    <label><input type="checkbox" checked={showAchievements} onChange={e => setShowAchievements(e.target.checked)} /> Achievements</label>
+                    <label><input type="checkbox" checked={showCompetencies} onChange={e => setShowCompetencies(e.target.checked)} /> Competencies</label>
+                    <label><input type="checkbox" checked={showCertifications} onChange={e => setShowCertifications(e.target.checked)} /> Certifications</label>
+                    <label><input type="checkbox" checked={showEducation} onChange={e => setShowEducation(e.target.checked)} /> Education</label>
+                  </div>
+                </div>
                 <Tabs defaultValue="cv" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="cv">Optimized CV</TabsTrigger>
                     <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
                   </TabsList>
                   <TabsContent value="cv" className="space-y-4">
+                    {/* 5. Refactor renderStructuredCV to use .content and .priority, filter by maxPriority, and only render sections if toggled on */}
                     {renderStructuredCV(structuredCV)}
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
