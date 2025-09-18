@@ -845,6 +845,18 @@ const ApplicationWizard = () => {
     }
   }, [currentStep]);
 
+  const filteredCV = filterByPriority(structuredCV, maxPriority);
+  function renderFilteredCV() {
+    if (!filteredCV) return <div>No CV data available.</div>;
+    return renderStructuredCV({
+      ...filteredCV,
+      relevant_achievements: showAchievements ? filteredCV.relevant_achievements : [],
+      core_competencies: showCompetencies ? filteredCV.core_competencies : [],
+      certifications: showCertifications ? filteredCV.certifications : [],
+      education: showEducation ? filteredCV.education : [],
+    });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -1052,8 +1064,7 @@ const ApplicationWizard = () => {
                     <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
                   </TabsList>
                   <TabsContent value="cv" className="space-y-4">
-                    {/* 5. Refactor renderStructuredCV to use .content and .priority, filter by maxPriority, and only render sections if toggled on */}
-                    {renderStructuredCV(structuredCV)}
+                    {renderFilteredCV()}
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
