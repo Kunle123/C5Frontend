@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useRef, useContext, useEffect } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -11,7 +11,6 @@ import { Switch } from './ui/switch';
 import { useToast } from '../hooks/use-toast';
 import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
 import { extractKeywords, generateCV } from '../api/aiApi';
-import { useEffect } from 'react';
 import { CreditsContext } from '../context/CreditsContext';
 import { saveJobApplication, createApplicationHistory } from '../api';
 
@@ -297,7 +296,10 @@ function filterByPriority(data: CVData, maxPriority: number): CVData {
   };
 }
 
+console.log('ApplicationWizard: file loaded');
+
 const ApplicationWizard = () => {
+  console.log('ApplicationWizard: component function called');
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
   const [currentStep, setCurrentStep] = useState(1);
@@ -340,6 +342,26 @@ const ApplicationWizard = () => {
   const [showCertifications, setShowCertifications] = useState(true);
   const [showEducation, setShowEducation] = useState(true);
 
+  useEffect(() => {
+    console.log('ApplicationWizard mounted');
+  }, []);
+
+  useEffect(() => {
+    console.log('Current step:', currentStep);
+  }, [currentStep]);
+
+  useEffect(() => {
+    if (structuredCV) {
+      console.log('structuredCV updated:', structuredCV);
+    }
+  }, [structuredCV]);
+
+  useEffect(() => {
+    if (error) {
+      console.error('ApplicationWizard error:', error);
+    }
+  }, [error]);
+
   // Fetch user profile and arc data on mount
   useEffect(() => {
     const fetchProfileAndArc = async () => {
@@ -347,7 +369,7 @@ const ApplicationWizard = () => {
         setError(null);
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Not authenticated');
-        // 1. Get user profile
+        console.log('Fetching user profile...');
         const profileRes = await fetch('https://api-gw-production.up.railway.app/api/user/profile', {
           headers: { 'Authorization': `Bearer ${token}` },
           credentials: 'include',
@@ -355,7 +377,9 @@ const ApplicationWizard = () => {
         if (!profileRes.ok) throw new Error('Failed to fetch user profile');
         const userProfile = await profileRes.json();
         setProfile(userProfile);
+        console.log('Fetched user profile:', userProfile);
         // 2. Get arc data
+        console.log('Fetching arc data...');
         const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfile.id}/all_sections`, {
           headers: { 'Authorization': `Bearer ${token}` },
           credentials: 'include',
@@ -363,8 +387,10 @@ const ApplicationWizard = () => {
         if (!arcRes.ok) throw new Error('Failed to fetch arc data');
         const arc = await arcRes.json();
         setArcData(arc);
+        console.log('Fetched arc data:', arc);
       } catch (err: any) {
         setError(err.message || 'Failed to load profile/arc data');
+        console.error('Error fetching profile/arc data:', err);
       }
     };
     fetchProfileAndArc();
@@ -456,8 +482,10 @@ const ApplicationWizard = () => {
       setSalary(result.salary || '');
       setContactName(result.contact_name || '');
       setContactNumber(result.contact_number || '');
+      console.log('Extracted keywords result:', result);
     } catch (err: any) {
       setError(err.message || 'Keyword extraction failed');
+      console.error('Error extracting keywords:', err);
       toast({ title: 'Error', description: err.message || 'Keyword extraction failed' });
     } finally {
       setIsAnalyzing(false);
@@ -514,10 +542,12 @@ const ApplicationWizard = () => {
       setJobTitle(data.job_title || '');
       setCompanyName(data.company_name || '');
       setStructuredCV(data); // Store structured data
+      console.log('Generated CV data:', data);
       // Advance to preview step (step 3)
       setCurrentStep(3);
     } catch (err: any) {
       setError(err.message || 'Document generation failed');
+      console.error('Error generating CV:', err);
       toast({ title: 'Error', description: err.message || 'Document generation failed' });
     } finally {
       setIsGenerating(false);
@@ -530,8 +560,8 @@ const ApplicationWizard = () => {
     const validationError = validateFinalCV(structuredCV);
     if (validationError) {
       setError(validationError);
-      toast({ title: 'Error', description: validationError });
       console.error('CV validation failed:', validationError, structuredCV);
+      toast({ title: 'Error', description: validationError });
       return;
     }
     setIsGenerating(true);
@@ -608,6 +638,7 @@ const ApplicationWizard = () => {
           errorMsg = error.detail || error.message || errorMsg;
         } catch {}
         setError(errorMsg);
+        console.error('Error saving CV:', errorMsg);
         toast({ title: 'Error', description: errorMsg });
         throw new Error(errorMsg);
       }
@@ -626,7 +657,8 @@ const ApplicationWizard = () => {
           return;
         }
         await refreshCredits();
-      } catch {
+      } catch (e) {
+        console.error('Error deducting credits:', e);
         setShowOutOfCreditsModal(true);
       }
       // In handleSaveAndDownload, after successful save (after toast for Documents Generated & Saved)
@@ -651,6 +683,7 @@ const ApplicationWizard = () => {
       window.location.href = '/my-cvs-new';
     } catch (err: any) {
       setError(err.message || 'Document save failed');
+      console.error('Error saving documents:', err);
       toast({ title: 'Error', description: err.message || 'Document save failed' });
     } finally {
       setIsGenerating(false);
@@ -823,6 +856,7 @@ const ApplicationWizard = () => {
       setCurrentStep(3);
     } catch (err: any) {
       setError(err.message || 'Document generation failed');
+      console.error('Error generating CV with language:', err);
       toast({ title: 'Error', description: err.message || 'Document generation failed' });
     } finally {
       setIsGenerating(false);
@@ -855,6 +889,19 @@ const ApplicationWizard = () => {
       certifications: showCertifications && Array.isArray(filteredCV?.certifications) ? filteredCV.certifications : [],
       education: showEducation && Array.isArray(filteredCV?.education) ? filteredCV.education : [],
     });
+  }
+
+  // Log all key state values before rendering
+  console.log('ApplicationWizard: currentStep', currentStep);
+  console.log('ApplicationWizard: error', error);
+  console.log('ApplicationWizard: profile', profile);
+  console.log('ApplicationWizard: arcData', arcData);
+  console.log('ApplicationWizard: structuredCV', structuredCV);
+
+  // Early return logs
+  if (error) {
+    console.error('ApplicationWizard: returning early due to error', error);
+    return <div>Error: {error}</div>;
   }
 
   return (
@@ -991,7 +1038,7 @@ const ApplicationWizard = () => {
                     </Button>
                   </div>
                 )}
-              </CardContent>
+               </CardContent>
             </Card>
           </div>
         )}
