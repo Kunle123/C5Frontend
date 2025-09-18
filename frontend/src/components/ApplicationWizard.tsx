@@ -302,1028 +302,634 @@ const ApplicationWizard = () => {
   console.log('ApplicationWizard: component function called');
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
-  const [currentStep, setCurrentStep] = useState(1);
-  const [jobDescription, setJobDescription] = useState('');
-  const [extractedKeywords, setExtractedKeywords] = useState<Keyword[]>([]);
-  const [matchScore, setMatchScore] = useState(0);
-  const [jobTitle, setJobTitle] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [showOptionsModal, setShowOptionsModal] = useState(false);
-  const [generationOptions, setGenerationOptions] = useState<GenerationOptions>({
-    pages: 2,
-    includeKeywords: true,
-    includeRelevantExperience: true,
-  });
-  const [generatedCV, setGeneratedCV] = useState('');
-  const [generatedCoverLetter, setGeneratedCoverLetter] = useState('');
-  const [profile, setProfile] = useState<any>(null);
-  const [arcData, setArcData] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [threadId, setThreadId] = useState<string | null>(null);
-  const [showOutOfCreditsModal, setShowOutOfCreditsModal] = useState(false);
+  // Commenting out all state and effects for minimal test
+  // const [currentStep, setCurrentStep] = useState(1);
+  // const [jobDescription, setJobDescription] = useState('');
+  // const [extractedKeywords, setExtractedKeywords] = useState<Keyword[]>([]);
+  // const [matchScore, setMatchScore] = useState(0);
+  // const [jobTitle, setJobTitle] = useState('');
+  // const [companyName, setCompanyName] = useState('');
+  // const [isAnalyzing, setIsAnalyzing] = useState(false);
+  // const [isGenerating, setIsGenerating] = useState(false);
+  // const [showOptionsModal, setShowOptionsModal] = useState(false);
+  // const [generationOptions, setGenerationOptions] = useState<GenerationOptions>({
+  //   pages: 2,
+  //   includeKeywords: true,
+  //   includeRelevantExperience: true,
+  // });
+  // const [generatedCV, setGeneratedCV] = useState('');
+  // const [generatedCoverLetter, setGeneratedCoverLetter] = useState('');
+  // const [profile, setProfile] = useState<any>(null);
+  // const [arcData, setArcData] = useState<any>(null);
+  // const [error, setError] = useState<string | null>(null);
+  // const [threadId, setThreadId] = useState<string | null>(null);
+  // const [showOutOfCreditsModal, setShowOutOfCreditsModal] = useState(false);
   // Add a new state to hold the structured CV data
-  const [structuredCV, setStructuredCV] = useState<any>(null);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [cvUpdateRequest, setCvUpdateRequest] = useState('');
-  const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('UK English');
+  // const [structuredCV, setStructuredCV] = useState<any>(null);
+  // const [showUpdateModal, setShowUpdateModal] = useState(false);
+  // const [cvUpdateRequest, setCvUpdateRequest] = useState('');
+  // const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
+  // const [isUpdating, setIsUpdating] = useState(false);
+  // const [selectedLanguage, setSelectedLanguage] = useState<string>('UK English');
   // Add state for salary, contactName, and contactNumber
-  const [salary, setSalary] = useState('');
-  const [contactName, setContactName] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
+  // const [salary, setSalary] = useState('');
+  // const [contactName, setContactName] = useState('');
+  // const [contactNumber, setContactNumber] = useState('');
 
   // 3. Add state for maxPriority and section toggles
-  const [maxPriority, setMaxPriority] = useState(2);
-  const [showAchievements, setShowAchievements] = useState(true);
-  const [showCompetencies, setShowCompetencies] = useState(true);
-  const [showCertifications, setShowCertifications] = useState(true);
-  const [showEducation, setShowEducation] = useState(true);
+  // const [maxPriority, setMaxPriority] = useState(2);
+  // const [showAchievements, setShowAchievements] = useState(true);
+  // const [showCompetencies, setShowCompetencies] = useState(true);
+  // const [showCertifications, setShowCertifications] = useState(true);
+  // const [showEducation, setShowEducation] = useState(true);
 
-  useEffect(() => {
-    console.log('ApplicationWizard mounted');
-  }, []);
+  // useEffect(() => {
+  //   console.log('ApplicationWizard mounted');
+  // }, []);
 
-  useEffect(() => {
-    console.log('Current step:', currentStep);
-  }, [currentStep]);
+  // useEffect(() => {
+  //   console.log('Current step:', currentStep);
+  // }, [currentStep]);
 
-  useEffect(() => {
-    if (structuredCV) {
-      console.log('structuredCV updated:', structuredCV);
-    }
-  }, [structuredCV]);
+  // useEffect(() => {
+  //   if (structuredCV) {
+  //     console.log('structuredCV updated:', structuredCV);
+  //   }
+  // }, [structuredCV]);
 
-  useEffect(() => {
-    if (error) {
-      console.error('ApplicationWizard error:', error);
-    }
-  }, [error]);
+  // useEffect(() => {
+  //   if (error) {
+  //     console.error('ApplicationWizard error:', error);
+  //   }
+  // }, [error]);
 
   // Fetch user profile and arc data on mount
-  useEffect(() => {
-    const fetchProfileAndArc = async () => {
-      try {
-        setError(null);
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('Not authenticated');
-        console.log('Fetching user profile...');
-        const profileRes = await fetch('https://api-gw-production.up.railway.app/api/user/profile', {
-          headers: { 'Authorization': `Bearer ${token}` },
-          credentials: 'include',
-        });
-        if (!profileRes.ok) throw new Error('Failed to fetch user profile');
-        const userProfile = await profileRes.json();
-        setProfile(userProfile);
-        console.log('Fetched user profile:', userProfile);
-        // 2. Get arc data
-        console.log('Fetching arc data...');
-        const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfile.id}/all_sections`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-          credentials: 'include',
-        });
-        if (!arcRes.ok) throw new Error('Failed to fetch arc data');
-        const arc = await arcRes.json();
-        setArcData(arc);
-        console.log('Fetched arc data:', arc);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load profile/arc data');
-        console.error('Error fetching profile/arc data:', err);
-      }
-    };
-    fetchProfileAndArc();
-  }, []);
+  // useEffect(() => {
+  //   const fetchProfileAndArc = async () => {
+  //     try {
+  //       setError(null);
+  //       const token = localStorage.getItem('token');
+  //       if (!token) throw new Error('Not authenticated');
+  //       console.log('Fetching user profile...');
+  //       const profileRes = await fetch('https://api-gw-production.up.railway.app/api/user/profile', {
+  //         headers: { 'Authorization': `Bearer ${token}` },
+  //         credentials: 'include',
+  //       });
+  //       if (!profileRes.ok) throw new Error('Failed to fetch user profile');
+  //       const userProfile = await profileRes.json();
+  //       setProfile(userProfile);
+  //       console.log('Fetched user profile:', userProfile);
+  //       // 2. Get arc data
+  //       console.log('Fetching arc data...');
+  //       const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfile.id}/all_sections`, {
+  //         headers: { 'Authorization': `Bearer ${token}` },
+  //         credentials: 'include',
+  //       });
+  //       if (!arcRes.ok) throw new Error('Failed to fetch arc data');
+  //       const arc = await arcRes.json();
+  //       setArcData(arc);
+  //       console.log('Fetched arc data:', arc);
+  //     } catch (err: any) {
+  //       setError(err.message || 'Failed to load profile/arc data');
+  //       console.error('Error fetching profile/arc data:', err);
+  //     }
+  //   };
+  //   fetchProfileAndArc();
+  // }, []);
 
   // Reset to step 1 if coming from menu
-  useEffect(() => {
-    if (localStorage.getItem('resetApplyStep') === 'true') {
-      setCurrentStep(1);
-      setJobDescription('');
-      setExtractedKeywords([]);
-      setMatchScore(0);
-      setJobTitle('');
-      setCompanyName('');
-      setGeneratedCV('');
-      setGeneratedCoverLetter('');
-      setThreadId(null);
-      localStorage.removeItem('resetApplyStep');
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (localStorage.getItem('resetApplyStep') === 'true') {
+  //     setCurrentStep(1);
+  //     setJobDescription('');
+  //     setExtractedKeywords([]);
+  //     setMatchScore(0);
+  //     setJobTitle('');
+  //     setCompanyName('');
+  //     setGeneratedCV('');
+  //     setGeneratedCoverLetter('');
+  //     setThreadId(null);
+  //     localStorage.removeItem('resetApplyStep');
+  //   }
+  // }, []);
 
   // Fetch credits on mount and after generation
-  const fetchCredits = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      const res = await fetch('https://api-gw-production.up.railway.app/api/user/credits', {
-        headers: { 'Authorization': `Bearer ${token}` },
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to fetch credits');
-      const data = await res.json();
-      // setCredits(data); // This line is removed as credits are now managed by context
-    } catch {}
-  };
-  useEffect(() => { fetchCredits(); }, []);
+  // const fetchCredits = async () => {
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     if (!token) throw new Error('Not authenticated');
+  //     const res = await fetch('https://api-gw-production.up.railway.app/api/user/credits', {
+  //       headers: { 'Authorization': `Bearer ${token}` },
+  //       credentials: 'include',
+  //     });
+  //     if (!res.ok) throw new Error('Failed to fetch credits');
+  //     const data = await res.json();
+  //     // setCredits(data); // This line is removed as credits are now managed by context
+  //   } catch {}
+  // };
+  // useEffect(() => { fetchCredits(); }, []);
 
   // Helper to merge profile and arc data
-  const getMergedProfile = () => {
-    if (!profile || !arcData) return null;
-    return {
-      ...profile,
-      work_experience: arcData.work_experience || [],
-      education: arcData.education || [],
-      skills: arcData.skills || [],
-      projects: arcData.projects || [],
-      certifications: arcData.certifications || [],
-      training: arcData.training || [],
-    };
-  };
+  // const getMergedProfile = () => {
+  //   if (!profile || !arcData) return null;
+  //   return {
+  //     ...profile,
+  //     work_experience: arcData.work_experience || [],
+  //     education: arcData.education || [],
+  //     skills: arcData.skills || [],
+  //     projects: arcData.projects || [],
+  //     certifications: arcData.certifications || [],
+  //     training: arcData.training || [],
+  //   };
+  // };
 
-  const steps = [
-    { number: 1, title: 'Paste Job Description' },
-    { number: 2, title: 'Review Arc Data & Keywords' },
-    { number: 3, title: 'Review & Download' },
-  ];
+  // const steps = [
+  //   { number: 1, title: 'Paste Job Description' },
+  //   { number: 2, title: 'Review Arc Data & Keywords' },
+  //   { number: 3, title: 'Review & Download' },
+  // ];
 
   // Replace handleJobDescriptionNext with real API call
-  const handleJobDescriptionNext = async () => {
-    if (!jobDescription.trim()) return;
-    setIsAnalyzing(true);
-    setError(null);
-    // Mark application as submitted in localStorage
-    localStorage.setItem('hasSubmittedApplication', 'true');
-    setCurrentStep(2);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      const mergedProfile = getMergedProfile();
-      if (!mergedProfile) throw new Error('Profile data not loaded');
-      // Build PII-free profile for assistant
-      const piiFreeProfile = buildPIIFreeProfile(profile, arcData);
-      // Dev-mode validation for PII
-      if (process.env.NODE_ENV === 'development') {
-        const piiError = validatePIIFreeProfile(piiFreeProfile);
-        if (piiError) {
-          // eslint-disable-next-line no-console
-          console.warn('PII validation failed:', piiError, piiFreeProfile);
-        }
-      }
-      const result = await extractKeywords(piiFreeProfile, jobDescription, token);
-      if (result.thread_id && !threadId) {
-        setThreadId(result.thread_id);
-      }
-      setExtractedKeywords((result.keywords || []).map((kw: any) => ({ text: kw.keyword, status: kw.status })));
-      setMatchScore(result.overall_match_percentage || 0);
-      setJobTitle(result.job_title || '');
-      setCompanyName(result.company_name || '');
-      setSalary(result.salary || '');
-      setContactName(result.contact_name || '');
-      setContactNumber(result.contact_number || '');
-      console.log('Extracted keywords result:', result);
-    } catch (err: any) {
-      setError(err.message || 'Keyword extraction failed');
-      console.error('Error extracting keywords:', err);
-      toast({ title: 'Error', description: err.message || 'Keyword extraction failed' });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
+  // const handleJobDescriptionNext = async () => {
+  //   if (!jobDescription.trim()) return;
+  //   setIsAnalyzing(true);
+  //   setError(null);
+  //   // Mark application as submitted in localStorage
+  //   localStorage.setItem('hasSubmittedApplication', 'true');
+  //   setCurrentStep(2);
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     if (!token) throw new Error('Not authenticated');
+  //     const mergedProfile = getMergedProfile();
+  //     if (!mergedProfile) throw new Error('Profile data not loaded');
+  //     // Build PII-free profile for assistant
+  //     const piiFreeProfile = buildPIIFreeProfile(profile, arcData);
+  //     // Dev-mode validation for PII
+  //     if (process.env.NODE_ENV === 'development') {
+  //       const piiError = validatePIIFreeProfile(piiFreeProfile);
+  //       if (piiError) {
+  //         // eslint-disable-next-line no-console
+  //         console.warn('PII validation failed:', piiError, piiFreeProfile);
+  //       }
+  //     }
+  //     const result = await extractKeywords(piiFreeProfile, jobDescription, token);
+  //     if (result.thread_id && !threadId) {
+  //       setThreadId(result.thread_id);
+  //     }
+  //     setExtractedKeywords((result.keywords || []).map((kw: any) => ({ text: kw.keyword, status: kw.status })));
+  //     setMatchScore(result.overall_match_percentage || 0);
+  //     setJobTitle(result.job_title || '');
+  //     setCompanyName(result.company_name || '');
+  //     setSalary(result.salary || '');
+  //     setContactName(result.contact_name || '');
+  //     setContactNumber(result.contact_number || '');
+  //     console.log('Extracted keywords result:', result);
+  //   } catch (err: any) {
+  //     setError(err.message || 'Keyword extraction failed');
+  //     console.error('Error extracting keywords:', err);
+  //     toast({ title: 'Error', description: err.message || 'Keyword extraction failed' });
+  //   } finally {
+  //     setIsAnalyzing(false);
+  //   }
+  // };
 
   // Refactored handleGenerate: only generate and preview, do not upload DOCX yet
-  const handleGenerate = async () => {
-    setIsGenerating(true);
-    setShowOptionsModal(false);
-    setError(null);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      const mergedProfile = getMergedProfile();
-      if (!mergedProfile) throw new Error('Profile data not loaded');
-      let payload;
-      if (threadId) {
-        payload = {
-          action: 'generate_cv',
-          thread_id: threadId
-        };
-      } else {
-        // When sending to the assistant, use the placeholder for name and contact_info
-        // per frontend guidance: send as strings, not arrays
-        const profileForAI = {
-          ...buildPIIFreeProfile(profile, arcData),
-          name: "{{CANDIDATE_NAME}}",
-          contact_info: "{{CONTACT_INFO}}"
-        };
-        payload = {
-          action: 'generate_cv',
-          profile: profileForAI,
-          job_description: jobDescription
-        };
-      }
-      // Generate both CV and Cover Letter in one call
-      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to generate documents');
-      const data = await res.json();
-      const normalizedData = {
-        ...data,
-        relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
-      };
-      if (normalizedData.thread_id && !threadId) {
-        setThreadId(normalizedData.thread_id);
-      }
-      setGeneratedCV(normalizedData.cv || '');
-      setGeneratedCoverLetter(normalizedData.cover_letter || '');
-      setJobTitle(normalizedData.job_title || '');
-      setCompanyName(normalizedData.company_name || '');
-      setStructuredCV(normalizedData); // Store structured data
-      console.log('Generated CV data:', normalizedData);
-      // Advance to preview step (step 3)
-      setCurrentStep(3);
-    } catch (err: any) {
-      setError(err.message || 'Document generation failed');
-      console.error('Error generating CV:', err);
-      toast({ title: 'Error', description: err.message || 'Document generation failed' });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  // const handleGenerate = async () => {
+  //   setIsGenerating(true);
+  //   setShowOptionsModal(false);
+  //   setError(null);
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     if (!token) throw new Error('Not authenticated');
+  //     const mergedProfile = getMergedProfile();
+  //     if (!mergedProfile) throw new Error('Profile data not loaded');
+  //     let payload;
+  //     if (threadId) {
+  //       payload = {
+  //         action: 'generate_cv',
+  //         thread_id: threadId
+  //       };
+  //     } else {
+  //       // When sending to the assistant, use the placeholder for name and contact_info
+  //       // per frontend guidance: send as strings, not arrays
+  //       const profileForAI = {
+  //         ...buildPIIFreeProfile(profile, arcData),
+  //         name: "{{CANDIDATE_NAME}}",
+  //         contact_info: "{{CONTACT_INFO}}"
+  //       };
+  //       payload = {
+  //         action: 'generate_cv',
+  //         profile: profileForAI,
+  //         job_description: jobDescription
+  //       };
+  //     }
+  //     // Generate both CV and Cover Letter in one call
+  //     const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${token}`
+  //       },
+  //       body: JSON.stringify(payload),
+  //       credentials: 'include',
+  //     });
+  //     if (!res.ok) throw new Error('Failed to generate documents');
+  //     const data = await res.json();
+  //     const normalizedData = {
+  //       ...data,
+  //       relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
+  //     };
+  //     if (normalizedData.thread_id && !threadId) {
+  //       setThreadId(normalizedData.thread_id);
+  //     }
+  //     setGeneratedCV(normalizedData.cv || '');
+  //     setGeneratedCoverLetter(normalizedData.cover_letter || '');
+  //     setJobTitle(normalizedData.job_title || '');
+  //     setCompanyName(normalizedData.company_name || '');
+  //     setStructuredCV(normalizedData); // Store structured data
+  //     console.log('Generated CV data:', normalizedData);
+  //     // Advance to preview step (step 3)
+  //     setCurrentStep(3);
+  //   } catch (err: any) {
+  //     setError(err.message || 'Document generation failed');
+  //     console.error('Error generating CV:', err);
+  //     toast({ title: 'Error', description: err.message || 'Document generation failed' });
+  //   } finally {
+  //     setIsGenerating(false);
+  //   }
+  // };
 
   // New handler: after preview, user clicks 'Save & Download' to generate/upload DOCX and persist CV
-  const handleSaveAndDownload = async () => {
-    // Validate all required fields before proceeding
-    const validationError = validateFinalCV(structuredCV);
-    if (validationError) {
-      setError(validationError);
-      console.error('CV validation failed:', validationError, structuredCV);
-      toast({ title: 'Error', description: validationError });
-      return;
-    }
-    setIsGenerating(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      // Debug log the payload
-      console.log('Sending structuredCV to /api/cv/generate-docx:', structuredCV);
-      // 1. Generate DOCX blob
-      const docxRes = await fetch('https://api-gw-production.up.railway.app/api/cv/generate-docx', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(structuredCV),
-        credentials: 'include',
-      });
-      if (!docxRes.ok) throw new Error('Failed to generate DOCX');
-      const docxBlob = await docxRes.blob();
-      // 2. Ensure uniqueJobTitle and uniqueCompanyName are defined and checked for duplicates
-      let uniqueJobTitle = jobTitle || structuredCV?.name || '';
-      let uniqueCompanyName = companyName || structuredCV?.company_name || '';
-      try {
-        const existingRes = await fetch('/api/cv', {
-          headers: { 'Authorization': `Bearer ${token}` },
-          credentials: 'include',
-        });
-        if (existingRes.ok) {
-          const existingCVs = await existingRes.json();
-          const sameTitleCount = existingCVs.filter((cv: any) =>
-            (cv.job_title || '') === uniqueJobTitle && (cv.company_name || '') === uniqueCompanyName
-          ).length;
-          if (sameTitleCount > 0) {
-            uniqueJobTitle = `${uniqueJobTitle} (${sameTitleCount + 1})`;
-          }
-        }
-      } catch (e) {
-        // If fetch fails, just proceed with the original job title
-      }
-      // 3. Build persist payload
-      const persistPayload = {
-        cv_docx_b64: await blobToBase64(docxBlob),
-        ...structuredCV,
-        // Use the real user name from the profile, not the job title
-        name: profile?.name || structuredCV?.name || '',
-        job_title: uniqueJobTitle,
-        company_name: uniqueCompanyName,
-        // If contact_info is present and not a string placeholder, ensure it's an array
-        contact_info: (structuredCV && typeof structuredCV.contact_info === 'string' && structuredCV.contact_info === "{{CONTACT_INFO}}")
-          ? "{{CONTACT_INFO}}"
-          : Array.isArray(structuredCV?.contact_info)
-            ? structuredCV.contact_info
-            : [],
-        // Inject real name in cover letter signature
-        cover_letter: injectNameInCoverLetter(structuredCV?.cover_letter, profile?.name),
-      };
-      console.log('Persist payload for /api/cv:', persistPayload);
-      // 4. Persist the CV
-      const persistRes = await fetch('/api/cv', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(persistPayload),
-        credentials: 'include',
-      });
-      if (!persistRes.ok) {
-        let errorMsg = 'Failed to save CV';
-        try {
-          const error = await persistRes.json();
-          errorMsg = error.detail || error.message || errorMsg;
-        } catch {}
-        setError(errorMsg);
-        console.error('Error saving CV:', errorMsg);
-        toast({ title: 'Error', description: errorMsg });
-        throw new Error(errorMsg);
-      }
-      toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
-      // Deduct a credit after successful generation
-      try {
-        const creditRes = await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`,'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'generate_cv' }),
-          credentials: 'include',
-        });
-        if (!creditRes.ok) {
-          setShowOutOfCreditsModal(true);
-          await refreshCredits();
-          return;
-        }
-        await refreshCredits();
-      } catch (e) {
-        console.error('Error deducting credits:', e);
-        setShowOutOfCreditsModal(true);
-      }
-      // In handleSaveAndDownload, after successful save (after toast for Documents Generated & Saved)
-      // Save job application to backend (jobTitle, companyName, jobDescription, appliedAt)
-      try {
-        const applicationHistoryPayload = {
-          job_title: uniqueJobTitle,
-          company_name: uniqueCompanyName,
-          job_description: jobDescription,
-          applied_at: new Date().toISOString(),
-          salary,
-          contact_name: contactName,
-          contact_number: contactNumber,
-        };
-        console.log('POST to application-history endpoint:', 'https://api-gw-production.up.railway.app/api/application-history');
-        console.log('POST to application-history payload:', applicationHistoryPayload);
-        const response = await createApplicationHistory(applicationHistoryPayload, token);
-        console.log('Application history response:', response);
-      } catch (e) {
-        console.error('Failed to save job application history', e);
-      }
-      window.location.href = '/my-cvs-new';
-    } catch (err: any) {
-      setError(err.message || 'Document save failed');
-      console.error('Error saving documents:', err);
-      toast({ title: 'Error', description: err.message || 'Document save failed' });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  // const handleSaveAndDownload = async () => {
+  //   // Validate all required fields before proceeding
+  //   const validationError = validateFinalCV(structuredCV);
+  //   if (validationError) {
+  //     setError(validationError);
+  //     console.error('CV validation failed:', validationError, structuredCV);
+  //     toast({ title: 'Error', description: validationError });
+  //     return;
+  //   }
+  //   setIsGenerating(true);
+  //   setError(null);
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     if (!token) throw new Error('Not authenticated');
+  //     // Debug log the payload
+  //     console.log('Sending structuredCV to /api/cv/generate-docx:', structuredCV);
+  //     // 1. Generate DOCX blob
+  //     const docxRes = await fetch('https://api-gw-production.up.railway.app/api/cv/generate-docx', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(structuredCV),
+  //       credentials: 'include',
+  //     });
+  //     if (!docxRes.ok) throw new Error('Failed to generate DOCX');
+  //     const docxBlob = await docxRes.blob();
+  //     // 2. Ensure uniqueJobTitle and uniqueCompanyName are defined and checked for duplicates
+  //     let uniqueJobTitle = jobTitle || structuredCV?.name || '';
+  //     let uniqueCompanyName = companyName || structuredCV?.company_name || '';
+  //     try {
+  //       const existingRes = await fetch('/api/cv', {
+  //         headers: { 'Authorization': `Bearer ${token}` },
+  //         credentials: 'include',
+  //       });
+  //       if (existingRes.ok) {
+  //         const existingCVs = await existingRes.json();
+  //         const sameTitleCount = existingCVs.filter((cv: any) =>
+  //           (cv.job_title || '') === uniqueJobTitle && (cv.company_name || '') === uniqueCompanyName
+  //         ).length;
+  //         if (sameTitleCount > 0) {
+  //           uniqueJobTitle = `${uniqueJobTitle} (${sameTitleCount + 1})`;
+  //         }
+  //       }
+  //     } catch (e) {
+  //       // If fetch fails, just proceed with the original job title
+  //     }
+  //     // 3. Build persist payload
+  //     const persistPayload = {
+  //       cv_docx_b64: await blobToBase64(docxBlob),
+  //       ...structuredCV,
+  //       // Use the real user name from the profile, not the job title
+  //       name: profile?.name || structuredCV?.name || '',
+  //       job_title: uniqueJobTitle,
+  //       company_name: uniqueCompanyName,
+  //       // If contact_info is present and not a string placeholder, ensure it's an array
+  //       contact_info: (structuredCV && typeof structuredCV.contact_info === 'string' && structuredCV.contact_info === "{{CONTACT_INFO}}")
+  //         ? "{{CONTACT_INFO}}"
+  //         : Array.isArray(structuredCV?.contact_info)
+  //           ? structuredCV.contact_info
+  //           : [],
+  //       // Inject real name in cover letter signature
+  //       cover_letter: injectNameInCoverLetter(structuredCV?.cover_letter, profile?.name),
+  //     };
+  //     console.log('Persist payload for /api/cv:', persistPayload);
+  //     // 4. Persist the CV
+  //     const persistRes = await fetch('/api/cv', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(persistPayload),
+  //       credentials: 'include',
+  //     });
+  //     if (!persistRes.ok) {
+  //       let errorMsg = 'Failed to save CV';
+  //       try {
+  //         const error = await persistRes.json();
+  //         errorMsg = error.detail || error.message || errorMsg;
+  //       } catch {}
+  //       setError(errorMsg);
+  //       console.error('Error saving CV:', errorMsg);
+  //       toast({ title: 'Error', description: errorMsg });
+  //       throw new Error(errorMsg);
+  //     }
+  //     toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
+  //     // Deduct a credit after successful generation
+  //     try {
+  //       const creditRes = await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
+  //         method: 'POST',
+  //         headers: { 'Authorization': `Bearer ${token}`,'Content-Type': 'application/json' },
+  //         body: JSON.stringify({ action: 'generate_cv' }),
+  //         credentials: 'include',
+  //       });
+  //       if (!creditRes.ok) {
+  //         setShowOutOfCreditsModal(true);
+  //         await refreshCredits();
+  //         return;
+  //       }
+  //       await refreshCredits();
+  //     } catch (e) {
+  //       console.error('Error deducting credits:', e);
+  //       setShowOutOfCreditsModal(true);
+  //     }
+  //     // In handleSaveAndDownload, after successful save (after toast for Documents Generated & Saved)
+  //     // Save job application to backend (jobTitle, companyName, jobDescription, appliedAt)
+  //     try {
+  //       const applicationHistoryPayload = {
+  //         job_title: uniqueJobTitle,
+  //         company_name: uniqueCompanyName,
+  //         job_description: jobDescription,
+  //         applied_at: new Date().toISOString(),
+  //         salary,
+  //         contact_name: contactName,
+  //         contact_number: contactNumber,
+  //       };
+  //       console.log('POST to application-history endpoint:', 'https://api-gw-production.up.railway.app/api/application-history');
+  //       console.log('POST to application-history payload:', applicationHistoryPayload);
+  //       const response = await createApplicationHistory(applicationHistoryPayload, token);
+  //       console.log('Application history response:', response);
+  //     } catch (e) {
+  //       console.error('Failed to save job application history', e);
+  //     }
+  //     window.location.href = '/my-cvs-new';
+  //   } catch (err: any) {
+  //     setError(err.message || 'Document save failed');
+  //     console.error('Error saving documents:', err);
+  //     toast({ title: 'Error', description: err.message || 'Document save failed' });
+  //   } finally {
+  //     setIsGenerating(false);
+  //   }
+  // };
 
   // Keyword extraction handler
-  const handleExtractKeywords = async (profile: any, jobDescription: string) => {
-    setIsAnalyzing(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      let payload;
-      if (threadId) {
-        payload = {
-          action: 'extract_keywords',
-          thread_id: threadId
-        };
-      } else {
-        payload = {
-          action: 'extract_keywords',
-          profile,
-          job_description: jobDescription
-        };
-      }
-      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Keyword extraction failed');
-      const data = await res.json();
-      if (data.thread_id && !threadId) setThreadId(data.thread_id);
-      setExtractedKeywords(data.keywords || []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to extract keywords');
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
+  // const handleExtractKeywords = async (profile: any, jobDescription: string) => {
+  //   setIsAnalyzing(true);
+  //   setError(null);
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     if (!token) throw new Error('Not authenticated');
+  //     let payload;
+  //     if (threadId) {
+  //       payload = {
+  //         action: 'extract_keywords',
+  //         thread_id: threadId
+  //       };
+  //     } else {
+  //       payload = {
+  //         action: 'extract_keywords',
+  //         profile,
+  //         job_description: jobDescription
+  //       };
+  //     }
+  //     const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${token}`
+  //       },
+  //       body: JSON.stringify(payload),
+  //       credentials: 'include',
+  //     });
+  //     if (!res.ok) throw new Error('Keyword extraction failed');
+  //     const data = await res.json();
+  //     if (data.thread_id && !threadId) setThreadId(data.thread_id);
+  //     setExtractedKeywords(data.keywords || []);
+  //   } catch (err: any) {
+  //     setError(err.message || 'Failed to extract keywords');
+  //   } finally {
+  //     setIsAnalyzing(false);
+  //   }
+  // };
 
-  const getKeywordColor = (status: Keyword['status']) => {
-    switch (status) {
-      case 'green': return 'success';
-      case 'amber': return 'warning';
-      case 'red': return 'destructive';
-      default: return 'secondary';
-    }
-  };
+  // const getKeywordColor = (status: Keyword['status']) => {
+  //   switch (status) {
+  //     case 'green': return 'success';
+  //     case 'amber': return 'warning';
+  //     case 'red': return 'destructive';
+  //     default: return 'secondary';
+  //   }
+  // };
 
-  const getKeywordIcon = (status: Keyword['status']) => {
-    switch (status) {
-      case 'green': return <CheckCircle className="w-3 h-3" />;
-      case 'amber': return <AlertCircle className="w-3 h-3" />;
-      case 'red': return <XCircle className="w-3 h-3" />;
-    }
-  };
+  // const getKeywordIcon = (status: Keyword['status']) => {
+  //   switch (status) {
+  //     case 'green': return <CheckCircle className="w-3 h-3" />;
+  //     case 'amber': return <AlertCircle className="w-3 h-3" />;
+  //     case 'red': return <XCircle className="w-3 h-3" />;
+  //   }
+  // };
 
   // Add useEffect to handle redirect after generation
   // Remove the useEffect that auto-redirects after generation
 
-  const handleApplyUpdates = async () => {
-    setIsUpdating(true);
-    // Do not close the modal immediately
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      if (!threadId) throw new Error('No thread ID available');
-      // Prepare keypoints arrays
-      const cv_keypoints = cvUpdateRequest
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
-      const cover_letter_keypoints = coverLetterUpdateRequest
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
-      // Map generationOptions.pages to string
-      let cv_length = '2_to_3_pages';
-      if (generationOptions.pages === 2) cv_length = '2_pages';
-      if (generationOptions.pages === 3) cv_length = '3_pages';
-      if (generationOptions.pages === 4) cv_length = '4_pages';
-      // Build payload
-      const payload = {
-        action: 'update_cv',
-        thread_id: threadId,
-        cv_keypoints,
-        cover_letter_keypoints,
-        cv_length,
-      };
-      // Send to backend
-      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to update documents');
-      const data = await res.json();
-      const normalizedData = {
-        ...data,
-        relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
-      };
-      // Defensive merge: always preserve previous structuredCV fields
-      setStructuredCV((prev: any) => ({
-        ...prev,
-        ...normalizedData,
-      }));
-      setGeneratedCV(normalizedData.cv || '');
-      setGeneratedCoverLetter(normalizedData.cover_letter || '');
-      setShowUpdateModal(false);
-      setCvUpdateRequest('');
-      setCoverLetterUpdateRequest('');
-      toast({ title: 'Documents Updated', description: 'Your CV and cover letter have been updated with your requests!' });
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message || 'Failed to update documents' });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
+  // const handleApplyUpdates = async () => {
+  //   setIsUpdating(true);
+  //   // Do not close the modal immediately
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     if (!token) throw new Error('Not authenticated');
+  //     if (!threadId) throw new Error('No thread ID available');
+  //     // Prepare keypoints arrays
+  //     const cv_keypoints = cvUpdateRequest
+  //       .split('\n')
+  //       .map(line => line.trim())
+  //       .filter(line => line.length > 0);
+  //     const cover_letter_keypoints = coverLetterUpdateRequest
+  //       .split('\n')
+  //       .map(line => line.trim())
+  //       .filter(line => line.length > 0);
+  //     // Map generationOptions.pages to string
+  //     let cv_length = '2_to_3_pages';
+  //     if (generationOptions.pages === 2) cv_length = '2_pages';
+  //     if (generationOptions.pages === 3) cv_length = '3_pages';
+  //     if (generationOptions.pages === 4) cv_length = '4_pages';
+  //     // Build payload
+  //     const payload = {
+  //       action: 'update_cv',
+  //       thread_id: threadId,
+  //       cv_keypoints,
+  //       cover_letter_keypoints,
+  //       cv_length,
+  //     };
+  //     // Send to backend
+  //     const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(payload),
+  //       credentials: 'include',
+  //     });
+  //     if (!res.ok) throw new Error('Failed to update documents');
+  //     const data = await res.json();
+  //     const normalizedData = {
+  //       ...data,
+  //       relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
+  //     };
+  //     // Defensive merge: always preserve previous structuredCV fields
+  //     setStructuredCV((prev: any) => ({
+  //       ...prev,
+  //       ...normalizedData,
+  //     }));
+  //     setGeneratedCV(normalizedData.cv || '');
+  //     setGeneratedCoverLetter(normalizedData.cover_letter || '');
+  //     setShowUpdateModal(false);
+  //     setCvUpdateRequest('');
+  //     setCoverLetterUpdateRequest('');
+  //     toast({ title: 'Documents Updated', description: 'Your CV and cover letter have been updated with your requests!' });
+  //   } catch (err: any) {
+  //     toast({ title: 'Error', description: err.message || 'Failed to update documents' });
+  //   } finally {
+  //     setIsUpdating(false);
+  //   }
+  // };
 
-  const handleGenerateWithLanguage = async () => {
-    setIsGenerating(true);
-    setShowOptionsModal(false);
-    setError(null);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      const mergedProfile = getMergedProfile();
-      if (!mergedProfile) throw new Error('Profile data not loaded');
-      // Always include profile and job_description, even if threadId is present
-      const profileForAI = {
-        ...buildPIIFreeProfile(profile, arcData),
-        name: "{{CANDIDATE_NAME}}",
-        contact_info: "{{CONTACT_INFO}}"
-      };
-      const payload = {
-        action: 'generate_cv',
-        thread_id: threadId || undefined,
-        profile: profileForAI,
-        job_description: jobDescription,
-        language: selectedLanguage,
-        numPages: generationOptions.pages,
-        includeKeywords: generationOptions.includeKeywords,
-        includeRelevantExperience: generationOptions.includeRelevantExperience,
-      };
-      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to generate documents');
-      const data = await res.json();
-      const normalizedData = {
-        ...data,
-        relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
-      };
-      if (normalizedData.thread_id && !threadId) {
-        setThreadId(normalizedData.thread_id);
-      }
-      setGeneratedCV(normalizedData.cv || '');
-      setGeneratedCoverLetter(normalizedData.cover_letter || '');
-      setJobTitle(normalizedData.job_title || '');
-      setCompanyName(normalizedData.company_name || '');
-      setStructuredCV(normalizedData);
-      setCurrentStep(3);
-    } catch (err: any) {
-      setError(err.message || 'Document generation failed');
-      console.error('Error generating CV with language:', err);
-      toast({ title: 'Error', description: err.message || 'Document generation failed' });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  // const handleGenerateWithLanguage = async () => {
+  //   setIsGenerating(true);
+  //   setShowOptionsModal(false);
+  //   setError(null);
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     if (!token) throw new Error('Not authenticated');
+  //     const mergedProfile = getMergedProfile();
+  //     if (!mergedProfile) throw new Error('Profile data not loaded');
+  //     // Always include profile and job_description, even if threadId is present
+  //     const profileForAI = {
+  //       ...buildPIIFreeProfile(profile, arcData),
+  //       name: "{{CANDIDATE_NAME}}",
+  //       contact_info: "{{CONTACT_INFO}}"
+  //     };
+  //     const payload = {
+  //       action: 'generate_cv',
+  //       thread_id: threadId || undefined,
+  //       profile: profileForAI,
+  //       job_description: jobDescription,
+  //       language: selectedLanguage,
+  //       numPages: generationOptions.pages,
+  //       includeKeywords: generationOptions.includeKeywords,
+  //       includeRelevantExperience: generationOptions.includeRelevantExperience,
+  //     };
+  //     const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${token}`
+  //       },
+  //       body: JSON.stringify(payload),
+  //       credentials: 'include',
+  //     });
+  //     if (!res.ok) throw new Error('Failed to generate documents');
+  //     const data = await res.json();
+  //     const normalizedData = {
+  //       ...data,
+  //       relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
+  //     };
+  //     if (normalizedData.thread_id && !threadId) {
+  //       setThreadId(normalizedData.thread_id);
+  //     }
+  //     setGeneratedCV(normalizedData.cv || '');
+  //     setGeneratedCoverLetter(normalizedData.cover_letter || '');
+  //     setJobTitle(normalizedData.job_title || '');
+  //     setCompanyName(normalizedData.company_name || '');
+  //     setStructuredCV(normalizedData);
+  //     setCurrentStep(3);
+  //   } catch (err: any) {
+  //     setError(err.message || 'Document generation failed');
+  //     console.error('Error generating CV with language:', err);
+  //     toast({ title: 'Error', description: err.message || 'Document generation failed' });
+  //   } finally {
+  //     setIsGenerating(false);
+  //   }
+  // };
 
   // 1. Add useEffect to deduct credits when entering step 3
   // (Removed to prevent double deduction)
 
   // 2. Add beforeunload warning on step 3 if not saved
-  useEffect(() => {
-    if (currentStep === 3) {
-      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-        e.preventDefault();
-        e.returnValue = "Are you sure you want to leave this page before this CV is saved - you won't be able to access it again.";
-        return e.returnValue;
-      };
-      window.addEventListener('beforeunload', handleBeforeUnload);
-      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-    }
-  }, [currentStep]);
+  // useEffect(() => {
+  //   if (currentStep === 3) {
+  //     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+  //       e.preventDefault();
+  //       e.returnValue = "Are you sure you want to leave this page before this CV is saved - you won't be able to access it again.";
+  //       return e.returnValue;
+  //     };
+  //     window.addEventListener('beforeunload', handleBeforeUnload);
+  //     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  //   }
+  // }, [currentStep]);
 
-  const filteredCV = filterByPriority(structuredCV, maxPriority);
-  function renderFilteredCV() {
-    if (!filteredCV || typeof filteredCV !== 'object') return <div>No CV data available.</div>;
-    return renderStructuredCV({
-      ...filteredCV,
-      relevant_achievements: showAchievements && Array.isArray(filteredCV?.relevant_achievements) ? filteredCV.relevant_achievements : [],
-      core_competencies: showCompetencies && Array.isArray(filteredCV?.core_competencies) ? filteredCV.core_competencies : [],
-      certifications: showCertifications && Array.isArray(filteredCV?.certifications) ? filteredCV.certifications : [],
-      education: showEducation && Array.isArray(filteredCV?.education) ? filteredCV.education : [],
-    });
-  }
+  // const filteredCV = filterByPriority(structuredCV, maxPriority);
+  // function renderFilteredCV() {
+  //   if (!filteredCV || typeof filteredCV !== 'object') return <div>No CV data available.</div>;
+  //   return renderStructuredCV({
+  //     ...filteredCV,
+  //     relevant_achievements: showAchievements && Array.isArray(filteredCV?.relevant_achievements) ? filteredCV.relevant_achievements : [],
+  //     core_competencies: showCompetencies && Array.isArray(filteredCV?.core_competencies) ? filteredCV.core_competencies : [],
+  //     certifications: showCertifications && Array.isArray(filteredCV?.certifications) ? filteredCV.certifications : [],
+  //     education: showEducation && Array.isArray(filteredCV?.education) ? filteredCV.education : [],
+  //   });
+  // }
 
   // Log all key state values before rendering
-  console.log('ApplicationWizard: currentStep', currentStep);
-  console.log('ApplicationWizard: error', error);
-  console.log('ApplicationWizard: profile', profile);
-  console.log('ApplicationWizard: arcData', arcData);
-  console.log('ApplicationWizard: structuredCV', structuredCV);
+  // console.log('ApplicationWizard: currentStep', currentStep);
+  // console.log('ApplicationWizard: error', error);
+  // console.log('ApplicationWizard: profile', profile);
+  // console.log('ApplicationWizard: arcData', arcData);
+  // console.log('ApplicationWizard: structuredCV', structuredCV);
 
   // Early return logs
-  if (error) {
-    console.error('ApplicationWizard: returning early due to error', error);
-    return <div>Error: {error}</div>;
-  }
+  // if (error) {
+  //   console.error('ApplicationWizard: returning early due to error', error);
+  //   return <div>Error: {error}</div>;
+  // }
 
   // Defensive early return to prevent TypeError on initial render
-  if (structuredCV == null) {
-    console.log('ApplicationWizard: structuredCV is null, rendering loading state');
-    return <div>Loading...</div>;
-  }
+  // if (structuredCV == null) {
+  //   console.log('ApplicationWizard: structuredCV is null, rendering loading state');
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-4xl pt-16">
-        {/* Progress Indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            {steps.map((step, index) => (
-              <div key={step.number} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep >= step.number 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-muted text-muted-foreground'
-                }`}>
-                  {step.number}
-                </div>
-                <span className={`ml-2 text-sm ${
-                  currentStep >= step.number ? 'text-foreground' : 'text-muted-foreground'
-                }`}>
-                  {step.title}
-                </span>
-                {index < steps.length - 1 && (
-                  <div className={`w-12 h-0.5 mx-4 ${
-                    currentStep > step.number ? 'bg-primary' : 'bg-muted'
-                  }`} />
-                )}
-              </div>
-            ))}
-          </div>
-          <Progress value={(currentStep / steps.length) * 100} className="w-full" />
-        </div>
-        {/* Step 1: Paste Job Description */}
-        {currentStep === 1 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                Paste Job Description
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Paste the job description below to get started. We'll analyze it to optimize your CV and cover letter.
-              </p>
-              <Textarea
-                placeholder="Paste the job description here..."
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                className="min-h-[300px]"
-              />
-              <Button 
-                onClick={handleJobDescriptionNext}
-                disabled={!jobDescription.trim()}
-                className="w-full"
-              >
-                Next: Review Arc Data
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-        {/* Step 2: Review Arc Data & Keywords */}
-        {currentStep === 2 && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Keyword Analysis</span>
-                  {jobTitle && (
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{jobTitle}</div>
-                      <div className="text-sm text-muted-foreground">{companyName}</div>
-                    </div>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isAnalyzing ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="text-center space-y-2">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      <p className="text-muted-foreground">Analyzing job description...</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">Match Score</h3>
-                      <div className="flex items-center gap-2">
-                        <div className={`text-2xl font-bold ${
-                          matchScore >= 70 ? 'text-green-600' : 
-                          matchScore >= 50 ? 'text-yellow-600' : 'text-red-600'
-                        }`}>
-                          {matchScore}%
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-medium mb-3">Extracted Keywords</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {extractedKeywords.map((keyword, index) => (
-                          <Badge
-                            key={index}
-                            className={`flex items-center gap-1 border ${
-                              keyword.status === 'green' ? 'bg-green-100 text-green-800 border-green-400' :
-                              keyword.status === 'amber' ? 'bg-yellow-100 text-yellow-800 border-yellow-400' :
-                              keyword.status === 'red' ? 'bg-red-100 text-red-800 border-red-400' :
-                              'bg-muted'
-                            }`}
-                          >
-                            {keyword.text}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => setShowOptionsModal(true)}
-                      className="w-full"
-                      disabled={isGenerating}
-                    >
-                      Generate CV & Cover Letter
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                    {/* Exit button for low score or user cancellation */}
-                    <Button
-                      variant="outline"
-                      className="w-full mt-2"
-                      onClick={() => window.location.href = '/dashboard'}
-                      type="button"
-                    >
-                      Exit
-                    </Button>
-                  </div>
-                )}
-               </CardContent>
-            </Card>
-          </div>
-        )}
-        {isGenerating && currentStep === 2 && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center min-w-[320px]">
-              <svg className="animate-spin h-8 w-8 text-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
-              <div className="space-y-2 text-center">
-                <div className="font-semibold text-lg">Generating your application...</div>
-                <ul className="text-sm text-muted-foreground space-y-1 mt-2">
-                  <li>• Curating expertise</li>
-                  <li>• Comparing expertise to job advert</li>
-                  <li>• Generating CV</li>
-                  <li>• Generating cover letter</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-        {/* Step 3: Preview Generated Documents */}
-        {currentStep === 3 && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Preview Generated Documents</span>
-                  {jobTitle && (
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{jobTitle}</div>
-                      <div className="text-sm text-muted-foreground">{companyName}</div>
-                    </div>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Info message about placeholders */}
-                <div className="mb-4 text-info text-sm font-semibold bg-blue-50 border border-blue-200 rounded p-2">
-                  For your privacy, personal details like your name and contact info are never sent to our AI provider. Placeholders (e.g., {'{{CANDIDATE_NAME}}'}) will be replaced with your real details in the final document.
-                </div>
-                {/* Show validation error if Save & Download is disabled */}
-                {validateFinalCV(structuredCV) && (
-                  <div className="mb-2 text-destructive text-sm font-semibold">
-                    {validateFinalCV(structuredCV)}
-                  </div>
-                )}
-                {error && (
-                  <div className="mb-4 text-destructive text-sm font-semibold">{error}</div>
-                )}
-                {/* Defensive check for structuredCV here: */}
-                {!structuredCV || typeof structuredCV !== 'object' ? (
-                  <div>Loading CV data...</div>
-                ) : (
-                  <>
-                    {/* 4. Add UI controls to preview pane in step 3 */}
-                    <div className="flex flex-col md:flex-row gap-4 mb-4">
-                      <div>
-                        <label className="font-medium mr-2">CV Length:</label>
-                        {[2, 3, 4].map(p => (
-                          <label key={p} className="mr-2">
-                            <input type="radio" name="cv-length" value={p} checked={maxPriority === p} onChange={() => setMaxPriority(p)} />
-                            {p} Page{p > 1 ? 's' : ''}
-                          </label>
-                        ))}
-                      </div>
-                      <div className="flex gap-4">
-                        <label><input type="checkbox" checked={showAchievements} onChange={e => setShowAchievements(e.target.checked)} /> Achievements</label>
-                        <label><input type="checkbox" checked={showCompetencies} onChange={e => setShowCompetencies(e.target.checked)} /> Competencies</label>
-                        <label><input type="checkbox" checked={showCertifications} onChange={e => setShowCertifications(e.target.checked)} /> Certifications</label>
-                        <label><input type="checkbox" checked={showEducation} onChange={e => setShowEducation(e.target.checked)} /> Education</label>
-                      </div>
-                    </div>
-                    <Tabs defaultValue="cv" className="w-full">
-                      <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="cv">Optimized CV</TabsTrigger>
-                        <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="cv" className="space-y-4">
-                        {renderFilteredCV()}
-                      </TabsContent>
-                      <TabsContent value="cover-letter" className="space-y-4">
-                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm">{injectNameInCoverLetter(generatedCoverLetter, profile?.name)}</pre>
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                    <div className="flex gap-4 mt-6">
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowUpdateModal(true)}
-                        className="flex-1"
-                        type="button"
-                      >
-                        Request Updates
-                      </Button>
-                      <Button
-                        onClick={handleSaveAndDownload}
-                        className="flex-1"
-                        disabled={isGenerating || !!validateFinalCV(structuredCV)}
-                        type="button"
-                      >
-                        {isGenerating ? 'Saving...' : 'Go to Download CVs Page'}
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
-        {/* Loading state for step 3 */}
-        {currentStep === 3 && isGenerating && (
-          <Card>
-            <CardContent className="py-12">
-              <div className="text-center space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <h3 className="text-lg font-semibold">Generating Your Documents</h3>
-                <p className="text-muted-foreground">
-                  Please wait while we create your optimized CV and cover letter...
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <h1>Apply Flow Minimal Test</h1>
+        <div>hello</div>
       </div>
-      {/* Generation Options Modal */}
-      <Dialog open={showOptionsModal} onOpenChange={setShowOptionsModal}>
-        <DialogContent aria-describedby="application-wizard-modal-desc">
-          <DialogHeader>
-            <DialogTitle>Generation Options</DialogTitle>
-          </DialogHeader>
-          <div id="application-wizard-modal-desc" className="space-y-6 py-4">
-            <div>
-              <h4 className="font-medium mb-3">Number of Pages</h4>
-              <div className="flex gap-2">
-                {[2, 3, 4].map((pages) => (
-                  <Button
-                    key={pages}
-                    variant={generationOptions.pages === pages ? "default" : "outline"}
-                    onClick={() => setGenerationOptions(prev => ({ ...prev, pages: pages as 2 | 3 | 4 }))}
-                  >
-                    {pages} Pages
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="font-medium mb-3">Language</h4>
-              <select
-                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
-                value={selectedLanguage}
-                onChange={e => setSelectedLanguage(e.target.value)}
-              >
-                <option>UK English</option>
-                <option>US English</option>
-                <option>Canadian English</option>
-                <option>Australian English</option>
-                <option>French</option>
-                <option>German</option>
-                <option>Spanish</option>
-                <option>Italian</option>
-                <option>Portuguese</option>
-                <option>Dutch</option>
-                <option>Swedish</option>
-                <option>Norwegian</option>
-                <option>Danish</option>
-                <option>Finnish</option>
-              </select>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label htmlFor="keywords" className="font-medium">
-                  Include Keywords
-                </label>
-                <Switch
-                  id="keywords"
-                  checked={generationOptions.includeKeywords}
-                  onCheckedChange={(checked) => 
-                    setGenerationOptions(prev => ({ ...prev, includeKeywords: checked }))
-                  }
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <label htmlFor="experience" className="font-medium">
-                  Include Relevant Experience
-                </label>
-                <Switch
-                  id="experience"
-                  checked={generationOptions.includeRelevantExperience}
-                  onCheckedChange={(checked) => 
-                    setGenerationOptions(prev => ({ ...prev, includeRelevantExperience: checked }))
-                  }
-                />
-              </div>
-            </div>
-            <Button onClick={handleGenerateWithLanguage} className="w-full">
-              Generate Documents
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      {/* Out of Credits Modal */}
-      <Dialog open={showOutOfCreditsModal} onOpenChange={setShowOutOfCreditsModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Out of Credits</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4 text-center">
-            <p className="text-lg text-destructive font-semibold">You have run out of credits.</p>
-            <p className="text-muted-foreground">Please visit the pricing page to top up or upgrade your plan.</p>
-            <Button className="w-full" onClick={() => window.location.href = '/pricing'}>Go to Pricing</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      {/* Request Updates Modal */}
-      <Dialog open={showUpdateModal} onOpenChange={setShowUpdateModal}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Request Document Updates</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6 py-4">
-            <p className="text-muted-foreground">
-              Provide specific updates you'd like to see in your CV and cover letter. The AI will incorporate your requests into the documents.
-            </p>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  CV Updates
-                </label>
-                <Textarea
-                  placeholder="e.g., Please include worked at Space X on a project whilst at NASA..."
-                  value={cvUpdateRequest}
-                  onChange={(e) => setCvUpdateRequest(e.target.value)}
-                  className="min-h-[100px]"
-                  disabled={isUpdating}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Cover Letter Updates
-                </label>
-                <Textarea
-                  placeholder="e.g., Mention my experience with machine learning projects..."
-                  value={coverLetterUpdateRequest}
-                  onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
-                  className="min-h-[100px]"
-                  disabled={isUpdating}
-                />
-              </div>
-            </div>
-            {isUpdating && (
-              <div className="flex flex-col items-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
-                <div className="text-muted-foreground text-sm">Applying your updates, please wait...</div>
-              </div>
-            )}
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setShowUpdateModal(false)} className="flex-1" type="button" disabled={isUpdating}>
-                Cancel
-              </Button>
-              <Button onClick={handleApplyUpdates} disabled={isUpdating || !cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()} className="flex-1" type="button">
-                Apply Updates
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
