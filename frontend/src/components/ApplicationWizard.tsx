@@ -110,7 +110,21 @@ function renderStructuredCV(cvData: any) {
       {cvData.contact_info && Array.isArray(cvData.contact_info) && (
         <div className="text-sm text-muted-foreground">{cvData.contact_info.filter(Boolean).join(' | ')}</div>
       )}
-      {cvData.summary && <p className="mt-2 text-base">{cvData.summary}</p>}
+      {cvData.summary && <p className="mt-2 text-base">{cvData.summary.content}</p>}
+
+      {/* Achievements */}
+      {cvData.relevant_achievements && Array.isArray(cvData.relevant_achievements) && cvData.relevant_achievements.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Relevant Achievements</h3>
+          <ul className="list-disc list-inside ml-4">
+            {cvData.relevant_achievements.map((a: any, idx: number) => (
+              <li key={idx}>{a.content}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Experience */}
       {cvData.experience && Array.isArray(cvData.experience) && cvData.experience.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Professional Experience</h3>
@@ -120,8 +134,8 @@ function renderStructuredCV(cvData: any) {
                 <div className="font-medium">{exp.job_title}{exp.company_name ? `, ${exp.company_name}` : ''}{exp.dates ? `, ${exp.dates}` : ''}</div>
                 {exp.responsibilities && Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
                   <ul className="list-disc list-inside ml-4">
-                    {exp.responsibilities.map((resp: string, i: number) => (
-                      <li key={i}>{resp}</li>
+                    {exp.responsibilities.map((resp: any, i: number) => (
+                      <li key={i}>{resp.content}</li>
                     ))}
                   </ul>
                 )}
@@ -130,6 +144,8 @@ function renderStructuredCV(cvData: any) {
           </ul>
         </div>
       )}
+
+      {/* Education */}
       {cvData.education && Array.isArray(cvData.education) && cvData.education.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Education</h3>
@@ -137,36 +153,38 @@ function renderStructuredCV(cvData: any) {
             {cvData.education.map((edu: any, idx: number) => (
               <li key={idx}>
                 <div className="font-medium">{edu.degree}{edu.institution ? `, ${edu.institution}` : ''}{edu.year ? `, ${edu.year}` : ''}</div>
-                {edu.location && <div className="text-sm text-muted-foreground">{edu.location}</div>}
               </li>
             ))}
           </ul>
         </div>
       )}
+
+      {/* Certifications */}
       {cvData.certifications && Array.isArray(cvData.certifications) && cvData.certifications.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Certifications</h3>
           <ul className="list-disc list-inside ml-4">
             {cvData.certifications.map((cert: any, idx: number) => (
-              <li key={idx}>
-                {typeof cert === 'string'
-                  ? cert
-                  : `${cert.name || ''}${cert.issuer ? ' (' + cert.issuer + ')' : ''}${cert.year ? ' - ' + cert.year : ''}`}
-              </li>
+              <li key={idx}>{cert.content}</li>
             ))}
           </ul>
         </div>
       )}
+
+      {/* Core Competencies */}
       {cvData.core_competencies && Array.isArray(cvData.core_competencies) && cvData.core_competencies.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Core Competencies</h3>
           <div className="flex flex-wrap gap-2">
-            {cvData.core_competencies.map((comp: string, idx: number) => (
-              <span key={idx} className="bg-muted px-2 py-1 rounded text-xs">{comp}</span>
+            {cvData.core_competencies.map((comp: any, idx: number) => (
+              <span key={idx} className="bg-muted px-2 py-1 rounded text-xs">{comp.content}</span>
             ))}
           </div>
         </div>
       )}
+
+      {/* Cover Letter */}
+      {cvData.cover_letter && <div className="mt-4"><h3 className="text-lg font-semibold mb-2">Cover Letter</h3><p>{cvData.cover_letter.content}</p></div>}
     </div>
   );
 }
