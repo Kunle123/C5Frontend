@@ -850,10 +850,10 @@ const ApplicationWizard = () => {
     if (!filteredCV) return <div>No CV data available.</div>;
     return renderStructuredCV({
       ...filteredCV,
-      relevant_achievements: showAchievements ? filteredCV.relevant_achievements : [],
-      core_competencies: showCompetencies ? filteredCV.core_competencies : [],
-      certifications: showCertifications ? filteredCV.certifications : [],
-      education: showEducation ? filteredCV.education : [],
+      relevant_achievements: showAchievements ? (filteredCV.relevant_achievements ?? []) : [],
+      core_competencies: showCompetencies ? (filteredCV.core_competencies ?? []) : [],
+      certifications: showCertifications ? (filteredCV.certifications ?? []) : [],
+      education: showEducation ? (filteredCV.education ?? []) : [],
     });
   }
 
