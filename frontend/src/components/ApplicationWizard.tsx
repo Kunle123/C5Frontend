@@ -103,17 +103,17 @@ function blobToBase64(blob: Blob): Promise<string> {
 
 // Add a utility to render the structured CV as JSX
 function renderStructuredCV(cvData: any) {
-  if (!cvData) return <div>No CV data available.</div>;
+  if (!cvData || typeof cvData !== 'object') return <div>No CV data available.</div>;
   return (
     <div className="space-y-4">
       {cvData.name && <h2 className="text-2xl font-bold">{cvData.name}</h2>}
       {cvData.contact_info && Array.isArray(cvData.contact_info) && (
         <div className="text-sm text-muted-foreground">{cvData.contact_info.filter(Boolean).join(' | ')}</div>
       )}
-      {cvData.summary && <p className="mt-2 text-base">{cvData.summary.content}</p>}
+      {cvData.summary && cvData.summary.content && <p className="mt-2 text-base">{cvData.summary.content}</p>}
 
       {/* Achievements */}
-      {cvData.relevant_achievements && Array.isArray(cvData.relevant_achievements) && cvData.relevant_achievements.length > 0 && (
+      {Array.isArray(cvData.relevant_achievements) && cvData.relevant_achievements.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Relevant Achievements</h3>
           <ul className="list-disc list-inside ml-4">
@@ -125,14 +125,14 @@ function renderStructuredCV(cvData: any) {
       )}
 
       {/* Experience */}
-      {cvData.experience && Array.isArray(cvData.experience) && cvData.experience.length > 0 && (
+      {Array.isArray(cvData.experience) && cvData.experience.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Professional Experience</h3>
           <ul className="space-y-2">
             {cvData.experience.map((exp: any, idx: number) => (
               <li key={idx}>
                 <div className="font-medium">{exp.job_title}{exp.company_name ? `, ${exp.company_name}` : ''}{exp.dates ? `, ${exp.dates}` : ''}</div>
-                {exp.responsibilities && Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
+                {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
                   <ul className="list-disc list-inside ml-4">
                     {exp.responsibilities.map((resp: any, i: number) => (
                       <li key={i}>{resp.content}</li>
@@ -146,7 +146,7 @@ function renderStructuredCV(cvData: any) {
       )}
 
       {/* Education */}
-      {cvData.education && Array.isArray(cvData.education) && cvData.education.length > 0 && (
+      {Array.isArray(cvData.education) && cvData.education.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Education</h3>
           <ul className="space-y-2">
@@ -160,7 +160,7 @@ function renderStructuredCV(cvData: any) {
       )}
 
       {/* Certifications */}
-      {cvData.certifications && Array.isArray(cvData.certifications) && cvData.certifications.length > 0 && (
+      {Array.isArray(cvData.certifications) && cvData.certifications.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Certifications</h3>
           <ul className="list-disc list-inside ml-4">
@@ -172,7 +172,7 @@ function renderStructuredCV(cvData: any) {
       )}
 
       {/* Core Competencies */}
-      {cvData.core_competencies && Array.isArray(cvData.core_competencies) && cvData.core_competencies.length > 0 && (
+      {Array.isArray(cvData.core_competencies) && cvData.core_competencies.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mt-4 mb-2">Core Competencies</h3>
           <div className="flex flex-wrap gap-2">
@@ -184,7 +184,7 @@ function renderStructuredCV(cvData: any) {
       )}
 
       {/* Cover Letter */}
-      {cvData.cover_letter && <div className="mt-4"><h3 className="text-lg font-semibold mb-2">Cover Letter</h3><p>{cvData.cover_letter.content}</p></div>}
+      {cvData.cover_letter && cvData.cover_letter.content && <div className="mt-4"><h3 className="text-lg font-semibold mb-2">Cover Letter</h3><p>{cvData.cover_letter.content}</p></div>}
     </div>
   );
 }
@@ -850,13 +850,14 @@ const ApplicationWizard = () => {
     if (!filteredCV || typeof filteredCV !== 'object') return <div>No CV data available.</div>;
     return renderStructuredCV({
       ...filteredCV,
-      relevant_achievements: showAchievements && Array.isArray(filteredCV.relevant_achievements) ? filteredCV.relevant_achievements : [],
-      core_competencies: showCompetencies && Array.isArray(filteredCV.core_competencies) ? filteredCV.core_competencies : [],
-      certifications: showCertifications && Array.isArray(filteredCV.certifications) ? filteredCV.certifications : [],
-      education: showEducation && Array.isArray(filteredCV.education) ? filteredCV.education : [],
+      relevant_achievements: showAchievements && Array.isArray(filteredCV?.relevant_achievements) ? filteredCV.relevant_achievements : [],
+      core_competencies: showCompetencies && Array.isArray(filteredCV?.core_competencies) ? filteredCV.core_competencies : [],
+      certifications: showCertifications && Array.isArray(filteredCV?.certifications) ? filteredCV.certifications : [],
+      education: showEducation && Array.isArray(filteredCV?.education) ? filteredCV.education : [],
     });
   }
 
+  // Defensive check at the top of the component
   if (!structuredCV || typeof structuredCV !== 'object') {
     return <div>Loading CV data...</div>;
   }
