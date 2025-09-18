@@ -54,6 +54,13 @@ export function Navigation() {
       </div>
       <div className="flex items-center gap-4">
         <span className="hidden md:inline text-base text-foreground">Dashboard</span>
+        {/* Show Login/Register if not logged in */}
+        {!isLoggedIn && (
+          <>
+            <Button variant="outline" size="sm" onClick={() => navigate('/login')} className="ml-2">Login</Button>
+            <Button variant="default" size="sm" onClick={() => navigate('/signup')} className="ml-2">Register</Button>
+          </>
+        )}
         {/* Menu icon/button here */}
         <button
           className="flex items-center px-2 py-2 rounded hover:bg-accent focus:outline-none"
