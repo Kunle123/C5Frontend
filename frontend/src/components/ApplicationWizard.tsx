@@ -916,6 +916,12 @@ const ApplicationWizard = () => {
     return <div>Error: {error}</div>;
   }
 
+  // Defensive early return to prevent TypeError on initial render
+  if (structuredCV == null) {
+    console.log('ApplicationWizard: structuredCV is null, rendering loading state');
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
