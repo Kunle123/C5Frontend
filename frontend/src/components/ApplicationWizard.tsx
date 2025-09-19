@@ -49,6 +49,7 @@ function filterByPriority(data: CVData, maxPriority: number): CVData {
 
 // --- Render utility ---
 function renderStructuredCV(cvData: any) {
+  console.log('renderStructuredCV called with:', cvData);
   if (!cvData || typeof cvData !== 'object') return <div>No CV data available.</div>;
   return (
     <div className="space-y-4">
@@ -142,6 +143,8 @@ const ApplicationWizard = () => {
   const [showCompetencies, setShowCompetencies] = useState(true);
   const [showCertifications, setShowCertifications] = useState(true);
   const [showEducation, setShowEducation] = useState(true);
+  // Store thread_id from backend
+  const [threadId, setThreadId] = useState<string | null>(null);
 
   // Fetch profile and arc data on mount
   useEffect(() => {
@@ -197,6 +200,7 @@ const ApplicationWizard = () => {
       const data = await res.json();
       setExtractedKeywords((data.keywords || []).map((kw: any) => ({ text: kw.keyword, status: kw.status })));
       setMatchScore(data.overall_match_percentage || 0);
+      setThreadId(data.thread_id || null); // <-- Store thread_id from response
       setCurrentStep(2);
     } catch (err: any) {
       setError(err.message || 'Failed to extract keywords');
@@ -212,6 +216,9 @@ const ApplicationWizard = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Not authenticated');
+      // Debug logs to find thread_id
+      console.log('arcData:', arcData);
+      console.log('profile:', profile);
       const payload = {
         action: 'generate_cv',
         profile: arcData, // or buildPIIFreeProfile(profile, arcData)
@@ -219,7 +226,9 @@ const ApplicationWizard = () => {
         numPages: maxPriority,
         includeKeywords: showCompetencies,
         includeRelevantExperience: showAchievements,
+        thread_id: threadId || arcData?.thread_id || profile?.thread_id || '' // Use threadId from state
       };
+      console.log('CV generation payload:', payload);
       const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
         method: 'POST',
         headers: {
@@ -371,7 +380,7 @@ const ApplicationWizard = () => {
               </label>
             </div>
             {/* Filtered preview */}
-            {(() => { console.log('structuredCV for preview:', structuredCV); return null; })()}
+            {console.log('structuredCV for preview:', structuredCV)}
             {structuredCV ? renderStructuredCV({
               ...filterByPriority(structuredCV, maxPriority),
               relevant_achievements: showAchievements && Array.isArray(structuredCV?.relevant_achievements) ? filterByPriority(structuredCV, maxPriority).relevant_achievements : [],
