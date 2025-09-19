@@ -604,7 +604,8 @@ const ApplicationWizard = () => {
                               id="achievements"
                               checked={generationOptions.sections.achievements}
                               onCheckedChange={(checked) => {
-                                const newSections = { ...generationOptions.sections, achievements: checked };
+                                const isChecked = checked === true;
+                                const newSections = { ...generationOptions.sections, achievements: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
                                 setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
                               }}
@@ -616,7 +617,8 @@ const ApplicationWizard = () => {
                               id="competencies"
                               checked={generationOptions.sections.competencies}
                               onCheckedChange={(checked) => {
-                                const newSections = { ...generationOptions.sections, competencies: checked };
+                                const isChecked = checked === true;
+                                const newSections = { ...generationOptions.sections, competencies: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
                                 setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
                               }}
@@ -628,7 +630,8 @@ const ApplicationWizard = () => {
                               id="certifications"
                               checked={generationOptions.sections.certifications}
                               onCheckedChange={(checked) => {
-                                const newSections = { ...generationOptions.sections, certifications: checked };
+                                const isChecked = checked === true;
+                                const newSections = { ...generationOptions.sections, certifications: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
                                 setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
                               }}
@@ -640,7 +643,8 @@ const ApplicationWizard = () => {
                               id="education"
                               checked={generationOptions.sections.education}
                               onCheckedChange={(checked) => {
-                                const newSections = { ...generationOptions.sections, education: checked };
+                                const isChecked = checked === true;
+                                const newSections = { ...generationOptions.sections, education: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
                                 setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
                               }}
