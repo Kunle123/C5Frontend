@@ -231,6 +231,7 @@ const ApplicationWizard = () => {
       });
       if (!res.ok) throw new Error('Failed to generate CV');
       const data = await res.json();
+      console.log('CV generation response:', data); // <-- Debug log
       const normalizedData = {
         ...data,
         relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
@@ -370,6 +371,7 @@ const ApplicationWizard = () => {
               </label>
             </div>
             {/* Filtered preview */}
+            {(() => { console.log('structuredCV for preview:', structuredCV); return null; })()}
             {structuredCV ? renderStructuredCV({
               ...filterByPriority(structuredCV, maxPriority),
               relevant_achievements: showAchievements && Array.isArray(structuredCV?.relevant_achievements) ? filterByPriority(structuredCV, maxPriority).relevant_achievements : [],
