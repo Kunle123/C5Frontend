@@ -351,6 +351,14 @@ const ApplicationWizard = () => {
       <div className="space-y-4">
         {cv.name && <h2 className="text-xl font-bold">{cv.name}</h2>}
         {cv.summary?.content && <div><strong>Summary:</strong> {cv.summary.content}</div>}
+        {options.sections.competencies && filterByPriority(cv.core_competencies).length > 0 && (
+          <div>
+            <h3 className="font-semibold">Core Competencies</h3>
+            <ul className="list-disc ml-6">
+              {filterByPriority(cv.core_competencies).map((c: PriorityItem, i: number) => <li key={i}>{c.content}</li>)}
+            </ul>
+          </div>
+        )}
         {options.sections.achievements && filterByPriority(cv.relevant_achievements).length > 0 && (
           <div>
             <h3 className="font-semibold">Achievements</h3>
@@ -372,14 +380,6 @@ const ApplicationWizard = () => {
                 )}
               </div>
             ))}
-          </div>
-        )}
-        {options.sections.competencies && filterByPriority(cv.core_competencies).length > 0 && (
-          <div>
-            <h3 className="font-semibold">Core Competencies</h3>
-            <ul className="list-disc ml-6">
-              {filterByPriority(cv.core_competencies).map((c: PriorityItem, i: number) => <li key={i}>{c.content}</li>)}
-            </ul>
           </div>
         )}
         {options.sections.education && filterByPriority(cv.education).length > 0 && (
@@ -667,18 +667,17 @@ const ApplicationWizard = () => {
                       <TabsContent value="cover-letter" className="space-y-4">
                         <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
                           {(() => {
-                            const doc = Object.values(generatedDocuments)[0];
-                            const cv = doc?.cv;
-                            const coverLetter = doc?.coverLetter;
+                            const doc = Object.values(generatedDocuments)[0] as any;
+                            const cv = doc?.cv as any;
+                            const coverLetter = doc?.coverLetter as any;
                             let content = '';
-                            if (coverLetter && typeof coverLetter === 'object' && coverLetter.content) {
+                            if (coverLetter && typeof coverLetter === 'object' && 'content' in coverLetter) {
                               content = coverLetter.content;
                             } else if (typeof coverLetter === 'string') {
                               content = coverLetter;
                             }
-                            // Try to get candidate name from cv object
                             let candidateName = '';
-                            if (cv && typeof cv === 'object' && cv.name) {
+                            if (cv && typeof cv === 'object' && 'name' in cv) {
                               candidateName = cv.name;
                             }
                             return (
