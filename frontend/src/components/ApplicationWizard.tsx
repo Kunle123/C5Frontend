@@ -167,7 +167,7 @@ const ApplicationWizard = () => {
     try {
       const profile = { ...(userProfile || {}), ...(arcData || {}) };
       const payload: any = {
-        action: 'generate_cv',
+          action: 'generate_cv',
         profile,
         job_description: jobDescription,
         numPages: generationOptions.length === 'short' ? 1 : generationOptions.length === 'medium' ? 2 : 3,
@@ -317,10 +317,24 @@ const ApplicationWizard = () => {
     cv: CVType,
     options: GenerationOptions
   ) {
-    if (!cv) return <div>No CV data available.</div>;
+    console.log('renderStructuredCV called', cv, options);
     const maxPriority = getMaxPriority(options.length);
     const filterByPriority = (arr: PriorityItem[] | undefined): PriorityItem[] => Array.isArray(arr) ? arr.filter((item: PriorityItem) => (item.priority ?? 1) <= maxPriority) : [];
-    return (
+    console.log('Achievements:', filterByPriority(cv.relevant_achievements));
+    console.log('Experience:', cv.experience);
+    console.log('Competencies:', filterByPriority(cv.core_competencies));
+    console.log('Education:', filterByPriority(cv.education));
+    if (!cv) return <div>No CV data available.</div>;
+    if (
+      !cv.summary?.content &&
+      filterByPriority(cv.relevant_achievements).length === 0 &&
+      (!Array.isArray(cv.experience) || cv.experience.length === 0) &&
+      filterByPriority(cv.core_competencies).length === 0 &&
+      filterByPriority(cv.education).length === 0
+    ) {
+      return <div style={{ color: 'red' }}>No CV sections to display (all filtered out or empty).</div>;
+    }
+  return (
       <div className="space-y-4">
         {cv.name && <h2 className="text-xl font-bold">{cv.name}</h2>}
         {cv.summary?.content && <div><strong>Summary:</strong> {cv.summary.content}</div>}
@@ -389,6 +403,8 @@ const ApplicationWizard = () => {
   }
 
   return (
+    <div>
+      <div style={{ color: 'blue', fontWeight: 'bold' }}>TOP-LEVEL TEST: ApplicationWizard is rendering</div>
     <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -438,14 +454,14 @@ const ApplicationWizard = () => {
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 className="min-h-[300px]"
-                disabled={isAnalyzing}
+                  disabled={isAnalyzing}
               />
               <Button 
                 onClick={handleJobDescriptionNext}
-                disabled={!jobDescription.trim() || isAnalyzing}
+                  disabled={!jobDescription.trim() || isAnalyzing}
                 className="w-full"
               >
-                {isAnalyzing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {isAnalyzing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Next: Review Arc Data
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -471,8 +487,8 @@ const ApplicationWizard = () => {
               <CardContent>
                 {isAnalyzing ? (
                   <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
-                    <p className="text-muted-foreground ml-4">Analyzing job description...</p>
+                      <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
+                      <p className="text-muted-foreground ml-4">Analyzing job description...</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
@@ -480,8 +496,8 @@ const ApplicationWizard = () => {
                       <h3 className="text-lg font-semibold">Match Score</h3>
                       <div className="flex items-center gap-2">
                         <div className={`text-2xl font-bold ${
-                          matchScore >= 70 ? 'text-emerald-500' : 
-                          matchScore >= 50 ? 'text-amber-500' : 'text-rose-500'
+                            matchScore >= 70 ? 'text-emerald-500' : 
+                            matchScore >= 50 ? 'text-amber-500' : 'text-rose-500'
                         }`}>
                           {matchScore}%
                         </div>
@@ -502,17 +518,17 @@ const ApplicationWizard = () => {
                         ))}
                       </div>
                     </div>
-                    <div className="flex justify-end">
-                      <Button
-                        onClick={handleGenerate}
-                        className="w-full"
-                        disabled={isGenerating}
-                      >
-                        {isGenerating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        Generate Documents
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
+                      <div className="flex justify-end">
+                    <Button
+                      onClick={handleGenerate}
+                      className="w-full"
+                      disabled={isGenerating}
+                    >
+                          {isGenerating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                          Generate Documents
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                      </div>
                   </div>
                 )}
               </CardContent>
@@ -520,49 +536,49 @@ const ApplicationWizard = () => {
           </div>
         )}
 
-        {/* Step 3: Preview */}
-        {currentStep === 3 && (isGenerating || isDocxGenerating || isUpdating) && (
-          <Card>
-            <CardContent className="py-12">
-              <div className="text-center space-y-4">
-                <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
-                <h3 className="text-lg font-semibold">
-                  {isGenerating && 'Generating Your Documents'}
-                  {isDocxGenerating && 'Generating DOCX'}
-                  {isUpdating && 'Updating Your Documents'}
-                </h3>
-                <p className="text-muted-foreground">
-                  Please wait while we process your request...
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Step 3: Preview */}
+          {currentStep === 3 && (isGenerating || isDocxGenerating || isUpdating) && (
+            <Card>
+              <CardContent className="py-12">
+                <div className="text-center space-y-4">
+                  <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+                  <h3 className="text-lg font-semibold">
+                    {isGenerating && 'Generating Your Documents'}
+                    {isDocxGenerating && 'Generating DOCX'}
+                    {isUpdating && 'Updating Your Documents'}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Please wait while we process your request...
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Loading state for generating */}
+          {currentStep === 3 && isGenerating && (
+            <Card>
+              <CardContent className="py-12">
+                <div className="text-center space-y-4">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                  <h3 className="text-lg font-semibold">Generating Your Documents</h3>
+                  <p className="text-muted-foreground">
+                    Please wait while we create your optimized CV and cover letter...
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
         )}
 
-        {/* Loading state for generating */}
-        {currentStep === 3 && isGenerating && (
+          {/* Loading state for updating */}
+          {isUpdating && (
           <Card>
             <CardContent className="py-12">
               <div className="text-center space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <h3 className="text-lg font-semibold">Generating Your Documents</h3>
+                  <h3 className="text-lg font-semibold">Updating Your Documents</h3>
                 <p className="text-muted-foreground">
-                  Please wait while we create your optimized CV and cover letter...
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Loading state for updating */}
-        {isUpdating && (
-          <Card>
-            <CardContent className="py-12">
-              <div className="text-center space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <h3 className="text-lg font-semibold">Updating Your Documents</h3>
-                <p className="text-muted-foreground">
-                  Please wait while we apply your requested updates...
+                    Please wait while we apply your requested updates...
                 </p>
               </div>
             </CardContent>
@@ -570,47 +586,48 @@ const ApplicationWizard = () => {
         )}
       </div>
 
-      {/* Edit Request Modal */}
+        {/* Edit Request Modal */}
       <Dialog open={showUpdateModal} onOpenChange={setShowUpdateModal}>
-        <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Documents</DialogTitle>
+              <DialogTitle>Edit Documents</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">CV Updates:</label>
-              <Textarea
-                placeholder="Describe any changes you'd like to make to your CV..."
-                value={cvUpdateRequest}
-                onChange={(e) => setCvUpdateRequest(e.target.value)}
-                className="min-h-[100px]"
-              />
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">CV Updates:</label>
+                <Textarea
+                  placeholder="Describe any changes you'd like to make to your CV..."
+                  value={cvUpdateRequest}
+                  onChange={(e) => setCvUpdateRequest(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Cover Letter Updates:</label>
+                <Textarea
+                  placeholder="Describe any changes you'd like to make to your cover letter..."
+                  value={coverLetterUpdateRequest}
+                  onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Cover Letter Updates:</label>
-              <Textarea
-                placeholder="Describe any changes you'd like to make to your cover letter..."
-                value={coverLetterUpdateRequest}
-                onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
-                className="min-h-[100px]"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button 
-              onClick={handleApplyUpdates}
-              disabled={!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()}
-            >
-              Apply Updates
-            </Button>
-          </DialogFooter>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button 
+                onClick={handleApplyUpdates}
+                disabled={!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()}
+              >
+                Apply Updates
+              </Button>
+            </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 };
 
-export default ApplicationWizard;
+export default ApplicationWizard; 
