@@ -167,8 +167,8 @@ const ApplicationWizard = () => {
         if (!arcRes.ok) throw new Error('Failed to fetch arc data');
         const arc = await arcRes.json();
         setArcData(arc);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load profile/arc data');
+      } catch (err) {
+        setError((err as any).message || 'Failed to load profile/arc data');
       }
     };
     fetchProfileAndArc();
@@ -343,7 +343,9 @@ const ApplicationWizard = () => {
             <p>Match Score: {matchScore}%</p>
             <ul>
               {extractedKeywords.map((kw, idx) => (
-                <li key={idx}>{kw.text} ({kw.status})</li>
+                <li key={idx} style={{ color: kw.status === 'match' ? 'green' : kw.status === 'partial' ? 'orange' : 'red' }}>
+                  {kw.text} ({kw.status})
+                </li>
               ))}
             </ul>
             <button
