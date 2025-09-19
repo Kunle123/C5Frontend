@@ -290,6 +290,13 @@ const ApplicationWizard = () => {
         credentials: 'include',
       });
       await refreshCredits();
+      // 4. Persist document to backend (optional, if endpoint exists)
+      // await fetch('https://api-gw-production.up.railway.app/api/cv', {
+      //   method: 'POST',
+      //   headers: { 'Authorization': `Bearer ${token}`,'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ cv: structuredCV }),
+      //   credentials: 'include',
+      // });
       toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
     } catch (err: any) {
       setError(err.message || 'Document save failed');
