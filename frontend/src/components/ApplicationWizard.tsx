@@ -599,7 +599,7 @@ const ApplicationWizard = () => {
                       {/* CV Sections */}
                       <div className="space-y-3">
                         <Label className="text-sm font-medium">Include sections in CV:</Label>
-                        <div clase content like this: sName="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                           <div className="flex items-center space-x-2">
                             <Checkbox
                               id="achievements"
