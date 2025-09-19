@@ -1,8 +1,93 @@
 import React, { useState } from "react";
 import { Navigation } from "./Navigation";
 
-// Utility to render the structured CV as JSX (already defined above)
-// function renderStructuredCV(cvData: any) { ... }
+// Utility to render the structured CV as JSX
+function renderStructuredCV(cvData: any) {
+  if (!cvData || typeof cvData !== 'object') return <div>No CV data available.</div>;
+  return (
+    <div className="space-y-4">
+      {cvData.name && <h2 className="text-2xl font-bold">{cvData.name}</h2>}
+      {cvData.contact_info && Array.isArray(cvData.contact_info) && (
+        <div className="text-sm text-muted-foreground">{cvData.contact_info.filter(Boolean).join(' | ')}</div>
+      )}
+      {cvData.summary && cvData.summary.content && <p className="mt-2 text-base">{cvData.summary.content}</p>}
+
+      {/* Achievements */}
+      {Array.isArray(cvData.relevant_achievements) && cvData.relevant_achievements.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Relevant Achievements</h3>
+          <ul className="list-disc list-inside ml-4">
+            {cvData.relevant_achievements.map((a: any, idx: number) => (
+              <li key={idx}>{a.content}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Experience */}
+      {Array.isArray(cvData.experience) && cvData.experience.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Professional Experience</h3>
+          <ul className="space-y-2">
+            {cvData.experience.map((exp: any, idx: number) => (
+              <li key={idx}>
+                <div className="font-medium">{exp.job_title}{exp.company_name ? `, ${exp.company_name}` : ''}{exp.dates ? `, ${exp.dates}` : ''}</div>
+                {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
+                  <ul className="list-disc list-inside ml-4">
+                    {exp.responsibilities.map((resp: any, i: number) => (
+                      <li key={i}>{resp.content}</li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Education */}
+      {Array.isArray(cvData.education) && cvData.education.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Education</h3>
+          <ul className="space-y-2">
+            {cvData.education.map((edu: any, idx: number) => (
+              <li key={idx}>
+                <div className="font-medium">{edu.degree || edu.content}{edu.institution ? `, ${edu.institution}` : ''}{edu.year ? `, ${edu.year}` : ''}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Certifications */}
+      {Array.isArray(cvData.certifications) && cvData.certifications.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Certifications</h3>
+          <ul className="list-disc list-inside ml-4">
+            {cvData.certifications.map((cert: any, idx: number) => (
+              <li key={idx}>{cert.content}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Core Competencies */}
+      {Array.isArray(cvData.core_competencies) && cvData.core_competencies.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Core Competencies</h3>
+          <div className="flex flex-wrap gap-2">
+            {cvData.core_competencies.map((comp: any, idx: number) => (
+              <span key={idx} className="bg-muted px-2 py-1 rounded text-xs">{comp.content}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Cover Letter */}
+      {cvData.cover_letter && cvData.cover_letter.content && <div className="mt-4"><h3 className="text-lg font-semibold mb-2">Cover Letter</h3><p>{cvData.cover_letter.content}</p></div>}
+    </div>
+  );
+}
 
 const mockStructuredCV = {
   name: "Jane Doe",
