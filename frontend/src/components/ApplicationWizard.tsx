@@ -89,30 +89,56 @@ function renderStructuredCV(cvData: any) {
   );
 }
 
-const mockStructuredCV = {
-  name: "Jane Doe",
-  contact_info: ["jane@example.com", "555-1234"],
-  summary: { content: "Experienced professional.", priority: 1 },
-  relevant_achievements: [{ content: "Achievement 1", priority: 1 }],
-  experience: [
-    {
-      job_title: "Developer",
-      company_name: "Tech Co",
-      dates: "2020-2022",
-      responsibilities: [{ content: "Built things", priority: 1 }],
-    },
-  ],
-  core_competencies: [{ content: "React", priority: 1 }],
-  education: [{ content: "BSc Computer Science", priority: 1 }],
-  certifications: [{ content: "Certified Dev", priority: 1 }],
-  cover_letter: { content: "Dear Sir/Madam...", priority: 1 },
-};
-
 const ApplicationWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [jobDescription, setJobDescription] = useState("");
   const [extractedKeywords, setExtractedKeywords] = useState<string[]>([]);
-  const [structuredCV] = useState<any>(mockStructuredCV); // Hardcoded for now
+  const [structuredCV, setStructuredCV] = useState<any>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Simulate keyword extraction for now
+  const handleNextKeywords = () => {
+    setExtractedKeywords(jobDescription ? ["example", "keywords"] : []);
+    setCurrentStep(2);
+  };
+
+  // Real API call for CV generation
+  const handleGenerateCV = async () => {
+    setIsGenerating(true);
+    setError(null);
+    try {
+      // Replace with your real API endpoint and payload as needed
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Not authenticated");
+      const res = await fetch("https://api-gw-production.up.railway.app/api/career-ark/generate-assistant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          action: "generate_cv",
+          job_description: jobDescription,
+          // Add other required fields here
+        }),
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to generate CV");
+      const data = await res.json();
+      // Defensive normalization for relevant_achievements
+      const normalizedData = {
+        ...data,
+        relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
+      };
+      setStructuredCV(normalizedData);
+      setCurrentStep(3);
+    } catch (err: any) {
+      setError(err.message || "CV generation failed");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,6 +152,7 @@ const ApplicationWizard = () => {
             <button onClick={() => setCurrentStep(3)} className={currentStep === 3 ? "font-bold" : ""}>Step 3</button>
           </div>
         </div>
+        {error && <div className="mb-4 text-red-600">Error: {error}</div>}
         {currentStep === 1 && (
           <div>
             <h2>Step 1: Paste Job Description</h2>
@@ -136,10 +163,7 @@ const ApplicationWizard = () => {
               className="w-full min-h-[120px] border rounded p-2"
             />
             <button
-              onClick={() => {
-                setExtractedKeywords(jobDescription ? ["example", "keywords"] : []);
-                setCurrentStep(2);
-              }}
+              onClick={handleNextKeywords}
               disabled={!jobDescription.trim()}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
             >
@@ -163,16 +187,17 @@ const ApplicationWizard = () => {
               Back
             </button>
             <button
-              onClick={() => setCurrentStep(3)}
+              onClick={handleGenerateCV}
               className="mt-4 ml-2 px-4 py-2 bg-green-600 text-white rounded"
+              disabled={isGenerating}
             >
-              Next: Preview
+              {isGenerating ? "Generating..." : "Next: Preview"}
             </button>
           </div>
         )}
         {currentStep === 3 && (
           <div>
-            <h2>Step 3: Preview (Mock Data)</h2>
+            <h2>Step 3: Preview</h2>
             {/* Defensive check for structuredCV */}
             {structuredCV ? renderStructuredCV(structuredCV) : <div>No CV data available.</div>}
             <button
