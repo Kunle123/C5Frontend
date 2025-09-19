@@ -367,6 +367,13 @@ const ApplicationWizard = () => {
     );
   }
 
+  if (currentStep === 3) {
+    console.log('Step 3 Debug:');
+    console.log('generatedDocuments:', generatedDocuments);
+    console.log('selectedVariant:', selectedVariant);
+    console.log('CV for preview:', generatedDocuments[selectedVariant]?.cv);
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
