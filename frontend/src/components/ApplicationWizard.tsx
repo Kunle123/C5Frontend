@@ -298,6 +298,13 @@ const ApplicationWizard = () => {
     }
   };
 
+  // Log structuredCV for preview when entering step 3
+  useEffect(() => {
+    if (currentStep === 3) {
+      console.log('structuredCV for preview:', structuredCV);
+    }
+  }, [currentStep, structuredCV]);
+
   // --- UI ---
   return (
     <div className="min-h-screen bg-background">
@@ -380,7 +387,6 @@ const ApplicationWizard = () => {
               </label>
             </div>
             {/* Filtered preview */}
-            {console.log('structuredCV for preview:', structuredCV)}
             {structuredCV ? renderStructuredCV({
               ...filterByPriority(structuredCV, maxPriority),
               relevant_achievements: showAchievements && Array.isArray(structuredCV?.relevant_achievements) ? filterByPriority(structuredCV, maxPriority).relevant_achievements : [],
