@@ -471,11 +471,11 @@ const ApplicationWizard = () => {
               />
               <Button 
                 onClick={handleJobDescriptionNext}
-                  disabled={!jobDescription.trim() || isAnalyzing}
+                disabled={!jobDescription.trim() || isAnalyzing}
                 className="w-full"
               >
-                  {isAnalyzing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Next: Review Arc Data
+                {isAnalyzing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                {isAnalyzing ? 'Analyzing...' : 'Next: Review Arc Data'}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </CardContent>
@@ -537,8 +537,8 @@ const ApplicationWizard = () => {
                       className="w-full"
                       disabled={isGenerating}
                     >
-                          {isGenerating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                          Generate Documents
+                          {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                          {isGenerating ? 'Generating...' : 'Generate Documents'}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                       </div>
@@ -550,20 +550,10 @@ const ApplicationWizard = () => {
         )}
 
           {/* Step 3: Preview */}
-          {currentStep === 3 && (isGenerating || isDocxGenerating || isUpdating) && (
+          {currentStep === 3 && !isGenerating && !isDocxGenerating && !isUpdating && (
             <Card>
-              <CardContent className="py-12">
-                <div className="text-center space-y-4">
-                  <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
-                  <h3 className="text-lg font-semibold">
-                    {isGenerating && 'Generating Your Documents'}
-                    {isDocxGenerating && 'Generating DOCX'}
-                    {isUpdating && 'Updating Your Documents'}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Please wait while we process your request...
-                  </p>
-                </div>
+              <CardContent>
+                {renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)}
               </CardContent>
             </Card>
           )}
