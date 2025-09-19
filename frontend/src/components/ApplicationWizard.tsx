@@ -302,15 +302,29 @@ const ApplicationWizard = () => {
   // Utility: Render structured CV JSON
   type CVType = any; // Replace with a proper interface if available
   type PriorityItem = { priority?: number; content?: string; [key: string]: any };
-  function renderStructuredCV(cv: CVType, maxPriority: number = 3) {
+  // Map page length to max priority
+  const getMaxPriority = (length: string) => {
+    switch (length) {
+      case 'short': return 1;
+      case 'medium': return 2;
+      case 'long': return 3;
+      default: return 3;
+    }
+  };
+
+  // Utility: Render structured CV JSON with toggles and priority filtering
+  function renderStructuredCV(
+    cv: CVType,
+    options: GenerationOptions
+  ) {
     if (!cv) return <div>No CV data available.</div>;
-    // Helper to filter by priority
+    const maxPriority = getMaxPriority(options.length);
     const filterByPriority = (arr: PriorityItem[] | undefined): PriorityItem[] => Array.isArray(arr) ? arr.filter((item: PriorityItem) => (item.priority ?? 1) <= maxPriority) : [];
     return (
       <div className="space-y-4">
         {cv.name && <h2 className="text-xl font-bold">{cv.name}</h2>}
         {cv.summary?.content && <div><strong>Summary:</strong> {cv.summary.content}</div>}
-        {filterByPriority(cv.relevant_achievements).length > 0 && (
+        {options.sections.achievements && filterByPriority(cv.relevant_achievements).length > 0 && (
           <div>
             <h3 className="font-semibold">Achievements</h3>
             <ul className="list-disc ml-6">
@@ -333,7 +347,7 @@ const ApplicationWizard = () => {
             ))}
           </div>
         )}
-        {filterByPriority(cv.core_competencies).length > 0 && (
+        {options.sections.competencies && filterByPriority(cv.core_competencies).length > 0 && (
           <div>
             <h3 className="font-semibold">Core Competencies</h3>
             <ul className="list-disc ml-6">
@@ -341,7 +355,7 @@ const ApplicationWizard = () => {
             </ul>
           </div>
         )}
-        {filterByPriority(cv.education).length > 0 && (
+        {options.sections.education && filterByPriority(cv.education).length > 0 && (
           <div>
             <h3 className="font-semibold">Education</h3>
             <ul className="list-disc ml-6">
@@ -349,7 +363,7 @@ const ApplicationWizard = () => {
             </ul>
           </div>
         )}
-        {Array.isArray(cv.certifications) && cv.certifications.length > 0 && (
+        {options.sections.certifications && Array.isArray(cv.certifications) && cv.certifications.length > 0 && (
           <div>
             <h3 className="font-semibold">Certifications</h3>
             <ul className="list-disc ml-6">
