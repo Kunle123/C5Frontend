@@ -15,6 +15,7 @@ import { useToast } from '../hooks/use-toast';
 import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
 import { extractKeywords, generateApplicationMaterials, updateCV, getArcData } from '../api/careerArkApi';
 import { CreditsContext } from '../context/CreditsContext';
+import { createApplicationHistory } from '../api';
 
 interface Keyword {
   text: string;
@@ -67,6 +68,9 @@ const ApplicationWizard = () => {
   const [arcData, setArcData] = useState<any>(null);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
+  // Add state for DOCX download
+  const [docxData, setDocxData] = useState<{ cv?: string; cover_letter?: string } | null>(null);
+  const [isDocxGenerating, setIsDocxGenerating] = useState(false);
 
   useEffect(() => {
     // Fetch Arc Data and user profile on mount
@@ -87,20 +91,49 @@ const ApplicationWizard = () => {
     { number: 3, title: 'Preview' },
   ];
 
+  // Utility to trigger DOCX download
+  const downloadBase64Docx = (base64: string, filename: string = 'cv.docx') => {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], {
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Step 1: Extract Keywords (correct endpoint/payload)
   const handleJobDescriptionNext = async () => {
     if (!jobDescription.trim()) return;
     setIsAnalyzing(true);
     try {
-      // Merge arcData and userProfile for richer profile
-      const profile = {
-        ...(userProfile || {}),
-        ...(arcData || {}),
+      const profile = { ...(userProfile || {}), ...(arcData || {}) };
+      const payload = {
+        action: 'extract_keywords',
+        profile,
+        job_description: jobDescription,
       };
-      const result = await extractKeywords(profile, jobDescription);
+      const res = await fetch('/api/career-ark/generate-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
       if (result.error) throw new Error(result.error);
-      setExtractedKeywords(
-        (result.keywords || []).map((kw: string) => ({ text: kw, status: 'match' }))
-      );
+      setExtractedKeywords((result.keywords || []).map((kw: string) => ({ text: kw, status: 'match' })));
       setMatchScore(result.match_percentage || 0);
       setJobTitle(result.job_title || '');
       setCompanyName(result.company_name || '');
@@ -122,22 +155,29 @@ const ApplicationWizard = () => {
     return `${length}-${sectionKeys}`;
   };
 
+  // Step 2: Generate CV (correct endpoint/payload)
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      // Merge arcData and userProfile for richer profile
-      const profile = {
-        ...(userProfile || {}),
-        ...(arcData || {}),
-      };
-      const options = { numPages: generationOptions.length === 'short' ? 1 : generationOptions.length === 'medium' ? 2 : 3 };
-      const result = await generateApplicationMaterials(
+      const profile = { ...(userProfile || {}), ...(arcData || {}) };
+      const payload: any = {
+        action: 'generate_cv',
         profile,
-        jobDescription,
-        extractedKeywords.map(k => k.text),
-        threadId || undefined,
-        options
-      );
+        job_description: jobDescription,
+        numPages: generationOptions.length === 'short' ? 1 : generationOptions.length === 'medium' ? 2 : 3,
+        includeKeywords: true,
+        includeRelevantExperience: true,
+        thread_id: threadId,
+      };
+      const res = await fetch('/api/career-ark/generate-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
       if (result.error) throw new Error(result.error);
       const variantKey = generateVariantKey(generationOptions.length, generationOptions.sections);
       setGeneratedDocuments({
@@ -149,12 +189,56 @@ const ApplicationWizard = () => {
       setSelectedVariant(variantKey);
       setJobTitle(result.job_title || '');
       setCompanyName(result.company_name || '');
-      toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated.' });
       setCurrentStep(3);
+      toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated.' });
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'CV generation failed', variant: 'destructive' });
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  // Step 3: Generate DOCX from CV JSON
+  const handleGenerateDocx = async () => {
+    setIsDocxGenerating(true);
+    try {
+      const cvJson = generatedDocuments[selectedVariant]?.cv;
+      if (!cvJson) throw new Error('No CV data to generate DOCX');
+      const res = await fetch('/api/cv/generate-docx', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+        body: JSON.stringify({ cv: cvJson }),
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+      setDocxData(result);
+      if (result.cv) downloadBase64Docx(result.cv, 'cv.docx');
+      if (result.cover_letter) downloadBase64Docx(result.cover_letter, 'cover_letter.docx');
+      toast({ title: 'DOCX Generated', description: 'Your CV and cover letter DOCX files are ready.' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'DOCX generation failed', variant: 'destructive' });
+    } finally {
+      setIsDocxGenerating(false);
+    }
+  };
+
+  // Step 4: Persist Application History
+  const handleSaveApplicationHistory = async () => {
+    try {
+      const token = localStorage.getItem('token') || '';
+      const payload = {
+        job_title: jobTitle,
+        company_name: companyName,
+        job_description: jobDescription,
+        applied_at: new Date().toISOString(),
+      };
+      await createApplicationHistory(payload, token);
+      toast({ title: 'Application Saved', description: 'Application history has been saved.' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to save application history', variant: 'destructive' });
     }
   };
 
@@ -482,10 +566,17 @@ const ApplicationWizard = () => {
                         Edit
                       </Button>
                       <Button
-                        onClick={() => window.location.href = '/cv-download'}
-                        className="flex-1"
+                        onClick={handleGenerateDocx}
+                        disabled={isDocxGenerating}
                       >
-                        Go to downloads
+                        {isDocxGenerating ? 'Generating DOCX...' : 'Generate DOCX'}
+                        <Download className="w-4 h-4 ml-2" />
+                      </Button>
+                      <Button
+                        onClick={handleSaveApplicationHistory}
+                        disabled={isDocxGenerating}
+                      >
+                        Save Application
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </>
