@@ -299,6 +299,74 @@ const ApplicationWizard = () => {
     }
   };
 
+  // Utility: Render structured CV JSON
+  type CVType = any; // Replace with a proper interface if available
+  type PriorityItem = { priority?: number; content?: string; [key: string]: any };
+  function renderStructuredCV(cv: CVType, maxPriority: number = 3) {
+    if (!cv) return <div>No CV data available.</div>;
+    // Helper to filter by priority
+    const filterByPriority = (arr: PriorityItem[] | undefined): PriorityItem[] => Array.isArray(arr) ? arr.filter((item: PriorityItem) => (item.priority ?? 1) <= maxPriority) : [];
+    return (
+      <div className="space-y-4">
+        {cv.name && <h2 className="text-xl font-bold">{cv.name}</h2>}
+        {cv.summary?.content && <div><strong>Summary:</strong> {cv.summary.content}</div>}
+        {filterByPriority(cv.relevant_achievements).length > 0 && (
+          <div>
+            <h3 className="font-semibold">Achievements</h3>
+            <ul className="list-disc ml-6">
+              {filterByPriority(cv.relevant_achievements).map((a: PriorityItem, i: number) => <li key={i}>{a.content}</li>)}
+            </ul>
+          </div>
+        )}
+        {Array.isArray(cv.experience) && cv.experience.length > 0 && (
+          <div>
+            <h3 className="font-semibold">Experience</h3>
+            {cv.experience.map((exp: any, i: number) => (
+              <div key={i} className="mb-2">
+                <div><strong>{exp.job_title}</strong> at {exp.company_name} {exp.dates && <span>({exp.dates})</span>}</div>
+                {filterByPriority(exp.responsibilities).length > 0 && (
+                  <ul className="list-disc ml-6">
+                    {filterByPriority(exp.responsibilities).map((r: PriorityItem, j: number) => <li key={j}>{r.content}</li>)}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {filterByPriority(cv.core_competencies).length > 0 && (
+          <div>
+            <h3 className="font-semibold">Core Competencies</h3>
+            <ul className="list-disc ml-6">
+              {filterByPriority(cv.core_competencies).map((c: PriorityItem, i: number) => <li key={i}>{c.content}</li>)}
+            </ul>
+          </div>
+        )}
+        {filterByPriority(cv.education).length > 0 && (
+          <div>
+            <h3 className="font-semibold">Education</h3>
+            <ul className="list-disc ml-6">
+              {filterByPriority(cv.education).map((e: any, i: number) => <li key={i}>{e.degree} - {e.institution} {e.year && `(${e.year})`}</li>)}
+            </ul>
+          </div>
+        )}
+        {Array.isArray(cv.certifications) && cv.certifications.length > 0 && (
+          <div>
+            <h3 className="font-semibold">Certifications</h3>
+            <ul className="list-disc ml-6">
+              {cv.certifications.map((cert: any, i: number) => <li key={i}>{cert.content || cert.name}</li>)}
+            </ul>
+          </div>
+        )}
+        {cv.cover_letter?.content && (
+          <div>
+            <h3 className="font-semibold">Cover Letter</h3>
+            <div className="whitespace-pre-line">{cv.cover_letter.content}</div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -544,7 +612,9 @@ const ApplicationWizard = () => {
                       </TabsList>
                       <TabsContent value="cv" className="space-y-4">
                         <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.cv}</pre>
+                          {typeof generatedDocuments[selectedVariant]?.cv === 'object'
+                            ? renderStructuredCV(generatedDocuments[selectedVariant]?.cv, 3)
+                            : <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.cv}</pre>}
                         </div>
                       </TabsContent>
                       <TabsContent value="cover-letter" className="space-y-4">
