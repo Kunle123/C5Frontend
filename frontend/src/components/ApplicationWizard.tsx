@@ -354,9 +354,9 @@ const ApplicationWizard = () => {
         {options.sections.competencies && filterByPriority(cv.core_competencies).length > 0 && (
           <div>
             <h3 className="font-semibold">Core Competencies</h3>
-            <ul className="list-disc ml-6">
-              {filterByPriority(cv.core_competencies).map((c: PriorityItem, i: number) => <li key={i}>{c.content}</li>)}
-            </ul>
+            <div className="ml-6">
+              {filterByPriority(cv.core_competencies).map((c: PriorityItem) => c.content).filter(Boolean).join(' • ')}
+            </div>
           </div>
         )}
         {options.sections.achievements && filterByPriority(cv.relevant_achievements).length > 0 && (
