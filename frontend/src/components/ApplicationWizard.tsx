@@ -737,12 +737,6 @@ const ApplicationWizard = () => {
                         onClick={handleSaveCV}
                         className="flex-1"
                       >
-                        Save CV
-                      </Button>
-                      <Button
-                        onClick={() => window.location.href = '/cv-download'}
-                        className="flex-1"
-                      >
                         Go to downloads
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
