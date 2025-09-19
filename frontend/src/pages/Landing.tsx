@@ -4,6 +4,10 @@ import { StatsTiles } from "../components/landing/StatsTiles";
 export default function Landing() {
   return (
     <main className="bg-white w-full min-h-screen flex flex-col items-center justify-start">
+      {/* Login Button Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <a href="/login" className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition-colors">Log In</a>
+      </div>
       {/* Hero Section */}
       <section className="w-full flex flex-col items-center pt-12 pb-8 px-4 md:px-8 lg:px-0">
         <h1
