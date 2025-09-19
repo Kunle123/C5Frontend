@@ -599,7 +599,7 @@ const ApplicationWizard = () => {
                       {/* CV Sections */}
                       <div className="space-y-3">
                         <Label className="text-sm font-medium">Include sections in CV:</Label>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div clase content like this: sName="grid grid-cols-2 gap-4">
                           <div className="flex items-center space-x-2">
                             <Checkbox
                               id="achievements"
@@ -667,7 +667,12 @@ const ApplicationWizard = () => {
                       </TabsList>
                       <TabsContent value="cv" className="space-y-4">
                         <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm">{typeof generatedDocuments[selectedVariant]?.cv === 'string' ? generatedDocuments[selectedVariant]?.cv : JSON.stringify(generatedDocuments[selectedVariant]?.cv, null, 2)}</pre>
+                          {typeof generatedDocuments[selectedVariant]?.cv === 'string'
+                            ? <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.cv}</pre>
+                            : generatedDocuments[selectedVariant]?.cv
+                              ? renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)
+                              : <pre className="whitespace-pre-wrap text-sm text-red-500">No CV data available.</pre>
+                          }
                         </div>
                       </TabsContent>
                       <TabsContent value="cover-letter" className="space-y-4">
@@ -791,4 +796,4 @@ const ApplicationWizard = () => {
   );
 };
 
-export default ApplicationWizard; 
+export default ApplicationWizard;
