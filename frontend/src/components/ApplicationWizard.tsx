@@ -85,6 +85,17 @@ const ApplicationWizard = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    console.log('STATE CHANGE: currentStep', currentStep);
+  }, [currentStep]);
+  useEffect(() => {
+    console.log('STATE CHANGE: selectedVariant', selectedVariant);
+  }, [selectedVariant]);
+  useEffect(() => {
+    console.log('STATE CHANGE: generatedDocuments', generatedDocuments);
+    console.log('All keys in generatedDocuments:', Object.keys(generatedDocuments));
+  }, [generatedDocuments]);
+
   console.log('ApplicationWizard render, currentStep:', currentStep);
 
   const steps = [
