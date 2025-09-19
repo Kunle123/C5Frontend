@@ -133,8 +133,14 @@ const ApplicationWizard = () => {
       });
       const result = await res.json();
       if (result.error) throw new Error(result.error);
-      setExtractedKeywords((result.keywords || []).map((kw: string) => ({ text: kw, status: 'match' })));
-      setMatchScore(result.match_percentage || 0);
+      setExtractedKeywords(
+        (result.keywords || []).map((kw: any) =>
+          typeof kw === 'string'
+            ? { text: kw, status: 'match' }
+            : { text: kw.keyword, status: kw.status || 'match' }
+        )
+      );
+      setMatchScore(result.overall_match_percentage ?? result.match_percentage ?? 0);
       setJobTitle(result.job_title || '');
       setCompanyName(result.company_name || '');
       setThreadId(result.thread_id || null);
