@@ -188,7 +188,7 @@ const ApplicationWizard = () => {
       const variantKey = generateVariantKey(generationOptions.length, generationOptions.sections);
       setGeneratedDocuments({
         [variantKey]: {
-          cv: result.cv || '',
+          cv: result.cv ? result.cv : result, // Store structured CV if .cv is missing
           coverLetter: result.cover_letter || result.coverLetter || '',
         },
       });
