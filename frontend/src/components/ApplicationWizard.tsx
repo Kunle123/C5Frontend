@@ -549,14 +549,167 @@ const ApplicationWizard = () => {
           </div>
         )}
 
-          {/* Step 3: Preview */}
-          {currentStep === 3 && !isGenerating && !isDocxGenerating && !isUpdating && (
+        {/* Step 3: Preview (ZEN DESIGN) */}
+        {currentStep === 3 && !isGenerating && !isDocxGenerating && !isUpdating && (
+          <div className="space-y-6">
             <Card>
-              <CardContent>
-                {renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)}
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Step 3: Preview</span>
+                  {(jobTitle || companyName) && (
+                    <div className="text-right">
+                      {jobTitle && <div className="text-sm font-medium">{jobTitle}</div>}
+                      {companyName && <div className="text-sm text-muted-foreground">{companyName}</div>}
+                    </div>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* CV Options Accordion */}
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="options">
+                    <AccordionTrigger>CV Options</AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      {/* Page Length */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Page Length:</Label>
+                        <RadioGroup
+                          value={generationOptions.length}
+                          onValueChange={(value) => {
+                            setGenerationOptions(prev => ({ ...prev, length: value }));
+                            setSelectedVariant(generateVariantKey(value, generationOptions.sections));
+                          }}
+                          className="flex gap-6"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="short" id="short" />
+                            <Label htmlFor="short">Short</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="medium" id="medium" />
+                            <Label htmlFor="medium">Medium</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="long" id="long" />
+                            <Label htmlFor="long">Long</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                      {/* CV Sections */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Include sections in CV:</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="achievements"
+                              checked={generationOptions.sections.achievements}
+                              onCheckedChange={(checked) => {
+                                const newSections = { ...generationOptions.sections, achievements: checked };
+                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
+                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                              }}
+                            />
+                            <Label htmlFor="achievements">Achievements</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="competencies"
+                              checked={generationOptions.sections.competencies}
+                              onCheckedChange={(checked) => {
+                                const newSections = { ...generationOptions.sections, competencies: checked };
+                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
+                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                              }}
+                            />
+                            <Label htmlFor="competencies">Competencies</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="certifications"
+                              checked={generationOptions.sections.certifications}
+                              onCheckedChange={(checked) => {
+                                const newSections = { ...generationOptions.sections, certifications: checked };
+                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
+                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                              }}
+                            />
+                            <Label htmlFor="certifications">Certifications</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="education"
+                              checked={generationOptions.sections.education}
+                              onCheckedChange={(checked) => {
+                                const newSections = { ...generationOptions.sections, education: checked };
+                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
+                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                              }}
+                            />
+                            <Label htmlFor="education">Education</Label>
+                          </div>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+                {/* Document Preview */}
+                {generatedDocuments[selectedVariant] ? (
+                  <div className="space-y-4">
+                    <Tabs defaultValue="cv" className="w-full">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="cv">Generated CV</TabsTrigger>
+                        <TabsTrigger value="cover-letter">Generated Cover Letter</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="cv" className="space-y-4">
+                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
+                          <pre className="whitespace-pre-wrap text-sm">{typeof generatedDocuments[selectedVariant]?.cv === 'string' ? generatedDocuments[selectedVariant]?.cv : JSON.stringify(generatedDocuments[selectedVariant]?.cv, null, 2)}</pre>
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="cover-letter" className="space-y-4">
+                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
+                          <pre className="whitespace-pre-wrap text-sm">{typeof generatedDocuments[selectedVariant]?.coverLetter === 'string' ? generatedDocuments[selectedVariant]?.coverLetter : JSON.stringify(generatedDocuments[selectedVariant]?.coverLetter, null, 2)}</pre>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                ) : (
+                  <div className="border rounded-lg p-8 bg-muted/50 text-center">
+                    <p className="text-muted-foreground">Your documents will appear here after generation</p>
+                  </div>
+                )}
+                {/* Action Buttons */}
+                <div className="flex gap-4">
+                  {generatedDocuments[selectedVariant] ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={handleRequestUpdates}
+                      >
+                        <Edit3 className="w-4 h-4 mr-2" />
+                        Edit
+                      </Button>
+                      <Button
+                        onClick={() => window.location.href = '/cv-download'}
+                        className="flex-1"
+                      >
+                        Go to downloads
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      onClick={handleGenerate}
+                      className="w-full"
+                    >
+                      Generate CV & Cover Letter
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
-          )}
+          </div>
+        )}
 
           {/* Loading state for generating */}
           {currentStep === 3 && isGenerating && (
