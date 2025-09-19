@@ -12,7 +12,7 @@ import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { useToast } from '../hooks/use-toast';
-import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
+import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { extractKeywords, generateApplicationMaterials, updateCV, getArcData } from '../api/careerArkApi';
 import { CreditsContext } from '../context/CreditsContext';
 import { createApplicationHistory } from '../api';
@@ -417,12 +417,14 @@ const ApplicationWizard = () => {
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 className="min-h-[300px]"
+                disabled={isAnalyzing}
               />
               <Button 
                 onClick={handleJobDescriptionNext}
-                disabled={!jobDescription.trim()}
+                disabled={!jobDescription.trim() || isAnalyzing}
                 className="w-full"
               >
+                {isAnalyzing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Next: Review Arc Data
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -448,10 +450,8 @@ const ApplicationWizard = () => {
               <CardContent>
                 {isAnalyzing ? (
                   <div className="flex items-center justify-center py-12">
-                    <div className="text-center space-y-2">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      <p className="text-muted-foreground">Analyzing job description...</p>
-                    </div>
+                    <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
+                    <p className="text-muted-foreground ml-4">Analyzing job description...</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
@@ -485,7 +485,9 @@ const ApplicationWizard = () => {
                       <Button
                         onClick={handleGenerate}
                         className="w-full"
+                        disabled={isGenerating}
                       >
+                        {isGenerating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                         Generate Documents
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
@@ -498,177 +500,22 @@ const ApplicationWizard = () => {
         )}
 
         {/* Step 3: Preview */}
-        {currentStep === 3 && !isGenerating && !isUpdating && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Step 3: Preview</span>
-                  {jobTitle && (
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{jobTitle}</div>
-                      <div className="text-sm text-muted-foreground">{companyName}</div>
-                    </div>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* CV Options Accordion */}
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="options">
-                    <AccordionTrigger>CV Options</AccordionTrigger>
-                    <AccordionContent className="space-y-6 pt-4">
-                      {/* Page Length */}
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">Page Length:</Label>
-                        <RadioGroup
-                          value={generationOptions.length}
-                          onValueChange={(value: 'short' | 'medium' | 'long') => {
-                            setGenerationOptions(prev => ({ ...prev, length: value }));
-                            setSelectedVariant(generateVariantKey(value, generationOptions.sections));
-                          }}
-                          className="flex gap-6"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="short" id="short" />
-                            <Label htmlFor="short">Short</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="medium" id="medium" />
-                            <Label htmlFor="medium">Medium</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="long" id="long" />
-                            <Label htmlFor="long">Long</Label>
-                          </div>
-                        </RadioGroup>
-                      </div>
-
-                      {/* CV Sections */}
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">Include sections in CV:</Label>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="achievements"
-                              checked={generationOptions.sections.achievements}
-                              onCheckedChange={(checked) => {
-                                const newSections = { ...generationOptions.sections, achievements: checked as boolean };
-                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
-                              }}
-                            />
-                            <Label htmlFor="achievements">Achievements</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="competencies"
-                              checked={generationOptions.sections.competencies}
-                              onCheckedChange={(checked) => {
-                                const newSections = { ...generationOptions.sections, competencies: checked as boolean };
-                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
-                              }}
-                            />
-                            <Label htmlFor="competencies">Competencies</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="certifications"
-                              checked={generationOptions.sections.certifications}
-                              onCheckedChange={(checked) => {
-                                const newSections = { ...generationOptions.sections, certifications: checked as boolean };
-                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
-                              }}
-                            />
-                            <Label htmlFor="certifications">Certifications</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="education"
-                              checked={generationOptions.sections.education}
-                              onCheckedChange={(checked) => {
-                                const newSections = { ...generationOptions.sections, education: checked as boolean };
-                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
-                              }}
-                            />
-                            <Label htmlFor="education">Education</Label>
-                          </div>
-                        </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-
-                {/* Document Preview */}
-                {generatedDocuments[selectedVariant] ? (
-                  <div className="space-y-4">
-                    <Tabs defaultValue="cv" className="w-full">
-                      <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="cv">Generated CV</TabsTrigger>
-                        <TabsTrigger value="cover-letter">Generated Cover Letter</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="cv" className="space-y-4">
-                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          {typeof generatedDocuments[selectedVariant]?.cv === 'object'
-                            ? renderStructuredCV(generatedDocuments[selectedVariant]?.cv, 3)
-                            : <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.cv}</pre>}
-                        </div>
-                      </TabsContent>
-                      <TabsContent value="cover-letter" className="space-y-4">
-                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.coverLetter}</pre>
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                  </div>
-                ) : (
-                  <div className="border rounded-lg p-8 bg-muted/50 text-center">
-                    <p className="text-muted-foreground">Your documents will appear here after generation</p>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex gap-4">
-                  {generatedDocuments[selectedVariant] ? (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={handleRequestUpdates}
-                      >
-                        <Edit3 className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={handleGenerateDocx}
-                        disabled={isDocxGenerating}
-                      >
-                        {isDocxGenerating ? 'Generating DOCX...' : 'Generate DOCX'}
-                        <Download className="w-4 h-4 ml-2" />
-                      </Button>
-                      <Button
-                        onClick={handleSaveApplicationHistory}
-                        disabled={isDocxGenerating}
-                      >
-                        Save Application
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      onClick={handleGenerate}
-                      className="w-full"
-                    >
-                      Generate CV & Cover Letter
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        {currentStep === 3 && (isGenerating || isDocxGenerating || isUpdating) && (
+          <Card>
+            <CardContent className="py-12">
+              <div className="text-center space-y-4">
+                <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+                <h3 className="text-lg font-semibold">
+                  {isGenerating && 'Generating Your Documents'}
+                  {isDocxGenerating && 'Generating DOCX'}
+                  {isUpdating && 'Updating Your Documents'}
+                </h3>
+                <p className="text-muted-foreground">
+                  Please wait while we process your request...
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Loading state for generating */}
