@@ -398,12 +398,6 @@ const ApplicationWizard = () => {
             </ul>
           </div>
         )}
-        {cv.cover_letter?.content && (
-          <div>
-            <h3 className="font-semibold">Cover Letter</h3>
-            <div className="whitespace-pre-line">{cv.cover_letter.content}</div>
-          </div>
-        )}
       </div>
     );
   }
@@ -672,7 +666,28 @@ const ApplicationWizard = () => {
                       </TabsContent>
                       <TabsContent value="cover-letter" className="space-y-4">
                         <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm">{typeof Object.values(generatedDocuments)[0]?.coverLetter === 'string' ? Object.values(generatedDocuments)[0]?.coverLetter : JSON.stringify(Object.values(generatedDocuments)[0]?.coverLetter, null, 2)}</pre>
+                          {(() => {
+                            const doc = Object.values(generatedDocuments)[0];
+                            const cv = doc?.cv;
+                            const coverLetter = doc?.coverLetter;
+                            let content = '';
+                            if (coverLetter && typeof coverLetter === 'object' && coverLetter.content) {
+                              content = coverLetter.content;
+                            } else if (typeof coverLetter === 'string') {
+                              content = coverLetter;
+                            }
+                            // Try to get candidate name from cv object
+                            let candidateName = '';
+                            if (cv && typeof cv === 'object' && cv.name) {
+                              candidateName = cv.name;
+                            }
+                            return (
+                              <pre className="whitespace-pre-wrap text-sm">
+                                {content}
+                                {candidateName ? `\n\nBest regards,\n${candidateName}` : ''}
+                              </pre>
+                            );
+                          })()}
                         </div>
                       </TabsContent>
                     </Tabs>
