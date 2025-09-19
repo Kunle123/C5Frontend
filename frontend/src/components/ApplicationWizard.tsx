@@ -1,415 +1,508 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState } from 'react';
 import { Navigation } from './Navigation';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Textarea } from './ui/textarea';
+import { Progress } from './ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from './ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useToast } from '../hooks/use-toast';
-import { CreditsContext } from '../context/CreditsContext';
+import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
 
-// --- Types ---
-interface PriorityContent {
-  content: string;
-  priority: number;
-}
-interface ExperienceEntry {
-  job_title: string;
-  company_name?: string;
-  dates?: string;
-  responsibilities: PriorityContent[];
-}
-interface EducationEntry extends PriorityContent {
-  degree?: string;
-  institution?: string;
-  year?: string;
-}
-interface CVData {
-  name: string;
-  contact_info: string[];
-  summary: PriorityContent;
-  relevant_achievements?: PriorityContent[];
-  experience: ExperienceEntry[];
-  core_competencies?: PriorityContent[];
-  education?: EducationEntry[];
-  certifications?: PriorityContent[];
-  cover_letter: PriorityContent;
-  trimming_guide?: { [key: string]: string };
+interface Keyword {
+  text: string;
+  status: 'match' | 'partial' | 'missing';
 }
 
-// --- Filtering utility ---
-function filterByPriority(data: CVData, maxPriority: number): CVData {
-  return {
-    ...data,
-    relevant_achievements: (data.relevant_achievements || []).filter(item => item.priority <= maxPriority),
-    experience: (data.experience || []).map(role => ({
-      ...role,
-      responsibilities: (role.responsibilities || []).filter(item => item.priority <= maxPriority)
-    })),
-    core_competencies: (data.core_competencies || []).filter(item => item.priority <= maxPriority),
-    certifications: (data.certifications || []).filter(item => item.priority <= maxPriority),
-    education: (data.education || []).filter(item => item.priority <= maxPriority)
-  };
-}
-
-// --- Render utility ---
-function renderStructuredCV(cvData: any) {
-  console.log('renderStructuredCV called with:', cvData);
-  if (!cvData || typeof cvData !== 'object') return <div>No CV data available.</div>;
-  return (
-    <div className="space-y-4">
-      {cvData.name && <h2 className="text-2xl font-bold">{cvData.name}</h2>}
-      {cvData.contact_info && Array.isArray(cvData.contact_info) && (
-        <div className="text-sm text-muted-foreground">{cvData.contact_info.filter(Boolean).join(' | ')}</div>
-      )}
-      {cvData.summary && cvData.summary.content && <p className="mt-2 text-base">{cvData.summary.content}</p>}
-      {Array.isArray(cvData.relevant_achievements) && cvData.relevant_achievements.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mt-4 mb-2">Relevant Achievements</h3>
-          <ul className="list-disc list-inside ml-4">
-            {cvData.relevant_achievements.map((a: any, idx: number) => (
-              <li key={idx}>{a.content}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {Array.isArray(cvData.experience) && cvData.experience.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mt-4 mb-2">Professional Experience</h3>
-          <ul className="space-y-2">
-            {cvData.experience.map((exp: any, idx: number) => (
-              <li key={idx}>
-                <div className="font-medium">{exp.job_title}{exp.company_name ? `, ${exp.company_name}` : ''}{exp.dates ? `, ${exp.dates}` : ''}</div>
-                {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
-                  <ul className="list-disc list-inside ml-4">
-                    {exp.responsibilities.map((resp: any, i: number) => (
-                      <li key={i}>{resp.content}</li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {Array.isArray(cvData.education) && cvData.education.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mt-4 mb-2">Education</h3>
-          <ul className="space-y-2">
-            {cvData.education.map((edu: any, idx: number) => (
-              <li key={idx}>
-                <div className="font-medium">{edu.degree || edu.content}{edu.institution ? `, ${edu.institution}` : ''}{edu.year ? `, ${edu.year}` : ''}</div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {Array.isArray(cvData.certifications) && cvData.certifications.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mt-4 mb-2">Certifications</h3>
-          <ul className="list-disc list-inside ml-4">
-            {cvData.certifications.map((cert: any, idx: number) => (
-              <li key={idx}>{cert.content}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {Array.isArray(cvData.core_competencies) && cvData.core_competencies.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mt-4 mb-2">Core Competencies</h3>
-          <div className="flex flex-wrap gap-2">
-            {cvData.core_competencies.map((comp: any, idx: number) => (
-              <span key={idx} className="bg-muted px-2 py-1 rounded text-xs">{comp.content}</span>
-            ))}
-          </div>
-        </div>
-      )}
-      {cvData.cover_letter && cvData.cover_letter.content && <div className="mt-4"><h3 className="text-lg font-semibold mb-2">Cover Letter</h3><p>{cvData.cover_letter.content}</p></div>}
-    </div>
-  );
+interface GenerationOptions {
+  pages: 2 | 3 | 4;
+  includeKeywords: boolean;
+  includeRelevantExperience: boolean;
+  language: string;
 }
 
 const ApplicationWizard = () => {
   const { toast } = useToast();
-  const { refreshCredits } = useContext(CreditsContext);
   const [currentStep, setCurrentStep] = useState(1);
-  const [jobDescription, setJobDescription] = useState("");
-  const [profile, setProfile] = useState<any>(null);
-  const [arcData, setArcData] = useState<any>(null);
-  const [extractedKeywords, setExtractedKeywords] = useState<any[]>([]);
-  const [matchScore, setMatchScore] = useState<number>(0);
-  const [structuredCV, setStructuredCV] = useState<any>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [jobDescription, setJobDescription] = useState('');
+  const [extractedKeywords, setExtractedKeywords] = useState<Keyword[]>([]);
+  const [matchScore, setMatchScore] = useState(0);
+  const [jobTitle, setJobTitle] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  // Section toggles and page length
-  const [maxPriority, setMaxPriority] = useState(2);
-  const [showAchievements, setShowAchievements] = useState(true);
-  const [showCompetencies, setShowCompetencies] = useState(true);
-  const [showCertifications, setShowCertifications] = useState(true);
-  const [showEducation, setShowEducation] = useState(true);
-  // Store thread_id from backend
-  const [threadId, setThreadId] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [generationOptions, setGenerationOptions] = useState<GenerationOptions>({
+    pages: 2,
+    includeKeywords: true,
+    includeRelevantExperience: true,
+    language: 'UK English',
+  });
+  const [generatedCV, setGeneratedCV] = useState('');
+  const [generatedCoverLetter, setGeneratedCoverLetter] = useState('');
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [cvUpdateRequest, setCvUpdateRequest] = useState('');
+  const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  // Fetch profile and arc data on mount
-  useEffect(() => {
-    const fetchProfileAndArc = async () => {
-      try {
-        setError(null);
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('Not authenticated');
-        const profileRes = await fetch('https://api-gw-production.up.railway.app/api/user/profile', {
-          headers: { 'Authorization': `Bearer ${token}` },
-          credentials: 'include',
-        });
-        if (!profileRes.ok) throw new Error('Failed to fetch user profile');
-        const userProfile = await profileRes.json();
-        setProfile(userProfile);
-        const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfile.id}/all_sections`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-          credentials: 'include',
-        });
-        if (!arcRes.ok) throw new Error('Failed to fetch arc data');
-        const arc = await arcRes.json();
-        setArcData(arc);
-      } catch (err) {
-        setError((err as any).message || 'Failed to load profile/arc data');
-      }
-    };
-    fetchProfileAndArc();
-  }, []);
+  const steps = [
+    { number: 1, title: 'Paste Job Description' },
+    { number: 2, title: 'Review Keywords' },
+    { number: 3, title: 'Review and Download' },
+  ];
 
-  // Real keyword extraction
-  const handleExtractKeywords = async () => {
+  const handleJobDescriptionNext = async () => {
+    if (!jobDescription.trim()) return;
     setIsAnalyzing(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      if (!profile || !arcData) throw new Error('Profile or arc data not loaded');
-      const payload = {
-        action: 'extract_keywords',
-        profile: arcData, // or buildPIIFreeProfile(profile, arcData)
-        job_description: jobDescription,
-      };
-      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Keyword extraction failed');
-      const data = await res.json();
-      setExtractedKeywords((data.keywords || []).map((kw: any) => ({ text: kw.keyword, status: kw.status })));
-      setMatchScore(data.overall_match_percentage || 0);
-      setThreadId(data.thread_id || null); // <-- Store thread_id from response
-      setCurrentStep(2);
-    } catch (err: any) {
-      setError(err.message || 'Failed to extract keywords');
-    } finally {
+    setCurrentStep(2);
+    // Simulate keyword extraction and analysis
+    setTimeout(() => {
+      setExtractedKeywords([
+        { text: 'React', status: 'match' },
+        { text: 'TypeScript', status: 'match' },
+        { text: 'Node.js', status: 'partial' },
+        { text: 'GraphQL', status: 'missing' },
+        { text: 'AWS', status: 'partial' },
+        { text: 'Docker', status: 'match' },
+        { text: 'Kubernetes', status: 'missing' },
+        { text: 'Agile', status: 'match' },
+      ]);
+      setMatchScore(72);
+      setJobTitle('Senior Full Stack Developer');
+      setCompanyName('TechCorp Inc.');
       setIsAnalyzing(false);
-    }
+    }, 2000);
   };
 
-  // Real CV generation
-  const handleGenerateCV = async () => {
+  const handleGenerate = async () => {
     setIsGenerating(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      // Debug logs to find thread_id
-      console.log('arcData:', arcData);
-      console.log('profile:', profile);
-      const payload = {
-        action: 'generate_cv',
-        profile: arcData, // or buildPIIFreeProfile(profile, arcData)
-        job_description: jobDescription,
-        numPages: maxPriority,
-        includeKeywords: showCompetencies,
-        includeRelevantExperience: showAchievements,
-        thread_id: threadId || arcData?.thread_id || profile?.thread_id || '' // Use threadId from state
-      };
-      console.log('CV generation payload:', payload);
-      const res = await fetch('https://api-gw-production.up.railway.app/api/career-ark/generate-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
+    setShowOptionsModal(false);
+    setCurrentStep(3);
+    // Simulate document generation
+    setTimeout(() => {
+      setGeneratedCV(`JOHN DOE\nSenior Full Stack Developer\n\nEXPERIENCE\nSoftware Engineer | Current Company | 2022-Present\n• Built scalable React applications with TypeScript\n• Implemented microservices using Node.js and Docker\n• Collaborated in Agile development environment\n• Increased application performance by 40%\n\nSKILLS\nReact, TypeScript, Node.js, Docker, Agile Development\n\nEDUCATION\nComputer Science Degree | University | 2018-2022`);
+      setGeneratedCoverLetter(`Dear Hiring Manager,\n\nI am writing to express my strong interest in the Senior Full Stack Developer position at TechCorp Inc. With my extensive experience in React, TypeScript, and modern development practices, I am confident I would be a valuable addition to your team.\n\nIn my current role, I have successfully built scalable applications and worked with technologies directly relevant to your job requirements. My experience with React and TypeScript aligns perfectly with your tech stack, and I am eager to contribute to your innovative projects.\n\nI would welcome the opportunity to discuss how my skills and experience can benefit TechCorp Inc.\n\nBest regards,\nJohn Doe`);
+      setIsGenerating(false);
+      toast({
+        title: "Documents Generated",
+        description: "Your CV and cover letter have been successfully generated!",
       });
-      if (!res.ok) throw new Error('Failed to generate CV');
-      const data = await res.json();
-      console.log('CV generation response:', data); // <-- Debug log
-      const normalizedData = {
-        ...data,
-        relevant_achievements: Array.isArray(data.relevant_achievements) ? data.relevant_achievements : [],
-      };
-      setStructuredCV(normalizedData);
+    }, 3000);
+  };
+
+  const handleRequestUpdates = () => {
+    setShowUpdateModal(true);
+  };
+
+  const handleApplyUpdates = async () => {
+    setIsUpdating(true);
+    setShowUpdateModal(false);
+    // Simulate AI processing updates
+    setTimeout(() => {
+      if (cvUpdateRequest.trim()) {
+        setGeneratedCV(prev => prev + `\n\nADDITIONAL EXPERIENCE\nSpace X Project Contributor | NASA | 2021\n• ${cvUpdateRequest}`);
+      }
+      if (coverLetterUpdateRequest.trim()) {
+        setGeneratedCoverLetter(prev => prev.replace(
+          'Best regards,',
+          `Additionally, I want to highlight my experience: ${coverLetterUpdateRequest}\n\nBest regards,`
+        ));
+      }
       setCurrentStep(3);
-    } catch (err: any) {
-      setError(err.message || 'CV generation failed');
-    } finally {
-      setIsGenerating(false);
+      setIsUpdating(false);
+      setCvUpdateRequest('');
+      setCoverLetterUpdateRequest('');
+      toast({
+        title: "Documents Updated",
+        description: "Your CV and cover letter have been updated with your requests!",
+      });
+    }, 2000);
+  };
+
+  const getKeywordColor = (status: Keyword['status']) => {
+    switch (status) {
+      case 'match': return 'success';
+      case 'partial': return 'warning';
+      case 'missing': return 'destructive';
+      default: return 'secondary';
     }
   };
 
-  // Save CV and deduct credit (no download)
-  const handleSaveCV = async () => {
-    setIsGenerating(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Not authenticated');
-      // 1. Prepare payload: remove forbidden fields and ensure PII placeholders
-      const cvToSave = { ...structuredCV };
-      delete cvToSave.thread_id;
-      delete cvToSave.skills;
-      delete cvToSave.achievements;
-      // Ensure PII placeholders
-      if (cvToSave.name) cvToSave.name = "{{CANDIDATE_NAME}}";
-      if (cvToSave.contact_info) cvToSave.contact_info = ["{{CONTACT_INFO}}"];
-      // 2. Save CV to backend
-      const saveRes = await fetch('https://api-gw-production.up.railway.app/api/cv', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(cvToSave),
-        credentials: 'include',
-      });
-      if (!saveRes.ok) throw new Error('Failed to save CV');
-      // 3. Deduct a credit
-      await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`,'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'generate_cv' }),
-        credentials: 'include',
-      });
-      await refreshCredits();
-      toast({ title: 'CV Saved!', description: 'Your CV has been saved. Go to MyCVs to download or manage your CVs.' });
-    } catch (err: any) {
-      setError(err.message || 'CV save failed');
-    } finally {
-      setIsGenerating(false);
+  const getKeywordIcon = (status: Keyword['status']) => {
+    switch (status) {
+      case 'match': return <CheckCircle className="w-3 h-3" />;
+      case 'partial': return <AlertCircle className="w-3 h-3" />;
+      case 'missing': return <XCircle className="w-3 h-3" />;
     }
   };
 
-  // Log structuredCV for preview when entering step 3
-  useEffect(() => {
-    if (currentStep === 3) {
-      console.log('structuredCV for preview:', structuredCV);
-    }
-  }, [currentStep, structuredCV]);
-
-  // --- UI ---
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container mx-auto px-4 py-8 max-w-4xl pt-16">
-        <h1>Apply Flow</h1>
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Progress Indicator */}
         <div className="mb-8">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setCurrentStep(1)} className={currentStep === 1 ? "font-bold" : ""}>Step 1</button>
-            <button onClick={() => setCurrentStep(2)} className={currentStep === 2 ? "font-bold" : ""}>Step 2</button>
-            <button onClick={() => setCurrentStep(3)} className={currentStep === 3 ? "font-bold" : ""}>Step 3</button>
+          <div className="flex items-center justify-between mb-4">
+            {steps.map((step, index) => (
+              <div key={step.number} className="flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  currentStep >= step.number 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-muted text-muted-foreground'
+                }`}>
+                  {step.number}
+                </div>
+                <span className={`ml-2 text-sm ${
+                  currentStep >= step.number ? 'text-foreground' : 'text-muted-foreground'
+                }`}>
+                  {step.title}
+                </span>
+                {index < steps.length - 1 && (
+                  <div className={`w-12 h-0.5 mx-4 ${
+                    currentStep > step.number ? 'bg-primary' : 'bg-muted'
+                  }`} />
+                )}
+              </div>
+            ))}
           </div>
+          <Progress value={(currentStep / steps.length) * 100} className="w-full" />
         </div>
-        {error && <div className="mb-4 text-red-600">Error: {error}</div>}
+
+        {/* Step 1: Paste Job Description */}
         {currentStep === 1 && (
-          <div>
-            <h2>Step 1: Paste Job Description</h2>
-            <textarea
-              value={jobDescription}
-              onChange={e => setJobDescription(e.target.value)}
-              placeholder="Paste the job description here..."
-              className="w-full min-h-[120px] border rounded p-2"
-            />
-            <button
-              onClick={handleExtractKeywords}
-              disabled={!jobDescription.trim() || isAnalyzing}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-            >
-              {isAnalyzing ? 'Analyzing...' : 'Next: Review Keywords'}
-            </button>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Paste Job Description
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Paste the job description below to get started. We'll analyze it to optimize your CV and cover letter.
+              </p>
+              <Textarea
+                placeholder="Paste the job description here..."
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                className="min-h-[300px]"
+              />
+              <Button 
+                onClick={handleJobDescriptionNext}
+                disabled={!jobDescription.trim()}
+                className="w-full"
+              >
+                Next: Review Arc Data
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
         )}
+
+        {/* Step 2: Review Arc Data & Keywords */}
         {currentStep === 2 && (
-          <div>
-            <h2>Step 2: Keyword Review</h2>
-            <p>Match Score: {matchScore}%</p>
-            <ul>
-              {extractedKeywords.map((kw, idx) => (
-                <li key={idx} style={{ color: kw.status === 'match' ? 'green' : kw.status === 'partial' ? 'orange' : 'red' }}>
-                  {kw.text} ({kw.status})
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => setCurrentStep(1)}
-              className="mt-4 px-4 py-2 bg-gray-400 text-white rounded"
-            >
-              Back
-            </button>
-            <button
-              onClick={handleGenerateCV}
-              className="mt-4 ml-2 px-4 py-2 bg-green-600 text-white rounded"
-              disabled={isGenerating}
-            >
-              {isGenerating ? "Generating..." : "Next: Preview"}
-            </button>
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Keyword Analysis</span>
+                  {jobTitle && (
+                    <div className="text-right">
+                      <div className="text-sm font-medium">{jobTitle}</div>
+                      <div className="text-sm text-muted-foreground">{companyName}</div>
+                    </div>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isAnalyzing ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center space-y-2">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      <p className="text-muted-foreground">Analyzing job description...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">Match Score</h3>
+                      <div className="flex items-center gap-2">
+                        <div className={`text-2xl font-bold ${
+                          matchScore >= 70 ? 'text-green-600' : 
+                          matchScore >= 50 ? 'text-yellow-600' : 'text-red-600'
+                        }`}>
+                          {matchScore}%
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-3">Extracted Keywords</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {extractedKeywords.map((keyword, index) => (
+                          <Badge
+                            key={index}
+                            variant={getKeywordColor(keyword.status)}
+                            className="flex items-center gap-1"
+                          >
+                            {getKeywordIcon(keyword.status)}
+                            {keyword.text}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button
+                        onClick={() => setShowOptionsModal(true)}
+                        className="w-full"
+                      >
+                        Generate CV & Cover Letter
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         )}
-        {currentStep === 3 && (
-          <div>
-            <h2>Step 3: Preview</h2>
-            {/* Section toggles and page length controls */}
-            <div className="mb-4 flex gap-4 items-center">
-              <span>Page Length:</span>
-              {[2, 3, 4].map(n => (
-                <label key={n} className="flex items-center gap-1">
-                  <input type="radio" checked={maxPriority === n} onChange={() => setMaxPriority(n)} />
-                  {n} pages
-                </label>
-              ))}
-              <label className="flex items-center gap-1">
-                <input type="checkbox" checked={showAchievements} onChange={e => setShowAchievements(e.target.checked)} /> Achievements
-              </label>
-              <label className="flex items-center gap-1">
-                <input type="checkbox" checked={showCompetencies} onChange={e => setShowCompetencies(e.target.checked)} /> Competencies
-              </label>
-              <label className="flex items-center gap-1">
-                <input type="checkbox" checked={showCertifications} onChange={e => setShowCertifications(e.target.checked)} /> Certifications
-              </label>
-              <label className="flex items-center gap-1">
-                <input type="checkbox" checked={showEducation} onChange={e => setShowEducation(e.target.checked)} /> Education
-              </label>
-            </div>
-            {/* Filtered preview */}
-            {structuredCV ? renderStructuredCV({
-              ...filterByPriority(structuredCV, maxPriority),
-              relevant_achievements: showAchievements && Array.isArray(structuredCV?.relevant_achievements) ? filterByPriority(structuredCV, maxPriority).relevant_achievements : [],
-              core_competencies: showCompetencies && Array.isArray(structuredCV?.core_competencies) ? filterByPriority(structuredCV, maxPriority).core_competencies : [],
-              certifications: showCertifications && Array.isArray(structuredCV?.certifications) ? filterByPriority(structuredCV, maxPriority).certifications : [],
-              education: showEducation && Array.isArray(structuredCV?.education) ? filterByPriority(structuredCV, maxPriority).education : [],
-            }) : <div>No CV data available.</div>}
-            <button
-              onClick={() => setCurrentStep(2)}
-              className="mt-4 px-4 py-2 bg-gray-400 text-white rounded"
-            >
-              Back
-            </button>
-            <button
-              onClick={handleSaveCV}
-              className="mt-4 ml-2 px-4 py-2 bg-blue-600 text-white rounded"
-              disabled={isGenerating}
-            >
-              {isGenerating ? "Saving..." : "Save CV"}
-            </button>
-          </div>
+
+        {/* Step 3: Generate Documents */}
+        {currentStep === 3 && !isGenerating && !isUpdating && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Documents Generated</span>
+                {jobTitle && (
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{jobTitle}</div>
+                    <div className="text-sm text-muted-foreground">{companyName}</div>
+                  </div>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="cv" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="cv">Generated CV</TabsTrigger>
+                  <TabsTrigger value="cover-letter">Generated Cover Letter</TabsTrigger>
+                </TabsList>
+                <TabsContent value="cv" className="space-y-4">
+                  <div className="border rounded-lg p-4 bg-muted/50 min-h-[300px]">
+                    <pre className="whitespace-pre-wrap text-sm">{generatedCV}</pre>
+                  </div>
+                </TabsContent>
+                <TabsContent value="cover-letter" className="space-y-4">
+                  <div className="border rounded-lg p-4 bg-muted/50 min-h-[300px]">
+                    <pre className="whitespace-pre-wrap text-sm">{generatedCoverLetter}</pre>
+                  </div>
+                </TabsContent>
+              </Tabs>
+              <div className="flex gap-4 mt-6">
+                <Button
+                  variant="outline"
+                  onClick={handleRequestUpdates}
+                >
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Request Updates
+                </Button>
+                <Button
+                  onClick={() => window.location.href = '/cv-download'}
+                  className="flex-1"
+                >
+                  Go to downloads
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Loading state for step 3 */}
+        {(currentStep === 3 && isGenerating) || isUpdating && (
+          <Card>
+            <CardContent className="py-12">
+              <div className="text-center space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <h3 className="text-lg font-semibold">
+                  {isUpdating ? 'Updating Your Documents' : 'Generating Your Documents'}
+                </h3>
+                <p className="text-muted-foreground">
+                  {isUpdating 
+                    ? 'Please wait while we apply your requested updates...'
+                    : 'Please wait while we create your optimized CV and cover letter...'
+                  }
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
+
+      {/* CV Options Modal */}
+      <Dialog open={showOptionsModal} onOpenChange={setShowOptionsModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>CV Options</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            {/* Pages Option */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium">Pages:</label>
+              <ToggleGroup
+                type="single"
+                value={generationOptions.pages.toString()}
+                onValueChange={(value) => {
+                  if (value) {
+                    setGenerationOptions(prev => ({ ...prev, pages: parseInt(value) as 2 | 3 | 4 }));
+                  }
+                }}
+                className="justify-start"
+              >
+                <ToggleGroupItem value="2" aria-label="2 pages">
+                  2
+                </ToggleGroupItem>
+                <ToggleGroupItem value="3" aria-label="3 pages">
+                  3
+                </ToggleGroupItem>
+                <ToggleGroupItem value="4" aria-label="4 pages">
+                  4
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+            {/* Include Keywords Option */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium">Include Keywords:</label>
+              <ToggleGroup
+                type="single"
+                value={generationOptions.includeKeywords ? "yes" : "no"}
+                onValueChange={(value) => {
+                  if (value) {
+                    setGenerationOptions(prev => ({ ...prev, includeKeywords: value === "yes" }));
+                  }
+                }}
+                className="justify-start"
+              >
+                <ToggleGroupItem value="yes" aria-label="Include keywords">
+                  Yes
+                </ToggleGroupItem>
+                <ToggleGroupItem value="no" aria-label="Don't include keywords">
+                  No
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+            {/* Include Relevant Experience Option */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium">Include Relevant Experience:</label>
+              <ToggleGroup
+                type="single"
+                value={generationOptions.includeRelevantExperience ? "yes" : "no"}
+                onValueChange={(value) => {
+                  if (value) {
+                    setGenerationOptions(prev => ({ ...prev, includeRelevantExperience: value === "yes" }));
+                  }
+                }}
+                className="justify-start"
+              >
+                <ToggleGroupItem value="yes" aria-label="Include relevant experience">
+                  Yes
+                </ToggleGroupItem>
+                <ToggleGroupItem value="no" aria-label="Don't include relevant experience">
+                  No
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+            {/* Language Option */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium">Language:</label>
+              <Select
+                value={generationOptions.language}
+                onValueChange={(value) => setGenerationOptions(prev => ({ ...prev, language: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="UK English">UK English</SelectItem>
+                  <SelectItem value="US English">US English</SelectItem>
+                  <SelectItem value="Canadian English">Canadian English</SelectItem>
+                  <SelectItem value="Australian English">Australian English</SelectItem>
+                  <SelectItem value="French">French</SelectItem>
+                  <SelectItem value="German">German</SelectItem>
+                  <SelectItem value="Spanish">Spanish</SelectItem>
+                  <SelectItem value="Italian">Italian</SelectItem>
+                  <SelectItem value="Portuguese">Portuguese</SelectItem>
+                  <SelectItem value="Dutch">Dutch</SelectItem>
+                  <SelectItem value="Swedish">Swedish</SelectItem>
+                  <SelectItem value="Norwegian">Norwegian</SelectItem>
+                  <SelectItem value="Danish">Danish</SelectItem>
+                  <SelectItem value="Finnish">Finnish</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleGenerate} className="w-full">
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Update Request Modal */}
+      <Dialog open={showUpdateModal} onOpenChange={setShowUpdateModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Request Document Updates</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <p className="text-muted-foreground">
+              Provide specific updates you'd like to see in your CV and cover letter. The AI will incorporate your requests into the documents.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  CV Updates
+                </label>
+                <Textarea
+                  placeholder="e.g., Please include worked at Space X on a project whilst at NASA..."
+                  value={cvUpdateRequest}
+                  onChange={(e) => setCvUpdateRequest(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Cover Letter Updates
+                </label>
+                <Textarea
+                  placeholder="e.g., Mention my experience with machine learning projects..."
+                  value={coverLetterUpdateRequest}
+                  onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowUpdateModal(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleApplyUpdates}
+                disabled={!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()}
+                className="flex-1"
+              >
+                Apply Updates
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

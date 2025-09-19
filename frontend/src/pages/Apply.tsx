@@ -1,3 +1,7 @@
 import ApplicationWizard from '../components/ApplicationWizard';
 
-export default ApplicationWizard; // Will rename this file to Apply.tsx 
+const ApplicationWizardPage = () => {
+  return <ApplicationWizard />;
+};
+
+export default ApplicationWizardPage; 
