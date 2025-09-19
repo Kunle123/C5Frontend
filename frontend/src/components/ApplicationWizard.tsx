@@ -409,6 +409,32 @@ const ApplicationWizard = () => {
     console.log('CV for preview:', generatedDocuments[selectedVariant]?.cv);
   }
 
+  // Add this function inside ApplicationWizard
+  const handleSaveCV = async () => {
+    const doc = Object.values(generatedDocuments)[0];
+    const cvJson = doc?.cv;
+    if (!cvJson) {
+      toast({ title: 'Error', description: 'No CV to save', variant: 'destructive' });
+      return;
+    }
+    try {
+      const res = await fetch('/api/cv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+        body: JSON.stringify(cvJson),
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+      toast({ title: 'CV Saved', description: 'Your CV has been saved to your account.' });
+      window.location.href = '/my-cvs-new';
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to save CV', variant: 'destructive' });
+    }
+  };
+
   return (
     <div>
       <div style={{ color: 'blue', fontWeight: 'bold' }}>TOP-LEVEL TEST: ApplicationWizard is rendering</div>
@@ -706,6 +732,12 @@ const ApplicationWizard = () => {
                       >
                         <Edit3 className="w-4 h-4 mr-2" />
                         Edit
+                      </Button>
+                      <Button
+                        onClick={handleSaveCV}
+                        className="flex-1"
+                      >
+                        Save CV
                       </Button>
                       <Button
                         onClick={() => window.location.href = '/cv-download'}
