@@ -658,7 +658,7 @@ const ApplicationWizard = () => {
                   </AccordionItem>
                 </Accordion>
                 {/* Document Preview */}
-                {generatedDocuments[selectedVariant] ? (
+                {Object.values(generatedDocuments)[0]?.cv ? (
                   <div className="space-y-4">
                     <Tabs defaultValue="cv" className="w-full">
                       <TabsList className="grid w-full grid-cols-2">
@@ -684,7 +684,7 @@ const ApplicationWizard = () => {
                 )}
                 {/* Action Buttons */}
                 <div className="flex gap-4">
-                  {generatedDocuments[selectedVariant] ? (
+                  {Object.values(generatedDocuments)[0]?.cv ? (
                     <>
                       <Button
                         variant="outline"
