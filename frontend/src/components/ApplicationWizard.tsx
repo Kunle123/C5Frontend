@@ -576,8 +576,9 @@ const ApplicationWizard = () => {
                         <RadioGroup
                           value={generationOptions.length}
                           onValueChange={(value) => {
-                            setGenerationOptions(prev => ({ ...prev, length: value }));
-                            setSelectedVariant(generateVariantKey(value, generationOptions.sections));
+                            const typedValue = value as 'short' | 'medium' | 'long';
+                            setGenerationOptions(prev => ({ ...prev, length: typedValue }));
+                            setSelectedVariant(generateVariantKey(typedValue, generationOptions.sections));
                           }}
                           className="flex gap-6"
                         >
