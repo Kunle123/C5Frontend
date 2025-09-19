@@ -667,17 +667,12 @@ const ApplicationWizard = () => {
                       </TabsList>
                       <TabsContent value="cv" className="space-y-4">
                         <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          {typeof generatedDocuments[selectedVariant]?.cv === 'string'
-                            ? <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.cv}</pre>
-                            : generatedDocuments[selectedVariant]?.cv
-                              ? renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)
-                              : <pre className="whitespace-pre-wrap text-sm text-red-500">No CV data available.</pre>
-                          }
+                          {renderStructuredCV(Object.values(generatedDocuments)[0]?.cv, generationOptions)}
                         </div>
                       </TabsContent>
                       <TabsContent value="cover-letter" className="space-y-4">
                         <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm">{typeof generatedDocuments[selectedVariant]?.coverLetter === 'string' ? generatedDocuments[selectedVariant]?.coverLetter : JSON.stringify(generatedDocuments[selectedVariant]?.coverLetter, null, 2)}</pre>
+                          <pre className="whitespace-pre-wrap text-sm">{typeof Object.values(generatedDocuments)[0]?.coverLetter === 'string' ? Object.values(generatedDocuments)[0]?.coverLetter : JSON.stringify(Object.values(generatedDocuments)[0]?.coverLetter, null, 2)}</pre>
                         </div>
                       </TabsContent>
                     </Tabs>
