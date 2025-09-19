@@ -297,10 +297,10 @@ const ApplicationWizard = () => {
 
   const getKeywordColor = (status: Keyword['status']) => {
     switch (status) {
-      case 'match': return 'success';
-      case 'partial': return 'warning';
-      case 'missing': return 'destructive';
-      default: return 'secondary';
+      case 'match': return 'bg-emerald-500 text-white'; // green
+      case 'partial': return 'bg-amber-400 text-white'; // amber
+      case 'missing': return 'bg-rose-500 text-white'; // red
+      default: return 'bg-gray-300 text-black';
     }
   };
 
@@ -542,8 +542,7 @@ const ApplicationWizard = () => {
                         {extractedKeywords.map((keyword, index) => (
                           <Badge
                             key={index}
-                            variant={getKeywordColor(keyword.status)}
-                            className="flex items-center gap-1"
+                            className={`flex items-center gap-1 ${getKeywordColor(keyword.status)}`}
                           >
                             {getKeywordIcon(keyword.status)}
                             {keyword.text}
