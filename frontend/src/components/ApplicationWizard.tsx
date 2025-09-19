@@ -254,34 +254,32 @@ const ApplicationWizard = () => {
     }
   };
 
-  // Download/save/credit deduction
-  const handleSaveAndDownload = async () => {
+  // Save CV and deduct credit (no download)
+  const handleSaveCV = async () => {
     setIsGenerating(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Not authenticated');
-      // 1. Generate DOCX blob
-      const docxRes = await fetch('https://api-gw-production.up.railway.app/api/cv/generate-docx', {
+      // 1. Prepare payload: remove forbidden fields and ensure PII placeholders
+      const cvToSave = { ...structuredCV };
+      delete cvToSave.thread_id;
+      delete cvToSave.skills;
+      delete cvToSave.achievements;
+      // Ensure PII placeholders
+      if (cvToSave.name) cvToSave.name = "{{CANDIDATE_NAME}}";
+      if (cvToSave.contact_info) cvToSave.contact_info = ["{{CONTACT_INFO}}"];
+      // 2. Save CV to backend
+      const saveRes = await fetch('https://api-gw-production.up.railway.app/api/cv', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(structuredCV),
+        body: JSON.stringify(cvToSave),
         credentials: 'include',
       });
-      if (!docxRes.ok) throw new Error('Failed to generate DOCX');
-      const docxBlob = await docxRes.blob();
-      // 2. Download file
-      const url = window.URL.createObjectURL(docxBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'CV.docx';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
+      if (!saveRes.ok) throw new Error('Failed to save CV');
       // 3. Deduct a credit
       await fetch('https://api-gw-production.up.railway.app/api/user/credits/use', {
         method: 'POST',
@@ -290,16 +288,9 @@ const ApplicationWizard = () => {
         credentials: 'include',
       });
       await refreshCredits();
-      // 4. Persist document to backend (optional, if endpoint exists)
-      // await fetch('https://api-gw-production.up.railway.app/api/cv', {
-      //   method: 'POST',
-      //   headers: { 'Authorization': `Bearer ${token}`,'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ cv: structuredCV }),
-      //   credentials: 'include',
-      // });
-      toast({ title: 'Documents Generated & Saved', description: 'Your CV and cover letter have been generated and saved!' });
+      toast({ title: 'CV Saved!', description: 'Your CV has been saved. Go to MyCVs to download or manage your CVs.' });
     } catch (err: any) {
-      setError(err.message || 'Document save failed');
+      setError(err.message || 'CV save failed');
     } finally {
       setIsGenerating(false);
     }
@@ -410,11 +401,11 @@ const ApplicationWizard = () => {
               Back
             </button>
             <button
-              onClick={handleSaveAndDownload}
+              onClick={handleSaveCV}
               className="mt-4 ml-2 px-4 py-2 bg-blue-600 text-white rounded"
               disabled={isGenerating}
             >
-              {isGenerating ? "Saving..." : "Save & Download"}
+              {isGenerating ? "Saving..." : "Save CV"}
             </button>
           </div>
         )}
