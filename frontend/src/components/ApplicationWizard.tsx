@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -11,8 +11,10 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../hooks/use-toast';
 import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
+import { extractKeywords, generateApplicationMaterials, updateCV, getArcData } from '../api/careerArkApi';
+import { CreditsContext } from '../context/CreditsContext';
 
 interface Keyword {
   text: string;
@@ -38,6 +40,7 @@ interface GeneratedDocuments {
 
 const ApplicationWizard = () => {
   const { toast } = useToast();
+  const { credits, refreshCredits } = useContext(CreditsContext);
   const [currentStep, setCurrentStep] = useState(1);
   const [jobDescription, setJobDescription] = useState('');
   const [extractedKeywords, setExtractedKeywords] = useState<Keyword[]>([]);
@@ -61,6 +64,22 @@ const ApplicationWizard = () => {
   const [cvUpdateRequest, setCvUpdateRequest] = useState('');
   const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [arcData, setArcData] = useState<any>(null);
+  const [threadId, setThreadId] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  useEffect(() => {
+    // Fetch Arc Data and user profile on mount
+    (async () => {
+      try {
+        const arc = await getArcData();
+        setArcData(arc);
+        // Optionally fetch user profile if needed
+      } catch (err) {
+        setArcData(null);
+      }
+    })();
+  }, []);
 
   const steps = [
     { number: 1, title: 'Paste Job Description' },
@@ -70,28 +89,28 @@ const ApplicationWizard = () => {
 
   const handleJobDescriptionNext = async () => {
     if (!jobDescription.trim()) return;
-    
     setIsAnalyzing(true);
-    setCurrentStep(2);
-    
-    // Simulate keyword extraction and analysis
-    setTimeout(() => {
-      // Mock data - in real app this would come from API
-      setExtractedKeywords([
-        { text: 'React', status: 'match' },
-        { text: 'TypeScript', status: 'match' },
-        { text: 'Node.js', status: 'partial' },
-        { text: 'GraphQL', status: 'missing' },
-        { text: 'AWS', status: 'partial' },
-        { text: 'Docker', status: 'match' },
-        { text: 'Kubernetes', status: 'missing' },
-        { text: 'Agile', status: 'match' },
-      ]);
-      setMatchScore(72);
-      setJobTitle('Senior Full Stack Developer');
-      setCompanyName('TechCorp Inc.');
+    try {
+      // Merge arcData and userProfile for richer profile
+      const profile = {
+        ...(userProfile || {}),
+        ...(arcData || {}),
+      };
+      const result = await extractKeywords(profile, jobDescription);
+      if (result.error) throw new Error(result.error);
+      setExtractedKeywords(
+        (result.keywords || []).map((kw: string) => ({ text: kw, status: 'match' }))
+      );
+      setMatchScore(result.match_percentage || 0);
+      setJobTitle(result.job_title || '');
+      setCompanyName(result.company_name || '');
+      setThreadId(result.thread_id || null);
+      setCurrentStep(2);
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Keyword extraction failed', variant: 'destructive' });
+    } finally {
       setIsAnalyzing(false);
-    }, 2000);
+    }
   };
 
   const generateVariantKey = (length: string, sections: GenerationOptions['sections']) => {
@@ -105,88 +124,38 @@ const ApplicationWizard = () => {
 
   const handleGenerate = async () => {
     setIsGenerating(true);
-    setCurrentStep(3);
-    
-    // Generate all possible combinations
-    const lengths = ['short', 'medium', 'long'];
-    const sectionCombinations = [
-      { achievements: true, competencies: true, certifications: true, education: true },
-      { achievements: true, competencies: true, certifications: false, education: true },
-      { achievements: false, competencies: true, certifications: true, education: true },
-      // Add more combinations as needed
-    ];
-    
-    // Simulate document generation for all variants
-    setTimeout(() => {
-      const newDocuments: GeneratedDocuments = {};
-      
-      lengths.forEach(length => {
-        sectionCombinations.forEach(sections => {
-          const variantKey = generateVariantKey(length, sections);
-          
-          const baseCV = `JOHN DOE
-Senior Full Stack Developer
-
-EXPERIENCE
-Software Engineer | Current Company | 2022-Present
-• Built scalable React applications with TypeScript
-• Implemented microservices using Node.js and Docker
-• Collaborated in Agile development environment
-• Increased application performance by 40%
-
-SKILLS
-React, TypeScript, Node.js, Docker, Agile Development`;
-
-          let cv = baseCV;
-          
-          if (sections.achievements) {
-            cv += `\n\nACHIEVEMENTS\n• Improved system performance by 40%\n• Led team of 5 developers`;
-          }
-          
-          if (sections.competencies) {
-            cv += `\n\nCOMPETENCIES\n• Technical Leadership\n• Agile Methodology\n• Problem Solving`;
-          }
-          
-          if (sections.certifications) {
-            cv += `\n\nCERTIFICATIONS\n• AWS Certified Developer\n• React Professional Certificate`;
-          }
-          
-          if (sections.education) {
-            cv += `\n\nEDUCATION\nComputer Science Degree | University | 2018-2022`;
-          }
-          
-          // Adjust length
-          if (length === 'short') {
-            cv = cv.substring(0, cv.length * 0.7);
-          } else if (length === 'long') {
-            cv += `\n\nADDITIONAL EXPERIENCE\nIntern | Previous Company | 2021\n• Developed web applications\n• Learned modern frameworks`;
-          }
-          
-          newDocuments[variantKey] = {
-            cv,
-            coverLetter: `Dear Hiring Manager,
-
-I am writing to express my strong interest in the Senior Full Stack Developer position at TechCorp Inc. With my extensive experience in React, TypeScript, and modern development practices, I am confident I would be a valuable addition to your team.
-
-In my current role, I have successfully built scalable applications and worked with technologies directly relevant to your job requirements. My experience with React and TypeScript aligns perfectly with your tech stack, and I am eager to contribute to your innovative projects.
-
-I would welcome the opportunity to discuss how my skills and experience can benefit TechCorp Inc.
-
-Best regards,
-John Doe`
-          };
-        });
+    try {
+      // Merge arcData and userProfile for richer profile
+      const profile = {
+        ...(userProfile || {}),
+        ...(arcData || {}),
+      };
+      const options = { numPages: generationOptions.length === 'short' ? 1 : generationOptions.length === 'medium' ? 2 : 3 };
+      const result = await generateApplicationMaterials(
+        profile,
+        jobDescription,
+        extractedKeywords.map(k => k.text),
+        threadId || undefined,
+        options
+      );
+      if (result.error) throw new Error(result.error);
+      const variantKey = generateVariantKey(generationOptions.length, generationOptions.sections);
+      setGeneratedDocuments({
+        [variantKey]: {
+          cv: result.cv || '',
+          coverLetter: result.cover_letter || result.coverLetter || '',
+        },
       });
-      
-      setGeneratedDocuments(newDocuments);
-      setSelectedVariant(generateVariantKey('medium', generationOptions.sections));
+      setSelectedVariant(variantKey);
+      setJobTitle(result.job_title || '');
+      setCompanyName(result.company_name || '');
+      toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated.' });
+      setCurrentStep(3);
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'CV generation failed', variant: 'destructive' });
+    } finally {
       setIsGenerating(false);
-      
-      toast({
-        title: "Documents Generated",
-        description: "All CV variations have been successfully generated!",
-      });
-    }, 3000);
+    }
   };
 
   const handleRequestUpdates = () => {
@@ -196,42 +165,31 @@ John Doe`
   const handleApplyUpdates = async () => {
     setIsUpdating(true);
     setShowUpdateModal(false);
-    
-    // Simulate AI processing updates
-    setTimeout(() => {
-      if (cvUpdateRequest.trim()) {
-        setGeneratedDocuments(prev => ({
-          ...prev,
-          [selectedVariant]: {
-            ...prev[selectedVariant],
-            cv: prev[selectedVariant]?.cv + `\n\nADDITIONAL EXPERIENCE\nSpace X Project Contributor | NASA | 2021\n• ${cvUpdateRequest}`
-          }
-        }));
-      }
-      
-      if (coverLetterUpdateRequest.trim()) {
-        setGeneratedDocuments(prev => ({
-          ...prev,
-          [selectedVariant]: {
-            ...prev[selectedVariant],
-            coverLetter: prev[selectedVariant]?.coverLetter.replace(
-              'Best regards,',
-              `Additionally, I want to highlight my experience: ${coverLetterUpdateRequest}\n\nBest regards,`
-            )
-          }
-        }));
-      }
-      
-      setCurrentStep(3);
+    try {
+      // Merge arcData and userProfile for richer profile
+      const profile = {
+        ...(userProfile || {}),
+        ...(arcData || {}),
+      };
+      const existing_cv = generatedDocuments[selectedVariant]?.cv || '';
+      const result = await updateCV(profile, jobDescription, existing_cv, [cvUpdateRequest, coverLetterUpdateRequest].filter(Boolean));
+      if (result.error) throw new Error(result.error);
+      setGeneratedDocuments(prev => ({
+        ...prev,
+        [selectedVariant]: {
+          ...prev[selectedVariant],
+          cv: result.cv || prev[selectedVariant]?.cv,
+          coverLetter: result.cover_letter || result.coverLetter || prev[selectedVariant]?.coverLetter,
+        },
+      }));
+      toast({ title: 'Documents Updated', description: 'Your CV and cover letter have been updated.' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Update failed', variant: 'destructive' });
+    } finally {
       setIsUpdating(false);
       setCvUpdateRequest('');
       setCoverLetterUpdateRequest('');
-      
-      toast({
-        title: "Documents Updated",
-        description: "Your CV and cover letter have been updated with your requests!",
-      });
-    }, 2000);
+    }
   };
 
   const getKeywordColor = (status: Keyword['status']) => {
@@ -254,7 +212,6 @@ John Doe`
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Progress Indicator */}
         <div className="mb-8">
@@ -351,7 +308,6 @@ John Doe`
                         </div>
                       </div>
                     </div>
-                    
                     <div>
                       <h4 className="font-medium mb-3">Extracted Keywords</h4>
                       <div className="flex flex-wrap gap-2">
@@ -367,7 +323,6 @@ John Doe`
                         ))}
                       </div>
                     </div>
-
                     <div className="flex justify-end">
                       <Button
                         onClick={handleGenerate}
@@ -497,18 +452,16 @@ John Doe`
                         <TabsTrigger value="cv">Generated CV</TabsTrigger>
                         <TabsTrigger value="cover-letter">Generated Cover Letter</TabsTrigger>
                       </TabsList>
-                      
-                       <TabsContent value="cv" className="space-y-4">
-                         <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                           <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.cv}</pre>
-                         </div>
-                       </TabsContent>
-                       
-                       <TabsContent value="cover-letter" className="space-y-4">
-                         <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                           <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.coverLetter}</pre>
-                         </div>
-                       </TabsContent>
+                      <TabsContent value="cv" className="space-y-4">
+                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
+                          <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.cv}</pre>
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="cover-letter" className="space-y-4">
+                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
+                          <pre className="whitespace-pre-wrap text-sm">{generatedDocuments[selectedVariant]?.coverLetter}</pre>
+                        </div>
+                      </TabsContent>
                     </Tabs>
                   </div>
                 ) : (
@@ -551,8 +504,6 @@ John Doe`
           </div>
         )}
 
-
-
         {/* Loading state for generating */}
         {currentStep === 3 && isGenerating && (
           <Card>
@@ -590,7 +541,6 @@ John Doe`
           <DialogHeader>
             <DialogTitle>Edit Documents</DialogTitle>
           </DialogHeader>
-          
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">CV Updates:</label>
@@ -601,7 +551,6 @@ John Doe`
                 className="min-h-[100px]"
               />
             </div>
-            
             <div className="space-y-2">
               <label className="text-sm font-medium">Cover Letter Updates:</label>
               <Textarea
@@ -612,7 +561,6 @@ John Doe`
               />
             </div>
           </div>
-
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
