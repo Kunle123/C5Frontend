@@ -85,6 +85,8 @@ const ApplicationWizard = () => {
     })();
   }, []);
 
+  console.log('ApplicationWizard render, currentStep:', currentStep);
+
   const steps = [
     { number: 1, title: 'Paste Job Description' },
     { number: 2, title: 'Review Keywords' },
@@ -396,7 +398,7 @@ const ApplicationWizard = () => {
   }
 
   if (currentStep === 3) {
-    console.log('Step 3 Debug:');
+    console.log('Rendering Step 3 preview, currentStep:', currentStep);
     console.log('generatedDocuments:', generatedDocuments);
     console.log('selectedVariant:', selectedVariant);
     console.log('CV for preview:', generatedDocuments[selectedVariant]?.cv);
