@@ -403,6 +403,9 @@ const ApplicationWizard = () => {
   return (
       <div className="space-y-4">
         {cv.name && <h2 className="text-xl font-bold">{cv.name}</h2>}
+        {cv.contact_info && Array.isArray(cv.contact_info) && (
+          <div className="text-sm text-muted-foreground">{cv.contact_info.filter(Boolean).join(' | ')}</div>
+        )}
         {cv.summary?.content && <div><strong>Summary:</strong> {cv.summary.content}</div>}
         {options.sections.competencies && filterByPriority(cv.core_competencies).length > 0 && (
           <div>
