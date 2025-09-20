@@ -71,6 +71,9 @@ const ApplicationWizard = () => {
   // Add state for DOCX download
   const [docxData, setDocxData] = useState<{ cv?: string; cover_letter?: string } | null>(null);
   const [isDocxGenerating, setIsDocxGenerating] = useState(false);
+  // Add a ref to track if generationOptions have changed after Step 2
+  const [optionsChanged, setOptionsChanged] = useState(false);
+  const [pendingSave, setPendingSave] = useState(false);
 
   useEffect(() => {
     // Fetch Arc Data and user profile on mount
@@ -95,6 +98,15 @@ const ApplicationWizard = () => {
     console.log('STATE CHANGE: generatedDocuments', generatedDocuments);
     console.log('All keys in generatedDocuments:', Object.keys(generatedDocuments));
   }, [generatedDocuments]);
+
+  // Watch for changes to generationOptions after Step 2 and trigger generation
+  useEffect(() => {
+    if (currentStep === 3 && !isGenerating && !isDocxGenerating && !isUpdating && optionsChanged) {
+      handleGenerate();
+      setOptionsChanged(false);
+    }
+    // eslint-disable-next-line
+  }, [generationOptions]);
 
   console.log('ApplicationWizard render, currentStep:', currentStep);
 
@@ -463,7 +475,14 @@ const ApplicationWizard = () => {
 
   // Add this function inside ApplicationWizard
   const handleSaveCV = async () => {
-    const doc = generatedDocuments[selectedVariant];
+    setPendingSave(true);
+    await handleGenerate(); // This will update the preview and generatedDocuments
+    // Wait for generation to finish
+    while (isGenerating) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    // Now save the latest generated CV
+    const doc = Object.values(generatedDocuments)[0];
     let cvJson: any = doc?.cv;
     if (
       cvJson &&
@@ -483,6 +502,7 @@ const ApplicationWizard = () => {
     }
     if (!cvJson) {
       toast({ title: 'Error', description: 'No CV to save', variant: 'destructive' });
+      setPendingSave(false);
       return;
     }
     try {
@@ -500,6 +520,8 @@ const ApplicationWizard = () => {
       window.location.href = '/my-cvs-new';
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to save CV', variant: 'destructive' });
+    } finally {
+      setPendingSave(false);
     }
   };
 
@@ -665,7 +687,7 @@ const ApplicationWizard = () => {
                           onValueChange={(value) => {
                             const typedValue = value as 'short' | 'medium' | 'long';
                             setGenerationOptions(prev => ({ ...prev, length: typedValue }));
-                            setSelectedVariant(generateVariantKey(typedValue, generationOptions.sections));
+                            setOptionsChanged(true);
                           }}
                           className="flex gap-6"
                         >
@@ -695,7 +717,7 @@ const ApplicationWizard = () => {
                                 const isChecked = checked === true;
                                 const newSections = { ...generationOptions.sections, achievements: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                                setOptionsChanged(true);
                               }}
                             />
                             <Label htmlFor="achievements">Achievements</Label>
@@ -708,7 +730,7 @@ const ApplicationWizard = () => {
                                 const isChecked = checked === true;
                                 const newSections = { ...generationOptions.sections, competencies: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                                setOptionsChanged(true);
                               }}
                             />
                             <Label htmlFor="competencies">Competencies</Label>
@@ -721,7 +743,7 @@ const ApplicationWizard = () => {
                                 const isChecked = checked === true;
                                 const newSections = { ...generationOptions.sections, certifications: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                                setOptionsChanged(true);
                               }}
                             />
                             <Label htmlFor="certifications">Certifications</Label>
@@ -734,7 +756,7 @@ const ApplicationWizard = () => {
                                 const isChecked = checked === true;
                                 const newSections = { ...generationOptions.sections, education: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                                setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                                setOptionsChanged(true);
                               }}
                             />
                             <Label htmlFor="education">Education</Label>
@@ -805,6 +827,7 @@ const ApplicationWizard = () => {
                   <Button
                         onClick={handleSaveCV}
                     className="flex-1"
+                    disabled={pendingSave || isGenerating}
                   >
                         Go to downloads
                     <ArrowRight className="w-4 h-4 ml-2" />
