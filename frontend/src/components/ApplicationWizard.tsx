@@ -540,13 +540,13 @@ const ApplicationWizard = () => {
                       <h4 className="font-medium mb-3">Extracted Keywords</h4>
                       <div className="flex flex-wrap gap-2">
                         {extractedKeywords.map((keyword, index) => (
-                          <Badge
+                          <span
                             key={index}
-                            className={`flex items-center gap-1 ${getKeywordColor(keyword.status)}`}
+                            className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getKeywordColor(keyword.status)}`}
                           >
                             {getKeywordIcon(keyword.status)}
                             {keyword.text}
-                          </Badge>
+                          </span>
                         ))}
                       </div>
                     </div>
