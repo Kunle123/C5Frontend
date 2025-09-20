@@ -104,8 +104,39 @@ const ApplicationWizard = () => {
     { number: 3, title: 'Preview' },
   ];
 
-  // Utility to trigger DOCX download
-  const downloadBase64Docx = (base64: string, filename: string = 'cv.docx') => {
+  // Utility to get initials from a name
+  const getInitials = (name: string) => {
+    if (!name) return '';
+    return name
+      .split(' ')
+      .map((n) => n[0]?.toUpperCase())
+      .join('');
+  };
+
+  // Utility to sanitize company name for filenames
+  const sanitizeCompany = (company: string) => {
+    if (!company) return '';
+    return company.replace(/[^a-zA-Z0-9]/g, '');
+  };
+
+  // Utility to get a timestamp string
+  const getTimestamp = () => {
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+  };
+
+  // Utility to trigger DOCX download with unique filename
+  const downloadBase64Docx = (base64: string, type: 'cv' | 'cover_letter', candidateName?: string, companyName?: string) => {
+    const initials = getInitials(candidateName || '');
+    const company = sanitizeCompany(companyName || '');
+    const timestamp = getTimestamp();
+    let filename = 'document.docx';
+    if (type === 'cv') {
+      filename = `${initials}_CV_${company}_${timestamp}.docx`;
+    } else if (type === 'cover_letter') {
+      filename = `${initials}_CLetter_${company}_${timestamp}.docx`;
+    }
     const byteCharacters = atob(base64);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
@@ -234,8 +265,8 @@ const ApplicationWizard = () => {
       const result = await res.json();
       if (result.error) throw new Error(result.error);
       setDocxData(result);
-      if (result.cv) downloadBase64Docx(result.cv, 'cv.docx');
-      if (result.cover_letter) downloadBase64Docx(result.cover_letter, 'cover_letter.docx');
+      if (result.cv) downloadBase64Docx(result.cv, 'cv', userProfile?.name, companyName);
+      if (result.cover_letter) downloadBase64Docx(result.cover_letter, 'cover_letter', userProfile?.name, companyName);
       toast({ title: 'DOCX Generated', description: 'Your CV and cover letter DOCX files are ready.' });
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'DOCX generation failed', variant: 'destructive' });
