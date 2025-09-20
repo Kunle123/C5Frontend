@@ -295,20 +295,41 @@ const ApplicationWizard = () => {
     }
   };
 
-  const getKeywordColor = (status: Keyword['status']) => {
+  const getKeywordColor = (status: string) => {
     switch (status) {
-      case 'match': return 'bg-emerald-500 text-white'; // green
-      case 'partial': return 'bg-amber-400 text-white'; // amber
-      case 'missing': return 'bg-rose-500 text-white'; // red
-      default: return 'bg-gray-300 text-black';
+      case 'green':
+      case 'match':
+        return 'bg-emerald-500 text-white'; // green
+      case 'amber':
+      case 'partial':
+        return 'bg-amber-400 text-white'; // amber
+      case 'red':
+      case 'missing':
+        return 'bg-rose-500 text-white'; // red
+      default:
+        return 'bg-gray-300 text-black';
     }
   };
 
-  const getKeywordIcon = (status: Keyword['status']) => {
+  const getKeywordIcon = (status: string) => {
     switch (status) {
-      case 'match': return <CheckCircle className="w-3 h-3" />;
-      case 'partial': return <AlertCircle className="w-3 h-3" />;
-      case 'missing': return <XCircle className="w-3 h-3" />;
+      case 'green':
+      case 'match':
+        return (
+          <svg className="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
+        );
+      case 'amber':
+      case 'partial':
+        return (
+          <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-7V7a1 1 0 112 0v4a1 1 0 01-2 0zm1 4a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" /></svg>
+        );
+      case 'red':
+      case 'missing':
+        return (
+          <svg className="w-3 h-3 text-rose-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-2.293-7.707a1 1 0 011.414 0L10 11.586l.879-.879a1 1 0 111.414 1.414l-1.293 1.293a1 1 0 01-1.414 0l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+        );
+      default:
+        return null;
     }
   };
 
@@ -548,19 +569,15 @@ const ApplicationWizard = () => {
                     <div>
                       <h4 className="font-medium mb-3">Extracted Keywords</h4>
                       <div className="flex flex-wrap gap-2">
-                        <span className="bg-emerald-500 text-white px-2 py-1 rounded">Test Green Badge</span>
-                        {extractedKeywords.map((keyword, index) => {
-                          console.log('Keyword badge:', keyword, 'Status:', keyword.status);
-                          return (
-                            <span
+                        {extractedKeywords.map((keyword, index) => (
+                          <span
                             key={index}
-                              className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getKeywordColor(keyword.status)}`}
+                            className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getKeywordColor(keyword.status)}`}
                           >
                             {getKeywordIcon(keyword.status)}
                             {keyword.text}
-                            </span>
-                          );
-                        })}
+                          </span>
+                        ))}
                       </div>
                     </div>
                       <div className="flex justify-end">
