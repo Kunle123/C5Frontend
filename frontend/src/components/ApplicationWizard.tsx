@@ -299,15 +299,15 @@ const ApplicationWizard = () => {
     switch (status) {
       case 'green':
       case 'match':
-        return 'bg-emerald-500 text-white'; // green
+        return 'bg-emerald-200 text-emerald-900'; // muted green
       case 'amber':
       case 'partial':
-        return 'bg-amber-400 text-white'; // amber
+        return 'bg-amber-200 text-amber-900'; // muted amber
       case 'red':
       case 'missing':
-        return 'bg-rose-500 text-white'; // red
+        return 'bg-rose-200 text-rose-900'; // muted red
       default:
-        return 'bg-gray-300 text-black';
+        return 'bg-gray-200 text-gray-800';
     }
   };
 
@@ -316,17 +316,17 @@ const ApplicationWizard = () => {
       case 'green':
       case 'match':
         return (
-          <svg className="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
+          <svg className="w-3 h-3 text-emerald-900" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
         );
       case 'amber':
       case 'partial':
         return (
-          <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-7V7a1 1 0 112 0v4a1 1 0 01-2 0zm1 4a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" /></svg>
+          <svg className="w-3 h-3 text-amber-900" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-7V7a1 1 0 112 0v4a1 1 0 01-2 0zm1 4a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" /></svg>
         );
       case 'red':
       case 'missing':
         return (
-          <svg className="w-3 h-3 text-rose-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-2.293-7.707a1 1 0 011.414 0L10 11.586l.879-.879a1 1 0 111.414 1.414l-1.293 1.293a1 1 0 01-1.414 0l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+          <svg className="w-3 h-3 text-rose-900" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-2.293-7.707a1 1 0 011.414 0L10 11.586l.879-.879a1 1 0 111.414 1.414l-1.293 1.293a1 1 0 01-1.414 0l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
         );
       default:
         return null;
