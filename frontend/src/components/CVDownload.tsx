@@ -58,8 +58,10 @@ export function CVDownload() {
   // const uniqueCVsMap: Record<string, any> = {};
   // cvs.forEach(cv => { ... });
   // const filteredCVs = Object.values(uniqueCVsMap);
-  // Only show main CVs (not cover letters)
-  const filteredCVs = cvs.filter(cv => cv.type === 'cv');
+  // Only show main CVs with an associated cover letter
+  const filteredCVs = cvs.filter(cv =>
+    cv.metadata?.name === 'Generated CV' && cv.cover_letter_available && cv.cover_letter_download_url
+  );
 
   return (
     <div className="min-h-screen bg-background">
