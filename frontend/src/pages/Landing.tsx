@@ -25,8 +25,8 @@ export default function Landing() {
         <img
           src="/hero-woman-desk.png"
           alt="Professional woman working at desk with plants"
-          className="rounded-lg object-cover shadow-lg"
-          style={{ width: '960px', maxWidth: '100%' }}
+          className="rounded-lg object-cover shadow-lg w-full max-w-[960px] md:max-w-[768px] lg:max-w-[960px]"
+          style={{ width: '100%' }}
         />
         <style>{`
           @media (max-width: 1023px) and (min-width: 768px) {
