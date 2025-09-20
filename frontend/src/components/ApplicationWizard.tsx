@@ -474,6 +474,13 @@ const ApplicationWizard = () => {
     ) {
       cvJson = { ...cvJson, name: userProfile.name };
     }
+    if (cvJson && typeof cvJson === 'object' && !Array.isArray(cvJson)) {
+      if (!('name' in cvJson) && userProfile?.name) {
+        cvJson = { ...cvJson, name: userProfile.name };
+      }
+      // Add a unique created_at timestamp to ensure uniqueness
+      cvJson = { ...cvJson, created_at: new Date().toISOString() };
+    }
     if (!cvJson) {
       toast({ title: 'Error', description: 'No CV to save', variant: 'destructive' });
       return;
