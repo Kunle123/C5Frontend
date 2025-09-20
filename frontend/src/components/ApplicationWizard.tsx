@@ -429,7 +429,7 @@ const ApplicationWizard = () => {
       const result = await res.json();
       if (result.error) throw new Error(result.error);
       toast({ title: 'CV Saved', description: 'Your CV has been saved to your account.' });
-      window.location.href = '/my-cvs-new';
+      // window.location.href = '/my-cvs-new';
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to save CV', variant: 'destructive' });
     }
