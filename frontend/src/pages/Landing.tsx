@@ -7,7 +7,7 @@ export default function Landing() {
       {/* Login Button Top Right */}
       <div className="fixed top-4 right-4 z-50">
         <a href="/login" className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition-colors">Log In</a>
-      </div>
+        </div>
       {/* Hero Section */}
       <section className="w-full flex flex-col items-center pt-12 pb-8 px-4 md:px-8 lg:px-0">
         <h1
@@ -105,17 +105,18 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* How It Works Section */}
-      <section className="w-full flex flex-col items-center py-16 bg-white">
+      {/* How It Works Section - Desktop/Tablet */}
+      <section className="w-full flex-col items-center py-16 bg-white hidden md:block">
         <div className="w-full max-w-[960px] mx-auto">
           <h2 className="text-center mb-8" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 44, color: '#555454' }}>
             HOW IT WORKS
           </h2>
+          {/* ...existing flex-row layout... */}
           <div className="flex flex-row w-[960px] h-[508px] mx-auto mb-[10px]">
             {/* Left: Image */}
             <div className="flex-shrink-0 flex items-start justify-start">
               <img src="/paste-job-posting.jpeg" alt="Paste a job posting" className="rounded-lg object-cover shadow-lg w-[300px] h-[300px] lg:w-[450px] lg:h-[450px]" />
-            </div>
+        </div>
             {/* Right: Text Box */}
             <div className="flex flex-col justify-center items-end ml-8" style={{ minWidth: 0 }}>
               <div className="flex flex-col items-end text-right" style={{ gap: 10, width: 420 }}>
@@ -126,9 +127,8 @@ export default function Landing() {
                   Candidate 5 will provide keyword and match analysis so you know which roles suit you best and how to improve your chances.
                 </p>
               </div>
-            </div>
-          </div>
-          {/* Second Flex Row */}
+                </div>
+                </div>
           <div className="flex flex-row w-[960px] h-[508px] mx-auto mb-[10px]">
             {/* Left: Text Box */}
             <div className="flex flex-col justify-center items-start mr-8" style={{ minWidth: 0 }}>
@@ -145,8 +145,7 @@ export default function Landing() {
             <div className="flex-shrink-0 flex items-start justify-end">
               <img src="/showcase-skills.jpeg" alt="Showcase your skills" className="rounded-lg object-cover shadow-lg w-[300px] h-[300px] lg:w-[450px] lg:h-[450px]" />
             </div>
-          </div>
-          {/* Third Flex Row */}
+              </div>
           <div className="flex flex-row w-[960px] h-[508px] mx-auto">
             {/* Left: Image */}
             <div className="flex-shrink-0 flex items-start justify-start">
@@ -163,6 +162,48 @@ export default function Landing() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+      {/* How It Works Section - Mobile Only */}
+      <section className="w-full flex flex-col items-center py-8 bg-white md:hidden">
+        <h2 className="text-center mb-8" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 32, color: '#555454' }}>
+          HOW IT WORKS
+            </h2>
+        {/* Step 1 */}
+        <div className="flex flex-col items-center w-full mb-8">
+          <img src="/paste-job-posting.jpeg" alt="Paste a job posting" className="rounded-lg object-cover shadow-lg" style={{ width: 375, height: 375, maxWidth: '100%' }} />
+          <div style={{ padding: '0 10px', width: '100%' }}>
+            <h3 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 24, color: '#555454', marginTop: 16 }}>
+              Paste a job posting
+            </h3>
+            <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: 16, color: '#555454', marginTop: 8 }}>
+              Candidate 5 will provide keyword and match analysis so you know which roles suit you best and how to improve your chances.
+            </p>
+          </div>
+        </div>
+        {/* Step 2 */}
+        <div className="flex flex-col items-center w-full mb-8">
+          <img src="/showcase-skills.jpeg" alt="Showcase your skills" className="rounded-lg object-cover shadow-lg" style={{ width: 375, height: 375, maxWidth: '100%' }} />
+          <div style={{ padding: '0 10px', width: '100%' }}>
+            <h3 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 24, color: '#555454', marginTop: 16 }}>
+              Showcase your skills
+            </h3>
+            <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: 16, color: '#555454', marginTop: 8 }}>
+              Each time you apply for a role our AI will look across your experience highlighting those that fit best and placing a spotlight on your skills.
+            </p>
+          </div>
+        </div>
+        {/* Step 3 */}
+        <div className="flex flex-col items-center w-full mb-8">
+          <img src="/stay-informed.jpeg" alt="Stay Informed" className="rounded-lg object-cover shadow-lg" style={{ width: 375, height: 375, maxWidth: '100%' }} />
+          <div style={{ padding: '0 10px', width: '100%' }}>
+            <h3 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 24, color: '#555454', marginTop: 16 }}>
+              Stay Informed
+            </h3>
+            <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: 16, color: '#555454', marginTop: 8 }}>
+              It’s easy to lose track of where you are in the applications process. C5 helps you keep track of every role, contact salary range so you’re ready when opportunity comes knocking.
+            </p>
           </div>
         </div>
       </section>
