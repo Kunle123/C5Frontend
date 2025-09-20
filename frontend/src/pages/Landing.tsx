@@ -213,28 +213,32 @@ export default function Landing() {
         <div className="w-full max-w-[960px] mx-auto">
           <h2 className="text-center mb-8" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 44, color: '#555454' }}>
             Testemonials
-            </h2>
-          <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 24, color: '#555454', maxWidth: 700, margin: '0 auto' }}>
-            Have you ever wondered how some services launch with hundreds of testimonials?
-            <br /><br />
-            We never figured it out either.
-            <br /><br />
-            What we can offer is free, full unfettered access to our service so you can make your own mind up.
-          </p>
+          </h2>
+          <div style={{ background: '#EEF0F6', borderRadius: 12, maxWidth: 960, margin: '0 auto', padding: 32 }}>
+            <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 24, color: '#555454', margin: 0 }}>
+              Have you ever wondered how some services launch with hundreds of testimonials?
+              <br /><br />
+              We never figured it out either.
+              <br /><br />
+              What we can offer is free, full unfettered access to our service so you can make your own mind up.
+            </p>
           </div>
+        </div>
       </section>
       {/* Testemonials Section - Mobile Only */}
       <section className="w-full flex flex-col items-center py-8 bg-white md:hidden">
         <h2 className="text-center mb-8" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 44, color: '#555454' }}>
           Testemonials
         </h2>
-        <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 18, color: '#555454', maxWidth: 375, padding: '0 10px' }}>
-          Have you ever wondered how some services launch with hundreds of testimonials?
-          <br /><br />
-          We never figured it out either.
-          <br /><br />
-          What we can offer is free, full unfettered access to our service so you can make your own mind up.
-        </p>
+        <div style={{ background: '#EEF0F6', borderRadius: 12, width: '100%', maxWidth: 375, margin: 10, padding: 20 }}>
+          <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 18, color: '#555454', margin: 0 }}>
+            Have you ever wondered how some services launch with hundreds of testimonials?
+            <br /><br />
+            We never figured it out either.
+            <br /><br />
+            What we can offer is free, full unfettered access to our service so you can make your own mind up.
+          </p>
+        </div>
       </section>
 
       {/* Footer */}
