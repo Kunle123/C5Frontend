@@ -604,17 +604,17 @@ const ApplicationWizard = () => {
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="short" id="short" />
                             <Label htmlFor="short">Short</Label>
-                          </div>
+                </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="medium" id="medium" />
                             <Label htmlFor="medium">Medium</Label>
-                          </div>
+                  </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="long" id="long" />
                             <Label htmlFor="long">Long</Label>
-                          </div>
+                    </div>
                         </RadioGroup>
-                      </div>
+                </div>
                       {/* CV Sections */}
                       <div className="space-y-3">
                         <Label className="text-sm font-medium">Include sections in CV:</Label>
@@ -631,7 +631,7 @@ const ApplicationWizard = () => {
                               }}
                             />
                             <Label htmlFor="achievements">Achievements</Label>
-                          </div>
+          </div>
                           <div className="flex items-center space-x-2">
                             <Checkbox
                               id="competencies"
@@ -644,7 +644,7 @@ const ApplicationWizard = () => {
                               }}
                             />
                             <Label htmlFor="competencies">Competencies</Label>
-                          </div>
+                    </div>
                           <div className="flex items-center space-x-2">
                             <Checkbox
                               id="certifications"
@@ -679,18 +679,18 @@ const ApplicationWizard = () => {
                 {/* Document Preview */}
                 {Object.values(generatedDocuments)[0]?.cv ? (
                   <div className="space-y-4">
-                    <Tabs defaultValue="cv" className="w-full">
-                      <TabsList className="grid w-full grid-cols-2">
+                <Tabs defaultValue="cv" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="cv">Generated CV</TabsTrigger>
                         <TabsTrigger value="cover-letter">Generated Cover Letter</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="cv" className="space-y-4">
-                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
+                  </TabsList>
+                  <TabsContent value="cv" className="space-y-4">
+                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
                           {renderStructuredCV(Object.values(generatedDocuments)[0]?.cv, generationOptions)}
-                        </div>
-                      </TabsContent>
-                      <TabsContent value="cover-letter" className="space-y-4">
-                        <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="cover-letter" className="space-y-4">
+                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
                           {(() => {
                             const doc = Object.values(generatedDocuments)[0] as any;
                             const cv = doc?.cv as any;
@@ -712,9 +712,9 @@ const ApplicationWizard = () => {
                               </pre>
                             );
                           })()}
-                        </div>
-                      </TabsContent>
-                    </Tabs>
+                    </div>
+                  </TabsContent>
+                </Tabs>
                   </div>
                 ) : (
                   <div className="border rounded-lg p-8 bg-muted/50 text-center">
@@ -725,20 +725,20 @@ const ApplicationWizard = () => {
                 <div className="flex gap-4">
                   {Object.values(generatedDocuments)[0]?.cv ? (
                     <>
-                      <Button
-                        variant="outline"
+                  <Button
+                    variant="outline"
                         onClick={handleRequestUpdates}
-                      >
+                  >
                         <Edit3 className="w-4 h-4 mr-2" />
                         Edit
-                      </Button>
-                      <Button
+                  </Button>
+                  <Button
                         onClick={handleSaveCV}
-                        className="flex-1"
-                      >
+                    className="flex-1"
+                  >
                         Go to downloads
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
                     </>
                   ) : (
                     <Button
@@ -756,18 +756,18 @@ const ApplicationWizard = () => {
         )}
 
           {/* Loading state for generating */}
-          {currentStep === 3 && isGenerating && (
-            <Card>
-              <CardContent className="py-12">
-                <div className="text-center space-y-4">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                  <h3 className="text-lg font-semibold">Generating Your Documents</h3>
-                  <p className="text-muted-foreground">
-                    Please wait while we create your optimized CV and cover letter...
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+        {currentStep === 3 && isGenerating && (
+          <Card>
+            <CardContent className="py-12">
+              <div className="text-center space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <h3 className="text-lg font-semibold">Generating Your Documents</h3>
+                <p className="text-muted-foreground">
+                  Please wait while we create your optimized CV and cover letter...
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
           {/* Loading state for updating */}
@@ -780,11 +780,11 @@ const ApplicationWizard = () => {
                 <p className="text-muted-foreground">
                     Please wait while we apply your requested updates...
                 </p>
-              </div>
+      </div>
             </CardContent>
           </Card>
         )}
-      </div>
+              </div>
 
         {/* Edit Request Modal */}
       <Dialog open={showUpdateModal} onOpenChange={setShowUpdateModal}>
@@ -830,4 +830,4 @@ const ApplicationWizard = () => {
   );
 };
 
-export default ApplicationWizard;
+export default ApplicationWizard; 
