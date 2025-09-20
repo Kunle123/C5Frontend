@@ -208,6 +208,35 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Testimonial Section - Desktop/Tablet */}
+      <section className="w-full flex-col items-center py-16 bg-white hidden md:block">
+        <div className="w-full max-w-[960px] mx-auto">
+          <h2 className="text-center mb-8" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 44, color: '#555454' }}>
+            Testimonial
+          </h2>
+          <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 24, color: '#555454', maxWidth: 700, margin: '0 auto' }}>
+            Have you ever wondered how some services launch with hundreds of testimonials?
+            <br /><br />
+            We never figured it out either.
+            <br /><br />
+            What we can offer is free, full unfettered access to our service so you can make your own mind up.
+          </p>
+        </div>
+      </section>
+      {/* Testimonial Section - Mobile Only */}
+      <section className="w-full flex flex-col items-center py-8 bg-white md:hidden">
+        <h2 className="text-center mb-8" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 44, color: '#555454' }}>
+          Testimonial
+        </h2>
+        <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 18, color: '#555454', maxWidth: 375, padding: '0 10px' }}>
+          Have you ever wondered how some services launch with hundreds of testimonials?
+          <br /><br />
+          We never figured it out either.
+          <br /><br />
+          What we can offer is free, full unfettered access to our service so you can make your own mind up.
+        </p>
+      </section>
+
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
