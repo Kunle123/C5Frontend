@@ -412,12 +412,12 @@ const ApplicationWizard = () => {
   // Add this function inside ApplicationWizard
   const handleSaveCV = async () => {
     const doc = generatedDocuments[selectedVariant];
-    let cvJson = doc?.cv;
+    let cvJson: any = doc?.cv;
     if (
       cvJson &&
       typeof cvJson === 'object' &&
       !Array.isArray(cvJson) &&
-      !cvJson.name &&
+      !('name' in cvJson) &&
       userProfile?.name
     ) {
       cvJson = { ...cvJson, name: userProfile.name };
