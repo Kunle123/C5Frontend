@@ -53,7 +53,12 @@ export function Navigation() {
         <span className="font-bold text-lg text-primary">Candidate 5</span>
       </div>
       <div className="flex items-center gap-4">
-        <span className="hidden md:inline text-base text-foreground">Dashboard</span>
+        <button
+          className="hidden md:inline text-base text-foreground hover:underline"
+          onClick={() => navigate('/dashboard')}
+        >
+          Dashboard
+        </button>
         {/* Show Login/Register if not logged in */}
         {!isLoggedIn && (
           <>
