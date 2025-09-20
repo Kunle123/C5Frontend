@@ -7,6 +7,14 @@ export default {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
+  safelist: [
+    'bg-emerald-500',
+    'bg-amber-400',
+    'bg-rose-500',
+    'text-white',
+    'bg-gray-300',
+    'text-black',
+  ],
   prefix: "",
   theme: {
     container: {
