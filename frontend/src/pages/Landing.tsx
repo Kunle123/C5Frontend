@@ -113,9 +113,8 @@ export default function Landing() {
           </h2>
           <div className="flex flex-row w-[960px] h-[508px] mx-auto mb-[10px]">
             {/* Left: Image */}
-            <div className="flex-shrink-0 flex items-start justify-start" style={{ width: 450, height: 450 }}>
-              <img src="/paste-job-posting.jpeg" alt="Paste a job posting" width={450} height={450} style={{ width: 450, height: 450 }} className="hidden lg:block rounded-lg object-cover shadow-lg" />
-              <img src="/paste-job-posting.png" alt="Paste a job posting" width={508} height={508} style={{ width: 508, height: 508 }} className="block lg:hidden rounded-lg object-cover shadow-lg" />
+            <div className="flex-shrink-0 flex items-start justify-start">
+              <img src="/paste-job-posting.jpeg" alt="Paste a job posting" className="rounded-lg object-cover shadow-lg w-[300px] h-[300px] lg:w-[450px] lg:h-[450px]" />
             </div>
             {/* Right: Text Box */}
             <div className="flex flex-col justify-center items-end ml-8" style={{ minWidth: 0 }}>
@@ -143,17 +142,15 @@ export default function Landing() {
               </div>
             </div>
             {/* Right: Image */}
-            <div className="flex-shrink-0 flex items-start justify-end" style={{ width: 450, height: 450 }}>
-              <img src="/showcase-skills.jpeg" alt="Showcase your skills" width={450} height={450} style={{ width: 450, height: 450 }} className="hidden lg:block rounded-lg object-cover shadow-lg" />
-              <img src="/showcase-skills.png" alt="Showcase your skills" width={508} height={508} style={{ width: 508, height: 508 }} className="block lg:hidden rounded-lg object-cover shadow-lg" />
+            <div className="flex-shrink-0 flex items-start justify-end">
+              <img src="/showcase-skills.jpeg" alt="Showcase your skills" className="rounded-lg object-cover shadow-lg w-[300px] h-[300px] lg:w-[450px] lg:h-[450px]" />
             </div>
           </div>
           {/* Third Flex Row */}
           <div className="flex flex-row w-[960px] h-[508px] mx-auto">
             {/* Left: Image */}
-            <div className="flex-shrink-0 flex items-start justify-start" style={{ width: 450, height: 450 }}>
-              <img src="/stay-informed.jpeg" alt="Stay Informed" width={450} height={450} style={{ width: 450, height: 450 }} className="hidden lg:block rounded-lg object-cover shadow-lg" />
-              <img src="/stay-informed.png" alt="Stay Informed" width={508} height={508} style={{ width: 508, height: 508 }} className="block lg:hidden rounded-lg object-cover shadow-lg" />
+            <div className="flex-shrink-0 flex items-start justify-start">
+              <img src="/stay-informed.jpeg" alt="Stay Informed" className="rounded-lg object-cover shadow-lg w-[300px] h-[300px] lg:w-[450px] lg:h-[450px]" />
             </div>
             {/* Right: Text Box */}
             <div className="flex flex-col justify-center items-end ml-8" style={{ minWidth: 0 }}>
