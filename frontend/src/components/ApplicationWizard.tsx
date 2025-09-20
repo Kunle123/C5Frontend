@@ -76,6 +76,10 @@ const ApplicationWizard = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editRequest, setEditRequest] = useState('');
   const [editedCV, setEditedCV] = useState<any | null>(null);
+  // Add state for contact details and salary
+  const [contactName, setContactName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+  const [salary, setSalary] = useState('');
 
   useEffect(() => {
     // Fetch Arc Data and user profile on mount
@@ -289,6 +293,9 @@ const ApplicationWizard = () => {
         company_name: companyName,
         job_description: jobDescription,
         applied_at: new Date().toISOString(),
+        contact_name: contactName,
+        contact_number: contactNumber,
+        salary: salary,
       };
       await createApplicationHistory(payload, token);
       toast({ title: 'Application Saved', description: 'Application history has been saved.' });
@@ -579,8 +586,44 @@ const ApplicationWizard = () => {
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 className="min-h-[300px]"
-                  disabled={isAnalyzing}
+                disabled={isAnalyzing}
               />
+              {/* Contact Name */}
+              <div>
+                <Label htmlFor="contactName">Contact Name (optional)</Label>
+                <input
+                  id="contactName"
+                  type="text"
+                  className="w-full border rounded px-3 py-2 mt-1"
+                  value={contactName}
+                  onChange={e => setContactName(e.target.value)}
+                  placeholder="e.g. Jane Smith"
+                />
+              </div>
+              {/* Contact Number */}
+              <div>
+                <Label htmlFor="contactNumber">Contact Number (optional)</Label>
+                <input
+                  id="contactNumber"
+                  type="text"
+                  className="w-full border rounded px-3 py-2 mt-1"
+                  value={contactNumber}
+                  onChange={e => setContactNumber(e.target.value)}
+                  placeholder="e.g. 01234 567890"
+                />
+              </div>
+              {/* Salary */}
+              <div>
+                <Label htmlFor="salary">Salary (optional)</Label>
+                <input
+                  id="salary"
+                  type="text"
+                  className="w-full border rounded px-3 py-2 mt-1"
+                  value={salary}
+                  onChange={e => setSalary(e.target.value)}
+                  placeholder="e.g. £60,000 or 500/day"
+                />
+              </div>
               <Button 
                 onClick={handleJobDescriptionNext}
                 disabled={!jobDescription.trim() || isAnalyzing}
