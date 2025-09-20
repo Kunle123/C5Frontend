@@ -690,7 +690,7 @@ const ApplicationWizard = () => {
                   </AccordionItem>
                 </Accordion>
                 {/* Document Preview */}
-                {Object.values(generatedDocuments)[0]?.cv ? (
+                {generatedDocuments[selectedVariant]?.cv ? (
                   <div className="space-y-4">
                 <Tabs defaultValue="cv" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
@@ -699,13 +699,13 @@ const ApplicationWizard = () => {
                   </TabsList>
                   <TabsContent value="cv" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          {renderStructuredCV(Object.values(generatedDocuments)[0]?.cv, generationOptions)}
+                          {renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)}
                     </div>
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
                           {(() => {
-                            const doc = Object.values(generatedDocuments)[0] as any;
+                            const doc = generatedDocuments[selectedVariant] as any;
                             const cv = doc?.cv as any;
                             const coverLetter = doc?.coverLetter as any;
                             let content = '';
@@ -736,7 +736,7 @@ const ApplicationWizard = () => {
                 )}
                 {/* Action Buttons */}
                 <div className="flex gap-4">
-                  {Object.values(generatedDocuments)[0]?.cv ? (
+                  {generatedDocuments[selectedVariant]?.cv ? (
                     <>
                   <Button
                     variant="outline"
