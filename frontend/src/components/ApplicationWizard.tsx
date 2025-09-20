@@ -572,7 +572,7 @@ const ApplicationWizard = () => {
                         {extractedKeywords.map((keyword, index) => (
                           <span
                             key={index}
-                            className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getKeywordColor(keyword.status)}`}
+                            className={`flex items-center justify-center gap-1 rounded px-2 py-1 text-xs font-medium ${getKeywordColor(keyword.status)}`}
                           >
                             {getKeywordIcon(keyword.status)}
                             {keyword.text}
