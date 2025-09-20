@@ -429,7 +429,7 @@ const ApplicationWizard = () => {
       const result = await res.json();
       if (result.error) throw new Error(result.error);
       toast({ title: 'CV Saved', description: 'Your CV has been saved to your account.' });
-      // window.location.href = '/my-cvs-new';
+      window.location.href = '/my-cvs-new';
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to save CV', variant: 'destructive' });
     }
@@ -539,6 +539,7 @@ const ApplicationWizard = () => {
                     <div>
                       <h4 className="font-medium mb-3">Extracted Keywords</h4>
                       <div className="flex flex-wrap gap-2">
+                        <span className="bg-emerald-500 text-white px-2 py-1 rounded">Test Green Badge</span>
                         {extractedKeywords.map((keyword, index) => (
                           <span
                             key={index}
