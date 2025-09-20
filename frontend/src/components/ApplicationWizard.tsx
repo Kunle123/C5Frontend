@@ -411,7 +411,7 @@ const ApplicationWizard = () => {
 
   // Add this function inside ApplicationWizard
   const handleSaveCV = async () => {
-    const doc = Object.values(generatedDocuments)[0];
+    const doc = generatedDocuments[selectedVariant];
     const cvJson = doc?.cv;
     if (!cvJson) {
       toast({ title: 'Error', description: 'No CV to save', variant: 'destructive' });
@@ -540,15 +540,18 @@ const ApplicationWizard = () => {
                       <h4 className="font-medium mb-3">Extracted Keywords</h4>
                       <div className="flex flex-wrap gap-2">
                         <span className="bg-emerald-500 text-white px-2 py-1 rounded">Test Green Badge</span>
-                        {extractedKeywords.map((keyword, index) => (
-                          <span
+                        {extractedKeywords.map((keyword, index) => {
+                          console.log('Keyword badge:', keyword, 'Status:', keyword.status);
+                          return (
+                            <span
                             key={index}
-                            className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getKeywordColor(keyword.status)}`}
+                              className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getKeywordColor(keyword.status)}`}
                           >
                             {getKeywordIcon(keyword.status)}
                             {keyword.text}
-                          </span>
-                        ))}
+                            </span>
+                          );
+                        })}
                       </div>
                     </div>
                       <div className="flex justify-end">
