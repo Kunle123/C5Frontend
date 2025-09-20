@@ -75,6 +75,7 @@ const ApplicationWizard = () => {
   const [optionsChanged, setOptionsChanged] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [editRequest, setEditRequest] = useState('');
   const [editedCV, setEditedCV] = useState<any | null>(null);
 
   useEffect(() => {
@@ -309,35 +310,23 @@ const ApplicationWizard = () => {
   const handleRequestUpdates = () => {
     setIsEditMode(true);
     setEditedCV(generatedDocuments[selectedVariant]?.cv);
+    setEditRequest('');
   };
 
   const handleApplyUpdates = async () => {
     setIsUpdating(true);
-    setShowUpdateModal(false);
     try {
-      // Merge arcData and userProfile for richer profile
-      const profile = {
-        ...(userProfile || {}),
-        ...(arcData || {}),
-      };
-      const existing_cv = generatedDocuments[selectedVariant]?.cv || '';
-      const result = await updateCV(profile, jobDescription, existing_cv, [cvUpdateRequest, coverLetterUpdateRequest].filter(Boolean));
+      const profile = { ...(userProfile || {}), ...(arcData || {}) };
+      const existing_cv = editedCV || generatedDocuments[selectedVariant]?.cv || '';
+      const result = await updateCV(profile, jobDescription, existing_cv, [editRequest].filter(Boolean));
       if (result.error) throw new Error(result.error);
-      setGeneratedDocuments(prev => ({
-        ...prev,
-        [selectedVariant]: {
-          ...prev[selectedVariant],
-          cv: result.cv || prev[selectedVariant]?.cv,
-          coverLetter: result.cover_letter || result.coverLetter || prev[selectedVariant]?.coverLetter,
-        },
-      }));
-      toast({ title: 'Documents Updated', description: 'Your CV and cover letter have been updated.' });
+      setEditedCV(result.cv || existing_cv);
+      toast({ title: 'Documents Updated', description: 'Your CV has been updated.' });
+      setEditRequest('');
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Update failed', variant: 'destructive' });
     } finally {
       setIsUpdating(false);
-      setCvUpdateRequest('');
-      setCoverLetterUpdateRequest('');
     }
   };
 
@@ -759,7 +748,25 @@ const ApplicationWizard = () => {
                   </AccordionItem>
                 </Accordion>
                 {/* Document Preview */}
-                {generatedDocuments[selectedVariant]?.cv ? (
+                {isEditMode ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Edit Request:</Label>
+                      <Textarea
+                        placeholder="Describe any changes you'd like to make to your CV..."
+                        value={editRequest}
+                        onChange={(e) => setEditRequest(e.target.value)}
+                        className="min-h-[100px]"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleApplyUpdates}
+                      disabled={!editRequest.trim()}
+                    >
+                      Apply Updates
+                    </Button>
+                  </div>
+                ) : (
                   <div className="space-y-4">
                 <Tabs defaultValue="cv" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
@@ -799,10 +806,6 @@ const ApplicationWizard = () => {
                     </div>
                   </TabsContent>
                 </Tabs>
-                  </div>
-                ) : (
-                  <div className="border rounded-lg p-8 bg-muted/50 text-center">
-                    <p className="text-muted-foreground">Your documents will appear here after generation</p>
                   </div>
                 )}
                 {/* Action Buttons */}
