@@ -173,11 +173,11 @@ export default function Landing() {
         {/* Step 1 */}
         <div className="flex flex-col items-center w-full mb-8">
           <img src="/paste-job-posting.jpeg" alt="Paste a job posting" className="rounded-lg object-cover shadow-lg" style={{ width: 375, height: 375, maxWidth: '100%' }} />
-          <div style={{ padding: '0 10px', width: '100%' }}>
-            <h3 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 24, color: '#555454', marginTop: 16 }}>
-              Paste a job posting
-            </h3>
-            <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: 16, color: '#555454', marginTop: 8 }}>
+          <h3 className="text-center w-full" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 24, color: '#555454', marginTop: 16 }}>
+            Paste a job posting
+          </h3>
+          <div style={{ width: 375, maxWidth: '100%', margin: '0 auto', background: 'transparent', padding: 0, display: 'flex', justifyContent: 'center' }}>
+            <p className="text-left" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: 18, color: '#555454', marginTop: 8, marginBottom: 0 }}>
               Candidate 5 will provide keyword and match analysis so you know which roles suit you best and how to improve your chances.
             </p>
           </div>
@@ -185,11 +185,11 @@ export default function Landing() {
         {/* Step 2 */}
         <div className="flex flex-col items-center w-full mb-8">
           <img src="/showcase-skills.jpeg" alt="Showcase your skills" className="rounded-lg object-cover shadow-lg" style={{ width: 375, height: 375, maxWidth: '100%' }} />
-          <div style={{ padding: '0 10px', width: '100%' }}>
-            <h3 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 24, color: '#555454', marginTop: 16 }}>
-              Showcase your skills
-            </h3>
-            <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: 16, color: '#555454', marginTop: 8 }}>
+          <h3 className="text-center w-full" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 24, color: '#555454', marginTop: 16 }}>
+            Showcase your skills
+          </h3>
+          <div style={{ width: 375, maxWidth: '100%', margin: '0 auto', background: 'transparent', padding: 0, display: 'flex', justifyContent: 'center' }}>
+            <p className="text-left" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: 18, color: '#555454', marginTop: 8, marginBottom: 0 }}>
               Each time you apply for a role our AI will look across your experience highlighting those that fit best and placing a spotlight on your skills.
             </p>
           </div>
@@ -197,11 +197,11 @@ export default function Landing() {
         {/* Step 3 */}
         <div className="flex flex-col items-center w-full mb-8">
           <img src="/stay-informed.jpeg" alt="Stay Informed" className="rounded-lg object-cover shadow-lg" style={{ width: 375, height: 375, maxWidth: '100%' }} />
-          <div style={{ padding: '0 10px', width: '100%' }}>
-            <h3 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 24, color: '#555454', marginTop: 16 }}>
-              Stay Informed
-            </h3>
-            <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: 16, color: '#555454', marginTop: 8 }}>
+          <h3 className="text-center w-full" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 24, color: '#555454', marginTop: 16 }}>
+            Stay Informed
+          </h3>
+          <div style={{ width: 375, maxWidth: '100%', margin: '0 auto', background: 'transparent', padding: 0, display: 'flex', justifyContent: 'center' }}>
+            <p className="text-left" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 300, fontSize: 18, color: '#555454', marginTop: 8, marginBottom: 0 }}>
               It’s easy to lose track of where you are in the applications process. C5 helps you keep track of every role, contact salary range so you’re ready when opportunity comes knocking.
             </p>
           </div>
