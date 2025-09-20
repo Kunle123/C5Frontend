@@ -413,8 +413,13 @@ const ApplicationWizard = () => {
   const handleSaveCV = async () => {
     const doc = generatedDocuments[selectedVariant];
     let cvJson = doc?.cv;
-    // Patch in the candidate name if missing
-    if (cvJson && !cvJson.name && userProfile?.name) {
+    if (
+      cvJson &&
+      typeof cvJson === 'object' &&
+      !Array.isArray(cvJson) &&
+      !cvJson.name &&
+      userProfile?.name
+    ) {
       cvJson = { ...cvJson, name: userProfile.name };
     }
     if (!cvJson) {
