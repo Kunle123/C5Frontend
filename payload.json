@@ -1,0 +1,55 @@
+{
+  "action": "generate_cv",
+  "includeKeywords": true,
+  "includeRelevantExperience": true,
+  "job_description": "Technology Support Manager (ServiceNow) - Contract\nLocation: Leeds (Wellington Place) or Edinburgh - Hybrid (2 days in office)\nContract Length: 6 months (potential for extension)\nDay Rate: 625 per day via Umbrella or EC\n\nAbout Client: You'll be joining a leading UK financial services organisation that is investing heavily in technology, people, and innovation. The team is driving large-scale digital transformation to deliver better outcomes for millions of customers.\n\nAbout the Role\n\nWe are looking for a Technology Support Manager with strong ServiceNow expertise to join a Service Transformation Lab focused on shaping how colleagues interact with IT. This role is pivotal in designing and delivering innovative solutions that enhance digital engagement, working closely with developers, analysts, and architects across all ServiceNow modules.\n\nYou'll be working in a highly collaborative, Agile environment, leading the creation of enterprise-level solutions that drive platform capability and long-term value.\n\nWhat You'll Be Doing\n\nInterpreting user stories and supporting development through to completion\nImplementing new functionality and solutions in ServiceNow\nCollaborating with developers, analysts, architects, and external UI experts\nDriving platform innovation across ITSM, Employee Centre, Cyber, Change, and Payments\nWhat We're Looking For\n\nTo be considered, your CV should demonstrate:\n\nA proven track record at a senior level within ServiceNow development\nExperience working in an Agile engineering environment\nBroad knowledge of ServiceNow modules and how they interact\nExpertise in process/solution integration and workflow design (including Event Flow Handler)\nStrong technical grasp of API, JSON, MID Servers and associated integration technologies\nHands-on experience in ServiceNow implementations\nPersonal Qualities\n\nWe're seeking someone who is:\n\nDecisive, creative, and analytical with a proactive mindset\nA strong communicator with excellent relationship management skills\nWell organised, pragmatic, and able to manage multiple priorities in a fast-paced setting\nA true team player who thrives in a collaborative environment\nWhy Join?\n\nThis is an opportunity to work at the forefront of ServiceNow innovation, delivering meaningful solutions that transform digital engagement at scale. You'll be part of a forward-thinking team that embraces diversity, inclusivity, and continuous learning.\n\nPlease be advised if you haven't heard from us within 48 hours then unfortunately your application has not been successful on this occasion, we may however keep your details on file for any suitable future vacancies and contact you accordingly.\n\nPontoon/Adecco is an employment consultancy. We put expertise, energy, and enthusiasm into improving everyone's chance of being part of the workplace. We respect and appreciate people of all ethnicities, generations, religious beliefs, sexual orientations, gender identities, and more. We do this by showcasing their talents, skills, and unique experience in an inclusive environment that helps them thrive.\n\nLocationCity, Leeds, UK\nIndustryIT\nRate500.00 Daily - 625.00 Daily GBP\nEmployment BusinessPontoon\nContactPontoon\nReferenceJS2998386007\nPosted Date18/09/2025 19:49:20\nPermalinkhttp://www.jobserve.com/eOKBy\n",
+  "numPages": 2,
+  "profile": {
+    "work_experience": [
+      {
+        "id": "8f5fd381-2e53-49e4-88b0-a96c917335e0",
+        "company": "Allpay Ltd.",
+        "job_title": "IT Support Manager",
+        "dates": "2020-2023",
+        "responsibilities": [
+          {"content": "Led ServiceNow implementation across the company.", "priority": 1},
+          {"content": "Managed a team of 10 IT professionals.", "priority": 2}
+        ]
+      },
+      {
+        "id": "b2cfd381-2e53-49e4-88b0-a96c917335e1",
+        "company": "Tech Innovations Ltd.",
+        "job_title": "Senior ServiceNow Developer",
+        "dates": "2017-2020",
+        "responsibilities": [
+          {"content": "Developed custom ServiceNow modules.", "priority": 1},
+          {"content": "Integrated ServiceNow with external APIs.", "priority": 2}
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "BSc Computer Science",
+        "institution": "University of Leeds",
+        "year": "2016",
+        "content": "Graduated with First Class Honours.",
+        "priority": 1
+      }
+    ],
+    "certifications": [
+      {"content": "ServiceNow Certified System Administrator", "priority": 1},
+      {"content": "ITIL Foundation", "priority": 2}
+    ],
+    "core_competencies": [
+      {"content": "ServiceNow", "priority": 1},
+      {"content": "ITSM", "priority": 1},
+      {"content": "Agile", "priority": 2},
+      {"content": "API Integration", "priority": 2}
+    ],
+    "relevant_achievements": [
+      {"content": "Reduced IT incident resolution time by 40%.", "priority": 1},
+      {"content": "Awarded Employee of the Year 2022.", "priority": 2}
+    ]
+  },
+  "thread_id": "thread_xo8XCXf0v5I7U3kHMVp9vkjD"
+}
