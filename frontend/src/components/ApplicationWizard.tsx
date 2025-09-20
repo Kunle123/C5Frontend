@@ -738,7 +738,9 @@ const ApplicationWizard = () => {
                             return (
                               <pre className="whitespace-pre-wrap text-sm">
                                 {content}
-                                {candidateName ? `\n\nBest regards,\n${candidateName}` : ''}
+                                {candidateName && content && !content.trim().endsWith(candidateName)
+                                  ? `\n\nBest regards,\n${candidateName}`
+                                  : ''}
                               </pre>
                             );
                           })()}
