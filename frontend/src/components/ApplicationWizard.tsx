@@ -455,9 +455,38 @@ const ApplicationWizard = () => {
     console.log('CV for preview:', generatedDocuments[selectedVariant]?.cv);
   }
 
+  // Utility to filter a CV object according to generationOptions
+  function filterCVForSave(cv: any, options: GenerationOptions) {
+    if (!cv) return cv;
+    const maxPriority = (() => {
+      switch (options.length) {
+        case 'short': return 1;
+        case 'medium': return 2;
+        case 'long': return 3;
+        default: return 3;
+      }
+    })();
+    const filterByPriority = (arr: any[] | undefined) => Array.isArray(arr) ? arr.filter((item: any) => (item.priority ?? 1) <= maxPriority) : [];
+    return {
+      ...cv,
+      relevant_achievements: options.sections.achievements ? filterByPriority(cv.relevant_achievements) : [],
+      core_competencies: options.sections.competencies ? filterByPriority(cv.core_competencies) : [],
+      experience: Array.isArray(cv.experience)
+        ? cv.experience.map((exp: any) => ({
+            ...exp,
+            responsibilities: filterByPriority(exp.responsibilities),
+          })
+        ) : [],
+      education: options.sections.education ? filterByPriority(cv.education) : [],
+      certifications: options.sections.certifications ? (Array.isArray(cv.certifications) ? cv.certifications : []) : [],
+    };
+  }
+
   // Add this function inside ApplicationWizard
   const handleSaveCV = async () => {
     let cvJson: any = isEditMode ? editedCV : generatedDocuments[selectedVariant]?.cv;
+    // Filter the CV according to current generationOptions before saving
+    cvJson = filterCVForSave(cvJson, generationOptions);
     if (
       cvJson &&
       typeof cvJson === 'object' &&
