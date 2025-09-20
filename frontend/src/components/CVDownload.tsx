@@ -58,7 +58,8 @@ export function CVDownload() {
   // const uniqueCVsMap: Record<string, any> = {};
   // cvs.forEach(cv => { ... });
   // const filteredCVs = Object.values(uniqueCVsMap);
-  const filteredCVs = cvs;
+  // Only show main CVs (not cover letters)
+  const filteredCVs = cvs.filter(cv => cv.type === 'cv');
 
   return (
     <div className="min-h-screen bg-background">
