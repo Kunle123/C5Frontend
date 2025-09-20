@@ -74,6 +74,8 @@ const ApplicationWizard = () => {
   // Add a ref to track if generationOptions have changed after Step 2
   const [optionsChanged, setOptionsChanged] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedCV, setEditedCV] = useState<any | null>(null);
 
   useEffect(() => {
     // Fetch Arc Data and user profile on mount
@@ -305,7 +307,8 @@ const ApplicationWizard = () => {
   };
 
   const handleRequestUpdates = () => {
-    setShowUpdateModal(true);
+    setIsEditMode(true);
+    setEditedCV(generatedDocuments[selectedVariant]?.cv);
   };
 
   const handleApplyUpdates = async () => {
@@ -475,15 +478,7 @@ const ApplicationWizard = () => {
 
   // Add this function inside ApplicationWizard
   const handleSaveCV = async () => {
-    setPendingSave(true);
-    await handleGenerate(); // This will update the preview and generatedDocuments
-    // Wait for generation to finish
-    while (isGenerating) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-    // Now save the latest generated CV
-    const doc = Object.values(generatedDocuments)[0];
-    let cvJson: any = doc?.cv;
+    let cvJson: any = isEditMode ? editedCV : generatedDocuments[selectedVariant]?.cv;
     if (
       cvJson &&
       typeof cvJson === 'object' &&
@@ -502,7 +497,6 @@ const ApplicationWizard = () => {
     }
     if (!cvJson) {
       toast({ title: 'Error', description: 'No CV to save', variant: 'destructive' });
-      setPendingSave(false);
       return;
     }
     try {
@@ -520,8 +514,6 @@ const ApplicationWizard = () => {
       window.location.href = '/my-cvs-new';
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to save CV', variant: 'destructive' });
-    } finally {
-      setPendingSave(false);
     }
   };
 
