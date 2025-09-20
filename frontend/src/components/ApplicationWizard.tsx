@@ -412,7 +412,11 @@ const ApplicationWizard = () => {
   // Add this function inside ApplicationWizard
   const handleSaveCV = async () => {
     const doc = generatedDocuments[selectedVariant];
-    const cvJson = doc?.cv;
+    let cvJson = doc?.cv;
+    // Patch in the candidate name if missing
+    if (cvJson && !cvJson.name && userProfile?.name) {
+      cvJson = { ...cvJson, name: userProfile.name };
+    }
     if (!cvJson) {
       toast({ title: 'Error', description: 'No CV to save', variant: 'destructive' });
       return;
