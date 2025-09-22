@@ -82,14 +82,14 @@ const ApplicationWizard = () => {
   const [salary, setSalary] = useState('');
 
   useEffect(() => {
-    // Fetch Arc Data and user profile on mount
     (async () => {
       try {
-        const arc = await getArcData();
-        setArcData(arc);
-        // Optionally fetch user profile if needed
+        const { profile, arcData } = await getArcData();
+        setUserProfile(profile); // This now contains name, email, phone, etc.
+        setArcData(arcData);
       } catch (err) {
         setArcData(null);
+        setUserProfile(null);
       }
     })();
   }, []);

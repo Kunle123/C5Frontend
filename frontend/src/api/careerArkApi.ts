@@ -53,7 +53,9 @@ export async function getArcData() {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error('Failed to fetch Ark data');
-  return res.json();
+  const arcData = await res.json();
+  // Return both
+  return { profile, arcData };
 }
 
 // 5. Update Arc Data
