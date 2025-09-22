@@ -27,7 +27,24 @@ export default function Landing() {
           }}
         >
           Land interviews twice as fast
-              </h1>
+        </h1>
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8 w-full justify-center items-center">
+          <a
+            href="/signup"
+            className="px-6 py-3 rounded font-semibold text-white bg-[#555454] hover:bg-[#333] shadow transition-colors text-lg w-full sm:w-auto text-center"
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+          >
+            Create Your Free Account
+          </a>
+          <a
+            href="#how-it-works"
+            className="px-6 py-3 rounded font-semibold border border-[#555454] text-[#555454] bg-transparent hover:bg-[#f5f5f5] shadow transition-colors text-lg w-full sm:w-auto text-center"
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+          >
+            See How It Works
+          </a>
+        </div>
         <img
           src="/hero-woman-desk.png"
           alt="Professional woman working at desk with plants"
