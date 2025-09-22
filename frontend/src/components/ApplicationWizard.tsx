@@ -252,7 +252,7 @@ const ApplicationWizard = () => {
         userProfile?.address_line1,
         userProfile?.city_state_postal,
         userProfile?.email,
-        userProfile?.phone,
+        userProfile?.phone_number,
         userProfile?.linkedin
       ].filter(Boolean);
       // Merge PII into the CV object for saving/rendering
