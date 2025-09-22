@@ -80,6 +80,12 @@ const ApplicationWizard = () => {
   const [contactName, setContactName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
   const [salary, setSalary] = useState('');
+  const [hasDecrementedCredits, setHasDecrementedCredits] = useState(false);
+
+  // Reset the flag when job description changes (new generation)
+  useEffect(() => {
+    setHasDecrementedCredits(false);
+  }, [jobDescription]);
 
   useEffect(() => {
     (async () => {
@@ -221,7 +227,7 @@ const ApplicationWizard = () => {
       // Only send arcData (no PII) to the AI service
       const profileToSend = { ...arcData };
       const payload: any = {
-        action: 'generate_cv',
+          action: 'generate_cv',
         profile: profileToSend,
         job_description: jobDescription,
         numPages: generationOptions.length === 'short' ? 1 : generationOptions.length === 'medium' ? 2 : 3,
@@ -262,19 +268,22 @@ const ApplicationWizard = () => {
       setSelectedVariant(variantKey);
       setJobTitle(result.job_title || '');
       setCompanyName(result.company_name || '');
-      // Decrement credits after successful generation
-      try {
-        const creditRes = await fetch('/api/user/credits/use', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-          },
+      // Decrement credits only if not already decremented for this generation
+      if (!hasDecrementedCredits) {
+        try {
+          const creditRes = await fetch('/api/user/credits/use', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+            },
           body: JSON.stringify({ action: 'generate_cv' }),
         });
-        await refreshCredits();
-      } catch (creditErr) {
-        console.error('Error decrementing credits:', creditErr);
+          await refreshCredits();
+          setHasDecrementedCredits(true);
+        } catch (creditErr) {
+          console.error('Error decrementing credits:', creditErr);
+        }
       }
       setCurrentStep(3);
       toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated.' });
@@ -843,13 +852,13 @@ const ApplicationWizard = () => {
                         className="min-h-[100px]"
                       />
                     </div>
-                    <Button
+                  <Button
                       onClick={handleApplyUpdates}
                       disabled={!editRequest.trim()}
                     >
                       Apply Updates
-                    </Button>
-                  </div>
+                  </Button>
+                </div>
                 ) : (
                   <div className="space-y-4">
                 <Tabs defaultValue="cv" className="w-full">
