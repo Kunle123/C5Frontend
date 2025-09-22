@@ -52,8 +52,9 @@ export function CareerArcPage() {
   useEffect(() => {
     getArcData()
       .then(data => {
-        console.log('API work_experience:', data.work_experience); // TEMP LOG
-        const exp = (data.work_experience || []).map((item: any) => {
+        // Use data.arcData.work_experience for the new structure
+        console.log('API work_experience:', data.arcData.work_experience); // TEMP LOG
+        const exp = (data.arcData.work_experience || []).map((item: any) => {
           // Ensure description and skills are arrays
           let description: string[] = [];
           if (Array.isArray(item.description)) {
