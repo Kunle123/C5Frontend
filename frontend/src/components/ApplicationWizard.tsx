@@ -248,6 +248,22 @@ const ApplicationWizard = () => {
       setSelectedVariant(variantKey);
       setJobTitle(result.job_title || '');
       setCompanyName(result.company_name || '');
+      // Decrement credits after successful generation
+      try {
+        const creditRes = await fetch('/api/user/credits/use', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          },
+          body: JSON.stringify({ action: 'generate_cv' }),
+        });
+        // Optionally check for errors in creditRes
+        await refreshCredits();
+      } catch (creditErr) {
+        // Optionally handle credit decrement error
+        console.error('Error decrementing credits:', creditErr);
+      }
       setCurrentStep(3);
       toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated.' });
     } catch (err: any) {
