@@ -251,7 +251,9 @@ const ApplicationWizard = () => {
       const contact_info = [
         userProfile?.address_line1,
         userProfile?.city_state_postal,
-        [userProfile?.email, userProfile?.phone, userProfile?.linkedin].filter(Boolean).join(' | ')
+        userProfile?.email,
+        userProfile?.phone,
+        userProfile?.linkedin
       ].filter(Boolean);
       // Merge PII into the CV object for saving/rendering
       const cvWithPII = {
