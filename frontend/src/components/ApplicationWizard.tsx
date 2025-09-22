@@ -220,15 +220,20 @@ const ApplicationWizard = () => {
     try {
       // Merge userProfile and arcData
       const mergedProfile = { ...(userProfile || {}), ...(arcData || {}) };
-      // Build contact_info array
+      // Log merged profile for debugging
+      console.log('Merged profile:', mergedProfile);
+      // Try to get all possible field names/locations
+      const email = mergedProfile.email || mergedProfile.contact?.email || '';
+      const phone = mergedProfile.phone || mergedProfile.contact?.phone || '';
+      const linkedin = mergedProfile.linkedin || mergedProfile.contact?.linkedin || '';
+      const address1 = mergedProfile.address_line1 || mergedProfile.address || '';
+      const city = mergedProfile.city_state_postal || mergedProfile.city || '';
       const contact_info = [
-        mergedProfile.address_line1,
-        mergedProfile.city_state_postal,
-        [mergedProfile.email, mergedProfile.phone, mergedProfile.linkedin].filter(Boolean).join(' | ')
+        address1,
+        city,
+        [email, phone, linkedin].filter(Boolean).join(' | ')
       ].filter(Boolean);
-      // Set name explicitly
-      const name = mergedProfile.name || "{{CANDIDATE_NAME}}";
-      // Build the profile object to send
+      const name = mergedProfile.name || mergedProfile.contact?.name || "{{CANDIDATE_NAME}}";
       const profileToSend = {
         ...mergedProfile,
         name,
