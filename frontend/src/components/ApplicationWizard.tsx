@@ -525,22 +525,16 @@ const ApplicationWizard = () => {
     let cvJson: any = isEditMode ? editedCV : generatedDocuments[selectedVariant]?.cv;
     // Filter the CV according to current generationOptions before saving
     cvJson = filterCVForSave(cvJson, generationOptions);
-    if (
-      cvJson &&
-      typeof cvJson === 'object' &&
-      !Array.isArray(cvJson) &&
-      !('name' in cvJson) &&
-      userProfile?.name
-    ) {
+    // Always set the real candidate name before saving
+    if (userProfile?.name) {
       cvJson = { ...cvJson, name: userProfile.name };
     }
+    // Add a unique created_at timestamp to ensure uniqueness
     if (cvJson && typeof cvJson === 'object' && !Array.isArray(cvJson)) {
-      if (!('name' in cvJson) && userProfile?.name) {
-        cvJson = { ...cvJson, name: userProfile.name };
-      }
-      // Add a unique created_at timestamp to ensure uniqueness
       cvJson = { ...cvJson, created_at: new Date().toISOString() };
     }
+    // Log the payload for debugging
+    console.log('CV payload:', cvJson);
     if (!cvJson) {
       toast({ title: 'Error', description: 'No CV to save', variant: 'destructive' });
       return;
