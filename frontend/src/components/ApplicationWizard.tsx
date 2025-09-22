@@ -218,28 +218,8 @@ const ApplicationWizard = () => {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      // Merge userProfile and arcData
-      const mergedProfile = { ...(userProfile || {}), ...(arcData || {}) };
-      // Log merged profile for debugging
-      console.log('Merged profile:', mergedProfile);
-      // Try to get all possible field names/locations
-      const email = mergedProfile.email || mergedProfile.contact?.email || '';
-      const phone = mergedProfile.phone || mergedProfile.contact?.phone || '';
-      const linkedin = mergedProfile.linkedin || mergedProfile.contact?.linkedin || '';
-      const address1 = mergedProfile.address_line1 || mergedProfile.address || '';
-      const city = mergedProfile.city_state_postal || mergedProfile.city || '';
-      const contact_info = [
-        address1,
-        city,
-        [email, phone, linkedin].filter(Boolean).join(' | ')
-      ].filter(Boolean);
-      const name = mergedProfile.name || mergedProfile.contact?.name || "{{CANDIDATE_NAME}}";
-      const profileToSend = {
-        ...mergedProfile,
-        name,
-        contact_info,
-      };
-      console.log('Profile sent to backend:', profileToSend);
+      // Only send arcData (no PII) to the AI service
+      const profileToSend = { ...arcData };
       const payload: any = {
         action: 'generate_cv',
         profile: profileToSend,
@@ -259,10 +239,23 @@ const ApplicationWizard = () => {
       });
       const result = await res.json();
       if (result.error) throw new Error(result.error);
+      // After receiving the AI response, merge in PII fields from userProfile
+      const name = userProfile?.name || "{{CANDIDATE_NAME}}";
+      const contact_info = [
+        userProfile?.address_line1,
+        userProfile?.city_state_postal,
+        [userProfile?.email, userProfile?.phone, userProfile?.linkedin].filter(Boolean).join(' | ')
+      ].filter(Boolean);
+      // Merge PII into the CV object for saving/rendering
+      const cvWithPII = {
+        ...(result.cv ? result.cv : result),
+        name,
+        contact_info,
+      };
       const variantKey = generateVariantKey(generationOptions.length, generationOptions.sections);
       setGeneratedDocuments({
         [variantKey]: {
-          cv: result.cv ? result.cv : result, // Store structured CV if .cv is missing
+          cv: cvWithPII,
           coverLetter: result.cover_letter || result.coverLetter || '',
         },
       });
@@ -279,10 +272,8 @@ const ApplicationWizard = () => {
           },
           body: JSON.stringify({ action: 'generate_cv' }),
         });
-        // Optionally check for errors in creditRes
         await refreshCredits();
       } catch (creditErr) {
-        // Optionally handle credit decrement error
         console.error('Error decrementing credits:', creditErr);
       }
       setCurrentStep(3);
