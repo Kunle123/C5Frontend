@@ -1,3 +1,4 @@
+// Dummy commit for deployment trigger
 import React, { useState, useContext, useEffect } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
