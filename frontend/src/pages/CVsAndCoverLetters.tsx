@@ -275,15 +275,12 @@ const Application: React.FC = () => {
         setLoading(false);
         return;
       }
-      setArcData(data);
+      setArcData(data.arcData);
       // 2. Merge /profiles/me and arcData for richer profile
       const profile = {
         ...(userProfile || {}),
-        work_experience: data.work_experience || [],
-        education: data.education || [],
-        skills: data.skills || [],
-        projects: data.projects || [],
-        certifications: data.certifications || [],
+        ...(data.profile || {}),
+        ...(data.arcData || {}),
       };
       // 3. Extract keywords from job description
       let kwResult;
@@ -299,14 +296,14 @@ const Application: React.FC = () => {
       setKeywords(keywords);
       if (kwResult.match_percentage !== undefined) setMatchScore(kwResult.match_percentage);
       // 4. Analyze keywords against ALL Arc data sections
-      const arcText = JSON.stringify(data).toLowerCase();
+      const arcText = JSON.stringify(data.arcData).toLowerCase();
       const now = new Date();
       const keywordStatuses = keywords.map((kw: string) => {
         const kwLower = kw.toLowerCase();
         let status: 'green' | 'amber' | 'red' = 'red';
         // 1. Work Experience
-        if (data.work_experience) {
-          for (const exp of data.work_experience) {
+        if (data.arcData.work_experience) {
+          for (const exp of data.arcData.work_experience) {
             let isRecent = false;
             if (exp.end_date || exp.endDate) {
               const end = exp.end_date || exp.endDate;
@@ -333,8 +330,8 @@ const Application: React.FC = () => {
           }
         }
         // 2. Skills (amber if not green)
-        if (status !== 'green' && data.skills && data.skills.length > 0) {
-          for (const skill of data.skills) {
+        if (status !== 'green' && data.arcData.skills && data.arcData.skills.length > 0) {
+          for (const skill of data.arcData.skills) {
             if ((typeof skill === 'string' && skill.toLowerCase().includes(kwLower)) ||
                 (skill.skillName && skill.skillName.toLowerCase().includes(kwLower))) {
               status = 'amber';
@@ -450,16 +447,16 @@ const Application: React.FC = () => {
           // 1. Use existing keywords and jobDesc
           // 2. Fetch latest Ark data
           const data = await getArcData();
-          setArcData(data);
+          setArcData(data.arcData);
           // 3. Analyze keywords against ALL Arc data sections
-          const arcText = JSON.stringify(data).toLowerCase();
+          const arcText = JSON.stringify(data.arcData).toLowerCase();
           const now = new Date();
           const keywordStatuses = keywords.map((kw: string) => {
             const kwLower = kw.toLowerCase();
             let status: 'green' | 'amber' | 'red' = 'red';
             // 1. Work Experience
-            if (data.work_experience) {
-              for (const exp of data.work_experience) {
+            if (data.arcData.work_experience) {
+              for (const exp of data.arcData.work_experience) {
                 let isRecent = false;
                 if (exp.end_date || exp.endDate) {
                   const end = exp.end_date || exp.endDate;
@@ -486,8 +483,8 @@ const Application: React.FC = () => {
               }
             }
             // 2. Skills (amber if not green)
-            if (status !== 'green' && data.skills && data.skills.length > 0) {
-              for (const skill of data.skills) {
+            if (status !== 'green' && data.arcData.skills && data.arcData.skills.length > 0) {
+              for (const skill of data.arcData.skills) {
                 if ((typeof skill === 'string' && skill.toLowerCase().includes(kwLower)) ||
                     (skill.skillName && skill.skillName.toLowerCase().includes(kwLower))) {
                   status = 'amber';
