@@ -218,10 +218,26 @@ const ApplicationWizard = () => {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const profile = { ...(userProfile || {}), ...(arcData || {}) };
+      // Merge userProfile and arcData
+      const mergedProfile = { ...(userProfile || {}), ...(arcData || {}) };
+      // Build contact_info array
+      const contact_info = [
+        mergedProfile.address_line1,
+        mergedProfile.city_state_postal,
+        [mergedProfile.email, mergedProfile.phone, mergedProfile.linkedin].filter(Boolean).join(' | ')
+      ].filter(Boolean);
+      // Set name explicitly
+      const name = mergedProfile.name || "{{CANDIDATE_NAME}}";
+      // Build the profile object to send
+      const profileToSend = {
+        ...mergedProfile,
+        name,
+        contact_info,
+      };
+      console.log('Profile sent to backend:', profileToSend);
       const payload: any = {
-          action: 'generate_cv',
-        profile,
+        action: 'generate_cv',
+        profile: profileToSend,
         job_description: jobDescription,
         numPages: generationOptions.length === 'short' ? 1 : generationOptions.length === 'medium' ? 2 : 3,
         includeKeywords: true,
