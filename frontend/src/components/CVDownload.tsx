@@ -44,10 +44,16 @@ export function CVDownload() {
       return;
     }
     const blob = await res.blob();
+    // Extract filename from Content-Disposition header
+    let filename = 'cv.docx';
+    const disposition = res.headers.get('Content-Disposition');
+    if (disposition && disposition.indexOf('filename=') !== -1) {
+      filename = disposition.split('filename=')[1].replace(/['"]/g, '').trim();
+    }
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'cv.docx'; // Optionally, parse Content-Disposition for filename
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
