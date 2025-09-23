@@ -82,10 +82,12 @@ const ApplicationWizard = () => {
   const [contactNumber, setContactNumber] = useState('');
   const [salary, setSalary] = useState('');
   const [hasDecrementedCredits, setHasDecrementedCredits] = useState(false);
+  const [cvJustSaved, setCvJustSaved] = useState(false);
 
   // Reset the flag when job description changes (new generation)
   useEffect(() => {
     setHasDecrementedCredits(false);
+    setThreadId(null); // Reset threadId when jobDescription changes
   }, [jobDescription]);
 
   useEffect(() => {
@@ -236,6 +238,7 @@ const ApplicationWizard = () => {
         includeRelevantExperience: true,
         thread_id: threadId,
       };
+      console.log('Generating CV with payload:', payload); // Debug log
       const res = await fetch('/api/career-ark/generate-assistant', {
         method: 'POST',
         headers: {
@@ -565,7 +568,8 @@ const ApplicationWizard = () => {
       toast({ title: 'CV Saved', description: 'Your CV has been saved to your account.' });
       // Save application history after successful CV save
       await handleSaveApplicationHistory();
-      window.location.href = '/my-cvs-new';
+      setCvJustSaved(true); // Set flag to require second click
+      // window.location.href = '/my-cvs-new'; // REMOVE auto navigation
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to save CV', variant: 'destructive' });
     }
@@ -916,11 +920,17 @@ const ApplicationWizard = () => {
                         Edit
                   </Button>
                   <Button
-                        onClick={handleSaveCV}
+                        onClick={() => {
+                          if (!cvJustSaved) {
+                            handleSaveCV();
+                          } else {
+                            window.location.href = '/my-cvs-new';
+                          }
+                        }}
                     className="flex-1"
                     disabled={pendingSave || isGenerating}
                   >
-                        Go to downloads
+                        {cvJustSaved ? 'Go to downloads' : 'Save CV'}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                     </>
