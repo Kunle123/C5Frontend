@@ -8,6 +8,7 @@ import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Separator } from "./ui/separator";
 import { toast } from "../hooks/use-toast";
+import SocialAuthButton from "./auth/SocialAuthButton";
 
 export function AuthToggle() {
   const [isLoading, setIsLoading] = useState(false);
@@ -103,6 +104,10 @@ export function AuthToggle() {
     }
   };
 
+  const handleGoogleAuth = () => {
+    window.location.href = "/api/auth/google";
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
@@ -169,9 +174,11 @@ export function AuthToggle() {
                   </span>
                 </div>
               </div>
-              <Button variant="outline" className="w-full">
-                Continue with Google
-              </Button>
+              <SocialAuthButton
+                provider="google"
+                onClick={handleGoogleAuth}
+                className="w-full"
+              />
             </TabsContent>
             <TabsContent value="register" className="space-y-4 mt-6">
               <div className="space-y-2">
@@ -247,9 +254,11 @@ export function AuthToggle() {
                   </span>
                 </div>
               </div>
-              <Button variant="outline" className="w-full">
-                Continue with Google
-              </Button>
+              <SocialAuthButton
+                provider="google"
+                onClick={handleGoogleAuth}
+                className="w-full"
+              />
             </TabsContent>
           </Tabs>
         </CardContent>
