@@ -235,7 +235,7 @@ export default function Landing() {
       <section className="w-full flex-col items-center py-16 bg-white hidden md:block">
         <div className="w-full max-w-[960px] mx-auto">
           <h2 className="text-center mb-8" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 44, color: '#555454' }}>
-            Testemonials
+            Testimonials
           </h2>
           <div style={{ background: '#EEF0F6', borderRadius: 12, maxWidth: 960, margin: '0 auto', padding: 32 }}>
             <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 24, color: '#555454', margin: 0 }}>
@@ -251,7 +251,7 @@ export default function Landing() {
       {/* Testemonials Section - Mobile Only */}
       <section className="w-full flex flex-col items-center py-8 bg-white md:hidden">
         <h2 className="text-center mb-8" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 44, color: '#555454' }}>
-          Testemonials
+          Testimonials
         </h2>
         <div style={{ background: '#EEF0F6', borderRadius: 12, width: '100%', maxWidth: 375, margin: 10, padding: 20 }}>
           <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 18, color: '#555454', margin: 0 }}>
