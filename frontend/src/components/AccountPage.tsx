@@ -318,7 +318,7 @@ export function AccountPage() {
     setError("");
     try {
       const token = localStorage.getItem("token") || "";
-      const email = localStorage.getItem("user_email") || localStorage.getItem("email") || profile.email || "";
+      const email = profile?.email || "";
       // Only use UUID for user_id, never email
       const user_id = localStorage.getItem("user_id") || localStorage.getItem("userId") || localStorage.getItem("id");
       if (!token || !email || !user_id) {

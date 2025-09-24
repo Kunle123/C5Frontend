@@ -12,6 +12,7 @@ const Pricing = () => {
   const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
   const [loadingTopUp, setLoadingTopUp] = useState(false);
   const [planIdMap, setPlanIdMap] = useState<{ [key: string]: string }>({});
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     async function fetchPlans() {
@@ -32,6 +33,21 @@ const Pricing = () => {
     fetchPlans();
   }, []);
 
+  useEffect(() => {
+    async function fetchProfile() {
+      const token = localStorage.getItem("token") || "";
+      if (!token) return;
+      const res = await fetch("https://api-gw-production.up.railway.app/api/user/profile", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setProfile(data);
+      }
+    }
+    fetchProfile();
+  }, []);
+
   // Payment handler for paid plans and top-up
   const handlePayment = async (plan: string, index?: number) => {
     console.log('handlePayment called with:', plan, index);
@@ -40,7 +56,7 @@ const Pricing = () => {
     if (plan === 'Top-up') setLoadingTopUp(true);
     try {
       const token = localStorage.getItem("token") || "";
-      const email = localStorage.getItem("user_email") || "";
+      const email = profile?.email || "";
       if (!token || !email) {
         toast({
           title: "Not logged in",
