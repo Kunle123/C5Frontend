@@ -115,7 +115,9 @@ export const Dashboard = () => {
         let hasDownloadsFlag = false;
         if (downloadsRes.ok) {
           const downloads = await downloadsRes.json();
-          hasDownloadsFlag = Array.isArray(downloads) && downloads.length > 0;
+          if (Array.isArray(downloads) && downloads.length > 0) {
+            hasDownloadsFlag = true;
+          }
         }
         setHasDownloads(hasDownloadsFlag);
       } catch (err: any) {
