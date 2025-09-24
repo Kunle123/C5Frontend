@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/auth/callback", "destination": "/index.html" },
     { "source": "/auth/:path*", "destination": "https://api-gw-production.up.railway.app/auth/:path*" },
     { "source": "/api/cv", "destination": "https://cvservice-production.up.railway.app/api/cv" },
     { "source": "/api/cv/:path*", "destination": "https://cvservice-production.up.railway.app/api/cv/:path*" },
