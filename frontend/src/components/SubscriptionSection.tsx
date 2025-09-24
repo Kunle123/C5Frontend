@@ -149,6 +149,14 @@ const SubscriptionSection: React.FC = () => {
     );
   }
 
+  // Patch: derive plan from subscription_type if present
+  let plan = subscription?.plan_name || 'None';
+  if (subscription?.subscription_type) {
+    if (subscription.subscription_type.toLowerCase() === 'monthly') plan = 'Monthly';
+    else if (subscription.subscription_type.toLowerCase() === 'annual') plan = 'Annual';
+    else plan = 'Free';
+  }
+
   return (
     <Box bg="white" boxShadow="md" borderRadius="lg" p={6} mb={6}>
       <Heading as="h3" size="md" mb={4}>
@@ -157,7 +165,7 @@ const SubscriptionSection: React.FC = () => {
       <Box mb={6}>
         <Heading as="h4" size="sm" mb={2}>Current Plan</Heading>
         <HStack spacing={4} mb={2}>
-          <Badge colorScheme="blue">{subscription?.plan_name || 'None'}</Badge>
+          <Badge colorScheme="blue">{plan}</Badge>
           <Text>Renewal: {subscription?.renewal_date || 'N/A'}</Text>
           <Badge colorScheme={subscription?.status === 'Active' ? 'green' : 'yellow'}>{subscription?.status || 'Inactive'}</Badge>
         </HStack>

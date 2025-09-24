@@ -48,7 +48,9 @@ function ProfileSettings() {
             getPaymentMethods ? getPaymentMethods(userId, token) : Promise.resolve([]),
           ]);
           setSubscription({
-            plan: sub?.plan_name || 'NONE',
+            plan: sub?.subscription_type
+              ? (sub.subscription_type.toLowerCase() === 'monthly' ? 'Monthly' : sub.subscription_type.toLowerCase() === 'annual' ? 'Annual' : 'Free')
+              : (sub?.plan_name || 'NONE'),
             status: sub?.status || 'INACTIVE',
             renewal: sub?.renewal_date || 'N/A',
           });

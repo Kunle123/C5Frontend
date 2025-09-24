@@ -77,7 +77,12 @@ export function AccountPage() {
       setCredits(creditsData);
       // Fetch subscription
       const sub = await getSubscription(userId, token);
-      const plan = sub?.plan_name && sub.plan_name !== 'N/A' ? sub.plan_name : 'Free';
+      let plan = sub?.plan_name && sub.plan_name !== 'N/A' ? sub.plan_name : 'Free';
+      if (sub?.subscription_type) {
+        if (sub.subscription_type.toLowerCase() === 'monthly') plan = 'Monthly';
+        else if (sub.subscription_type.toLowerCase() === 'annual') plan = 'Annual';
+        else plan = 'Free';
+      }
       const status = sub?.status && sub.status !== 'N/A' ? sub.status : 'Active';
       setSubscription({
         plan,
