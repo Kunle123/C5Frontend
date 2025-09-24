@@ -271,7 +271,9 @@ export const Dashboard = () => {
                     </div>
                     <div className="text-2xl font-bold text-foreground">
                       {credits.monthly_credits_remaining ?? 0}
-                      <span className="text-sm font-normal text-muted-foreground">/50</span>
+                      <span className="text-sm font-normal text-muted-foreground">{
+                        credits.subscription_type?.toLowerCase() === 'free' ? '/3' : '/100'
+                      }</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       Renews monthly
