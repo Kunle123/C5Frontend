@@ -710,7 +710,7 @@ export function AccountPage() {
                         <div className="text-2xl font-bold text-foreground">
                           {credits.daily_credits_remaining ?? 0}
                           <span className="text-sm font-normal text-muted-foreground">{
-                            credits.subscription_type === 'Annual' ? '/5' : credits.subscription_type === 'Monthly' ? '/3' : '/0'
+                            credits.subscription_type?.toLowerCase() === 'annual' ? '/5' : credits.subscription_type?.toLowerCase() === 'monthly' ? '/3' : '/0'
                           }</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">Expires end of day</p>
