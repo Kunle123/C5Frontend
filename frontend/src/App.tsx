@@ -76,6 +76,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/auth/google/callback" element={<AuthCallback />} />
             <Route path="/auth/linkedin/callback" element={<AuthCallback />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* Chakra-based pages - wrap with ChakraProvider and Layout */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
