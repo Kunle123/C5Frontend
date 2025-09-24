@@ -519,10 +519,11 @@ export function AccountPage() {
                   </Label>
                   <Input
                     id="phone_number"
+                    type="tel"
+                    placeholder="+44 7xxxx xxx xxx"
                     value={editedProfile.phone_number}
-                    onChange={(e) => setEditedProfile({ ...editedProfile, phone_number: e.target.value })}
-                    disabled={!isEditing}
-                    placeholder="+447966461005"
+                    onChange={e => setEditedProfile({ ...editedProfile, phone_number: e.target.value })}
+                    className="w-full"
                   />
                 </div>
                 <div className="space-y-2">
@@ -724,7 +725,7 @@ export function AccountPage() {
                         <div className="text-2xl font-bold text-foreground">
                           {credits.monthly_credits_remaining ?? 0}
                           <span className="text-sm font-normal text-muted-foreground">{
-                            subscription.plan === 'Annual' || subscription.plan === 'Monthly' ? '/50' : '/0'
+                            credits.subscription_type?.toLowerCase() === 'free' ? '/3' : '/50'
                           }</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">Renews monthly</p>
