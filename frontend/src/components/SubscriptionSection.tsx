@@ -44,23 +44,18 @@ const SubscriptionSection: React.FC = () => {
   const userId = getUserIdFromToken(token);
 
   useEffect(() => {
-    console.log('[SubscriptionSection] useEffect: token', token, 'userId', userId);
     if (!userId) return;
     setLoading(true);
     setError('');
-    Promise.all([
-      getSubscription(userId, token),
-      getPaymentHistory(userId, token),
-      getPaymentMethods(userId, token),
-    ])
-      .then(([sub, billingData, methods]) => {
-        console.log('[SubscriptionSection] API results:', { sub, billingData, methods });
+    // Fetch the user's actual subscription
+    fetch(`https://api-gw-production.up.railway.app/api/subscriptions/user/${userId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(sub => {
         setSubscription(sub);
-        setBilling(billingData);
-        setPaymentMethods(methods);
       })
       .catch((err) => {
-        console.error('[SubscriptionSection] API error:', err);
         setError(err.message || 'Failed to load subscription info');
       })
       .finally(() => setLoading(false));
