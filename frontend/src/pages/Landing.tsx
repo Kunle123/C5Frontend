@@ -56,11 +56,6 @@ export default function Landing() {
             .hero-img-tablet { width: 768px !important; }
           }
         `}</style>
-        <img
-          src="/hero-woman-desk.png"
-          alt="Professional woman working at desk with plants"
-          className="rounded-lg object-cover shadow-lg hero-img-tablet hidden md:block lg:hidden"
-        />
         <p
           className="mt-6 text-center"
           style={{
