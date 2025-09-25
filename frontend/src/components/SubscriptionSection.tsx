@@ -31,6 +31,7 @@ import {
 } from '../api';
 
 const SubscriptionSection: React.FC = () => {
+  console.log('SubscriptionSection component is mounted!');
   console.log('[SubscriptionSection] Rendered');
   const [subscription, setSubscription] = useState<any>(null);
   const [billing, setBilling] = useState<any[]>([]);
