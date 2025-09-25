@@ -73,19 +73,7 @@ export function AccountPage() {
       setCredits(creditsData);
       // Fetch subscription
       const sub = await getSubscription(userId, token);
-      let plan = sub?.plan_name && sub.plan_name !== 'N/A' ? sub.plan_name : 'Free';
-      if (sub?.subscription_type) {
-        if (sub.subscription_type.toLowerCase() === 'monthly') plan = 'Monthly';
-        else if (sub.subscription_type.toLowerCase() === 'annual') plan = 'Annual';
-        else plan = 'Free';
-      }
-      const status = sub?.status && sub.status !== 'N/A' ? sub.status : 'Active';
-      setSubscription({
-        plan,
-        status,
-        nextBilling: sub?.renewal_date || 'N/A',
-        amount: sub?.amount ? `£${sub.amount}/month` : '£0',
-      });
+      setSubscription(sub);
     } catch (err: any) {
       setCreditsError(err.message || 'Failed to load credits');
       setSubscriptionError(err.message || 'Failed to load subscription');
