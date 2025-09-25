@@ -16,7 +16,6 @@ import { getUserIdFromToken, getSubscription, getPaymentMethods } from '../api';
 const API_BASE = "https://api-gw-production.up.railway.app";
 
 export function AccountPage() {
-  console.log('AccountPage Subscription tile mounted!');
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,12 +44,8 @@ export function AccountPage() {
   });
 
   // Subscription state (static for now)
-  const [subscription, setSubscription] = useState({
-    plan: '',
-    status: '',
-    nextBilling: '',
-    amount: '',
-  });
+  const [subscription, setSubscription] = useState<any>(null);
+  console.log('AccountPage Subscription tile mounted!', subscription);
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const [subscriptionError, setSubscriptionError] = useState('');
 
@@ -459,7 +454,7 @@ export function AccountPage() {
         </div>
         <div className="grid gap-8 md:grid-cols-2">
           {/* Profile Section */}
-          <Card className="shadow-card">
+          <Card className="shadow-card mb-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5 text-primary" />
@@ -836,7 +831,7 @@ export function AccountPage() {
             </CardContent>
           </Card>
           {/* Payment Methods Section */}
-          <Card className="shadow-card">
+          <Card className="shadow-card mt-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5 text-primary" />
