@@ -16,6 +16,7 @@ import { getUserIdFromToken, getSubscription, getPaymentMethods } from '../api';
 const API_BASE = "https://api-gw-production.up.railway.app";
 
 export function AccountPage() {
+  console.log('AccountPage Subscription tile mounted!');
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -437,6 +438,14 @@ export function AccountPage() {
     );
   }
 
+  const plan = subscription?.plan?.name || subscription?.plan_name || 'None';
+  const amount = subscription?.plan?.amount || subscription?.amount || 0;
+  const interval = subscription?.plan?.interval || subscription?.interval || '';
+  const status = subscription?.status || 'Inactive';
+  const renewalDate = subscription?.current_period_end
+    ? new Date(subscription.current_period_end).toLocaleDateString()
+    : 'N/A';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/50">
       <Navigation />
@@ -680,21 +689,19 @@ export function AccountPage() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Current Plan</span>
-                    <Badge variant="default">{subscription.plan}</Badge>
+                    <Badge variant="default">{plan}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Status</span>
-                    <Badge variant="default" className="bg-success text-success-foreground">
-                      {subscription.status}
-                    </Badge>
+                    <Badge variant="default" className="bg-success text-success-foreground">{status}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Next Billing</span>
-                    <span className="text-sm font-medium">{subscription.nextBilling}</span>
+                    <span className="text-sm font-medium">{renewalDate}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Amount</span>
-                    <span className="text-sm font-medium">{subscription.amount}</span>
+                    <span className="text-sm font-medium">£{amount}{interval ? `/${interval}` : ''}</span>
                   </div>
                 </div>
               )}

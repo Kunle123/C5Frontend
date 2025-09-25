@@ -17,6 +17,7 @@ import {
 import { getUser, updateUser, getUserIdFromToken, getSubscription, getPaymentMethods, getPaymentHistory, cancelSubscription } from "../api";
 
 function ProfileSettings() {
+  console.log('ProfileSettings Subscription tile mounted!');
   const [profile, setProfile] = useState({ name: "", email: "", phone_number: "", emailVerified: false });
   const [subscription, setSubscription] = useState({ plan: "NONE", status: "INACTIVE", renewal: "N/A" });
   const [billing, setBilling] = useState<any[]>([]);
@@ -102,8 +103,20 @@ function ProfileSettings() {
     }
   };
 
+  // Phone validation regex: allow +, digits, spaces, dashes, parentheses, must have at least 8 digits
+  const phoneFlexibleRegex = /^([+0][0-9\s\-()]{7,})$/;
+  const isPhoneValid = !profile.phone_number || phoneFlexibleRegex.test(profile.phone_number.replace(/\s|\-/g, ''));
+
   if (loading) return <div className="py-12 text-center">Loading...</div>;
   if (error) return <div className="py-12 text-center text-red-500">{error}</div>;
+
+  const plan = subscription?.plan?.name || subscription?.plan_name || 'None';
+  const amount = subscription?.plan?.amount || subscription?.amount || 0;
+  const interval = subscription?.plan?.interval || subscription?.interval || '';
+  const status = subscription?.status || 'Inactive';
+  const renewal = subscription?.current_period_end
+    ? new Date(subscription.current_period_end).toLocaleDateString()
+    : 'N/A';
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -148,7 +161,10 @@ function ProfileSettings() {
                     placeholder="+44 7123 456 789" // UK example
                     className="h-10"
                   />
-                  <p className="text-xs text-muted-foreground">Phone must be in international format, e.g. +44 7123 456 789</p>
+                  <p className="text-xs text-muted-foreground">Phone can include spaces, dashes, and parentheses. Must start with + or 0 and have at least 8 digits.</p>
+                  {!isPhoneValid && (
+                    <p className="text-xs text-red-500">Please enter a valid phone number (e.g. +44 7123 456 789 or 07123 456789)</p>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
@@ -216,23 +232,17 @@ function ProfileSettings() {
               <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border">
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
-                    <Badge variant="inactive" className="text-sm">
-                      {subscription.plan}
-                    </Badge>
-                    <Badge variant="outline" className="text-sm">
-                      {subscription.status}
-                    </Badge>
+                    <Badge variant="inactive" className="text-sm">{plan}</Badge>
+                    <Badge variant="outline" className="text-sm">{status}</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Renewal: {subscription.renewal}
-                  </p>
+                  <p className="text-sm text-muted-foreground">Renewal: {renewal}</p>
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" disabled>Upgrade</Button>
                   <Button variant="outline" size="sm" disabled>Downgrade</Button>
                 </div>
               </div>
-              <Button variant="link" className="text-destructive p-0 h-auto" onClick={handleCancelSubscription} disabled={cancelling || subscription.status !== 'Active' || !('id' in subscription && (subscription as any).id)}>
+              <Button variant="link" className="text-destructive p-0 h-auto" onClick={handleCancelSubscription} disabled={cancelling || status !== 'Active' || !('id' in subscription && (subscription as any).id)}>
                 {cancelling ? 'Cancelling...' : 'Cancel Subscription'}
               </Button>
             </div>
