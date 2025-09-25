@@ -1,3 +1,5 @@
+// DEPRECATED: This SubscriptionSection component is inactive and not used in the current UI. Safe to remove after migration.
+console.warn('SubscriptionSection.tsx is deprecated and not used in the current UI.');
 import React, { useEffect, useState } from 'react';
 import {
   Box,
