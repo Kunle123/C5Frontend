@@ -160,7 +160,7 @@ const SubscriptionSection: React.FC = () => {
   }
 
   return (
-    <Box bg="white" boxShadow="md" borderRadius="lg" p={6} mb={6}>
+    <Box bg="white" boxShadow="md" borderRadius="lg" p={6} mb={2}>
       <Heading as="h3" size="md" mb={4}>
         Subscription & Billing
       </Heading>
