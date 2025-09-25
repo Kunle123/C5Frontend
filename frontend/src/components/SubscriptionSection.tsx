@@ -149,8 +149,10 @@ const SubscriptionSection: React.FC = () => {
     );
   }
 
-  // Patch: derive plan from subscription_type if present
-  let plan = subscription?.plan_name || 'None';
+  // Patch: derive plan from nested plan object if present
+  let plan = subscription?.plan_name || (subscription?.plan?.name) || 'None';
+  let amount = subscription?.amount || (subscription?.plan?.amount) || 0;
+  let interval = subscription?.interval || (subscription?.plan?.interval) || '';
   if (subscription?.subscription_type) {
     if (subscription.subscription_type.toLowerCase() === 'monthly') plan = 'Monthly';
     else if (subscription.subscription_type.toLowerCase() === 'annual') plan = 'Annual';
@@ -166,7 +168,7 @@ const SubscriptionSection: React.FC = () => {
         <Heading as="h4" size="sm" mb={2}>Current Plan</Heading>
         <HStack spacing={4} mb={2}>
           <Badge colorScheme="blue">{plan}</Badge>
-          <Text>Renewal: {subscription?.renewal_date || 'N/A'}</Text>
+          <Text>Amount: £{amount}{interval ? `/${interval}` : ''}</Text>
           <Badge colorScheme={subscription?.status === 'Active' ? 'green' : 'yellow'}>{subscription?.status || 'Inactive'}</Badge>
         </HStack>
         <HStack spacing={4} mb={2}>
