@@ -149,15 +149,14 @@ const SubscriptionSection: React.FC = () => {
     );
   }
 
-  // Patch: derive plan from nested plan object if present
-  let plan = subscription?.plan_name || (subscription?.plan?.name) || 'None';
-  let amount = subscription?.amount || (subscription?.plan?.amount) || 0;
-  let interval = subscription?.interval || (subscription?.plan?.interval) || '';
-  if (subscription?.subscription_type) {
-    if (subscription.subscription_type.toLowerCase() === 'monthly') plan = 'Monthly';
-    else if (subscription.subscription_type.toLowerCase() === 'annual') plan = 'Annual';
-    else plan = 'Free';
-  }
+  console.log('Subscription object:', subscription);
+  let plan = subscription?.plan?.name || subscription?.plan_name || 'None';
+  let amount = subscription?.plan?.amount || subscription?.amount || 0;
+  let interval = subscription?.plan?.interval || subscription?.interval || '';
+  let status = subscription?.status || 'Inactive';
+  let renewalDate = subscription?.current_period_end
+    ? new Date(subscription.current_period_end).toLocaleDateString()
+    : 'N/A';
 
   return (
     <Box bg="white" boxShadow="md" borderRadius="lg" p={6} mb={2}>
@@ -168,8 +167,9 @@ const SubscriptionSection: React.FC = () => {
         <Heading as="h4" size="sm" mb={2}>Current Plan</Heading>
         <HStack spacing={4} mb={2}>
           <Badge colorScheme="blue">{plan}</Badge>
+          <Text>Status: {status}</Text>
+          <Text>Next Billing: {renewalDate}</Text>
           <Text>Amount: £{amount}{interval ? `/${interval}` : ''}</Text>
-          <Badge colorScheme={subscription?.status === 'Active' ? 'green' : 'yellow'}>{subscription?.status || 'Inactive'}</Badge>
         </HStack>
         <HStack spacing={4} mb={2}>
           <Button colorScheme="blue" variant="solid">Upgrade</Button>
