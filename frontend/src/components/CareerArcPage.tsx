@@ -117,7 +117,7 @@ export function CareerArcPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsImporting(true);
-    toast({ title: "Starting CV import", description: "Uploading and processing your CV file..." });
+    toast({ title: "Starting CV import", description: "Uploading and processing your CV file. This could take several minutes." });
     try {
       const uploadRes = await uploadCV(file);
       const taskId = uploadRes.taskId;
@@ -133,6 +133,7 @@ export function CareerArcPage() {
             setIsImporting(false);
             setRefreshFlag(f => f + 1);
             toast({ title: "CV imported successfully", description: "New experience has been added to your Career Arc™." });
+            window.location.reload(); // Hard reload to ensure new data loads
           } else if (statusData.status === 'failed') {
             setIsImporting(false);
             toast({ title: "Import failed", description: statusData.error || 'CV extraction failed.', variant: 'destructive' });
