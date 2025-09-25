@@ -110,12 +110,14 @@ function ProfileSettings() {
   if (loading) return <div className="py-12 text-center">Loading...</div>;
   if (error) return <div className="py-12 text-center text-red-500">{error}</div>;
 
-  const plan = subscription?.plan?.name || subscription?.plan_name || 'None';
-  const amount = subscription?.plan?.amount || subscription?.amount || 0;
-  const interval = subscription?.plan?.interval || subscription?.interval || '';
-  const status = subscription?.status || 'Inactive';
-  const renewal = subscription?.current_period_end
-    ? new Date(subscription.current_period_end).toLocaleDateString()
+  // Safely extract plan fields with robust type guards
+  const planObj = typeof (subscription as any)?.plan === 'object' && (subscription as any)?.plan !== null ? (subscription as any).plan : {};
+  const plan = (planObj as any)?.name || (subscription as any)?.plan_name || 'None';
+  const amount = (planObj as any)?.amount || (subscription as any)?.amount || 0;
+  const interval = (planObj as any)?.interval || (subscription as any)?.interval || '';
+  const status = (subscription as any)?.status || 'Inactive';
+  const renewal = (subscription as any)?.current_period_end
+    ? new Date((subscription as any).current_period_end).toLocaleDateString()
     : 'N/A';
 
   return (
