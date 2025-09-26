@@ -358,6 +358,7 @@ const ApplicationWizard = () => {
 
   // 2. In handleApplyUpdates, disable options, show spinner, and show toast
   const handleApplyUpdates = async () => {
+    console.log('Edit button clicked');
     setIsUpdating(true);
     setOptionsDisabled(true);
     toast({ title: 'Please wait while your edits are applied' });
@@ -365,16 +366,22 @@ const ApplicationWizard = () => {
       const profile = { ...(userProfile || {}), ...(arcData || {}) };
       const existing_cv = editedCV || generatedDocuments[selectedVariant]?.cv || '';
       const result = await updateCV(profile, jobDescription, existing_cv, [editRequest].filter(Boolean));
-      if (result.error) throw new Error(result.error);
+      console.log('--- BACKEND updateCV RESPONSE ---', result);
+      if (!result || !result.cv) {
+        console.error('No CV returned from backend updateCV!');
+      }
       setEditedCV(result.cv || existing_cv);
-      // Update the preview with the new CV after edit
-      setGeneratedDocuments(prev => ({
-        ...prev,
-        [selectedVariant]: {
-          ...prev[selectedVariant],
-          cv: result.cv || existing_cv,
-        },
-      }));
+      setGeneratedDocuments(prev => {
+        const updated = {
+          ...prev,
+          [selectedVariant]: {
+            ...prev[selectedVariant],
+            cv: result.cv || existing_cv,
+          },
+        };
+        console.log('--- UPDATED generatedDocuments ---', updated);
+        return updated;
+      });
       setIsEditMode(false); // Exit edit mode after update
       setOptionsDisabled(false); // Re-enable options
       setJustEdited(true); // Mark as just edited
@@ -382,6 +389,7 @@ const ApplicationWizard = () => {
       setEditRequest('');
     } catch (err: any) {
       setOptionsDisabled(false); // Re-enable options on error
+      console.error('Error in handleApplyUpdates:', err);
       toast({ title: 'Error', description: err.message || 'Update failed', variant: 'destructive' });
     } finally {
       setIsUpdating(false);
