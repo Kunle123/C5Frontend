@@ -86,6 +86,7 @@ const ApplicationWizard = () => {
   // 1. Add a new state to track if options should be disabled
   const [optionsDisabled, setOptionsDisabled] = useState(false);
   const [justEdited, setJustEdited] = useState(false);
+  const [latestEditedCV, setLatestEditedCV] = useState<any | null>(null);
 
   // Reset the flag when job description changes (new generation)
   useEffect(() => {
@@ -371,6 +372,7 @@ const ApplicationWizard = () => {
         console.error('No CV returned from backend updateCV!');
       }
       setEditedCV(result.cv || existing_cv);
+      setLatestEditedCV(result.cv || existing_cv); // Store the latest edited CV for preview
       setGeneratedDocuments(prev => {
         const updated = {
           ...prev,
@@ -399,6 +401,7 @@ const ApplicationWizard = () => {
   // When user changes any options, set justEdited to false
   const handleOptionChange = (updater: () => void) => {
     setJustEdited(false);
+    setLatestEditedCV(null);
     updater();
   };
 
@@ -537,7 +540,7 @@ const ApplicationWizard = () => {
     console.log('Rendering Step 3 preview, currentStep:', currentStep);
     console.log('generatedDocuments:', generatedDocuments);
     console.log('selectedVariant:', selectedVariant);
-    console.log('CV for preview:', generatedDocuments[selectedVariant]?.cv);
+    console.log('CV for preview:', latestEditedCV || (justEdited ? generatedDocuments[selectedVariant]?.cv : generatedDocuments[selectedVariant]?.cv));
   }
 
   // Utility to filter a CV object according to generationOptions
@@ -898,9 +901,11 @@ const ApplicationWizard = () => {
                         <TabsTrigger value="cover-letter">Generated Cover Letter</TabsTrigger>
                   </TabsList>
                   <TabsContent value="cv" className="space-y-4">
-                    {justEdited
-  ? <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(generatedDocuments[selectedVariant]?.cv, { length: 'long', sections: { achievements: true, competencies: true, certifications: true, education: true } })}</div>
-  : <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)}</div>
+                    {latestEditedCV
+  ? <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(latestEditedCV, { length: 'long', sections: { achievements: true, competencies: true, certifications: true, education: true } })}</div>
+  : justEdited
+    ? <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(generatedDocuments[selectedVariant]?.cv, { length: 'long', sections: { achievements: true, competencies: true, certifications: true, education: true } })}</div>
+    : <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)}</div>
 }
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
