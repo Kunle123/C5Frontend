@@ -83,6 +83,8 @@ const ApplicationWizard = () => {
   const [salary, setSalary] = useState('');
   const [hasDecrementedCredits, setHasDecrementedCredits] = useState(false);
   const [cvJustSaved, setCvJustSaved] = useState(false);
+  // 1. Add a new state to track if options should be disabled
+  const [optionsDisabled, setOptionsDisabled] = useState(false);
 
   // Reset the flag when job description changes (new generation)
   useEffect(() => {
@@ -353,17 +355,23 @@ const ApplicationWizard = () => {
     setEditRequest('');
   };
 
+  // 2. In handleApplyUpdates, disable options, show spinner, and show toast
   const handleApplyUpdates = async () => {
     setIsUpdating(true);
+    setOptionsDisabled(true);
+    toast({ title: 'Please wait while your edits are applied' });
     try {
       const profile = { ...(userProfile || {}), ...(arcData || {}) };
       const existing_cv = editedCV || generatedDocuments[selectedVariant]?.cv || '';
       const result = await updateCV(profile, jobDescription, existing_cv, [editRequest].filter(Boolean));
       if (result.error) throw new Error(result.error);
       setEditedCV(result.cv || existing_cv);
+      setIsEditMode(false); // Exit edit mode after update
+      setOptionsDisabled(false); // Re-enable options
       toast({ title: 'Documents Updated', description: 'Your CV has been updated.' });
       setEditRequest('');
     } catch (err: any) {
+      setOptionsDisabled(false); // Re-enable options on error
       toast({ title: 'Error', description: err.message || 'Update failed', variant: 'destructive' });
     } finally {
       setIsUpdating(false);
@@ -575,6 +583,12 @@ const ApplicationWizard = () => {
     }
   };
 
+  // 4. On edit cancel, ensure optionsDisabled is false
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setOptionsDisabled(false);
+  };
+
   return (
     <div>
       <div style={{ color: 'blue', fontWeight: 'bold' }}>TOP-LEVEL TEST: ApplicationWizard is rendering</div>
@@ -775,6 +789,7 @@ const ApplicationWizard = () => {
                             setGenerationOptions(prev => ({ ...prev, length: typedValue }));
                           }}
                           className="flex gap-6"
+                          disabled={optionsDisabled || isUpdating || isGenerating}
                         >
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="short" id="short" />
@@ -803,6 +818,7 @@ const ApplicationWizard = () => {
                                 const newSections = { ...generationOptions.sections, achievements: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
                               }}
+                              disabled={optionsDisabled || isUpdating || isGenerating}
                             />
                             <Label htmlFor="achievements">Achievements</Label>
           </div>
@@ -815,6 +831,7 @@ const ApplicationWizard = () => {
                                 const newSections = { ...generationOptions.sections, competencies: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
                               }}
+                              disabled={optionsDisabled || isUpdating || isGenerating}
                             />
                             <Label htmlFor="competencies">Competencies</Label>
                     </div>
@@ -827,6 +844,7 @@ const ApplicationWizard = () => {
                                 const newSections = { ...generationOptions.sections, certifications: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
                               }}
+                              disabled={optionsDisabled || isUpdating || isGenerating}
                             />
                             <Label htmlFor="certifications">Certifications</Label>
                           </div>
@@ -839,6 +857,7 @@ const ApplicationWizard = () => {
                                 const newSections = { ...generationOptions.sections, education: isChecked };
                                 setGenerationOptions(prev => ({ ...prev, sections: newSections }));
                               }}
+                              disabled={optionsDisabled || isUpdating || isGenerating}
                             />
                             <Label htmlFor="education">Education</Label>
                           </div>
