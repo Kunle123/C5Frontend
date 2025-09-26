@@ -592,7 +592,7 @@ const ApplicationWizard = () => {
   return (
     <div>
       <div style={{ color: 'blue', fontWeight: 'bold' }}>TOP-LEVEL TEST: ApplicationWizard is rendering</div>
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-24">
       <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Progress Indicator */}
