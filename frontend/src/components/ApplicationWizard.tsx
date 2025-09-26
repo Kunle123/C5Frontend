@@ -85,6 +85,7 @@ const ApplicationWizard = () => {
   const [cvJustSaved, setCvJustSaved] = useState(false);
   // 1. Add a new state to track if options should be disabled
   const [optionsDisabled, setOptionsDisabled] = useState(false);
+  const [justEdited, setJustEdited] = useState(false);
 
   // Reset the flag when job description changes (new generation)
   useEffect(() => {
@@ -376,6 +377,7 @@ const ApplicationWizard = () => {
       }));
       setIsEditMode(false); // Exit edit mode after update
       setOptionsDisabled(false); // Re-enable options
+      setJustEdited(true); // Mark as just edited
       toast({ title: 'Documents Updated', description: 'Your CV has been updated.' });
       setEditRequest('');
     } catch (err: any) {
@@ -384,6 +386,12 @@ const ApplicationWizard = () => {
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  // When user changes any options, set justEdited to false
+  const handleOptionChange = (updater: () => void) => {
+    setJustEdited(false);
+    updater();
   };
 
   const getKeywordColor = (status: string) => {
@@ -792,10 +800,7 @@ const ApplicationWizard = () => {
                         <Label className="text-sm font-medium">Page Length:</Label>
                         <RadioGroup
                           value={generationOptions.length}
-                          onValueChange={(value) => {
-                            const typedValue = value as 'short' | 'medium' | 'long';
-                            setGenerationOptions(prev => ({ ...prev, length: typedValue }));
-                          }}
+                          onValueChange={(value) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, length: value as 'short' | 'medium' | 'long' })))}
                           className="flex gap-6"
                           disabled={optionsDisabled || isUpdating || isGenerating}
                         >
@@ -821,11 +826,7 @@ const ApplicationWizard = () => {
                             <Checkbox
                               id="achievements"
                               checked={generationOptions.sections.achievements}
-                              onCheckedChange={(checked) => {
-                                const isChecked = checked === true;
-                                const newSections = { ...generationOptions.sections, achievements: isChecked };
-                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                              }}
+                              onCheckedChange={(checked) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, sections: { ...prev.sections, achievements: checked === true } })))}
                               disabled={optionsDisabled || isUpdating || isGenerating}
                             />
                             <Label htmlFor="achievements">Achievements</Label>
@@ -834,11 +835,7 @@ const ApplicationWizard = () => {
                             <Checkbox
                               id="competencies"
                               checked={generationOptions.sections.competencies}
-                              onCheckedChange={(checked) => {
-                                const isChecked = checked === true;
-                                const newSections = { ...generationOptions.sections, competencies: isChecked };
-                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                              }}
+                              onCheckedChange={(checked) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, sections: { ...prev.sections, competencies: checked === true } })))}
                               disabled={optionsDisabled || isUpdating || isGenerating}
                             />
                             <Label htmlFor="competencies">Competencies</Label>
@@ -847,11 +844,7 @@ const ApplicationWizard = () => {
                             <Checkbox
                               id="certifications"
                               checked={generationOptions.sections.certifications}
-                              onCheckedChange={(checked) => {
-                                const isChecked = checked === true;
-                                const newSections = { ...generationOptions.sections, certifications: isChecked };
-                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                              }}
+                              onCheckedChange={(checked) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, sections: { ...prev.sections, certifications: checked === true } })))}
                               disabled={optionsDisabled || isUpdating || isGenerating}
                             />
                             <Label htmlFor="certifications">Certifications</Label>
@@ -860,11 +853,7 @@ const ApplicationWizard = () => {
                             <Checkbox
                               id="education"
                               checked={generationOptions.sections.education}
-                              onCheckedChange={(checked) => {
-                                const isChecked = checked === true;
-                                const newSections = { ...generationOptions.sections, education: isChecked };
-                                setGenerationOptions(prev => ({ ...prev, sections: newSections }));
-                              }}
+                              onCheckedChange={(checked) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, sections: { ...prev.sections, education: checked === true } })))}
                               disabled={optionsDisabled || isUpdating || isGenerating}
                             />
                             <Label htmlFor="education">Education</Label>
@@ -901,9 +890,10 @@ const ApplicationWizard = () => {
                         <TabsTrigger value="cover-letter">Generated Cover Letter</TabsTrigger>
                   </TabsList>
                   <TabsContent value="cv" className="space-y-4">
-                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          {renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)}
-                    </div>
+                    {justEdited
+  ? <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(generatedDocuments[selectedVariant]?.cv, { length: 'long', sections: { achievements: true, competencies: true, certifications: true, education: true } })}</div>
+  : <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)}</div>
+}
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
                     <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
