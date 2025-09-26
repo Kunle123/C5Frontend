@@ -366,6 +366,14 @@ const ApplicationWizard = () => {
       const result = await updateCV(profile, jobDescription, existing_cv, [editRequest].filter(Boolean));
       if (result.error) throw new Error(result.error);
       setEditedCV(result.cv || existing_cv);
+      // Update the preview with the new CV after edit
+      setGeneratedDocuments(prev => ({
+        ...prev,
+        [selectedVariant]: {
+          ...prev[selectedVariant],
+          cv: result.cv || existing_cv,
+        },
+      }));
       setIsEditMode(false); // Exit edit mode after update
       setOptionsDisabled(false); // Re-enable options
       toast({ title: 'Documents Updated', description: 'Your CV has been updated.' });
