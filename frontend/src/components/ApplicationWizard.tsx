@@ -905,7 +905,7 @@ const ApplicationWizard = () => {
   ? <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(latestEditedCV, { length: 'long', sections: { achievements: true, competencies: true, certifications: true, education: true } })}</div>
   : justEdited
     ? <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(generatedDocuments[selectedVariant]?.cv, { length: 'long', sections: { achievements: true, competencies: true, certifications: true, education: true } })}</div>
-    : <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(generatedDocuments[selectedVariant]?.cv, generationOptions)}</div>
+    : <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(latestEditedCV || generatedDocuments[selectedVariant]?.cv, generationOptions)}</div>
 }
                   </TabsContent>
                   <TabsContent value="cover-letter" className="space-y-4">
