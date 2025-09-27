@@ -122,6 +122,7 @@ const ApplicationWizard = () => {
         ...(data.keyword_analysis.amber_keywords || []).map((k: any) => ({ text: k.keyword, status: 'partial' })),
         ...(data.keyword_analysis.red_keywords || []).map((k: any) => ({ text: k.keyword, status: 'missing' })),
       ]);
+      console.log('Extracted keywords from API:', data.keyword_analysis, extractedKeywords);
       setMatchScore(data.keyword_analysis.alignment_score || 0);
       setJobTitle(data.job_analysis.job_title || '');
       setCompanyName(data.job_analysis.company || '');
@@ -334,7 +335,7 @@ const ApplicationWizard = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Key Requirements</label>
-                  <p className="text-sm">React, TypeScript, Node.js, Database Management, Team Leadership</p>
+                  <p className="text-sm">{(previewData?.job_analysis?.primary_keywords || []).join(', ')}</p>
                 </div>
               </CardContent>
             </Card>
