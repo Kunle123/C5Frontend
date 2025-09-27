@@ -108,9 +108,7 @@ const TestAppJourneys: React.FC = () => {
       let result;
       result = await generateApplicationMaterials(
         profile,
-        jobAdvert,
-        undefined,
-        threadId || undefined
+        jobAdvert
       );
       if (result.thread_id && !threadId) setThreadId(result.thread_id);
       setGenResult(result);
