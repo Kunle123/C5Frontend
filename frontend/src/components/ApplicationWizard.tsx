@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -62,6 +62,25 @@ const ApplicationWizard = () => {
   const [cvUpdateRequest, setCvUpdateRequest] = useState('');
   const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [previewData, setPreviewData] = useState<any>(null);
+  const [userPreferences, setUserPreferences] = useState<any>({});
+  const [profile, setProfile] = useState<any>(null);
+
+  // 2. Fetch profile (Career Arc) on mount if not loaded
+  useEffect(() => {
+    if (!profile) {
+      const fetchProfile = async () => {
+        const token = localStorage.getItem('token') || '';
+        const userId = /* extract from token or context */ '';
+        const res = await fetch(`/api/career-ark/profiles/${userId}/all_sections`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setProfile(data);
+      };
+      fetchProfile();
+    }
+  }, [profile]);
 
   const steps = [
     { number: 1, title: 'Paste Job Description' },
@@ -69,30 +88,36 @@ const ApplicationWizard = () => {
     { number: 3, title: 'Preview' },
   ];
 
+  // 3. Step 1: On Next, call /cv/preview
   const handleJobDescriptionNext = async () => {
-    if (!jobDescription.trim()) return;
-    
+    if (!jobDescription.trim() || !profile) return;
     setIsAnalyzing(true);
-    setCurrentStep(2);
-    
-    // Simulate keyword extraction and analysis
-    setTimeout(() => {
-      // Mock data - in real app this would come from API
+    try {
+      const token = localStorage.getItem('token') || '';
+      const res = await fetch('/api/career-ark/cv/preview', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ profile, jobDescription }),
+      });
+      const data = await res.json();
       setExtractedKeywords([
-        { text: 'React', status: 'match' },
-        { text: 'TypeScript', status: 'match' },
-        { text: 'Node.js', status: 'partial' },
-        { text: 'GraphQL', status: 'missing' },
-        { text: 'AWS', status: 'partial' },
-        { text: 'Docker', status: 'match' },
-        { text: 'Kubernetes', status: 'missing' },
-        { text: 'Agile', status: 'match' },
+        ...(data.keyword_analysis.green_keywords || []).map((k: any) => ({ text: k.keyword, status: 'match' })),
+        ...(data.keyword_analysis.amber_keywords || []).map((k: any) => ({ text: k.keyword, status: 'partial' })),
+        ...(data.keyword_analysis.red_keywords || []).map((k: any) => ({ text: k.keyword, status: 'missing' })),
       ]);
-      setMatchScore(72);
-      setJobTitle('Senior Full Stack Developer');
-      setCompanyName('TechCorp Inc.');
+      setMatchScore(data.keyword_analysis.alignment_score || 0);
+      setJobTitle(data.job_analysis.job_title || '');
+      setCompanyName(data.job_analysis.company || '');
+      setPreviewData(data);
+      setCurrentStep(2);
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Keyword extraction failed', variant: 'destructive' });
+    } finally {
       setIsAnalyzing(false);
-    }, 2000);
+    }
   };
 
   const generateVariantKey = (length: string, sections: GenerationOptions['sections']) => {
@@ -104,135 +129,85 @@ const ApplicationWizard = () => {
     return `${length}-${sectionKeys}`;
   };
 
+  // 4. Step 2: On Generate, call /cv/generate
   const handleGenerate = async () => {
+    if (!profile || !previewData) return;
     setIsGenerating(true);
     setCurrentStep(3);
-    
-    // Generate all possible combinations
-    const lengths = ['short', 'medium', 'long'];
-    const sectionCombinations = [
-      { achievements: true, competencies: true, certifications: true, education: true },
-      { achievements: true, competencies: true, certifications: false, education: true },
-      { achievements: false, competencies: true, certifications: true, education: true },
-      // Add more combinations as needed
-    ];
-    
-    // Simulate document generation for all variants
-    setTimeout(() => {
-      const newDocuments: GeneratedDocuments = {};
-      
-      lengths.forEach(length => {
-        sectionCombinations.forEach(sections => {
-          const variantKey = generateVariantKey(length, sections);
-          
-          const baseCV = `JOHN DOE
-Senior Full Stack Developer
-
-EXPERIENCE
-Software Engineer | Current Company | 2022-Present
-• Built scalable React applications with TypeScript
-• Implemented microservices using Node.js and Docker
-• Collaborated in Agile development environment
-• Increased application performance by 40%
-
-SKILLS
-React, TypeScript, Node.js, Docker, Agile Development`;
-
-          let cv = baseCV;
-          
-          if (sections.achievements) {
-            cv += `\n\nACHIEVEMENTS\n• Improved system performance by 40%\n• Led team of 5 developers`;
-          }
-          
-          if (sections.competencies) {
-            cv += `\n\nCOMPETENCIES\n• Technical Leadership\n• Agile Methodology\n• Problem Solving`;
-          }
-          
-          if (sections.certifications) {
-            cv += `\n\nCERTIFICATIONS\n• AWS Certified Developer\n• React Professional Certificate`;
-          }
-          
-          if (sections.education) {
-            cv += `\n\nEDUCATION\nComputer Science Degree | University | 2018-2022`;
-          }
-          
-          // Adjust length
-          if (length === 'short') {
-            cv = cv.substring(0, cv.length * 0.7);
-          } else if (length === 'long') {
-            cv += `\n\nADDITIONAL EXPERIENCE\nIntern | Previous Company | 2021\n• Developed web applications\n• Learned modern frameworks`;
-          }
-          
-          newDocuments[variantKey] = {
-            cv,
-            coverLetter: `Dear Hiring Manager,
-
-I am writing to express my strong interest in the Senior Full Stack Developer position at TechCorp Inc. With my extensive experience in React, TypeScript, and modern development practices, I am confident I would be a valuable addition to your team.
-
-In my current role, I have successfully built scalable applications and worked with technologies directly relevant to your job requirements. My experience with React and TypeScript aligns perfectly with your tech stack, and I am eager to contribute to your innovative projects.
-
-I would welcome the opportunity to discuss how my skills and experience can benefit TechCorp Inc.
-
-Best regards,
-John Doe`
-          };
-        });
+    try {
+      const token = localStorage.getItem('token') || '';
+      const res = await fetch('/api/career-ark/cv/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          profile,
+          jobDescription,
+          previewData,
+          userPreferences,
+        }),
       });
-      
+      const data = await res.json();
+      // Assume data.cv and data.cover_letter
+      const newDocuments: GeneratedDocuments = {
+        ['medium-all']: {
+          cv: data.cv,
+          coverLetter: data.cover_letter?.content || data.cover_letter || '',
+        },
+      };
       setGeneratedDocuments(newDocuments);
-      setSelectedVariant(generateVariantKey('medium', generationOptions.sections));
+      setSelectedVariant('medium-all');
+      toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated!' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'CV generation failed', variant: 'destructive' });
+    } finally {
       setIsGenerating(false);
-      
-      toast({
-        title: "Documents Generated",
-        description: "All CV variations have been successfully generated!",
-      });
-    }, 3000);
+    }
   };
 
   const handleRequestUpdates = () => {
     setShowUpdateModal(true);
   };
 
+  // 5. Step 3: On Apply Update, call /cv/update
   const handleApplyUpdates = async () => {
+    if (!profile || !generatedDocuments[selectedVariant]) return;
     setIsUpdating(true);
     setShowUpdateModal(false);
-    
-    // Simulate AI processing updates
-    setTimeout(() => {
-      if (cvUpdateRequest.trim()) {
-        setGeneratedDocuments(prev => ({
-          ...prev,
-          [selectedVariant]: {
-            ...prev[selectedVariant],
-            cv: prev[selectedVariant]?.cv + `\n\nADDITIONAL EXPERIENCE\nSpace X Project Contributor | NASA | 2021\n• ${cvUpdateRequest}`
-          }
-        }));
-      }
-      
-      if (coverLetterUpdateRequest.trim()) {
-        setGeneratedDocuments(prev => ({
-          ...prev,
-          [selectedVariant]: {
-            ...prev[selectedVariant],
-            coverLetter: prev[selectedVariant]?.coverLetter.replace(
-              'Best regards,',
-              `Additionally, I want to highlight my experience: ${coverLetterUpdateRequest}\n\nBest regards,`
-            )
-          }
-        }));
-      }
-      
-      setCurrentStep(3);
-      setIsUpdating(false);
+    try {
+      const token = localStorage.getItem('token') || '';
+      const res = await fetch('/api/career-ark/cv/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentCV: generatedDocuments[selectedVariant].cv,
+          updateRequest: cvUpdateRequest,
+          originalProfile: profile,
+          jobDescription,
+        }),
+      });
+      const data = await res.json();
+      setGeneratedDocuments(prev => ({
+        ...prev,
+        [selectedVariant]: {
+          ...prev[selectedVariant],
+          cv: data.cv,
+          coverLetter: data.cover_letter?.content || data.cover_letter || prev[selectedVariant].coverLetter,
+        },
+      }));
       setCvUpdateRequest('');
       setCoverLetterUpdateRequest('');
-      
-      toast({
-        title: "Documents Updated",
-        description: "Your CV and cover letter have been updated with your requests!",
-      });
-    }, 2000);
+      toast({ title: 'Documents Updated', description: 'Your CV and cover letter have been updated!' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Update failed', variant: 'destructive' });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const getKeywordColor = (status: Keyword['status']) => {
@@ -306,7 +281,7 @@ John Doe`
               />
               <Button 
                 onClick={handleJobDescriptionNext}
-                disabled={!jobDescription.trim()}
+                disabled={!jobDescription.trim() || !profile}
                 className="w-full"
               >
                 Next: Review Arc Data
