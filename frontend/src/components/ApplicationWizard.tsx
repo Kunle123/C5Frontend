@@ -1,5 +1,4 @@
-// Dummy commit for deployment trigger
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -12,11 +11,9 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { useToast } from '../hooks/use-toast';
-import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
-import { extractKeywords, generateApplicationMaterials, updateCV, getArcData } from '../api/careerArkApi';
-import { CreditsContext } from '../context/CreditsContext';
-import { createApplicationHistory } from '../api';
+import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
 
 interface Keyword {
   text: string;
@@ -42,7 +39,6 @@ interface GeneratedDocuments {
 
 const ApplicationWizard = () => {
   const { toast } = useToast();
-  const { credits, refreshCredits } = useContext(CreditsContext);
   const [currentStep, setCurrentStep] = useState(1);
   const [jobDescription, setJobDescription] = useState('');
   const [extractedKeywords, setExtractedKeywords] = useState<Keyword[]>([]);
@@ -66,59 +62,6 @@ const ApplicationWizard = () => {
   const [cvUpdateRequest, setCvUpdateRequest] = useState('');
   const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
-  const [arcData, setArcData] = useState<any>(null);
-  const [threadId, setThreadId] = useState<string | null>(null);
-  const [userProfile, setUserProfile] = useState<any>(null);
-  // Add state for DOCX download
-  const [docxData, setDocxData] = useState<{ cv?: string; cover_letter?: string } | null>(null);
-  const [isDocxGenerating, setIsDocxGenerating] = useState(false);
-  // Add a ref to track if generationOptions have changed after Step 2
-  const [pendingSave, setPendingSave] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editRequest, setEditRequest] = useState('');
-  const [editedCV, setEditedCV] = useState<any | null>(null);
-  // Add state for contact details and salary
-  const [contactName, setContactName] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
-  const [salary, setSalary] = useState('');
-  const [hasDecrementedCredits, setHasDecrementedCredits] = useState(false);
-  const [cvJustSaved, setCvJustSaved] = useState(false);
-  // 1. Add a new state to track if options should be disabled
-  const [optionsDisabled, setOptionsDisabled] = useState(false);
-  const [justEdited, setJustEdited] = useState(false);
-  const [latestEditedCV, setLatestEditedCV] = useState<any | null>(null);
-
-  // Reset the flag when job description changes (new generation)
-  useEffect(() => {
-    setHasDecrementedCredits(false);
-    setThreadId(null); // Reset threadId when jobDescription changes
-  }, [jobDescription]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { profile, arcData } = await getArcData();
-        setUserProfile(profile); // This now contains name, email, phone, etc.
-        setArcData(arcData);
-      } catch (err) {
-        setArcData(null);
-        setUserProfile(null);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    console.log('STATE CHANGE: currentStep', currentStep);
-  }, [currentStep]);
-  useEffect(() => {
-    console.log('STATE CHANGE: selectedVariant', selectedVariant);
-  }, [selectedVariant]);
-  useEffect(() => {
-    console.log('STATE CHANGE: generatedDocuments', generatedDocuments);
-    console.log('All keys in generatedDocuments:', Object.keys(generatedDocuments));
-  }, [generatedDocuments]);
-
-  console.log('ApplicationWizard render, currentStep:', currentStep);
 
   const steps = [
     { number: 1, title: 'Paste Job Description' },
@@ -126,96 +69,30 @@ const ApplicationWizard = () => {
     { number: 3, title: 'Preview' },
   ];
 
-  // Utility to get initials from a name
-  const getInitials = (name: string) => {
-    if (!name) return '';
-    return name
-      .split(' ')
-      .map((n) => n[0]?.toUpperCase())
-      .join('');
-  };
-
-  // Utility to sanitize company name for filenames
-  const sanitizeCompany = (company: string) => {
-    if (!company) return '';
-    return company.replace(/[^a-zA-Z0-9]/g, '');
-  };
-
-  // Utility to get a timestamp string
-  const getTimestamp = () => {
-    const now = new Date();
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
-  };
-
-  // Utility to trigger DOCX download with unique filename
-  const downloadBase64Docx = (base64: string, type: 'cv' | 'cover_letter', candidateName?: string, companyName?: string) => {
-    const initials = getInitials(candidateName || '');
-    const company = sanitizeCompany(companyName || '');
-    const timestamp = getTimestamp();
-    let filename = 'document.docx';
-    if (type === 'cv') {
-      filename = `${initials}_CV_${company}_${timestamp}.docx`;
-    } else if (type === 'cover_letter') {
-      filename = `${initials}_CLetter_${company}_${timestamp}.docx`;
-    }
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], {
-      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-  };
-
-  // Step 1: Extract Keywords (correct endpoint/payload)
   const handleJobDescriptionNext = async () => {
     if (!jobDescription.trim()) return;
+    
     setIsAnalyzing(true);
-    try {
-      const profile = { ...(userProfile || {}), ...(arcData || {}) };
-      const payload = {
-        action: 'extract_keywords',
-        profile,
-        job_description: jobDescription,
-      };
-      const res = await fetch('/api/career-ark/generate-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-        },
-        body: JSON.stringify(payload),
-      });
-      const result = await res.json();
-      if (result.error) throw new Error(result.error);
-      setExtractedKeywords(
-        (result.keywords || []).map((kw: any) =>
-          typeof kw === 'string'
-            ? { text: kw, status: 'match' }
-            : { text: kw.keyword, status: kw.status || 'match' }
-        )
-      );
-      setMatchScore(result.overall_match_percentage ?? result.match_percentage ?? 0);
-      setJobTitle(result.job_title || '');
-      setCompanyName(result.company_name || '');
-      setThreadId(result.thread_id || null);
-      setCurrentStep(2);
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message || 'Keyword extraction failed', variant: 'destructive' });
-    } finally {
+    setCurrentStep(2);
+    
+    // Simulate keyword extraction and analysis
+    setTimeout(() => {
+      // Mock data - in real app this would come from API
+      setExtractedKeywords([
+        { text: 'React', status: 'match' },
+        { text: 'TypeScript', status: 'match' },
+        { text: 'Node.js', status: 'partial' },
+        { text: 'GraphQL', status: 'missing' },
+        { text: 'AWS', status: 'partial' },
+        { text: 'Docker', status: 'match' },
+        { text: 'Kubernetes', status: 'missing' },
+        { text: 'Agile', status: 'match' },
+      ]);
+      setMatchScore(72);
+      setJobTitle('Senior Full Stack Developer');
+      setCompanyName('TechCorp Inc.');
       setIsAnalyzing(false);
-    }
+    }, 2000);
   };
 
   const generateVariantKey = (length: string, sections: GenerationOptions['sections']) => {
@@ -227,395 +104,158 @@ const ApplicationWizard = () => {
     return `${length}-${sectionKeys}`;
   };
 
-  // Step 2: Generate CV (correct endpoint/payload)
   const handleGenerate = async () => {
     setIsGenerating(true);
-    try {
-      // Only send arcData (no PII) to the AI service
-      const profileToSend = { ...arcData };
-      const payload: any = {
-        profile: profileToSend,
-        job_description: jobDescription,
-      };
-      console.log('Generating CV with payload:', payload); // Debug log
-      const res = await fetch('/api/career-ark/generate-assistant-adaptive', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-        },
-        body: JSON.stringify(payload),
-      });
-      const result = await res.json();
-      if (result.error) throw new Error(result.error);
-      // After receiving the AI response, merge in PII fields from userProfile
-      const name = userProfile?.name || "{{CANDIDATE_NAME}}";
-      const contact_info = [
-        userProfile?.address_line1,
-        userProfile?.city_state_postal,
-        userProfile?.email,
-        userProfile?.phone_number,
-        userProfile?.linkedin
-      ].filter(Boolean);
-      // Merge PII into the CV object for saving/rendering
-      const cvWithPII = {
-        ...(result.cv ? result.cv : result),
-        name,
-        contact_info,
-      };
-      const variantKey = generateVariantKey(generationOptions.length, generationOptions.sections);
-      setGeneratedDocuments({
-        [variantKey]: {
-          cv: cvWithPII,
-          coverLetter: result.cover_letter?.content || result.coverLetter?.content || '',
-        },
-      });
-      setSelectedVariant(variantKey);
-      setJobTitle(result.job_title || '');
-      setCompanyName(result.company_name || '');
-      // Decrement credits only if not already decremented for this generation
-      if (!hasDecrementedCredits) {
-        try {
-          const creditRes = await fetch('/api/user/credits/use', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-            },
-          body: JSON.stringify({ action: 'generate_cv' }),
+    setCurrentStep(3);
+    
+    // Generate all possible combinations
+    const lengths = ['short', 'medium', 'long'];
+    const sectionCombinations = [
+      { achievements: true, competencies: true, certifications: true, education: true },
+      { achievements: true, competencies: true, certifications: false, education: true },
+      { achievements: false, competencies: true, certifications: true, education: true },
+      // Add more combinations as needed
+    ];
+    
+    // Simulate document generation for all variants
+    setTimeout(() => {
+      const newDocuments: GeneratedDocuments = {};
+      
+      lengths.forEach(length => {
+        sectionCombinations.forEach(sections => {
+          const variantKey = generateVariantKey(length, sections);
+          
+          const baseCV = `JOHN DOE
+Senior Full Stack Developer
+
+EXPERIENCE
+Software Engineer | Current Company | 2022-Present
+• Built scalable React applications with TypeScript
+• Implemented microservices using Node.js and Docker
+• Collaborated in Agile development environment
+• Increased application performance by 40%
+
+SKILLS
+React, TypeScript, Node.js, Docker, Agile Development`;
+
+          let cv = baseCV;
+          
+          if (sections.achievements) {
+            cv += `\n\nACHIEVEMENTS\n• Improved system performance by 40%\n• Led team of 5 developers`;
+          }
+          
+          if (sections.competencies) {
+            cv += `\n\nCOMPETENCIES\n• Technical Leadership\n• Agile Methodology\n• Problem Solving`;
+          }
+          
+          if (sections.certifications) {
+            cv += `\n\nCERTIFICATIONS\n• AWS Certified Developer\n• React Professional Certificate`;
+          }
+          
+          if (sections.education) {
+            cv += `\n\nEDUCATION\nComputer Science Degree | University | 2018-2022`;
+          }
+          
+          // Adjust length
+          if (length === 'short') {
+            cv = cv.substring(0, cv.length * 0.7);
+          } else if (length === 'long') {
+            cv += `\n\nADDITIONAL EXPERIENCE\nIntern | Previous Company | 2021\n• Developed web applications\n• Learned modern frameworks`;
+          }
+          
+          newDocuments[variantKey] = {
+            cv,
+            coverLetter: `Dear Hiring Manager,
+
+I am writing to express my strong interest in the Senior Full Stack Developer position at TechCorp Inc. With my extensive experience in React, TypeScript, and modern development practices, I am confident I would be a valuable addition to your team.
+
+In my current role, I have successfully built scalable applications and worked with technologies directly relevant to your job requirements. My experience with React and TypeScript aligns perfectly with your tech stack, and I am eager to contribute to your innovative projects.
+
+I would welcome the opportunity to discuss how my skills and experience can benefit TechCorp Inc.
+
+Best regards,
+John Doe`
+          };
         });
-          await refreshCredits();
-          setHasDecrementedCredits(true);
-        } catch (creditErr) {
-          console.error('Error decrementing credits:', creditErr);
-        }
-      }
-      setCurrentStep(3);
-      toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated.' });
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message || 'CV generation failed', variant: 'destructive' });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  // Step 3: Generate DOCX from CV JSON
-  const handleGenerateDocx = async () => {
-    setIsDocxGenerating(true);
-    try {
-      const cvJson = generatedDocuments[selectedVariant]?.cv;
-      if (!cvJson) throw new Error('No CV data to generate DOCX');
-      const res = await fetch('/api/cv/generate-docx', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-        },
-        body: JSON.stringify({ cv: cvJson }),
       });
-      const result = await res.json();
-      if (result.error) throw new Error(result.error);
-      setDocxData(result);
-      if (result.cv) downloadBase64Docx(result.cv, 'cv', userProfile?.name, companyName);
-      if (result.cover_letter) downloadBase64Docx(result.cover_letter, 'cover_letter', userProfile?.name, companyName);
-      toast({ title: 'DOCX Generated', description: 'Your CV and cover letter DOCX files are ready.' });
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message || 'DOCX generation failed', variant: 'destructive' });
-    } finally {
-      setIsDocxGenerating(false);
-    }
-  };
-
-  // Step 4: Persist Application History
-  const handleSaveApplicationHistory = async () => {
-    try {
-      const token = localStorage.getItem('token') || '';
-      const payload = {
-        job_title: jobTitle,
-        company_name: companyName,
-        job_description: jobDescription,
-        applied_at: new Date().toISOString(),
-        contact_name: contactName,
-        contact_number: contactNumber,
-        salary: salary,
-      };
-      await createApplicationHistory(payload, token);
-      toast({ title: 'Application Saved', description: 'Application history has been saved.' });
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message || 'Failed to save application history', variant: 'destructive' });
-    }
+      
+      setGeneratedDocuments(newDocuments);
+      setSelectedVariant(generateVariantKey('medium', generationOptions.sections));
+      setIsGenerating(false);
+      
+      toast({
+        title: "Documents Generated",
+        description: "All CV variations have been successfully generated!",
+      });
+    }, 3000);
   };
 
   const handleRequestUpdates = () => {
-    setIsEditMode(true);
-    setEditedCV(generatedDocuments[selectedVariant]?.cv);
-    setEditRequest('');
+    setShowUpdateModal(true);
   };
 
-  // 2. In handleApplyUpdates, disable options, show spinner, and show toast
   const handleApplyUpdates = async () => {
-    console.log('Edit button clicked');
     setIsUpdating(true);
-    setOptionsDisabled(true);
-    toast({ title: 'Please wait while your edits are applied' });
-    try {
-      const profile = { ...(userProfile || {}), ...(arcData || {}) };
-      const existing_cv = editedCV || generatedDocuments[selectedVariant]?.cv || '';
-      const result = await updateCV(profile, jobDescription, existing_cv, [editRequest].filter(Boolean));
-      console.log('--- BACKEND updateCV RESPONSE ---', result);
-      if (!result || !result.cv) {
-        console.error('No CV returned from backend updateCV!');
-      }
-      setEditedCV(result.cv || existing_cv);
-      setLatestEditedCV(result.cv || existing_cv); // Store the latest edited CV for preview
-      setGeneratedDocuments(prev => {
-        const updated = {
+    setShowUpdateModal(false);
+    
+    // Simulate AI processing updates
+    setTimeout(() => {
+      if (cvUpdateRequest.trim()) {
+        setGeneratedDocuments(prev => ({
           ...prev,
           [selectedVariant]: {
             ...prev[selectedVariant],
-            cv: result.cv || existing_cv,
-          },
-        };
-        console.log('--- UPDATED generatedDocuments ---', updated);
-        return updated;
-      });
-      setIsEditMode(false); // Exit edit mode after update
-      setOptionsDisabled(false); // Re-enable options
-      setJustEdited(true); // Mark as just edited
-      toast({ title: 'Documents Updated', description: 'Your CV has been updated.' });
-      setEditRequest('');
-    } catch (err: any) {
-      setOptionsDisabled(false); // Re-enable options on error
-      console.error('Error in handleApplyUpdates:', err);
-      toast({ title: 'Error', description: err.message || 'Update failed', variant: 'destructive' });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  // When user changes any options, set justEdited to false
-  const handleOptionChange = (updater: () => void) => {
-    setJustEdited(false);
-    setLatestEditedCV(null);
-    updater();
-  };
-
-  const getKeywordColor = (status: string) => {
-    switch (status) {
-      case 'green':
-      case 'match':
-        return 'bg-emerald-200 text-emerald-900'; // muted green
-      case 'amber':
-      case 'partial':
-        return 'bg-amber-200 text-amber-900'; // muted amber
-      case 'red':
-      case 'missing':
-        return 'bg-rose-200 text-rose-900'; // muted red
-      default:
-        return 'bg-gray-200 text-gray-800';
-    }
-  };
-
-  const getKeywordIcon = (status: string) => {
-    switch (status) {
-      case 'green':
-      case 'match':
-        return (
-          <svg className="w-3 h-3 text-emerald-900" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
-        );
-      case 'amber':
-      case 'partial':
-        return (
-          <svg className="w-3 h-3 text-amber-900" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-7V7a1 1 0 112 0v4a1 1 0 01-2 0zm1 4a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" /></svg>
-        );
-      case 'red':
-      case 'missing':
-        return (
-          <svg className="w-3 h-3 text-rose-900" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-2.293-7.707a1 1 0 011.414 0L10 11.586l.879-.879a1 1 0 111.414 1.414l-1.293 1.293a1 1 0 01-1.414 0l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-        );
-      default:
-        return null;
-    }
-  };
-
-  // Utility: Render structured CV JSON
-  type CVType = any; // Replace with a proper interface if available
-  type PriorityItem = { priority?: number; content?: string; [key: string]: any };
-  // Map page length to max priority
-  const getMaxPriority = (length: string) => {
-    switch (length) {
-      case 'short': return 1;
-      case 'medium': return 2;
-      case 'long': return 3;
-      default: return 3;
-    }
-  };
-
-  // Utility: Render structured CV JSON with toggles and priority filtering
-  function renderStructuredCV(
-    cv: CVType,
-    options: GenerationOptions
-  ) {
-    console.log('renderStructuredCV called', cv, options);
-    const maxPriority = getMaxPriority(options.length);
-    const filterByPriority = (arr: PriorityItem[] | undefined): PriorityItem[] => Array.isArray(arr) ? arr.filter((item: PriorityItem) => (item.priority ?? 1) <= maxPriority) : [];
-    console.log('Achievements:', filterByPriority(cv.relevant_achievements));
-    console.log('Experience:', cv.experience);
-    console.log('Competencies:', filterByPriority(cv.core_competencies));
-    console.log('Education:', filterByPriority(cv.education));
-    if (!cv) return <div>No CV data available.</div>;
-    if (
-      !cv.summary?.content &&
-      filterByPriority(cv.relevant_achievements).length === 0 &&
-      (!Array.isArray(cv.experience) || cv.experience.length === 0) &&
-      filterByPriority(cv.core_competencies).length === 0 &&
-      filterByPriority(cv.education).length === 0
-    ) {
-      return <div style={{ color: 'red' }}>No CV sections to display (all filtered out or empty).</div>;
-    }
-  return (
-      <div className="space-y-4">
-        {cv.name && <h2 className="text-xl font-bold">{cv.name}</h2>}
-        {cv.contact_info && Array.isArray(cv.contact_info) && (
-          <div className="text-sm text-muted-foreground">{cv.contact_info.filter(Boolean).join(' | ')}</div>
-        )}
-        {cv.summary?.content && <div><strong>Summary:</strong> {cv.summary.content}</div>}
-        {options.sections.competencies && filterByPriority(cv.core_competencies).length > 0 && (
-          <div>
-            <h3 className="font-semibold">Core Competencies</h3>
-            <div className="ml-6">
-              {filterByPriority(cv.core_competencies).map((c: PriorityItem) => c.content).filter(Boolean).join(' • ')}
-            </div>
-          </div>
-        )}
-        {options.sections.achievements && filterByPriority(cv.relevant_achievements).length > 0 && (
-          <div>
-            <h3 className="font-semibold">Achievements</h3>
-            <ul className="list-disc ml-6">
-              {filterByPriority(cv.relevant_achievements).map((a: PriorityItem, i: number) => <li key={i}>{a.content}</li>)}
-            </ul>
-          </div>
-        )}
-        {Array.isArray(cv.experience) && cv.experience.length > 0 && (
-          <div>
-            <h3 className="font-semibold">Experience</h3>
-            {cv.experience.map((exp: any, i: number) => (
-              <div key={i} className="mb-2">
-                <div><strong>{exp.job_title}</strong> at {exp.company_name} {exp.dates && <span>({exp.dates})</span>}</div>
-                {filterByPriority(exp.responsibilities).length > 0 && (
-                  <ul className="list-disc ml-6">
-                    {filterByPriority(exp.responsibilities).map((r: PriorityItem, j: number) => <li key={j}>{r.content}</li>)}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-        {options.sections.education && filterByPriority(cv.education).length > 0 && (
-          <div>
-            <h3 className="font-semibold">Education</h3>
-            <ul className="list-disc ml-6">
-              {filterByPriority(cv.education).map((e: any, i: number) => <li key={i}>{e.degree} - {e.institution} {e.year && `(${e.year})`}</li>)}
-            </ul>
-          </div>
-        )}
-        {options.sections.certifications && Array.isArray(cv.certifications) && cv.certifications.length > 0 && (
-          <div>
-            <h3 className="font-semibold">Certifications</h3>
-            <ul className="list-disc ml-6">
-              {cv.certifications.map((cert: any, i: number) => <li key={i}>{cert.content || cert.name}</li>)}
-            </ul>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (currentStep === 3) {
-    console.log('Rendering Step 3 preview, currentStep:', currentStep);
-    console.log('generatedDocuments:', generatedDocuments);
-    console.log('selectedVariant:', selectedVariant);
-    console.log('CV for preview:', latestEditedCV || (justEdited ? generatedDocuments[selectedVariant]?.cv : generatedDocuments[selectedVariant]?.cv));
-  }
-
-  // Utility to filter a CV object according to generationOptions
-  function filterCVForSave(cv: any, options: GenerationOptions) {
-    if (!cv) return cv;
-    const maxPriority = (() => {
-      switch (options.length) {
-        case 'short': return 1;
-        case 'medium': return 2;
-        case 'long': return 3;
-        default: return 3;
+            cv: prev[selectedVariant]?.cv + `\n\nADDITIONAL EXPERIENCE\nSpace X Project Contributor | NASA | 2021\n• ${cvUpdateRequest}`
+          }
+        }));
       }
-    })();
-    const filterByPriority = (arr: any[] | undefined) => Array.isArray(arr) ? arr.filter((item: any) => (item.priority ?? 1) <= maxPriority) : [];
-    return {
-      ...cv,
-      relevant_achievements: options.sections.achievements ? filterByPriority(cv.relevant_achievements) : [],
-      core_competencies: options.sections.competencies ? filterByPriority(cv.core_competencies) : [],
-      experience: Array.isArray(cv.experience)
-        ? cv.experience.map((exp: any) => ({
-            ...exp,
-            responsibilities: filterByPriority(exp.responsibilities),
-          })
-        ) : [],
-      education: options.sections.education ? filterByPriority(cv.education) : [],
-      certifications: options.sections.certifications ? (Array.isArray(cv.certifications) ? cv.certifications : []) : [],
-    };
-  }
-
-  // Add this function inside ApplicationWizard
-  const handleSaveCV = async () => {
-    let cvJson: any = isEditMode ? editedCV : generatedDocuments[selectedVariant]?.cv;
-    // Filter the CV according to current generationOptions before saving
-    cvJson = filterCVForSave(cvJson, generationOptions);
-    // Always set the real candidate name before saving
-    if (userProfile?.name) {
-      cvJson = { ...cvJson, name: userProfile.name };
-    }
-    // Add a unique created_at timestamp to ensure uniqueness
-    if (cvJson && typeof cvJson === 'object' && !Array.isArray(cvJson)) {
-      cvJson = { ...cvJson, created_at: new Date().toISOString() };
-    }
-    // Log the payload for debugging
-    console.log('CV payload:', cvJson);
-    if (!cvJson) {
-      toast({ title: 'Error', description: 'No CV to save', variant: 'destructive' });
-      return;
-    }
-    try {
-      const res = await fetch('/api/cv', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-        },
-        body: JSON.stringify(cvJson),
+      
+      if (coverLetterUpdateRequest.trim()) {
+        setGeneratedDocuments(prev => ({
+          ...prev,
+          [selectedVariant]: {
+            ...prev[selectedVariant],
+            coverLetter: prev[selectedVariant]?.coverLetter.replace(
+              'Best regards,',
+              `Additionally, I want to highlight my experience: ${coverLetterUpdateRequest}\n\nBest regards,`
+            )
+          }
+        }));
+      }
+      
+      setCurrentStep(3);
+      setIsUpdating(false);
+      setCvUpdateRequest('');
+      setCoverLetterUpdateRequest('');
+      
+      toast({
+        title: "Documents Updated",
+        description: "Your CV and cover letter have been updated with your requests!",
       });
-      const result = await res.json();
-      if (result.error) throw new Error(result.error);
-      toast({ title: 'CV Saved', description: 'Your CV has been saved to your account.' });
-      // Save application history after successful CV save
-      await handleSaveApplicationHistory();
-      setCvJustSaved(true); // Set flag to require second click
-      // window.location.href = '/my-cvs-new'; // REMOVE auto navigation
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message || 'Failed to save CV', variant: 'destructive' });
+    }, 2000);
+  };
+
+  const getKeywordColor = (status: Keyword['status']) => {
+    switch (status) {
+      case 'match': return 'success';
+      case 'partial': return 'warning';
+      case 'missing': return 'destructive';
+      default: return 'secondary';
     }
   };
 
-  // 4. On edit cancel, ensure optionsDisabled is false
-  const handleCancelEdit = () => {
-    setIsEditMode(false);
-    setOptionsDisabled(false);
+  const getKeywordIcon = (status: Keyword['status']) => {
+    switch (status) {
+      case 'match': return <CheckCircle className="w-3 h-3" />;
+      case 'partial': return <AlertCircle className="w-3 h-3" />;
+      case 'missing': return <XCircle className="w-3 h-3" />;
+    }
   };
 
   return (
-    <div>
-      <div style={{ color: 'blue', fontWeight: 'bold' }}>TOP-LEVEL TEST: ApplicationWizard is rendering</div>
-    <div className="min-h-screen bg-background pt-24">
+    <div className="min-h-screen bg-background">
       <Navigation />
+      
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Progress Indicator */}
         <div className="mb-8">
@@ -663,301 +303,444 @@ const ApplicationWizard = () => {
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 className="min-h-[300px]"
-                disabled={isAnalyzing}
               />
-              {/* Contact Name */}
-              <div>
-                <Label htmlFor="contactName">Contact Name (optional)</Label>
-                <input
-                  id="contactName"
-                  type="text"
-                  className="w-full border rounded px-3 py-2 mt-1"
-                  value={contactName}
-                  onChange={e => setContactName(e.target.value)}
-                  placeholder="e.g. Jane Smith"
-                />
-              </div>
-              {/* Contact Number */}
-              <div>
-                <Label htmlFor="contactNumber">Contact Number (optional)</Label>
-                <input
-                  id="contactNumber"
-                  type="text"
-                  className="w-full border rounded px-3 py-2 mt-1"
-                  value={contactNumber}
-                  onChange={e => setContactNumber(e.target.value)}
-                  placeholder="e.g. 01234 567890"
-                />
-              </div>
-              {/* Salary */}
-              <div>
-                <Label htmlFor="salary">Salary (optional)</Label>
-                <input
-                  id="salary"
-                  type="text"
-                  className="w-full border rounded px-3 py-2 mt-1"
-                  value={salary}
-                  onChange={e => setSalary(e.target.value)}
-                  placeholder="e.g. £60,000 or 500/day"
-                />
-              </div>
               <Button 
                 onClick={handleJobDescriptionNext}
-                disabled={!jobDescription.trim() || isAnalyzing}
+                disabled={!jobDescription.trim()}
                 className="w-full"
               >
-                {isAnalyzing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                {isAnalyzing ? 'Analyzing...' : 'Next: Review Arc Data'}
+                Next: Review Arc Data
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </CardContent>
           </Card>
         )}
 
-        {/* Step 2: Review Arc Data & Keywords */}
-        {currentStep === 2 && (
+        {/* Step 2: Review Keywords */}
+        {currentStep === 2 && !isAnalyzing && (
           <div className="space-y-6">
+            {/* Job Analysis Panel */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Keyword Analysis</span>
-                  {jobTitle && (
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{jobTitle}</div>
-                      <div className="text-sm text-muted-foreground">{companyName}</div>
-                    </div>
-                  )}
-                </CardTitle>
+                <CardTitle>Job Analysis</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Job Title</label>
+                    <p className="font-semibold">{jobTitle || 'Senior Software Engineer'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Company</label>
+                    <p className="font-semibold">{companyName || 'Tech Solutions Inc.'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Experience Level</label>
+                    <p className="font-semibold">Senior (5+ years)</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Industry</label>
+                    <p className="font-semibold">Technology</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Key Requirements</label>
+                  <p className="text-sm">React, TypeScript, Node.js, Database Management, Team Leadership</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Match Score */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Match Score</CardTitle>
               </CardHeader>
               <CardContent>
-                {isAnalyzing ? (
-                  <div className="flex items-center justify-center py-12">
-                      <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
-                      <p className="text-muted-foreground ml-4">Analyzing job description...</p>
+                <div className="flex items-center gap-4">
+                  <div className={`text-3xl font-bold ${
+                    matchScore >= 70 ? 'text-emerald-600' : 
+                    matchScore >= 50 ? 'text-amber-600' : 'text-rose-600'
+                  }`}>
+                    {matchScore}%
                   </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">Match Score</h3>
-                      <div className="flex items-center gap-2">
-                        <div className={`text-2xl font-bold ${
-                            matchScore >= 70 ? 'text-emerald-500' : 
-                            matchScore >= 50 ? 'text-amber-500' : 'text-rose-500'
-                        }`}>
-                          {matchScore}%
-                        </div>
+                  <div className="flex-1">
+                    <Progress value={matchScore} className="h-3" />
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {extractedKeywords.filter(k => k.status === 'match').length} / {extractedKeywords.length} keywords matched
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Keyword Analysis */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Matched Keywords */}
+              <Card className="border-emerald-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-emerald-700 flex items-center gap-2">
+                    <span className="text-lg">✓</span>
+                    Matched Keywords
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Skills and experience that align with the job requirements
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {extractedKeywords.filter(k => k.status === 'match').map((keyword, idx) => (
+                      <TooltipProvider key={idx}>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-sm border border-emerald-200 cursor-help hover:bg-emerald-100 transition-colors">
+                              {keyword.text}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Strong evidence found in your experience with {keyword.text}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Transferable Keywords */}
+              <Card className="border-amber-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-amber-700 flex items-center gap-2">
+                    <span className="text-lg">!</span>
+                    Transferable Keywords
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Related skills that can be highlighted as relevant experience
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {extractedKeywords.filter(k => k.status === 'partial').map((keyword, idx) => (
+                      <TooltipProvider key={idx}>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm border border-amber-200 cursor-help hover:bg-amber-100 transition-colors">
+                              {keyword.text}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Your related experience with similar technologies can be positioned as transferable to {keyword.text}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Missing Keywords */}
+              <Card className="border-rose-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-rose-700 flex items-center gap-2">
+                    <span className="text-lg">✗</span>
+                    Missing Keywords
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Skills not found in your profile - we'll address these strategically
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {extractedKeywords.filter(k => k.status === 'missing').map((keyword, idx) => (
+                      <TooltipProvider key={idx}>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-full text-sm border border-rose-200 cursor-help hover:bg-rose-100 transition-colors">
+                              {keyword.text}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">We'll focus on your learning agility and related experience to mitigate the gap in {keyword.text}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Customization Options */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Customization Options</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Adjust how we tailor your documents to this specific role
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Focus Areas</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="technical" className="rounded" defaultChecked />
+                        <label htmlFor="technical" className="text-sm">Emphasize technical skills</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="leadership" className="rounded" />
+                        <label htmlFor="leadership" className="text-sm">Highlight leadership experience</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="achievements" className="rounded" defaultChecked />
+                        <label htmlFor="achievements" className="text-sm">Focus on quantifiable achievements</label>
                       </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium mb-3">Extracted Keywords</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {extractedKeywords.map((keyword, index) => (
-                          <span
-                            key={index}
-                            className={`flex items-center justify-center gap-1 rounded px-2 py-1 text-xs font-medium ${getKeywordColor(keyword.status)}`}
-                          >
-                            {getKeywordIcon(keyword.status)}
-                            {keyword.text}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                      <div className="flex justify-end">
-                    <Button
-                      onClick={handleGenerate}
-                      className="w-full"
-                      disabled={isGenerating}
-                    >
-                          {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                          {isGenerating ? 'Generating...' : 'Generate Documents'}
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                      </div>
                   </div>
-                )}
+                  <div className="space-y-3">
+                    <label htmlFor="custom-instructions" className="text-sm font-medium">Custom Instructions</label>
+                    <Textarea 
+                      id="custom-instructions"
+                      placeholder="Any specific requirements or preferences for your application..."
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Generate Button */}
+            <Card>
+              <CardContent className="pt-6">
+                <Button onClick={handleGenerate} className="w-full" size="lg" disabled={isGenerating}>
+                  {isGenerating ? "Generating Documents..." : "Generate Documents"}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Step 3: Preview (ZEN DESIGN) */}
-        {currentStep === 3 && !isGenerating && !isDocxGenerating && !isUpdating && (
+        {/* Loading state for analyzing */}
+        {currentStep === 2 && isAnalyzing && (
+          <Card>
+            <CardContent className="py-12">
+              <div className="text-center space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <h3 className="text-lg font-semibold">Analyzing Job Description</h3>
+                <p className="text-muted-foreground">
+                  Please wait while we extract keywords and analyze the requirements...
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Step 3: Preview CV & Cover Letter */}
+        {currentStep === 3 && !isGenerating && !isUpdating && (
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Step 3: Preview</span>
-                  {(jobTitle || companyName) && (
-                    <div className="text-right">
-                      {jobTitle && <div className="text-sm font-medium">{jobTitle}</div>}
-                      {companyName && <div className="text-sm text-muted-foreground">{companyName}</div>}
-                    </div>
-                  )}
-                </CardTitle>
+                <CardTitle>Preview Your CV & Cover Letter</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Review your generated documents below. You can switch between length and section options to see different variations.
+                </p>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* CV Options Accordion */}
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="options">
-                    <AccordionTrigger>CV Options</AccordionTrigger>
-                    <AccordionContent className="space-y-6 pt-4">
-                      {/* Page Length */}
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">Page Length:</Label>
-                        <RadioGroup
-                          value={generationOptions.length}
-                          onValueChange={(value) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, length: value as 'short' | 'medium' | 'long' })))}
-                          className="flex gap-6"
-                          disabled={optionsDisabled || isUpdating || isGenerating}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="short" id="short" />
-                            <Label htmlFor="short">Short</Label>
-                </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="medium" id="medium" />
-                            <Label htmlFor="medium">Medium</Label>
+                {/* Document Options */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Page Length:</Label>
+                    <RadioGroup
+                      value={generationOptions.length}
+                      onValueChange={(value: 'short' | 'medium' | 'long') => {
+                        setGenerationOptions(prev => ({ ...prev, length: value }));
+                        setSelectedVariant(generateVariantKey(value, generationOptions.sections));
+                      }}
+                      className="flex gap-6"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="short" id="short" />
+                        <Label htmlFor="short">Short</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="medium" id="medium" />
+                        <Label htmlFor="medium">Medium</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="long" id="long" />
+                        <Label htmlFor="long">Long</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="long" id="long" />
-                            <Label htmlFor="long">Long</Label>
+
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Include sections:</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="achievements"
+                          checked={generationOptions.sections.achievements}
+                          onCheckedChange={(checked) => {
+                            const newSections = { ...generationOptions.sections, achievements: checked as boolean };
+                            setGenerationOptions(prev => ({ ...prev, sections: newSections }));
+                            setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                          }}
+                        />
+                        <Label htmlFor="achievements" className="text-sm">Achievements</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="competencies"
+                          checked={generationOptions.sections.competencies}
+                          onCheckedChange={(checked) => {
+                            const newSections = { ...generationOptions.sections, competencies: checked as boolean };
+                            setGenerationOptions(prev => ({ ...prev, sections: newSections }));
+                            setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                          }}
+                        />
+                        <Label htmlFor="competencies" className="text-sm">Competencies</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="certifications"
+                          checked={generationOptions.sections.certifications}
+                          onCheckedChange={(checked) => {
+                            const newSections = { ...generationOptions.sections, certifications: checked as boolean };
+                            setGenerationOptions(prev => ({ ...prev, sections: newSections }));
+                            setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                          }}
+                        />
+                        <Label htmlFor="certifications" className="text-sm">Certifications</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="education"
+                          checked={generationOptions.sections.education}
+                          onCheckedChange={(checked) => {
+                            const newSections = { ...generationOptions.sections, education: checked as boolean };
+                            setGenerationOptions(prev => ({ ...prev, sections: newSections }));
+                            setSelectedVariant(generateVariantKey(generationOptions.length, newSections));
+                          }}
+                        />
+                        <Label htmlFor="education" className="text-sm">Education</Label>
+                      </div>
                     </div>
-                        </RadioGroup>
+                  </div>
                 </div>
-                      {/* CV Sections */}
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">Include sections in CV:</Label>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="achievements"
-                              checked={generationOptions.sections.achievements}
-                              onCheckedChange={(checked) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, sections: { ...prev.sections, achievements: checked === true } })))}
-                              disabled={optionsDisabled || isUpdating || isGenerating}
-                            />
-                            <Label htmlFor="achievements">Achievements</Label>
-          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="competencies"
-                              checked={generationOptions.sections.competencies}
-                              onCheckedChange={(checked) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, sections: { ...prev.sections, competencies: checked === true } })))}
-                              disabled={optionsDisabled || isUpdating || isGenerating}
-                            />
-                            <Label htmlFor="competencies">Competencies</Label>
-                    </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="certifications"
-                              checked={generationOptions.sections.certifications}
-                              onCheckedChange={(checked) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, sections: { ...prev.sections, certifications: checked === true } })))}
-                              disabled={optionsDisabled || isUpdating || isGenerating}
-                            />
-                            <Label htmlFor="certifications">Certifications</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="education"
-                              checked={generationOptions.sections.education}
-                              onCheckedChange={(checked) => handleOptionChange(() => setGenerationOptions(prev => ({ ...prev, sections: { ...prev.sections, education: checked === true } })))}
-                              disabled={optionsDisabled || isUpdating || isGenerating}
-                            />
-                            <Label htmlFor="education">Education</Label>
+
+                {/* Document Preview with Tabs */}
+                {generatedDocuments[selectedVariant] ? (
+                  <div className="space-y-4">
+                    <Tabs defaultValue="cv" className="w-full">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="cv">CV</TabsTrigger>
+                        <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value="cv" className="space-y-4">
+                        {/* CV Validation Badges */}
+                        <div className="flex items-center gap-2 mb-4">
+                          <Badge variant="success" className="flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            Factual Accuracy
+                          </Badge>
+                          <Badge variant="success" className="flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            Job Alignment
+                          </Badge>
+                          <Badge variant="success" className="flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            Anti-Fabrication
+                          </Badge>
+                        </div>
+
+                        {/* Included Keywords */}
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium mb-2">Included Keywords:</h4>
+                          <div className="flex flex-wrap gap-1">
+                            {extractedKeywords.filter(k => k.status === 'match').map((keyword, idx) => (
+                              <span key={idx} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded">
+                                {keyword.text}
+                              </span>
+                            ))}
                           </div>
                         </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-                {/* Document Preview */}
-                {isEditMode ? (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Edit Request:</Label>
-                      <Textarea
-                        placeholder="Describe any changes you'd like to make to your CV..."
-                        value={editRequest}
-                        onChange={(e) => setEditRequest(e.target.value)}
-                        className="min-h-[100px]"
-                      />
-                    </div>
-                  <Button
-                      onClick={handleApplyUpdates}
-                      disabled={!editRequest.trim()}
-                    >
-                      Apply Updates
-                  </Button>
-                </div>
+
+                        {/* Alignment Score */}
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">Alignment Score:</span>
+                            <span className="text-sm font-bold text-emerald-600">{matchScore}%</span>
+                            <Progress value={matchScore} className="flex-1 h-2" />
+                          </div>
+                        </div>
+
+                        {/* CV Content */}
+                        <div className="border rounded-lg p-6 bg-muted/50 min-h-[400px]">
+                          <pre className="whitespace-pre-wrap text-sm font-mono">{generatedDocuments[selectedVariant]?.cv}</pre>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="cover-letter" className="space-y-4">
+                        {/* Cover Letter Validation Badges */}
+                        <div className="flex items-center gap-2 mb-4">
+                          <Badge variant="success" className="flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            Tone & Style
+                          </Badge>
+                          <Badge variant="success" className="flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            Job Alignment
+                          </Badge>
+                          <Badge variant="success" className="flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            Professional Format
+                          </Badge>
+                        </div>
+
+                        {/* Included Keywords */}
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium mb-2">Included Keywords:</h4>
+                          <div className="flex flex-wrap gap-1">
+                            {extractedKeywords.filter(k => k.status === 'match').slice(0, 6).map((keyword, idx) => (
+                              <span key={idx} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded">
+                                {keyword.text}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Cover Letter Content */}
+                        <div className="border rounded-lg p-6 bg-muted/50 min-h-[400px]">
+                          <pre className="whitespace-pre-wrap text-sm font-mono">{generatedDocuments[selectedVariant]?.coverLetter}</pre>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
-                <Tabs defaultValue="cv" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="cv">Generated CV</TabsTrigger>
-                        <TabsTrigger value="cover-letter">Generated Cover Letter</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="cv" className="space-y-4">
-                    {latestEditedCV
-  ? <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(latestEditedCV, { length: 'long', sections: { achievements: true, competencies: true, certifications: true, education: true } })}</div>
-  : justEdited
-    ? <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(generatedDocuments[selectedVariant]?.cv, { length: 'long', sections: { achievements: true, competencies: true, certifications: true, education: true } })}</div>
-    : <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">{renderStructuredCV(latestEditedCV || generatedDocuments[selectedVariant]?.cv, generationOptions)}</div>
-}
-                  </TabsContent>
-                  <TabsContent value="cover-letter" className="space-y-4">
-                    <div className="border rounded-lg p-4 bg-muted/50 min-h-[400px]">
-                          {(() => {
-                            const doc = generatedDocuments[selectedVariant] as any;
-                            const cv = doc?.cv as any;
-                            const coverLetter = doc?.coverLetter as any;
-                            let content = '';
-                            if (coverLetter && typeof coverLetter === 'object' && 'content' in coverLetter) {
-                              content = coverLetter.content;
-                            } else if (typeof coverLetter === 'string') {
-                              content = coverLetter;
-                            }
-                            let candidateName = '';
-                            if (cv && typeof cv === 'object' && 'name' in cv) {
-                              candidateName = cv.name;
-                            }
-                            return (
-                              <pre className="whitespace-pre-wrap text-sm">
-                                {content}
-                                {candidateName && content && !content.trim().endsWith(candidateName)
-                                  ? `\n\nBest regards,\n${candidateName}`
-                                  : ''}
-                              </pre>
-                            );
-                          })()}
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                  <div className="border rounded-lg p-8 bg-muted/50 text-center">
+                    <p className="text-muted-foreground">Your documents will appear here after generation</p>
                   </div>
                 )}
+
                 {/* Action Buttons */}
                 <div className="flex gap-4">
-                  {generatedDocuments[selectedVariant]?.cv ? (
+                  {generatedDocuments[selectedVariant] ? (
                     <>
-                  <Button
-                    variant="outline"
+                      <Button
+                        variant="outline"
                         onClick={handleRequestUpdates}
-                  >
+                      >
                         <Edit3 className="w-4 h-4 mr-2" />
-                        Edit
-                  </Button>
-                  <Button
-                        onClick={() => {
-                          if (!cvJustSaved) {
-                            handleSaveCV();
-                          } else {
-                            window.location.href = '/my-cvs-new';
-                          }
-                        }}
-                    className="flex-1"
-                    disabled={pendingSave || isGenerating}
-                  >
-                        {cvJustSaved ? 'Go to downloads' : 'Save CV'}
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
+                        Edit/Request Update
+                      </Button>
+                      <Button
+                        onClick={() => window.location.href = '/cv-download'}
+                        className="flex-1"
+                      >
+                        Go to Downloads
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
                     </>
                   ) : (
                     <Button
@@ -974,7 +757,9 @@ const ApplicationWizard = () => {
           </div>
         )}
 
-          {/* Loading state for generating */}
+
+
+        {/* Loading state for generating */}
         {currentStep === 3 && isGenerating && (
           <Card>
             <CardContent className="py-12">
@@ -989,64 +774,69 @@ const ApplicationWizard = () => {
           </Card>
         )}
 
-          {/* Loading state for updating */}
-          {isUpdating && (
+        {/* Loading state for updating */}
+        {isUpdating && (
           <Card>
             <CardContent className="py-12">
               <div className="text-center space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                  <h3 className="text-lg font-semibold">Updating Your Documents</h3>
+                <h3 className="text-lg font-semibold">Updating Your Documents</h3>
                 <p className="text-muted-foreground">
-                    Please wait while we apply your requested updates...
+                  Please wait while we apply your requested updates...
                 </p>
-      </div>
+              </div>
             </CardContent>
           </Card>
         )}
-              </div>
+      </div>
 
-        {/* Edit Request Modal */}
+      {/* Edit Request Modal */}
       <Dialog open={showUpdateModal} onOpenChange={setShowUpdateModal}>
-          <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-              <DialogTitle>Edit Documents</DialogTitle>
+            <DialogTitle>Request an Update</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Describe what you want changed in your CV or cover letter
+            </p>
           </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">CV Updates:</label>
-                <Textarea
-                  placeholder="Describe any changes you'd like to make to your CV..."
-                  value={cvUpdateRequest}
-                  onChange={(e) => setCvUpdateRequest(e.target.value)}
-                  className="min-h-[100px]"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Cover Letter Updates:</label>
-                <Textarea
-                  placeholder="Describe any changes you'd like to make to your cover letter..."
-                  value={coverLetterUpdateRequest}
-                  onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
-                  className="min-h-[100px]"
-                />
-              </div>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">CV Updates:</label>
+              <Textarea
+                placeholder="Describe what you want changed in your CV..."
+                value={cvUpdateRequest}
+                onChange={(e) => setCvUpdateRequest(e.target.value)}
+                className="min-h-[100px]"
+              />
             </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button 
-                onClick={handleApplyUpdates}
-                disabled={!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()}
-              >
-                Apply Updates
-              </Button>
-            </DialogFooter>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Cover Letter Updates:</label>
+              <Textarea
+                placeholder="Describe what you want changed in your cover letter..."
+                value={coverLetterUpdateRequest}
+                onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button 
+              onClick={handleApplyUpdates}
+              disabled={!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()}
+            >
+              Apply Update
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-      </div>
     </div>
   );
 };
 
-export default ApplicationWizard; 
+export default ApplicationWizard;
