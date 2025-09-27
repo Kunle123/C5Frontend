@@ -368,10 +368,7 @@ const Application: React.FC = () => {
       };
       let result = await generateApplicationMaterials(
         profile,
-        jobDesc,
-        keywords,
-        threadId || undefined,
-        { numPages, language }
+        jobDesc
       );
       if (result.error) throw new Error(result.error);
       setOptimizedCV(result.cv || '');
