@@ -14,6 +14,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { useToast } from '../hooks/use-toast';
 import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
+import { jwtDecode } from 'jwt-decode';
 
 interface Keyword {
   text: string;
@@ -35,6 +36,18 @@ interface GeneratedDocuments {
     cv: string;
     coverLetter: string;
   };
+}
+
+const BASE_URL = 'https://api-gw-production.up.railway.app';
+
+// Helper to extract user_id from JWT
+function getUserIdFromToken(token: string): string | null {
+  try {
+    const decoded: any = jwtDecode(token);
+    return decoded.id || null;
+  } catch {
+    return null;
+  }
 }
 
 const ApplicationWizard = () => {
@@ -71,8 +84,9 @@ const ApplicationWizard = () => {
     if (!profile) {
       const fetchProfile = async () => {
         const token = localStorage.getItem('token') || '';
-        const userId = /* extract from token or context */ '';
-        const res = await fetch(`/api/career-ark/profiles/${userId}/all_sections`, {
+        const userId = getUserIdFromToken(token);
+        if (!userId) return;
+        const res = await fetch(`${BASE_URL}/api/career-ark/profiles/${userId}/all_sections`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -94,7 +108,7 @@ const ApplicationWizard = () => {
     setIsAnalyzing(true);
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch('/api/career-ark/cv/preview', {
+      const res = await fetch(`${BASE_URL}/api/career-ark/cv/preview`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +150,7 @@ const ApplicationWizard = () => {
     setCurrentStep(3);
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch('/api/career-ark/cv/generate', {
+      const res = await fetch(`${BASE_URL}/api/career-ark/cv/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -178,7 +192,7 @@ const ApplicationWizard = () => {
     setShowUpdateModal(false);
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch('/api/career-ark/cv/update', {
+      const res = await fetch(`${BASE_URL}/api/career-ark/cv/update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
