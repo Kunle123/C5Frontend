@@ -73,18 +73,12 @@ export async function getArcData() {
 // }
 
 // 6. Generate Application Materials
-export async function generateApplicationMaterials(profile: any, job_description: string, keywords?: string[], thread_id?: string, options?: { numPages?: number, language?: string }) {
-  // Always include all required context fields, even if thread_id is provided
+export async function generateApplicationMaterials(profile: any, job_description: string) {
   const payload: any = {
-    action: 'generate_cv',
-    ...(thread_id ? { thread_id } : {}),
     profile,
     job_description,
-    keywords: keywords || [],
   };
-  if (options?.numPages) payload.numPages = options.numPages;
-  if (options?.language) payload.language = options.language;
-  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/generate-assistant`, {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/generate-assistant-adaptive`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),

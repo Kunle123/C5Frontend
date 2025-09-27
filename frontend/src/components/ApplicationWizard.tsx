@@ -234,16 +234,11 @@ const ApplicationWizard = () => {
       // Only send arcData (no PII) to the AI service
       const profileToSend = { ...arcData };
       const payload: any = {
-          action: 'generate_cv',
         profile: profileToSend,
         job_description: jobDescription,
-        numPages: generationOptions.length === 'short' ? 1 : generationOptions.length === 'medium' ? 2 : 3,
-        includeKeywords: true,
-        includeRelevantExperience: true,
-        thread_id: threadId,
       };
       console.log('Generating CV with payload:', payload); // Debug log
-      const res = await fetch('/api/career-ark/generate-assistant', {
+      const res = await fetch('/api/career-ark/generate-assistant-adaptive', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -272,7 +267,7 @@ const ApplicationWizard = () => {
       setGeneratedDocuments({
         [variantKey]: {
           cv: cvWithPII,
-          coverLetter: result.cover_letter || result.coverLetter || '',
+          coverLetter: result.cover_letter?.content || result.coverLetter?.content || '',
         },
       });
       setSelectedVariant(variantKey);
