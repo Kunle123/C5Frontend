@@ -123,7 +123,10 @@ const ApplicationWizard = () => {
         ...(data.keyword_analysis.red_keywords || []).map((k: any) => ({ text: k.keyword, status: 'missing' })),
       ]);
       console.log('Extracted keywords from API:', data.keyword_analysis, extractedKeywords);
-      setMatchScore(data.keyword_analysis.alignment_score || 0);
+      setMatchScore(
+        data.match_score ??
+        (data.keyword_analysis?.keyword_coverage?.coverage_percentage ?? 0)
+      );
       setJobTitle(data.job_analysis.job_title || '');
       setCompanyName(data.job_analysis.company || '');
       setPreviewData(data);
