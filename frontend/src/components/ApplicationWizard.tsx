@@ -458,10 +458,10 @@ const ApplicationWizard = () => {
               </Card>
             </div>
 
-            {/* Customization Options */}
+            {/* Customisation Options */}
             <Card>
               <CardHeader>
-                <CardTitle>Customization Options</CardTitle>
+                <CardTitle>Customisation Options</CardTitle>
                 <p className="text-sm text-muted-foreground">
                   Adjust how we tailor your documents to this specific role
                 </p>
@@ -473,7 +473,7 @@ const ApplicationWizard = () => {
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
                         <input type="checkbox" id="technical" className="rounded" defaultChecked />
-                        <label htmlFor="technical" className="text-sm">Emphasize technical skills</label>
+                        <label htmlFor="technical" className="text-sm">Emphasise technical skills</label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <input type="checkbox" id="leadership" className="rounded" />
