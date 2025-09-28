@@ -133,6 +133,12 @@ const ApplicationWizard = () => {
   const [userPreferences, setUserPreferences] = useState<any>({});
   const [profile, setProfile] = useState<any>(null);
 
+  // Add useEffect to update selectedVariant when generationOptions change
+  useEffect(() => {
+    const newKey = generateVariantKey(generationOptions.length, generationOptions.sections);
+    setSelectedVariant(newKey);
+  }, [generationOptions]);
+
   // 2. Fetch profile (Career Arc) on mount if not loaded
   useEffect(() => {
     if (!profile) {
@@ -537,25 +543,59 @@ const ApplicationWizard = () => {
                     <label className="text-sm font-medium">Focus Areas</label>
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="technical" className="rounded" defaultChecked />
-                        <label htmlFor="technical" className="text-sm">Emphasise technical skills</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="leadership" className="rounded" />
-                        <label htmlFor="leadership" className="text-sm">Highlight leadership experience</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="achievements" className="rounded" defaultChecked />
+                        <Checkbox
+                          id="achievements"
+                          checked={generationOptions.sections.achievements}
+                          onCheckedChange={(checked) => setGenerationOptions((prev) => ({
+                            ...prev,
+                            sections: { ...prev.sections, achievements: !!checked },
+                          }))}
+                        />
                         <label htmlFor="achievements" className="text-sm">Focus on quantifiable achievements</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="competencies"
+                          checked={generationOptions.sections.competencies}
+                          onCheckedChange={(checked) => setGenerationOptions((prev) => ({
+                            ...prev,
+                            sections: { ...prev.sections, competencies: !!checked },
+                          }))}
+                        />
+                        <label htmlFor="competencies" className="text-sm">Emphasise technical skills</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="certifications"
+                          checked={generationOptions.sections.certifications}
+                          onCheckedChange={(checked) => setGenerationOptions((prev) => ({
+                            ...prev,
+                            sections: { ...prev.sections, certifications: !!checked },
+                          }))}
+                        />
+                        <label htmlFor="certifications" className="text-sm">Highlight certifications</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="education"
+                          checked={generationOptions.sections.education}
+                          onCheckedChange={(checked) => setGenerationOptions((prev) => ({
+                            ...prev,
+                            sections: { ...prev.sections, education: !!checked },
+                          }))}
+                        />
+                        <label htmlFor="education" className="text-sm">Include education</label>
                       </div>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <label htmlFor="custom-instructions" className="text-sm font-medium">Custom Instructions</label>
-                    <Textarea 
+                    <Textarea
                       id="custom-instructions"
                       placeholder="Any specific requirements or preferences for your application..."
                       className="min-h-[100px]"
+                      value={userPreferences.instructions || ''}
+                      onChange={(e) => setUserPreferences((prev: any) => ({ ...prev, instructions: e.target.value }))}
                     />
                   </div>
                 </div>
@@ -600,6 +640,18 @@ const ApplicationWizard = () => {
                   Please wait while we apply your requested updates...
                 </p>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* In the preview rendering (Step 3), only show the preview if generatedDocuments[selectedVariant] exists */}
+        {currentStep === 3 && !isGenerating && !isUpdating && generatedDocuments[selectedVariant] && (
+          <Card>
+            <CardHeader>
+              <CardTitle>CV Preview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {renderStructuredCV(generatedDocuments[selectedVariant].cv)}
             </CardContent>
           </Card>
         )}
