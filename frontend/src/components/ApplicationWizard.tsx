@@ -50,6 +50,55 @@ function getUserIdFromToken(token: string): string | null {
   }
 }
 
+function renderStructuredCV(cv: any) {
+  if (!cv) return <div>No CV data available.</div>;
+  return (
+    <div>
+      {cv.name && <h2>{cv.name}</h2>}
+      {cv.summary?.content && <p><strong>Summary:</strong> {cv.summary.content}</p>}
+      {Array.isArray(cv.relevant_achievements) && cv.relevant_achievements.length > 0 && (
+        <div>
+          <strong>Achievements:</strong>
+          <ul>
+            {cv.relevant_achievements.map((a: any, i: number) => <li key={i}>{a.content}</li>)}
+          </ul>
+        </div>
+      )}
+      {Array.isArray(cv.experience) && cv.experience.length > 0 && (
+        <div>
+          <strong>Experience:</strong>
+          {cv.experience.map((exp: any, i: number) => (
+            <div key={i} style={{ marginBottom: '1em' }}>
+              <div><strong>{exp.job_title}</strong> at {exp.company_name} {exp.dates && <span>({exp.dates})</span>}</div>
+              {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
+                <ul>
+                  {exp.responsibilities.map((r: any, j: number) => <li key={j}>{r.content}</li>)}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {Array.isArray(cv.education) && cv.education.length > 0 && (
+        <div>
+          <strong>Education:</strong>
+          <ul>
+            {cv.education.map((e: any, i: number) => <li key={i}>{e.degree} - {e.institution} {e.year && `(${e.year})`}</li>)}
+          </ul>
+        </div>
+      )}
+      {Array.isArray(cv.core_competencies) && cv.core_competencies.length > 0 && (
+        <div>
+          <strong>Core Competencies:</strong>
+          <ul>
+            {cv.core_competencies.map((c: any, i: number) => <li key={i}>{c.content}</li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const ApplicationWizard = () => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
@@ -670,7 +719,7 @@ const ApplicationWizard = () => {
 
                         {/* CV Content */}
                         <div className="border rounded-lg p-6 bg-muted/50 min-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm font-mono">{generatedDocuments[selectedVariant]?.cv}</pre>
+                          {renderStructuredCV(generatedDocuments[selectedVariant]?.cv)}
                         </div>
                       </TabsContent>
                       
