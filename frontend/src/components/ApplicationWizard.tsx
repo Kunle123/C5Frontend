@@ -69,10 +69,15 @@ function renderStructuredCV(cv: any) {
           <strong>Experience:</strong>
           {cv.experience.map((exp: any, i: number) => (
             <div key={i} style={{ marginBottom: '1em' }}>
-              <div><strong>{exp.job_title}</strong> at {exp.company_name} {exp.dates && <span>({exp.dates})</span>}</div>
+              <div><strong>{exp.title || exp.job_title}</strong> at {exp.company || exp.company_name} {(exp.start_date || exp.dates) && (exp.end_date || exp.dates) && <span>({exp.start_date || ''}{exp.start_date && exp.end_date ? ' - ' : ''}{exp.end_date || exp.dates})</span>}</div>
+              {Array.isArray(exp.description) && exp.description.length > 0 && (
+                <ul>
+                  {exp.description.map((desc: any, j: number) => <li key={j}>{typeof desc === 'string' ? desc : desc.content}</li>)}
+                </ul>
+              )}
               {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
                 <ul>
-                  {exp.responsibilities.map((r: any, j: number) => <li key={j}>{r.content}</li>)}
+                  {exp.responsibilities.map((r: any, j: number) => <li key={j}>{typeof r === 'string' ? r : r.content}</li>)}
                 </ul>
               )}
             </div>
@@ -91,7 +96,7 @@ function renderStructuredCV(cv: any) {
         <div>
           <strong>Core Competencies:</strong>
           <ul>
-            {cv.core_competencies.map((c: any, i: number) => <li key={i}>{c.content}</li>)}
+            {cv.core_competencies.map((c: any, i: number) => <li key={i}>{typeof c === 'string' ? c : c.content}</li>)}
           </ul>
         </div>
       )}
