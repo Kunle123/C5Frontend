@@ -375,24 +375,24 @@ const ApplicationWizard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Job Title</label>
-                    <p className="font-semibold">{jobTitle || 'Senior Software Engineer'}</p>
+                    <p className="font-semibold">{jobTitle}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Company</label>
-                    <p className="font-semibold">{companyName || 'Tech Solutions Inc.'}</p>
+                    <p className="font-semibold">{companyName}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Experience Level</label>
-                    <p className="font-semibold">Senior (5+ years)</p>
+                    <p className="font-semibold">{previewData?.job_analysis?.experience_level}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Industry</label>
-                    <p className="font-semibold">Technology</p>
+                    <p className="font-semibold">{previewData?.job_analysis?.industry}</p>
                   </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Key Requirements</label>
-                  <p className="text-sm">{(previewData?.job_analysis?.primary_keywords || []).join(', ')}</p>
+                  <p className="text-sm">{(previewData?.job_analysis?.primary_keywords ?? []).join(', ')}</p>
                 </div>
               </CardContent>
             </Card>
