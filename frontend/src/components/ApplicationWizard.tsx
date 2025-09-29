@@ -146,7 +146,7 @@ const ApplicationWizard = () => {
         const token = localStorage.getItem('token') || '';
         const userId = getUserIdFromToken(token);
         if (!userId) return;
-        const res = await fetch(`${BASE_URL}/api/career-ark/profiles/${userId}/all_sections`, {
+        const res = await fetch(`${BASE_URL}/api/v1/users/${userId}/all_sections`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

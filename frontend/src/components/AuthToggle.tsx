@@ -258,11 +258,3 @@ export function AuthToggle() {
                 provider="google"
                 onClick={handleGoogleAuth}
                 className="w-full"
-              />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
