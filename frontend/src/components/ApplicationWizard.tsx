@@ -214,6 +214,8 @@ const ApplicationWizard = () => {
     setCurrentStep(3);
     try {
       const token = localStorage.getItem('token') || '';
+      const userId = getUserIdFromToken(token);
+      if (!userId) throw new Error('User ID not found');
       const res = await fetch(`${BASE_URL}/api/v1/cv/generate`, {
         method: 'POST',
         headers: {
@@ -221,22 +223,18 @@ const ApplicationWizard = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          profile,
+          user_id: userId,
           jobDescription,
-          previewData,
-          userPreferences,
         }),
       });
       const data = await res.json();
-      // Assume data.cv and data.cover_letter
       const newDocuments: GeneratedDocuments = {
-        ['medium-all']: {
+        [selectedVariant]: {
           cv: data.cv,
           coverLetter: data.cover_letter?.content || data.cover_letter || '',
         },
       };
       setGeneratedDocuments(newDocuments);
-      setSelectedVariant('medium-all');
       toast({ title: 'Documents Generated', description: 'Your CV and cover letter have been generated!' });
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'CV generation failed', variant: 'destructive' });

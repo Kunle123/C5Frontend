@@ -96,21 +96,22 @@ const TestAppJourneys: React.FC = () => {
   const handleGenerate = async () => {
     setError(''); setGenResult(null);
     try {
-      const arc = arcData || await getArcData();
-      // Always construct the profile from arc
-      const profile = {
-        work_experience: arc.work_experience || [],
-        education: arc.education || [],
-        skills: arc.skills || [],
-        projects: arc.projects || [],
-        certifications: arc.certifications || [],
-      };
-      let result;
-      result = await generateApplicationMaterials(
-        profile,
-        jobAdvert
-      );
-      if (result.thread_id && !threadId) setThreadId(result.thread_id);
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No token');
+      const userId = JSON.parse(atob(token.split('.')[1])).id;
+      const res = await fetch('https://api-gw-production.up.railway.app/api/v1/cv/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          jobDescription: jobAdvert,
+        }),
+      });
+      if (!res.ok) throw await res.json();
+      const result = await res.json();
       setGenResult(result);
     } catch (err: any) {
       setError(err?.error || err?.message || 'Failed to generate application');
