@@ -339,7 +339,14 @@ const ApplicationWizard = () => {
         </div>
 
         {/* Step 1: Paste Job Description */}
-        {currentStep === 1 && (
+        {currentStep === 1 && isAnalyzing && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <h3 className="text-lg font-semibold">Analysing Job Description...</h3>
+            <p className="text-muted-foreground">Please wait while we process your job description...</p>
+          </div>
+        )}
+        {currentStep === 1 && !isAnalyzing && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
