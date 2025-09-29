@@ -381,9 +381,8 @@ const ApplicationWizard = () => {
   //       console.log('Fetched user profile:', userProfile);
   //       // 2. Get arc data
   //       console.log('Fetching arc data...');
-  //       const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfile.id}/all_sections`, {
+  //       const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/v1/users/${userProfile.id}/all_sections`, {
   //         headers: { 'Authorization': `Bearer ${token}` },
-  //         credentials: 'include',
   //       });
   //       if (!arcRes.ok) throw new Error('Failed to fetch arc data');
   //       const arc = await arcRes.json();
