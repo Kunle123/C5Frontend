@@ -102,7 +102,7 @@ export const Dashboard = () => {
         const userProfileData = await profileRes.json();
         setUserProfile(userProfileData); // <-- store userProfile
         // Fetch arc data
-        const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/career-ark/profiles/${userProfileData.id}/all_sections`, {
+        const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/v1/users/${userProfileData.id}/all_sections`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         if (!arcRes.ok) throw new Error('Failed to fetch arc data');

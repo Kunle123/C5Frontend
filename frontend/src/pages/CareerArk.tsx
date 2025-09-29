@@ -157,7 +157,7 @@ const CareerArk: React.FC = () => {
         setUser(profile); // Store the profile object
         setProfileId(profile.id);
         // Now fetch all sections using the profileId, always bypassing cache
-        return fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
+        return fetch(`${API_GATEWAY_BASE}/api/v1/users/${profile.id}/all_sections`, {
           headers: { Authorization: `Bearer ${token}`, 'Cache-Control': 'no-cache' },
         });
       })
@@ -423,7 +423,7 @@ const CareerArk: React.FC = () => {
       });
       if (!profileRes.ok) throw new Error('Failed to fetch profile');
       const profile = await profileRes.json();
-      const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
+      const res = await fetch(`${API_GATEWAY_BASE}/api/v1/users/${profile.id}/all_sections`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch Ark data');

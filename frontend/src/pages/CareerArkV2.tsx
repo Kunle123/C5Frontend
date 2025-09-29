@@ -294,7 +294,7 @@ const CareerArkV2: React.FC = () => {
       const user = await userRes.json();
       setProfile(user);
       // Fetch all sections using the userId
-      const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${user.id}/all_sections`, {
+      const res = await fetch(`${API_GATEWAY_BASE}/api/v1/users/${user.id}/all_sections`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch Ark data');

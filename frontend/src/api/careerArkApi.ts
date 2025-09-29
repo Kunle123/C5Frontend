@@ -49,7 +49,7 @@ export async function getArcData() {
   if (!profileRes.ok) throw new Error('Failed to fetch profile');
   const profile = await profileRes.json();
   // Fetch all sections using the profileId
-  const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profile.id}/all_sections`, {
+  const res = await fetch(`${API_GATEWAY_BASE}/api/v1/users/${profile.id}/all_sections`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error('Failed to fetch Ark data');
