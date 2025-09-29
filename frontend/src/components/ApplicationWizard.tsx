@@ -168,7 +168,7 @@ const ApplicationWizard = () => {
     setIsAnalyzing(true);
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch(`${BASE_URL}/api/career-ark/cv/preview`, {
+      const res = await fetch(`${BASE_URL}/api/v1/cv/preview`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ const ApplicationWizard = () => {
     setCurrentStep(3);
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch(`${BASE_URL}/api/career-ark/cv/generate`, {
+      const res = await fetch(`${BASE_URL}/api/v1/cv/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -256,7 +256,7 @@ const ApplicationWizard = () => {
     setShowUpdateModal(false);
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch(`${BASE_URL}/api/career-ark/cv/update`, {
+      const res = await fetch(`${BASE_URL}/api/v1/cv/update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
