@@ -152,6 +152,8 @@ const ApplicationWizard = () => {
   const [previewData, setPreviewData] = useState<any>(null);
   const [userPreferences, setUserPreferences] = useState<any>({});
   const [profile, setProfile] = useState<any>(null);
+  // Add state for preview tab
+  const [previewTab, setPreviewTab] = useState<'cv' | 'coverLetter'>('cv');
 
   // Add useEffect to update selectedVariant when generationOptions change
   useEffect(() => {
@@ -565,7 +567,20 @@ const ApplicationWizard = () => {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-3">
-                    <label className="text-sm font-medium">Focus Areas</label>
+                    <label className="text-sm font-medium">CV Length</label>
+                    <RadioGroup
+                      value={generationOptions.length}
+                      onValueChange={(val) => setGenerationOptions((prev) => ({ ...prev, length: val as 'short' | 'medium' | 'long' }))}
+                      className="flex flex-row gap-4"
+                    >
+                      <RadioGroupItem value="short" id="short" />
+                      <Label htmlFor="short">Short</Label>
+                      <RadioGroupItem value="medium" id="medium" />
+                      <Label htmlFor="medium">Medium</Label>
+                      <RadioGroupItem value="long" id="long" />
+                      <Label htmlFor="long">Long</Label>
+                    </RadioGroup>
+                    <label className="text-sm font-medium mt-4">Focus Areas</label>
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
                         <Checkbox
@@ -669,14 +684,25 @@ const ApplicationWizard = () => {
           </Card>
         )}
 
-        {/* In the preview rendering (Step 3), only show the preview if generatedDocuments[selectedVariant] exists */}
+        {/* In the preview rendering (Step 3), use Tabs to toggle between CV and Cover Letter */}
         {currentStep === 3 && !isGenerating && !isUpdating && generatedDocuments[selectedVariant] && (
           <Card>
             <CardHeader>
-              <CardTitle>CV Preview</CardTitle>
+              <CardTitle>Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              {renderStructuredCV(generatedDocuments[selectedVariant].cv, generatedDocuments[selectedVariant].coverLetter ? { content: generatedDocuments[selectedVariant].coverLetter } : undefined)}
+              <Tabs value={previewTab} onValueChange={(val) => setPreviewTab(val as 'cv' | 'coverLetter')} className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="cv">CV</TabsTrigger>
+                  <TabsTrigger value="coverLetter">Cover Letter</TabsTrigger>
+                </TabsList>
+                <TabsContent value="cv">
+                  {renderStructuredCV(generatedDocuments[selectedVariant].cv)}
+                </TabsContent>
+                <TabsContent value="coverLetter">
+                  <div style={{ whiteSpace: 'pre-line' }}>{generatedDocuments[selectedVariant].coverLetter}</div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         )}
