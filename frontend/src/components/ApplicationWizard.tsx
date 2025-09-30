@@ -152,6 +152,7 @@ const ApplicationWizard = () => {
   const [previewData, setPreviewData] = useState<any>(null);
   const [userPreferences, setUserPreferences] = useState<any>({});
   const [profile, setProfile] = useState<any>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   // Add state for preview tab
   const [previewTab, setPreviewTab] = useState<'cv' | 'coverLetter'>('cv');
 
@@ -161,22 +162,44 @@ const ApplicationWizard = () => {
     setSelectedVariant(newKey);
   }, [generationOptions]);
 
-  // 2. Fetch profile (Career Arc) on mount if not loaded
+  // On mount, fetch profile and start session
   useEffect(() => {
     if (!profile) {
-      const fetchProfile = async () => {
+      const fetchProfileAndStartSession = async () => {
         const token = localStorage.getItem('token') || '';
         const userId = getUserIdFromToken(token);
         if (!userId) return;
+        // Fetch full profile
         const res = await fetch(`${BASE_URL}/api/v1/users/${userId}/all_sections`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
         setProfile(data);
+        // Start session
+        const sessionRes = await fetch(`${BASE_URL}/api/v1/cv/session/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ profile: data }),
+        });
+        const sessionData = await sessionRes.json();
+        setSessionId(sessionData.session_id);
       };
-      fetchProfile();
+      fetchProfileAndStartSession();
     }
   }, [profile]);
+
+  // End session on unmount
+  useEffect(() => {
+    return () => {
+      if (sessionId) {
+        fetch(`${BASE_URL}/api/v1/cv/session/end`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId }),
+        });
+      }
+    };
+  }, [sessionId]);
 
   const steps = [
     { number: 1, title: 'Paste Job Description' },
@@ -184,9 +207,9 @@ const ApplicationWizard = () => {
     { number: 3, title: 'Preview' },
   ];
 
-  // 3. Step 1: On Next, call /cv/preview
+  // Step 1: On Next, call /cv/preview with session_id
   const handleJobDescriptionNext = async () => {
-    if (!jobDescription.trim() || !profile) return;
+    if (!jobDescription.trim() || !sessionId) return;
     setIsAnalyzing(true);
     try {
       const token = localStorage.getItem('token') || '';
@@ -196,7 +219,7 @@ const ApplicationWizard = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ profile, jobDescription }),
+        body: JSON.stringify({ session_id: sessionId, job_description: jobDescription }),
       });
       const data = await res.json();
       setExtractedKeywords([
@@ -229,25 +252,20 @@ const ApplicationWizard = () => {
     return `${length}-${sectionKeys}`;
   };
 
-  // 4. Step 2: On Generate, call /cv/generate
+  // Step 2: On Generate, call /cv/generate with session_id
   const handleGenerate = async () => {
-    if (!profile || !previewData) return;
+    if (!sessionId || !previewData) return;
     setIsGenerating(true);
     setCurrentStep(3);
     try {
       const token = localStorage.getItem('token') || '';
-      const userId = getUserIdFromToken(token);
-      if (!userId) throw new Error('User ID not found');
       const res = await fetch(`${BASE_URL}/api/v1/cv/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          user_id: userId,
-          jobDescription,
-        }),
+        body: JSON.stringify({ session_id: sessionId, job_description: jobDescription }),
       });
       const data = await res.json();
       const newDocuments: GeneratedDocuments = {
@@ -269,9 +287,9 @@ const ApplicationWizard = () => {
     setShowUpdateModal(true);
   };
 
-  // 5. Step 3: On Apply Update, call /cv/update
+  // Step 3: On Apply Update, call /cv/update with session_id
   const handleApplyUpdates = async () => {
-    if (!profile || !generatedDocuments[selectedVariant]) return;
+    if (!sessionId || !generatedDocuments[selectedVariant]) return;
     setIsUpdating(true);
     setShowUpdateModal(false);
     try {
@@ -283,10 +301,10 @@ const ApplicationWizard = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
+          session_id: sessionId,
           currentCV: generatedDocuments[selectedVariant].cv,
           updateRequest: cvUpdateRequest,
-          originalProfile: profile,
-          jobDescription,
+          job_description: jobDescription,
         }),
       });
       const data = await res.json();
