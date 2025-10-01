@@ -386,7 +386,7 @@ const ApplicationWizard = () => {
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Progress Indicator */}
-        <div className="mb-8">
+        <div className="mb-8 sticky top-0 z-20 bg-background pt-4 pb-2">
           <div className="flex items-center justify-between mb-4">
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
@@ -746,7 +746,7 @@ const ApplicationWizard = () => {
               <CardTitle>Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs value={previewTab} onValueChange={(val) => setPreviewTab(val as 'cv' | 'coverLetter')} className="w-full">
+              <Tabs value={previewTab} onValueChange={(val) => setPreviewTab(val as 'cv' | 'coverLetter')} className="w-full mt-8">
                 <TabsList className="mb-4">
                   <TabsTrigger value="cv">CV</TabsTrigger>
                   <TabsTrigger value="coverLetter">Cover Letter</TabsTrigger>
