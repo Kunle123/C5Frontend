@@ -54,33 +54,46 @@ function getUserIdFromToken(token: string): string | null {
 
 function renderStructuredCV(cv: any, coverLetter?: any) {
   if (!cv) return <div>No CV data available.</div>;
+  // If cv is a stringified JSON, parse it
+  let parsedCV = cv;
+  if (typeof cv === 'string') {
+    try {
+      parsedCV = JSON.parse(cv);
+    } catch {
+      // fallback to raw string
+      return <div style={{ whiteSpace: 'pre-line' }}>{cv}</div>;
+    }
+  }
   return (
     <div>
-      {cv.name && <h2>{cv.name}</h2>}
-      {cv.contact && (
+      {parsedCV.name && <h2>{parsedCV.name}</h2>}
+      {parsedCV.contact && (
         <div style={{ marginBottom: '1em' }}>
-          {cv.contact.email && <div><strong>Email:</strong> {cv.contact.email}</div>}
-          {cv.contact.phone && <div><strong>Phone:</strong> {cv.contact.phone}</div>}
-          {cv.contact.location && <div><strong>Location:</strong> {cv.contact.location}</div>}
-          {cv.contact.linkedin && <div><strong>LinkedIn:</strong> {cv.contact.linkedin}</div>}
+          {parsedCV.contact.email && <div><strong>Email:</strong> {parsedCV.contact.email}</div>}
+          {parsedCV.contact.phone && <div><strong>Phone:</strong> {parsedCV.contact.phone}</div>}
+          {parsedCV.contact.location && <div><strong>Location:</strong> {parsedCV.contact.location}</div>}
+          {parsedCV.contact.linkedin && <div><strong>LinkedIn:</strong> {parsedCV.contact.linkedin}</div>}
         </div>
       )}
-      {cv.professional_summary?.content && <p><strong>Summary:</strong> {cv.professional_summary.content}</p>}
-      {Array.isArray(cv.key_achievements) && cv.key_achievements.length > 0 && (
+      {/* Professional Summary */}
+      {parsedCV.professional_summary?.content && <p><strong>Summary:</strong> {parsedCV.professional_summary.content}</p>}
+      {/* Key Achievements */}
+      {Array.isArray(parsedCV.key_achievements) && parsedCV.key_achievements.length > 0 && (
         <div>
           <strong>Key Achievements:</strong>
           <ul>
-            {cv.key_achievements
+            {parsedCV.key_achievements
               .slice()
               .sort((a: any, b: any) => (a.priority ?? 99) - (b.priority ?? 99))
               .map((a: any, i: number) => <li key={i}>{a.content}</li>)}
           </ul>
         </div>
       )}
-      {Array.isArray(cv.professional_experience) && cv.professional_experience.length > 0 && (
+      {/* Professional Experience */}
+      {Array.isArray(parsedCV.professional_experience) && parsedCV.professional_experience.length > 0 ? (
         <div>
           <strong>Professional Experience:</strong>
-          {cv.professional_experience.map((exp: any, i: number) => (
+          {parsedCV.professional_experience.map((exp: any, i: number) => (
             <div key={i} style={{ marginBottom: '1em' }}>
               <div><strong>{exp.title}</strong> at {exp.company} {exp.dates && <span>({exp.dates})</span>}</div>
               {Array.isArray(exp.bullets) && exp.bullets.length > 0 && (
@@ -94,32 +107,39 @@ function renderStructuredCV(cv: any, coverLetter?: any) {
             </div>
           ))}
         </div>
+      ) : (
+        <div className="text-muted-foreground">No work experience found. Please update your profile to add experience.</div>
       )}
-      {cv.core_competencies && (
+      {/* Core Competencies/Skills */}
+      {parsedCV.core_competencies && (
         <div>
           <strong>Core Competencies:</strong>
           <ul>
-            {cv.core_competencies.technical_skills && cv.core_competencies.technical_skills.map((c: any, i: number) => (
-              <li key={i}>{c.skill} ({c.proficiency})</li>
+            {parsedCV.core_competencies.technical_skills && parsedCV.core_competencies.technical_skills.map((c: any, i: number) => (
+              <li key={i}>{c.skill || c.job_aligned_skill} ({c.proficiency})</li>
             ))}
-            {cv.core_competencies.functional_skills && cv.core_competencies.functional_skills.map((c: any, i: number) => (
-              <li key={i + (cv.core_competencies.technical_skills?.length || 0)}>{c.skill} ({c.proficiency})</li>
+            {parsedCV.core_competencies.functional_skills && parsedCV.core_competencies.functional_skills.map((c: any, i: number) => (
+              <li key={i + (parsedCV.core_competencies.technical_skills?.length || 0)}>{c.skill || c.job_aligned_skill} ({c.proficiency})</li>
             ))}
           </ul>
         </div>
       )}
-      {Array.isArray(cv.education) && cv.education.length > 0 && (
+      {/* Education */}
+      {Array.isArray(parsedCV.education) && parsedCV.education.length > 0 ? (
         <div>
           <strong>Education:</strong>
           <ul>
-            {cv.education.map((e: any, i: number) => <li key={i}>{e.degree} - {e.institution} {e.year && `(${e.year})`}</li>)}
+            {parsedCV.education.map((e: any, i: number) => <li key={i}>{e.degree} - {e.institution} {e.year && `(${e.year})`}</li>)}
           </ul>
         </div>
+      ) : (
+        <div className="text-muted-foreground">No education history found. Please update your profile to add education.</div>
       )}
-      {coverLetter?.content && (
+      {/* Cover Letter */}
+      {coverLetter && (
         <div style={{ marginTop: '2em' }}>
           <strong>Cover Letter:</strong>
-          <div style={{ whiteSpace: 'pre-line', marginTop: '0.5em' }}>{coverLetter.content}</div>
+          <div style={{ whiteSpace: 'pre-line', marginTop: '0.5em' }}>{coverLetter.full_content || coverLetter.content || coverLetter}</div>
         </div>
       )}
     </div>
@@ -276,10 +296,19 @@ const ApplicationWizard = () => {
         body: JSON.stringify({ session_id: sessionId, job_description: jobDescription }),
       });
       const data = await res.json();
+      // Parse cv and cover letter if they are stringified JSON
+      let parsedCV = data.cv;
+      if (typeof parsedCV === 'string') {
+        try { parsedCV = JSON.parse(parsedCV); } catch {}
+      }
+      let parsedCoverLetter = data.cover_letter;
+      if (typeof parsedCoverLetter === 'string') {
+        try { parsedCoverLetter = JSON.parse(parsedCoverLetter); } catch {}
+      }
       const newDocuments: GeneratedDocuments = {
         [selectedVariant]: {
-          cv: data.cv,
-          coverLetter: data.cover_letter?.content || data.cover_letter || '',
+          cv: parsedCV,
+          coverLetter: parsedCoverLetter,
         },
       };
       setGeneratedDocuments(newDocuments);
@@ -726,7 +755,7 @@ const ApplicationWizard = () => {
                   {renderStructuredCV(generatedDocuments[selectedVariant].cv)}
                 </TabsContent>
                 <TabsContent value="coverLetter">
-                  <div style={{ whiteSpace: 'pre-line' }}>{generatedDocuments[selectedVariant].coverLetter}</div>
+                  {renderStructuredCV(undefined, generatedDocuments[selectedVariant].coverLetter)}
                 </TabsContent>
               </Tabs>
             </CardContent>
