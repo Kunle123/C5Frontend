@@ -98,6 +98,95 @@ const ApplicationWizard = () => {
     : [];
   const matchScore = preview?.profile_match?.match_score || 0;
 
+  function renderCV(cv: any) {
+    if (!cv) return <div>No CV data available.</div>;
+    return (
+      <div className="space-y-6">
+        {/* Personal Information */}
+        {cv.personal_information && (
+          <div>
+            <h3 className="font-semibold text-lg mb-1">Personal Information</h3>
+            <ul className="text-sm">
+              {Object.entries(cv.personal_information).map(([key, value]) => (
+                <li key={key}><strong>{key.replace(/_/g, ' ')}:</strong> {value}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {/* Professional Summary */}
+        {cv.professional_summary && (
+          <div>
+            <h3 className="font-semibold text-lg mb-1">Professional Summary</h3>
+            <p className="text-sm">{cv.professional_summary.content}</p>
+          </div>
+        )}
+        {/* Work Experience */}
+        {Array.isArray(cv.work_experience) && cv.work_experience.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-lg mb-1">Work Experience</h3>
+            {cv.work_experience.map((exp: any, i: number) => (
+              <div key={i} className="mb-3">
+                <div className="font-medium">{exp.title} at {exp.company} <span className="text-xs text-muted-foreground">({exp.start_date} - {exp.end_date})</span></div>
+                {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
+                  <ul className="list-disc ml-6 text-sm">
+                    {exp.responsibilities.map((r: string, j: number) => <li key={j}>{r}</li>)}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {/* Skills */}
+        {cv.skills && (
+          <div>
+            <h3 className="font-semibold text-lg mb-1">Skills</h3>
+            <ul className="flex flex-wrap gap-2 text-xs">
+              {Object.entries(cv.skills).map(([category, skills]: [string, any]) =>
+                Array.isArray(skills)
+                  ? skills.map((s: string, i: number) => <li key={category + i} className="px-2 py-1 bg-primary/10 text-primary rounded">{s}</li>)
+                  : null
+              )}
+            </ul>
+          </div>
+        )}
+        {/* Education */}
+        {Array.isArray(cv.education) && cv.education.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-lg mb-1">Education</h3>
+            <ul className="text-sm">
+              {cv.education.map((e: any, i: number) => (
+                <li key={i}><strong>{e.degree}</strong> - {e.institution} {e.year && `(${e.year})`}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {/* Additional Sections */}
+        {cv.additional_sections && Object.keys(cv.additional_sections).length > 0 && (
+          <div>
+            <h3 className="font-semibold text-lg mb-1">Additional Sections</h3>
+            <ul className="text-sm">
+              {Object.entries(cv.additional_sections).map(([key, value]) => (
+                <li key={key}><strong>{key.replace(/_/g, ' ')}:</strong> {JSON.stringify(value)}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  function renderCoverLetter(coverLetter: any) {
+    if (!coverLetter) return <div>No cover letter data available.</div>;
+    return (
+      <div className="space-y-4">
+        <h3 className="font-semibold text-lg mb-1">Cover Letter</h3>
+        <div className="whitespace-pre-line text-sm">{coverLetter.content}</div>
+        <div className="text-xs text-muted-foreground">Word count: {coverLetter.word_count}</div>
+        {coverLetter.evidence_source && <div className="text-xs text-muted-foreground">Evidence: {coverLetter.evidence_source}</div>}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -299,12 +388,10 @@ const ApplicationWizard = () => {
                   <TabsTrigger value="coverLetter">Cover Letter</TabsTrigger>
                 </TabsList>
                 <TabsContent value="cv" className="mt-4">
-                  {/* Render CV sections here */}
-                  <pre className="whitespace-pre-wrap text-sm font-mono">{JSON.stringify(cv, null, 2)}</pre>
+                  {renderCV(cv)}
                 </TabsContent>
                 <TabsContent value="coverLetter" className="mt-4">
-                  {/* Render Cover Letter here */}
-                  <pre className="whitespace-pre-wrap text-sm font-mono">{JSON.stringify(coverLetter, null, 2)}</pre>
+                  {renderCoverLetter(coverLetter)}
                 </TabsContent>
               </Tabs>
               <div className="flex gap-4 mt-6">
