@@ -15,6 +15,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 import { useToast } from '../hooks/use-toast';
 import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
+import { startSession } from '../api/cvWorkflowApi';
+import { UserProfile } from '../api/cvWorkflowTypes';
 
 interface Keyword {
   text: string;
@@ -175,14 +177,20 @@ const ApplicationWizard = () => {
         });
         const data = await res.json();
         setProfile(data);
-        // Start session
-        const sessionRes = await fetch(`${BASE_URL}/api/v1/cv/session/start`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ profile: data }),
-        });
-        const sessionData = await sessionRes.json();
-        setSessionId(sessionData.session_id);
+        // Ensure name and email are present (use placeholders if missing)
+        const safeProfile: UserProfile = {
+          ...data,
+          name: data.name || 'Candidate Name',
+          email: data.email || 'candidate@email.com',
+        };
+        // Start session using API client
+        try {
+          const sessionData = await startSession({ profile: safeProfile, user_id: userId });
+          setSessionId(sessionData.session_id);
+        } catch (err: any) {
+          // Optionally show error toast
+          toast({ title: 'Session Error', description: err.detail || err.message || 'Could not start session', variant: 'destructive' });
+        }
       };
       fetchProfileAndStartSession();
     }
