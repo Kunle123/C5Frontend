@@ -250,18 +250,23 @@ const ApplicationWizard = () => {
         body: JSON.stringify({ session_id: sessionId, job_description: jobDescription }),
       });
       const data = await res.json();
-      setExtractedKeywords([
-        ...(data.keyword_analysis.green_keywords || []).map((k: any) => ({ text: k.keyword, status: 'match' })),
-        ...(data.keyword_analysis.amber_keywords || []).map((k: any) => ({ text: k.keyword, status: 'partial' })),
-        ...(data.keyword_analysis.red_keywords || []).map((k: any) => ({ text: k.keyword, status: 'missing' })),
-      ]);
-      console.log('Extracted keywords from API:', data.keyword_analysis, extractedKeywords);
+      // Use new flat structure
+      setJobTitle(data.job_title || '');
+      setCompanyName(data.company || '');
+      // Keyword extraction: use keyword_priority (high/medium/low)
+      const extracted: Keyword[] = [];
+      if (data.keyword_priority) {
+        (data.keyword_priority.high || []).forEach((k: string) => extracted.push({ text: k, status: 'match' }));
+        (data.keyword_priority.medium || []).forEach((k: string) => extracted.push({ text: k, status: 'partial' }));
+        (data.keyword_priority.low || []).forEach((k: string) => extracted.push({ text: k, status: 'missing' }));
+      }
+      setExtractedKeywords(extracted);
+      // Match score: use profile_analysis.overall_match_score or keyword_match_analysis.keyword_coverage_percentage
       setMatchScore(
-        data.match_score ??
-        (data.keyword_analysis?.keyword_coverage?.coverage_percentage ?? 0)
+        Number(data.profile_analysis?.overall_match_score) ||
+        Number(data.keyword_match_analysis?.keyword_coverage_percentage) ||
+        0
       );
-      setJobTitle(data.job_analysis.job_title || '');
-      setCompanyName(data.job_analysis.company || '');
       setPreviewData(data);
       setCurrentStep(2);
     } catch (err: any) {
@@ -386,7 +391,8 @@ const ApplicationWizard = () => {
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Progress Indicator */}
-        <div className="mb-8 sticky top-0 z-20 bg-background pt-4 pb-2">
+        <div className="mb-8 sticky top-16 z-20 bg-background pt-4 pb-2">
+          {/* If your header height changes, adjust 'top-16' (64px) accordingly */}
           <div className="flex items-center justify-between mb-4">
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
@@ -459,7 +465,7 @@ const ApplicationWizard = () => {
             <p className="text-muted-foreground">Please wait while we extract keywords and analyse the requirements...</p>
           </div>
         )}
-        {currentStep === 2 && !isAnalyzing && (
+        {currentStep === 2 && !isAnalyzing && previewData && (
           <div className="space-y-6">
             {/* Job Analysis Panel */}
             <Card>
@@ -470,29 +476,37 @@ const ApplicationWizard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Job Title</label>
-                    <p className="font-semibold">{jobTitle}</p>
+                    <p className="font-semibold">{previewData.job_title}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Company</label>
-                    <p className="font-semibold">{companyName}</p>
+                    <p className="font-semibold">{previewData.company}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Experience Level</label>
-                    <p className="font-semibold">{previewData?.job_analysis?.experience_level}</p>
+                    <p className="font-semibold">{previewData.experience_level}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Industry</label>
-                    <p className="font-semibold">{previewData?.job_analysis?.industry}</p>
+                    <p className="font-semibold">{previewData.industry}</p>
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Key Requirements</label>
-                  <p className="text-sm">{(previewData?.job_analysis?.primary_keywords ?? []).join(', ')}</p>
+                  <label className="text-sm font-medium text-muted-foreground">Technical Skills</label>
+                  <p className="text-sm">{(previewData.technical_skills || []).join(', ')}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Functional Skills</label>
+                  <p className="text-sm">{(previewData.functional_skills || []).join(', ')}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Soft Skills</label>
+                  <p className="text-sm">{(previewData.soft_skills || []).join(', ')}</p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Match Score */}
+            {/* Match Score & Profile Analysis */}
             <Card>
               <CardHeader>
                 <CardTitle>Match Score</CardTitle>
@@ -512,6 +526,12 @@ const ApplicationWizard = () => {
                     {extractedKeywords.filter(k => k.status === 'match').length} / {extractedKeywords.length} keywords matched
                   </div>
                 </div>
+                {previewData.profile_analysis && (
+                  <div className="mt-4 text-sm text-muted-foreground">
+                    <div><strong>Confidence:</strong> {previewData.profile_analysis.match_confidence}</div>
+                    <div><strong>Scoring Method:</strong> {previewData.profile_analysis.scoring_methodology}</div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -522,24 +542,24 @@ const ApplicationWizard = () => {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-emerald-700 flex items-center gap-2">
                     <span className="text-lg">✓</span>
-                    Matched Keywords
+                    High Priority Keywords
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Skills and experience that align with the job requirements
+                    Skills and experience that align most closely with the job requirements
                   </p>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {extractedKeywords.filter(k => k.status === 'match').map((keyword, idx) => (
+                    {(previewData.keyword_priority?.high || []).map((keyword: string, idx: number) => (
                       <TooltipProvider key={idx}>
                         <Tooltip>
                           <TooltipTrigger>
                             <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-sm border border-emerald-200 cursor-help hover:bg-emerald-100 transition-colors">
-                              {keyword.text}
+                              {keyword}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="max-w-xs">Strong evidence found in your experience with {keyword.text}</p>
+                            <p className="max-w-xs">High priority: {keyword}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -547,30 +567,29 @@ const ApplicationWizard = () => {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Transferable Keywords */}
+              {/* Medium Priority Keywords */}
               <Card className="border-amber-200">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-amber-700 flex items-center gap-2">
                     <span className="text-lg">!</span>
-                    Transferable Keywords
+                    Medium Priority Keywords
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Related skills that can be highlighted as relevant experience
+                    Related skills that are important for the role
                   </p>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {extractedKeywords.filter(k => k.status === 'partial').map((keyword, idx) => (
+                    {(previewData.keyword_priority?.medium || []).map((keyword: string, idx: number) => (
                       <TooltipProvider key={idx}>
                         <Tooltip>
                           <TooltipTrigger>
                             <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm border border-amber-200 cursor-help hover:bg-amber-100 transition-colors">
-                              {keyword.text}
+                              {keyword}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="max-w-xs">Your related experience with similar technologies can be positioned as transferable to {keyword.text}</p>
+                            <p className="max-w-xs">Medium priority: {keyword}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -578,30 +597,29 @@ const ApplicationWizard = () => {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Missing Keywords */}
+              {/* Low Priority Keywords */}
               <Card className="border-rose-200">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-rose-700 flex items-center gap-2">
                     <span className="text-lg">✗</span>
-                    Missing Keywords
+                    Low Priority Keywords
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Skills not found in your profile - we'll address these strategically
+                    Skills that are less critical but still relevant
                   </p>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {extractedKeywords.filter(k => k.status === 'missing').map((keyword, idx) => (
+                    {(previewData.keyword_priority?.low || []).map((keyword: string, idx: number) => (
                       <TooltipProvider key={idx}>
                         <Tooltip>
                           <TooltipTrigger>
                             <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-full text-sm border border-rose-200 cursor-help hover:bg-rose-100 transition-colors">
-                              {keyword.text}
+                              {keyword}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="max-w-xs">We'll focus on your learning agility and related experience to mitigate the gap in {keyword.text}</p>
+                            <p className="max-w-xs">Low priority: {keyword}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
