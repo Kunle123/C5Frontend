@@ -108,7 +108,7 @@ const ApplicationWizard = () => {
             <h3 className="font-semibold text-lg mb-1">Personal Information</h3>
             <ul className="text-sm">
               {Object.entries(cv.personal_information).map(([key, value]) => (
-                <li key={key}><strong>{key.replace(/_/g, ' ')}:</strong> {value}</li>
+                <li key={key}><strong>{key.replace(/_/g, ' ')}:</strong> {String(value)}</li>
               ))}
             </ul>
           </div>
@@ -143,7 +143,7 @@ const ApplicationWizard = () => {
             <ul className="flex flex-wrap gap-2 text-xs">
               {Object.entries(cv.skills).map(([category, skills]: [string, any]) =>
                 Array.isArray(skills)
-                  ? skills.map((s: string, i: number) => <li key={category + i} className="px-2 py-1 bg-primary/10 text-primary rounded">{s}</li>)
+                  ? skills.map((s: unknown, i: number) => <li key={category + i} className="px-2 py-1 bg-primary/10 text-primary rounded">{String(s)}</li>)
                   : null
               )}
             </ul>
@@ -166,7 +166,7 @@ const ApplicationWizard = () => {
             <h3 className="font-semibold text-lg mb-1">Additional Sections</h3>
             <ul className="text-sm">
               {Object.entries(cv.additional_sections).map(([key, value]) => (
-                <li key={key}><strong>{key.replace(/_/g, ' ')}:</strong> {JSON.stringify(value)}</li>
+                <li key={key}><strong>{key.replace(/_/g, ' ')}:</strong> {String(value)}</li>
               ))}
             </ul>
           </div>
