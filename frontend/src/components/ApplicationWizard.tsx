@@ -751,10 +751,10 @@ const ApplicationWizard = () => {
                   <TabsTrigger value="cv">CV</TabsTrigger>
                   <TabsTrigger value="coverLetter">Cover Letter</TabsTrigger>
                 </TabsList>
-                <TabsContent value="cv">
+                <TabsContent value="cv" className="mt-4">
                   {renderStructuredCV(generatedDocuments[selectedVariant].cv)}
                 </TabsContent>
-                <TabsContent value="coverLetter">
+                <TabsContent value="coverLetter" className="mt-4">
                   {renderStructuredCV(undefined, generatedDocuments[selectedVariant].coverLetter)}
                 </TabsContent>
               </Tabs>
