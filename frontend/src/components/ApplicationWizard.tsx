@@ -164,7 +164,7 @@ const ApplicationWizard = () => {
     }
 
     try {
-      // Save CV to database
+      // Save CV to database - use the structure that matches the API expectation
       const saveRes = await fetch('https://api-gw-production.up.railway.app/api/cvs', {
         method: 'POST',
         headers: {
@@ -174,11 +174,31 @@ const ApplicationWizard = () => {
         body: JSON.stringify({
           name: `CV for ${preview?.job_analysis?.summary || 'Job Application'}`,
           description: `Generated for ${preview?.job_analysis?.summary || 'job application'}`,
-          cv_data: cv,
-          cover_letter_data: coverLetter,
+          experience: (cv as any).professional_experience?.roles || [], // Required field
+          summary: (cv as any).professional_summary?.content || '',
+          education: (cv as any).education || [],
+          skills: {
+            technical: [
+              ...((cv as any).technical_skills?.priority_1 || []),
+              ...((cv as any).technical_skills?.priority_2 || []),
+              ...((cv as any).technical_skills?.priority_3 || [])
+            ],
+            soft: [
+              ...((cv as any).soft_skills?.priority_1 || []),
+              ...((cv as any).soft_skills?.priority_2 || [])
+            ]
+          },
+          achievements: (cv as any).achievements || [],
+          certifications: (cv as any).certifications || [],
+          projects: (cv as any).projects || [],
+          contact: {
+            name: (cv as any).personal_information?.name || '',
+            email: (cv as any).personal_information?.contact || '',
+            location: (cv as any).personal_information?.location || ''
+          },
           job_description: jobDescription,
+          cover_letter: (coverLetter as any)?.content || '',
           generation_options: generationOptions,
-          is_default: false,
         }),
       });
 
