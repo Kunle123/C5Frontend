@@ -199,6 +199,135 @@ const ApplicationWizard = () => {
     }
   };
 
+  const renderCV = (cv: any) => {
+    if (!cv) return <div>No CV data available.</div>;
+    
+    return (
+      <div className="space-y-6 text-sm">
+        {/* Personal Information */}
+        {cv.personal_information && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Personal Information</h3>
+            <div className="space-y-1">
+              {Object.entries(cv.personal_information).map(([key, value]) => (
+                <div key={key}>
+                  <strong>{key.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}:</strong> {String(value)}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Professional Summary */}
+        {cv.professional_summary && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Professional Summary</h3>
+            <p>{cv.professional_summary.content || cv.professional_summary}</p>
+          </div>
+        )}
+
+        {/* Work Experience */}
+        {Array.isArray(cv.work_experience) && cv.work_experience.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Work Experience</h3>
+            {cv.work_experience.map((exp: any, i: number) => (
+              <div key={i} className="mb-4 border-l-2 border-primary/20 pl-4">
+                <div className="font-medium text-base">
+                  {exp.title || exp.job_title} at {exp.company}
+                </div>
+                {exp.dates && (
+                  <div className="text-muted-foreground text-xs mb-2">{exp.dates}</div>
+                )}
+                {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
+                  <ul className="list-disc ml-4 space-y-1">
+                    {exp.responsibilities.map((resp: any, j: number) => (
+                      <li key={j}>{resp.content || resp}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Skills */}
+        {cv.skills && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Skills</h3>
+            <div className="space-y-2">
+              {Object.entries(cv.skills).map(([category, skills]: [string, any]) => (
+                <div key={category}>
+                  <strong>{category.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}:</strong>
+                  {Array.isArray(skills) ? (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {skills.map((skill: any, i: number) => (
+                        <span key={i} className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
+                          {typeof skill === 'object' ? skill.name || skill.skill : skill}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="ml-2">{String(skills)}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Education */}
+        {Array.isArray(cv.education) && cv.education.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Education</h3>
+            {cv.education.map((edu: any, i: number) => (
+              <div key={i} className="mb-2">
+                <div className="font-medium">{edu.degree}</div>
+                <div className="text-muted-foreground">{edu.institution} {edu.year && `(${edu.year})`}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Additional Sections */}
+        {cv.additional_sections && Object.keys(cv.additional_sections).length > 0 && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Additional Information</h3>
+            <div className="space-y-2">
+              {Object.entries(cv.additional_sections).map(([key, value]) => (
+                <div key={key}>
+                  <strong>{key.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}:</strong>
+                  <div className="ml-2">{Array.isArray(value) ? value.join(', ') : String(value)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderCoverLetter = (coverLetter: any) => {
+    if (!coverLetter) return <div>No cover letter data available.</div>;
+    
+    return (
+      <div className="space-y-4">
+        <div className="whitespace-pre-line text-sm leading-relaxed">
+          {coverLetter.content || coverLetter.full_content || JSON.stringify(coverLetter, null, 2)}
+        </div>
+        {coverLetter.word_count && (
+          <div className="text-xs text-muted-foreground border-t pt-2">
+            Word count: {coverLetter.word_count}
+          </div>
+        )}
+        {coverLetter.evidence_source && (
+          <div className="text-xs text-muted-foreground">
+            Evidence: {coverLetter.evidence_source}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -596,7 +725,7 @@ const ApplicationWizard = () => {
 
                         {/* CV Content */}
                         <div className="border rounded-lg p-6 bg-muted/50 min-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm font-mono">{cv ? JSON.stringify(cv, null, 2) : 'No CV data available'}</pre>
+                          {cv ? renderCV(cv) : <div>No CV data available</div>}
                         </div>
                       </TabsContent>
                       
@@ -631,7 +760,7 @@ const ApplicationWizard = () => {
 
                         {/* Cover Letter Content */}
                         <div className="border rounded-lg p-6 bg-muted/50 min-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm font-mono">{coverLetter ? JSON.stringify(coverLetter, null, 2) : 'No cover letter data available'}</pre>
+                          {coverLetter ? renderCoverLetter(coverLetter) : <div>No cover letter data available</div>}
                         </div>
                       </TabsContent>
                     </Tabs>
