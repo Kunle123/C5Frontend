@@ -257,12 +257,16 @@ const ApplicationWizard = () => {
     const cv = cvData.cv;
     const selectedLength = generationOptions.length;
     
-    // Filter content based on selected length and enabled sections
-    const shouldShowInLength = (item: any) => {
-      if (selectedLength === 'short') return item.appears_in_short_cv;
-      if (selectedLength === 'medium') return item.appears_in_medium_cv;
-      if (selectedLength === 'long') return item.appears_in_long_cv;
-      return true;
+    // Filter content based on priority and selected length
+    const getPriorityThreshold = () => {
+      if (selectedLength === 'short') return 1; // Only priority 1
+      if (selectedLength === 'medium') return 2; // Priority 1-2
+      if (selectedLength === 'long') return 3; // Priority 1-3
+      return 3;
+    };
+    
+    const shouldShowByPriority = (item: any) => {
+      return item.priority <= getPriorityThreshold();
     };
     
     return (
@@ -297,11 +301,12 @@ const ApplicationWizard = () => {
                 </div>
                 <div className="text-muted-foreground text-sm mb-2">
                   {role.start_date} - {role.end_date}
+                  {role.location && <span className="ml-2">| {role.location}</span>}
                 </div>
                 {Array.isArray(role.bullets) && (
                   <ul className="list-disc ml-4 space-y-1">
                     {role.bullets
-                      .filter((bullet: any) => shouldShowInLength(bullet))
+                      .filter((bullet: any) => shouldShowByPriority(bullet))
                       .map((bullet: any, j: number) => (
                         <li key={j} className="text-sm">{bullet.content}</li>
                       ))}
@@ -313,12 +318,12 @@ const ApplicationWizard = () => {
         )}
 
         {/* Achievements Section - Toggleable */}
-        {cv.achievements_section && cv.achievements_section.section_enabled && generationOptions.sections.achievements && (
+        {cv.achievements && generationOptions.sections.achievements && (
           <div>
             <h3 className="font-semibold text-lg mb-2">Key Achievements</h3>
             <ul className="list-disc ml-4 space-y-1">
-              {cv.achievements_section.achievements
-                .filter((achievement: any) => shouldShowInLength(achievement))
+              {cv.achievements
+                .filter((achievement: any) => shouldShowByPriority(achievement))
                 .map((achievement: any, i: number) => (
                   <li key={i} className="text-sm">{achievement.content}</li>
                 ))}
@@ -326,37 +331,63 @@ const ApplicationWizard = () => {
           </div>
         )}
 
-        {/* Competencies Section - Toggleable */}
-        {cv.competencies_section && cv.competencies_section.section_enabled && generationOptions.sections.competencies && (
+        {/* Technical Skills - Toggleable */}
+        {cv.technical_skills && generationOptions.sections.competencies && (
           <div>
-            <h3 className="font-semibold text-lg mb-2">Core Competencies</h3>
-            <div className="space-y-3">
-              {cv.competencies_section.technical_skills && cv.competencies_section.technical_skills.length > 0 && (
-                <div>
-                  <h4 className="font-medium mb-2">Technical Skills</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {cv.competencies_section.technical_skills
-                      .filter((skill: any) => shouldShowInLength(skill))
-                      .map((skill: any, i: number) => (
-                        <span key={i} className="px-3 py-1 bg-primary/10 text-primary rounded text-sm">
-                          {skill.skill} ({skill.proficiency})
-                        </span>
-                      ))}
-                  </div>
+            <h3 className="font-semibold text-lg mb-2">Technical Skills</h3>
+            <div className="space-y-2">
+              {cv.technical_skills.priority_1 && cv.technical_skills.priority_1.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {cv.technical_skills.priority_1.map((skill: string, i: number) => (
+                    <span key={i} className="px-3 py-1 bg-primary/10 text-primary rounded text-sm font-medium">
+                      {skill}
+                    </span>
+                  ))}
                 </div>
               )}
-              {cv.competencies_section.soft_skills && cv.competencies_section.soft_skills.length > 0 && (
-                <div>
-                  <h4 className="font-medium mb-2">Soft Skills</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {cv.competencies_section.soft_skills
-                      .filter((skill: any) => shouldShowInLength(skill))
-                      .map((skill: any, i: number) => (
-                        <span key={i} className="px-3 py-1 bg-secondary/10 text-secondary-foreground rounded text-sm">
-                          {skill.skill}
-                        </span>
-                      ))}
-                  </div>
+              {selectedLength !== 'short' && cv.technical_skills.priority_2 && cv.technical_skills.priority_2.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {cv.technical_skills.priority_2.map((skill: string, i: number) => (
+                    <span key={i} className="px-3 py-1 bg-primary/20 text-primary rounded text-sm">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {selectedLength === 'long' && cv.technical_skills.priority_3 && cv.technical_skills.priority_3.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {cv.technical_skills.priority_3.map((skill: string, i: number) => (
+                    <span key={i} className="px-3 py-1 bg-primary/30 text-primary rounded text-sm">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Soft Skills - Toggleable */}
+        {cv.soft_skills && generationOptions.sections.competencies && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Soft Skills</h3>
+            <div className="space-y-2">
+              {cv.soft_skills.priority_1 && cv.soft_skills.priority_1.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {cv.soft_skills.priority_1.map((skill: string, i: number) => (
+                    <span key={i} className="px-3 py-1 bg-secondary/10 text-secondary-foreground rounded text-sm font-medium">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {selectedLength !== 'short' && cv.soft_skills.priority_2 && cv.soft_skills.priority_2.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {cv.soft_skills.priority_2.map((skill: string, i: number) => (
+                    <span key={i} className="px-3 py-1 bg-secondary/20 text-secondary-foreground rounded text-sm">
+                      {skill}
+                    </span>
+                  ))}
                 </div>
               )}
             </div>
@@ -364,27 +395,28 @@ const ApplicationWizard = () => {
         )}
 
         {/* Education Section - Toggleable */}
-        {cv.education_section && cv.education_section.section_enabled && generationOptions.sections.education && (
+        {cv.education && generationOptions.sections.education && (
           <div>
             <h3 className="font-semibold text-lg mb-2">Education</h3>
-            {cv.education_section.education
-              .filter((edu: any) => shouldShowInLength(edu))
+            {cv.education
+              .filter((edu: any) => shouldShowByPriority(edu))
               .map((edu: any, i: number) => (
                 <div key={i} className="mb-2">
                   <div className="font-medium">{edu.degree}</div>
                   <div className="text-muted-foreground">{edu.institution} ({edu.graduation_date})</div>
+                  {edu.classification && <div className="text-sm text-muted-foreground">{edu.classification}</div>}
                 </div>
               ))}
           </div>
         )}
 
         {/* Certifications Section - Toggleable */}
-        {cv.certifications_section && cv.certifications_section.section_enabled && generationOptions.sections.certifications && (
+        {cv.certifications && generationOptions.sections.certifications && (
           <div>
             <h3 className="font-semibold text-lg mb-2">Certifications</h3>
             <div className="space-y-2">
-              {cv.certifications_section.certifications
-                .filter((cert: any) => shouldShowInLength(cert))
+              {cv.certifications
+                .filter((cert: any) => shouldShowByPriority(cert))
                 .map((cert: any, i: number) => (
                   <div key={i}>
                     <div className="font-medium">{cert.name}</div>
@@ -395,20 +427,46 @@ const ApplicationWizard = () => {
           </div>
         )}
 
-        {/* Projects Section - Toggleable */}
-        {cv.projects_section && cv.projects_section.section_enabled && (
+        {/* Projects Section - Toggleable (if enabled in options) */}
+        {cv.projects && selectedLength === 'long' && (
           <div>
             <h3 className="font-semibold text-lg mb-2">Key Projects</h3>
-            {cv.projects_section.projects.map((project: any, i: number) => (
-              <div key={i} className="mb-3">
-                <div className="font-medium">{project.name}</div>
-                <ul className="list-disc ml-4 mt-1 space-y-1">
-                  {project.description.map((desc: string, j: number) => (
-                    <li key={j} className="text-sm">{desc}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            {cv.projects
+              .filter((project: any) => shouldShowByPriority(project))
+              .map((project: any, i: number) => (
+                <div key={i} className="mb-3">
+                  <div className="font-medium">{project.name}</div>
+                  <p className="text-sm text-muted-foreground mt-1">{project.description}</p>
+                </div>
+              ))}
+          </div>
+        )}
+
+        {/* Languages - Only in long CV */}
+        {cv.languages && selectedLength === 'long' && cv.languages.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Languages</h3>
+            <div className="flex flex-wrap gap-2">
+              {cv.languages.map((lang: string, i: number) => (
+                <span key={i} className="px-2 py-1 bg-muted text-muted-foreground rounded text-sm">
+                  {lang}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Interests - Only in long CV */}
+        {cv.interests && selectedLength === 'long' && cv.interests.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Interests</h3>
+            <div className="flex flex-wrap gap-2">
+              {cv.interests.map((interest: string, i: number) => (
+                <span key={i} className="px-2 py-1 bg-muted text-muted-foreground rounded text-sm">
+                  {interest}
+                </span>
+              ))}
+            </div>
           </div>
         )}
       </div>
