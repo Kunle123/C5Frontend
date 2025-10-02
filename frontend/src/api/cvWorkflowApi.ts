@@ -79,3 +79,4 @@ export async function updateCV(request: CVUpdateRequest): Promise<CVUpdateRespon
   });
   return handleApiResponse<CVUpdateResponse>(res);
 }
+
