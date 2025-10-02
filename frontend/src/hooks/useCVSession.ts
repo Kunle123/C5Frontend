@@ -10,7 +10,7 @@ export function useCVSession() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/v1/cv/session/start', {
+      const res = await fetch('https://api-gw-production.up.railway.app/api/v1/cv/session/start', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ export function useCVSession() {
     setLoading(true);
     setError(null);
     try {
-      await fetch('/api/v1/cv/session/end', {
+      await fetch('https://api-gw-production.up.railway.app/api/v1/cv/session/end', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

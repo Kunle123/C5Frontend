@@ -11,7 +11,7 @@ export function useCVGenerate() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/v1/cv/generate', {
+      const res = await fetch('https://api-gw-production.up.railway.app/api/v1/cv/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

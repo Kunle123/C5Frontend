@@ -16,7 +16,7 @@ export function useCVUpdate() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/v1/cv/update', {
+      const res = await fetch('https://api-gw-production.up.railway.app/api/v1/cv/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
