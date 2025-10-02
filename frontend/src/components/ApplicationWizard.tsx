@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -7,9 +7,13 @@ import { Textarea } from './ui/textarea';
 import { Progress } from './ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from './ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Checkbox } from './ui/checkbox';
+import { Label } from './ui/label';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { useToast } from '../hooks/use-toast';
-import { CheckCircle, AlertCircle, XCircle, FileText, Edit3, ArrowRight } from 'lucide-react';
+import { CheckCircle, AlertCircle, XCircle, FileText, Download, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useCVSession } from '../hooks/useCVSession';
 import { useCVPreview } from '../hooks/useCVPreview';
 import { useCVGenerate } from '../hooks/useCVGenerate';
@@ -55,16 +59,16 @@ const ApplicationWizard = () => {
   const { updatedCV, updateCV, loading: updateLoading, error: updateError } = useCVUpdate();
 
   // Start session on mount
-  useEffect(() => {
-    if (!sessionId && userId && userToken) {
-      startSession(userId, userToken);
-    }
-    // End session on unmount
-    return () => {
-      if (sessionId && userToken) endSession(userToken);
-    };
-    // eslint-disable-next-line
-  }, [userId, userToken]);
+  // useEffect(() => {
+  //   if (!sessionId && userId && userToken) {
+  //     startSession(userId, userToken);
+  //   }
+  //   // End session on unmount
+  //   return () => {
+  //     if (sessionId && userToken) endSession(userToken);
+  //   };
+  //   // eslint-disable-next-line
+  // }, [userId, userToken]);
 
   // Step 1: Next
   const handleJobDescriptionNext = async () => {
@@ -225,11 +229,26 @@ const ApplicationWizard = () => {
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 className="min-h-[300px]"
+                disabled={previewLoading}
               />
-              <Button onClick={handleJobDescriptionNext} disabled={!jobDescription.trim() || sessionLoading} className="w-full">
-                {previewLoading ? 'Analyzing...' : 'Next: Review Arc Data'}
-                <ArrowRight className="w-4 h-4 ml-2" />
+              <Button onClick={handleJobDescriptionNext} disabled={!jobDescription.trim() || sessionLoading || previewLoading} className="w-full flex items-center justify-center">
+                {previewLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></span>
+                    Analyzing...
+                  </span>
+                ) : (
+                  <>
+                    Next: Review Arc Data
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
               </Button>
+              {previewLoading && (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              )}
               {sessionError && <div className="text-destructive text-sm">{sessionError}</div>}
               {previewError && <div className="text-destructive text-sm">{previewError}</div>}
             </CardContent>
