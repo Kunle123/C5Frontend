@@ -199,50 +199,60 @@ const ApplicationWizard = () => {
     }
   };
 
-  const renderCV = (cv: any) => {
-    if (!cv) return <div>No CV data available.</div>;
+  const renderCV = (cvData: any) => {
+    if (!cvData || !cvData.cv) return <div>No CV data available.</div>;
+    
+    const cv = cvData.cv;
+    const selectedLength = generationOptions.length;
+    
+    // Filter content based on selected length and enabled sections
+    const shouldShowInLength = (item: any) => {
+      if (selectedLength === 'short') return item.appears_in_short_cv;
+      if (selectedLength === 'medium') return item.appears_in_medium_cv;
+      if (selectedLength === 'long') return item.appears_in_long_cv;
+      return true;
+    };
     
     return (
       <div className="space-y-6 text-sm">
-        {/* Personal Information */}
+        {/* Personal Information - Always included */}
         {cv.personal_information && (
           <div>
-            <h3 className="font-semibold text-lg mb-2">Personal Information</h3>
-            <div className="space-y-1">
-              {Object.entries(cv.personal_information).map(([key, value]) => (
-                <div key={key}>
-                  <strong>{key.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}:</strong> {String(value)}
-                </div>
-              ))}
+            <div className="text-center mb-4">
+              <h2 className="text-2xl font-bold">{cv.personal_information.name}</h2>
+              <p className="text-lg text-muted-foreground">{cv.personal_information.professional_title}</p>
+              <p className="text-sm">{cv.personal_information.contact} | {cv.personal_information.location}</p>
             </div>
           </div>
         )}
 
-        {/* Professional Summary */}
+        {/* Professional Summary - Always included */}
         {cv.professional_summary && (
           <div>
             <h3 className="font-semibold text-lg mb-2">Professional Summary</h3>
-            <p>{cv.professional_summary.content || cv.professional_summary}</p>
+            <p className="leading-relaxed">{cv.professional_summary.content}</p>
           </div>
         )}
 
-        {/* Work Experience */}
-        {Array.isArray(cv.work_experience) && cv.work_experience.length > 0 && (
+        {/* Professional Experience - Always included */}
+        {cv.professional_experience && Array.isArray(cv.professional_experience.roles) && (
           <div>
-            <h3 className="font-semibold text-lg mb-2">Work Experience</h3>
-            {cv.work_experience.map((exp: any, i: number) => (
+            <h3 className="font-semibold text-lg mb-2">Professional Experience</h3>
+            {cv.professional_experience.roles.map((role: any, i: number) => (
               <div key={i} className="mb-4 border-l-2 border-primary/20 pl-4">
                 <div className="font-medium text-base">
-                  {exp.title || exp.job_title} at {exp.company}
+                  {role.title} | {role.company}
                 </div>
-                {exp.dates && (
-                  <div className="text-muted-foreground text-xs mb-2">{exp.dates}</div>
-                )}
-                {Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0 && (
+                <div className="text-muted-foreground text-sm mb-2">
+                  {role.start_date} - {role.end_date}
+                </div>
+                {Array.isArray(role.bullets) && (
                   <ul className="list-disc ml-4 space-y-1">
-                    {exp.responsibilities.map((resp: any, j: number) => (
-                      <li key={j}>{resp.content || resp}</li>
-                    ))}
+                    {role.bullets
+                      .filter((bullet: any) => shouldShowInLength(bullet))
+                      .map((bullet: any, j: number) => (
+                        <li key={j} className="text-sm">{bullet.content}</li>
+                      ))}
                   </ul>
                 )}
               </div>
@@ -250,75 +260,123 @@ const ApplicationWizard = () => {
           </div>
         )}
 
-        {/* Skills */}
-        {cv.skills && (
+        {/* Achievements Section - Toggleable */}
+        {cv.achievements_section && cv.achievements_section.section_enabled && generationOptions.sections.achievements && (
           <div>
-            <h3 className="font-semibold text-lg mb-2">Skills</h3>
-            <div className="space-y-2">
-              {Object.entries(cv.skills).map(([category, skills]: [string, any]) => (
-                <div key={category}>
-                  <strong>{category.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}:</strong>
-                  {Array.isArray(skills) ? (
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {skills.map((skill: any, i: number) => (
-                        <span key={i} className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
-                          {typeof skill === 'object' ? skill.name || skill.skill : skill}
+            <h3 className="font-semibold text-lg mb-2">Key Achievements</h3>
+            <ul className="list-disc ml-4 space-y-1">
+              {cv.achievements_section.achievements
+                .filter((achievement: any) => shouldShowInLength(achievement))
+                .map((achievement: any, i: number) => (
+                  <li key={i} className="text-sm">{achievement.content}</li>
+                ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Competencies Section - Toggleable */}
+        {cv.competencies_section && cv.competencies_section.section_enabled && generationOptions.sections.competencies && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Core Competencies</h3>
+            <div className="space-y-3">
+              {cv.competencies_section.technical_skills && cv.competencies_section.technical_skills.length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Technical Skills</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {cv.competencies_section.technical_skills
+                      .filter((skill: any) => shouldShowInLength(skill))
+                      .map((skill: any, i: number) => (
+                        <span key={i} className="px-3 py-1 bg-primary/10 text-primary rounded text-sm">
+                          {skill.skill} ({skill.proficiency})
                         </span>
                       ))}
-                    </div>
-                  ) : (
-                    <span className="ml-2">{String(skills)}</span>
-                  )}
+                  </div>
                 </div>
-              ))}
+              )}
+              {cv.competencies_section.soft_skills && cv.competencies_section.soft_skills.length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Soft Skills</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {cv.competencies_section.soft_skills
+                      .filter((skill: any) => shouldShowInLength(skill))
+                      .map((skill: any, i: number) => (
+                        <span key={i} className="px-3 py-1 bg-secondary/10 text-secondary-foreground rounded text-sm">
+                          {skill.skill}
+                        </span>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Education */}
-        {Array.isArray(cv.education) && cv.education.length > 0 && (
+        {/* Education Section - Toggleable */}
+        {cv.education_section && cv.education_section.section_enabled && generationOptions.sections.education && (
           <div>
             <h3 className="font-semibold text-lg mb-2">Education</h3>
-            {cv.education.map((edu: any, i: number) => (
-              <div key={i} className="mb-2">
-                <div className="font-medium">{edu.degree}</div>
-                <div className="text-muted-foreground">{edu.institution} {edu.year && `(${edu.year})`}</div>
-              </div>
-            ))}
+            {cv.education_section.education
+              .filter((edu: any) => shouldShowInLength(edu))
+              .map((edu: any, i: number) => (
+                <div key={i} className="mb-2">
+                  <div className="font-medium">{edu.degree}</div>
+                  <div className="text-muted-foreground">{edu.institution} ({edu.graduation_date})</div>
+                </div>
+              ))}
           </div>
         )}
 
-        {/* Additional Sections */}
-        {cv.additional_sections && Object.keys(cv.additional_sections).length > 0 && (
+        {/* Certifications Section - Toggleable */}
+        {cv.certifications_section && cv.certifications_section.section_enabled && generationOptions.sections.certifications && (
           <div>
-            <h3 className="font-semibold text-lg mb-2">Additional Information</h3>
+            <h3 className="font-semibold text-lg mb-2">Certifications</h3>
             <div className="space-y-2">
-              {Object.entries(cv.additional_sections).map(([key, value]) => (
-                <div key={key}>
-                  <strong>{key.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}:</strong>
-                  <div className="ml-2">{Array.isArray(value) ? value.join(', ') : String(value)}</div>
-                </div>
-              ))}
+              {cv.certifications_section.certifications
+                .filter((cert: any) => shouldShowInLength(cert))
+                .map((cert: any, i: number) => (
+                  <div key={i}>
+                    <div className="font-medium">{cert.name}</div>
+                    <div className="text-muted-foreground text-sm">{cert.issuer} ({cert.date})</div>
+                  </div>
+                ))}
             </div>
+          </div>
+        )}
+
+        {/* Projects Section - Toggleable */}
+        {cv.projects_section && cv.projects_section.section_enabled && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Key Projects</h3>
+            {cv.projects_section.projects.map((project: any, i: number) => (
+              <div key={i} className="mb-3">
+                <div className="font-medium">{project.name}</div>
+                <ul className="list-disc ml-4 mt-1 space-y-1">
+                  {project.description.map((desc: string, j: number) => (
+                    <li key={j} className="text-sm">{desc}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         )}
       </div>
     );
   };
 
-  const renderCoverLetter = (coverLetter: any) => {
-    if (!coverLetter) return <div>No cover letter data available.</div>;
+  const renderCoverLetter = (data: any) => {
+    if (!data || !data.cover_letter) return <div>No cover letter data available.</div>;
+    
+    const coverLetter = data.cover_letter;
     
     return (
       <div className="space-y-4">
         <div className="whitespace-pre-line text-sm leading-relaxed">
-          {coverLetter.content || coverLetter.full_content || JSON.stringify(coverLetter, null, 2)}
+          {coverLetter.content}
         </div>
-        {coverLetter.word_count && (
-          <div className="text-xs text-muted-foreground border-t pt-2">
-            Word count: {coverLetter.word_count}
-          </div>
-        )}
+        <div className="flex justify-between items-center text-xs text-muted-foreground border-t pt-2">
+          <span>Word count: {coverLetter.word_count}</span>
+          <span>Keywords included: {(coverLetter.keywords_included || []).join(', ')}</span>
+        </div>
         {coverLetter.evidence_source && (
           <div className="text-xs text-muted-foreground">
             Evidence: {coverLetter.evidence_source}
@@ -725,7 +783,7 @@ const ApplicationWizard = () => {
 
                         {/* CV Content */}
                         <div className="border rounded-lg p-6 bg-muted/50 min-h-[400px]">
-                          {cv ? renderCV(cv) : <div>No CV data available</div>}
+                          {cv ? renderCV({ cv }) : <div>No CV data available</div>}
                         </div>
                       </TabsContent>
                       
@@ -760,7 +818,7 @@ const ApplicationWizard = () => {
 
                         {/* Cover Letter Content */}
                         <div className="border rounded-lg p-6 bg-muted/50 min-h-[400px]">
-                          {coverLetter ? renderCoverLetter(coverLetter) : <div>No cover letter data available</div>}
+                          {coverLetter ? renderCoverLetter({ cover_letter: coverLetter }) : <div>No cover letter data available</div>}
                         </div>
                       </TabsContent>
                     </Tabs>
