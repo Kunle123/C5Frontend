@@ -45,10 +45,6 @@ const ApplicationWizard = () => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [jobDescription, setJobDescription] = useState('');
-  const [extractedKeywords, setExtractedKeywords] = useState<Keyword[]>([]);
-  const [matchScore, setMatchScore] = useState(0);
-  const [jobTitle, setJobTitle] = useState('');
-  const [companyName, setCompanyName] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationOptions, setGenerationOptions] = useState<GenerationOptions>({
@@ -108,13 +104,6 @@ const ApplicationWizard = () => {
       if (sessionId) {
         await getPreview(sessionId, jobDescription, userToken);
       }
-      setExtractedKeywords([
-        ...(preview?.keyword_coverage?.present_in_profile || []).map((k: string) => ({ text: k, status: 'match' as const })),
-        ...(preview?.keyword_coverage?.missing_from_profile || []).map((k: string) => ({ text: k, status: 'missing' as const }))
-      ]);
-      setMatchScore(preview?.profile_match?.match_score || 0);
-      setJobTitle(preview?.job_analysis?.summary || 'Senior Software Engineer');
-      setCompanyName('Tech Solutions Inc.');
       setIsAnalyzing(false);
     } catch (err) {
       toast({
@@ -275,7 +264,7 @@ const ApplicationWizard = () => {
         )}
 
         {/* Step 2: Review Keywords */}
-        {currentStep === 2 && !isAnalyzing && (
+        {currentStep === 2 && !isAnalyzing && preview && (
           <div className="space-y-6">
             {/* Job Analysis Panel */}
             <Card>
@@ -286,24 +275,24 @@ const ApplicationWizard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Job Title</label>
-                    <p className="font-semibold">{jobTitle || 'Senior Software Engineer'}</p>
+                    <p className="font-semibold">{preview.job_analysis?.summary || 'Not specified'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Company</label>
-                    <p className="font-semibold">{companyName || 'Tech Solutions Inc.'}</p>
+                    <label className="text-sm font-medium text-muted-foreground">Keywords</label>
+                    <p className="font-semibold">{(preview.job_analysis?.keywords || []).join(', ') || 'No keywords found'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Experience Level</label>
-                    <p className="font-semibold">Senior (5+ years)</p>
+                    <label className="text-sm font-medium text-muted-foreground">Strengths</label>
+                    <p className="font-semibold">{(preview.profile_match?.strengths || []).join(', ') || 'No strengths identified'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Industry</label>
-                    <p className="font-semibold">Technology</p>
+                    <label className="text-sm font-medium text-muted-foreground">Gaps</label>
+                    <p className="font-semibold">{(preview.profile_match?.gaps || []).join(', ') || 'No gaps identified'}</p>
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Key Requirements</label>
-                  <p className="text-sm">React, TypeScript, Node.js, Database Management, Team Leadership</p>
+                  <label className="text-sm font-medium text-muted-foreground">Evidence Source</label>
+                  <p className="text-sm">{preview.profile_match?.evidence_source || 'No evidence source available'}</p>
                 </div>
               </CardContent>
             </Card>
@@ -316,77 +305,49 @@ const ApplicationWizard = () => {
               <CardContent>
                 <div className="flex items-center gap-4">
                   <div className={`text-3xl font-bold ${
-                    matchScore >= 70 ? 'text-emerald-600' : 
-                    matchScore >= 50 ? 'text-amber-600' : 'text-rose-600'
+                    (preview.profile_match?.match_score || 0) >= 70 ? 'text-emerald-600' : 
+                    (preview.profile_match?.match_score || 0) >= 50 ? 'text-amber-600' : 'text-rose-600'
                   }`}>
-                    {matchScore}%
+                    {preview.profile_match?.match_score || 0}%
                   </div>
                   <div className="flex-1">
-                    <Progress value={matchScore} className="h-3" />
+                    <Progress value={preview.profile_match?.match_score || 0} className="h-3" />
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {extractedKeywords.filter(k => k.status === 'match').length} / {extractedKeywords.length} keywords matched
+                    {(preview.keyword_coverage?.present_in_profile || []).length} / {((preview.keyword_coverage?.present_in_profile || []).length + (preview.keyword_coverage?.missing_from_profile || []).length)} keywords matched
                   </div>
+                </div>
+                <div className="mt-4 text-sm text-muted-foreground">
+                  <div><strong>Evidence:</strong> {preview.profile_match?.evidence_source || 'No evidence available'}</div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Keyword Analysis */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Matched Keywords */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Present Keywords */}
               <Card className="border-emerald-200">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-emerald-700 flex items-center gap-2">
                     <span className="text-lg">✓</span>
-                    Matched Keywords
+                    Present in Profile
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Skills and experience that align with the job requirements
+                    Skills and experience found in your profile
                   </p>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {extractedKeywords.filter(k => k.status === 'match').map((keyword, idx) => (
+                    {(preview.keyword_coverage?.present_in_profile || []).map((keyword, idx) => (
                       <TooltipProvider key={idx}>
                         <Tooltip>
                           <TooltipTrigger>
                             <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-sm border border-emerald-200 cursor-help hover:bg-emerald-100 transition-colors">
-                              {keyword.text}
+                              {keyword}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="max-w-xs">Strong evidence found in your experience with {keyword.text}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Transferable Keywords */}
-              <Card className="border-amber-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-amber-700 flex items-center gap-2">
-                    <span className="text-lg">!</span>
-                    Transferable Keywords
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Related skills that can be highlighted as relevant experience
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {extractedKeywords.filter(k => k.status === 'partial').map((keyword, idx) => (
-                      <TooltipProvider key={idx}>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm border border-amber-200 cursor-help hover:bg-amber-100 transition-colors">
-                              {keyword.text}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="max-w-xs">Your related experience with similar technologies can be positioned as transferable to {keyword.text}</p>
+                            <p className="max-w-xs">Found in your {preview.keyword_coverage?.profile_references?.[keyword] || 'profile'}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -400,24 +361,24 @@ const ApplicationWizard = () => {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-rose-700 flex items-center gap-2">
                     <span className="text-lg">✗</span>
-                    Missing Keywords
+                    Missing from Profile
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Skills not found in your profile - we'll address these strategically
+                    Skills not found in your profile
                   </p>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {extractedKeywords.filter(k => k.status === 'missing').map((keyword, idx) => (
+                    {(preview.keyword_coverage?.missing_from_profile || []).map((keyword, idx) => (
                       <TooltipProvider key={idx}>
                         <Tooltip>
                           <TooltipTrigger>
                             <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-full text-sm border border-rose-200 cursor-help hover:bg-rose-100 transition-colors">
-                              {keyword.text}
+                              {keyword}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="max-w-xs">We'll focus on your learning agility and related experience to mitigate the gap in {keyword.text}</p>
+                            <p className="max-w-xs">Consider highlighting related experience or learning agility for {keyword}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -616,9 +577,9 @@ const ApplicationWizard = () => {
                         <div className="mb-4">
                           <h4 className="text-sm font-medium mb-2">Included Keywords:</h4>
                           <div className="flex flex-wrap gap-1">
-                            {extractedKeywords.filter(k => k.status === 'match').map((keyword, idx) => (
+                            {(preview?.keyword_coverage?.present_in_profile || []).map((keyword, idx) => (
                               <span key={idx} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded">
-                                {keyword.text}
+                                {keyword}
                               </span>
                             ))}
                           </div>
@@ -628,8 +589,8 @@ const ApplicationWizard = () => {
                         <div className="mb-4">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium">Alignment Score:</span>
-                            <span className="text-sm font-bold text-emerald-600">{matchScore}%</span>
-                            <Progress value={matchScore} className="flex-1 h-2" />
+                            <span className="text-sm font-bold text-emerald-600">{preview?.profile_match?.match_score || 0}%</span>
+                            <Progress value={preview?.profile_match?.match_score || 0} className="flex-1 h-2" />
                           </div>
                         </div>
 
@@ -660,9 +621,9 @@ const ApplicationWizard = () => {
                         <div className="mb-4">
                           <h4 className="text-sm font-medium mb-2">Included Keywords:</h4>
                           <div className="flex flex-wrap gap-1">
-                            {extractedKeywords.filter(k => k.status === 'match').slice(0, 6).map((keyword, idx) => (
+                            {(preview?.keyword_coverage?.present_in_profile || []).slice(0, 6).map((keyword, idx) => (
                               <span key={idx} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded">
-                                {keyword.text}
+                                {keyword}
                               </span>
                             ))}
                           </div>
