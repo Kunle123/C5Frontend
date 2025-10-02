@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -76,6 +76,28 @@ const ApplicationWizard = () => {
   const { cv, coverLetter, generateCV, loading: generateLoading, error: generateError } = useCVGenerate();
   const { updatedCV, updateCV, loading: updateLoading, error: updateError } = useCVUpdate();
 
+  // Auth/session - get user_id from JWT
+  const userToken = localStorage.getItem('token') || '';
+  const userId = (() => {
+    try {
+      return JSON.parse(atob(userToken.split('.')[1])).id;
+    } catch {
+      return '';
+    }
+  })();
+
+  // Start session on mount
+  useEffect(() => {
+    if (!sessionId && userId && userToken) {
+      startSession(userId, userToken);
+    }
+    // End session on unmount
+    return () => {
+      if (sessionId && userToken) endSession(userToken);
+    };
+    // eslint-disable-next-line
+  }, [userId, userToken]);
+
   const handleJobDescriptionNext = async () => {
     if (!jobDescription.trim()) return;
     
@@ -84,7 +106,7 @@ const ApplicationWizard = () => {
     
     try {
       if (sessionId) {
-        await getPreview(sessionId, jobDescription, localStorage.getItem('token') || '');
+        await getPreview(sessionId, jobDescription, userToken);
       }
       setExtractedKeywords([
         ...(preview?.keyword_coverage?.present_in_profile || []).map((k: string) => ({ text: k, status: 'match' as const })),
@@ -119,7 +141,7 @@ const ApplicationWizard = () => {
     
     try {
       if (sessionId) {
-        await generateCV(sessionId, jobDescription, localStorage.getItem('token') || '');
+        await generateCV(sessionId, jobDescription, userToken);
       }
       // setGeneratedDocuments(preview?.generatedDocuments || {}); // This line is removed as per the edit hint
       // setSelectedVariant(preview?.selectedVariant || generateVariantKey('medium', generationOptions.sections)); // This line is removed as per the edit hint
@@ -149,7 +171,7 @@ const ApplicationWizard = () => {
     
     try {
       if (sessionId && cv) {
-        await updateCV(sessionId, cv, cvUpdateRequest, jobDescription, localStorage.getItem('token') || '');
+        await updateCV(sessionId, cv, cvUpdateRequest, jobDescription, userToken);
       }
       // setGeneratedDocuments(preview?.generatedDocuments || {}); // This line is removed as per the edit hint
       // setSelectedVariant(preview?.selectedVariant || generateVariantKey(generationOptions.length, generationOptions.sections)); // This line is removed as per the edit hint
