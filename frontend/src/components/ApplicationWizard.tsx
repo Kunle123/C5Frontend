@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -18,6 +18,7 @@ import { useCVSession } from '../hooks/useCVSession';
 import { useCVPreview } from '../hooks/useCVPreview';
 import { useCVGenerate } from '../hooks/useCVGenerate';
 import { useCVUpdate } from '../hooks/useCVUpdate';
+import { CreditsContext } from '../context/CreditsContext';
 
 interface Keyword {
   text: string;
@@ -43,6 +44,7 @@ interface GeneratedDocuments {
 
 const ApplicationWizard = () => {
   const { toast } = useToast();
+  const { credits, refreshCredits } = useContext(CreditsContext);
   const [currentStep, setCurrentStep] = useState(1);
   const [jobDescription, setJobDescription] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -131,15 +133,16 @@ const ApplicationWizard = () => {
     try {
       if (sessionId) {
         await generateCV(sessionId, jobDescription, userToken);
+        
+        // Deduct 1 credit after successful generation
+        await refreshCredits();
+        
+        toast({
+          title: "Documents Generated",
+          description: "All CV variations have been successfully generated!",
+        });
       }
-      // setGeneratedDocuments(preview?.generatedDocuments || {}); // This line is removed as per the edit hint
-      // setSelectedVariant(preview?.selectedVariant || generateVariantKey('medium', generationOptions.sections)); // This line is removed as per the edit hint
       setIsGenerating(false);
-      
-      toast({
-        title: "Documents Generated",
-        description: "All CV variations have been successfully generated!",
-      });
     } catch (err) {
       toast({
         title: "Error Generating Documents",
@@ -147,6 +150,55 @@ const ApplicationWizard = () => {
         variant: "destructive",
       });
       setIsGenerating(false);
+    }
+  };
+
+  const handleSaveAndDownload = async () => {
+    if (!cv || !coverLetter) {
+      toast({
+        title: "No Documents to Save",
+        description: "Please generate documents first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Save CV to database
+      const saveRes = await fetch('https://api-gw-production.up.railway.app/api/cvs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({
+          name: `CV for ${preview?.job_analysis?.summary || 'Job Application'}`,
+          description: `Generated for ${preview?.job_analysis?.summary || 'job application'}`,
+          cv_data: cv,
+          cover_letter_data: coverLetter,
+          job_description: jobDescription,
+          generation_options: generationOptions,
+          is_default: false,
+        }),
+      });
+
+      if (!saveRes.ok) throw new Error('Failed to save CV');
+      const saveResult = await saveRes.json();
+
+      toast({
+        title: "CV Saved Successfully",
+        description: "Your CV has been saved and is ready for download.",
+      });
+
+      // Redirect to My CVs page
+      window.location.href = '/my-cvs';
+      
+    } catch (err) {
+      toast({
+        title: "Error Saving CV",
+        description: err instanceof Error ? err.message : "Failed to save CV.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -463,7 +515,7 @@ const ApplicationWizard = () => {
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Job Title</label>
                     <p className="font-semibold">{preview.job_analysis?.summary || 'Not specified'}</p>
-                  </div>
+                    </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Keywords</label>
                     <p className="font-semibold">{(preview.job_analysis?.keywords || []).join(', ') || 'No keywords found'}</p>
@@ -496,17 +548,17 @@ const ApplicationWizard = () => {
                     (preview.profile_match?.match_score || 0) >= 50 ? 'text-amber-600' : 'text-rose-600'
                   }`}>
                     {preview.profile_match?.match_score || 0}%
-                  </div>
+                    </div>
                   <div className="flex-1">
                     <Progress value={preview.profile_match?.match_score || 0} className="h-3" />
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {(preview.keyword_coverage?.present_in_profile || []).length} / {((preview.keyword_coverage?.present_in_profile || []).length + (preview.keyword_coverage?.missing_from_profile || []).length)} keywords matched
-                  </div>
-                </div>
+                        </div>
+                      </div>
                 <div className="mt-4 text-sm text-muted-foreground">
                   <div><strong>Evidence:</strong> {preview.profile_match?.evidence_source || 'No evidence available'}</div>
-                </div>
+                    </div>
               </CardContent>
             </Card>
 
@@ -524,7 +576,7 @@ const ApplicationWizard = () => {
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2">
                     {(preview.keyword_coverage?.present_in_profile || []).map((keyword, idx) => (
                       <TooltipProvider key={idx}>
                         <Tooltip>
@@ -538,8 +590,8 @@ const ApplicationWizard = () => {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                    ))}
-                  </div>
+                        ))}
+                      </div>
                 </CardContent>
               </Card>
 
@@ -570,10 +622,10 @@ const ApplicationWizard = () => {
                         </Tooltip>
                       </TooltipProvider>
                     ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                    </div>
+              </CardContent>
+            </Card>
+          </div>
 
             {/* Customization Options */}
             <Card>
@@ -591,17 +643,17 @@ const ApplicationWizard = () => {
                       <div className="flex items-center space-x-2">
                         <input type="checkbox" id="technical" className="rounded" defaultChecked />
                         <label htmlFor="technical" className="text-sm">Emphasize technical skills</label>
-                      </div>
+              </div>
                       <div className="flex items-center space-x-2">
                         <input type="checkbox" id="leadership" className="rounded" />
                         <label htmlFor="leadership" className="text-sm">Highlight leadership experience</label>
-                      </div>
+            </div>
                       <div className="flex items-center space-x-2">
                         <input type="checkbox" id="achievements" className="rounded" defaultChecked />
                         <label htmlFor="achievements" className="text-sm">Focus on quantifiable achievements</label>
-                      </div>
+          </div>
                     </div>
-                  </div>
+                </div>
                   <div className="space-y-3">
                     <label htmlFor="custom-instructions" className="text-sm font-medium">Custom Instructions</label>
                     <Textarea 
@@ -610,7 +662,7 @@ const ApplicationWizard = () => {
                       className="min-h-[100px]"
                     />
                   </div>
-                </div>
+                    </div>
               </CardContent>
             </Card>
 
@@ -619,8 +671,8 @@ const ApplicationWizard = () => {
               <CardContent className="pt-6">
                 <Button onClick={handleGenerate} className="w-full" size="lg" disabled={isGenerating || sessionLoading}>
                   {isGenerating ? "Generating Documents..." : "Generate Documents"}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
               </CardContent>
             </Card>
           </div>
@@ -628,7 +680,7 @@ const ApplicationWizard = () => {
 
         {/* Loading state for analyzing */}
         {currentStep === 2 && isAnalyzing && (
-          <Card>
+            <Card>
             <CardContent className="py-12">
               <div className="text-center space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
@@ -636,7 +688,7 @@ const ApplicationWizard = () => {
                 <p className="text-muted-foreground">
                   Please wait while we extract keywords and analyze the requirements...
                 </p>
-              </div>
+                    </div>
             </CardContent>
           </Card>
         )}
@@ -737,13 +789,13 @@ const ApplicationWizard = () => {
                 {/* Document Preview with Tabs */}
                 {(cv || coverLetter) ? (
                   <div className="space-y-4">
-                    <Tabs defaultValue="cv" className="w-full">
-                      <TabsList className="grid w-full grid-cols-2">
+                <Tabs defaultValue="cv" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="cv">CV</TabsTrigger>
-                        <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
-                      </TabsList>
+                    <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
+                  </TabsList>
                       
-                      <TabsContent value="cv" className="space-y-4">
+                  <TabsContent value="cv" className="space-y-4">
                         {/* CV Validation Badges */}
                         <div className="flex items-center gap-2 mb-4">
                           <Badge variant="success" className="flex items-center gap-1">
@@ -784,10 +836,10 @@ const ApplicationWizard = () => {
                         {/* CV Content */}
                         <div className="border rounded-lg p-6 bg-muted/50 min-h-[400px]">
                           {cv ? renderCV({ cv }) : <div>No CV data available</div>}
-                        </div>
-                      </TabsContent>
+                    </div>
+                  </TabsContent>
                       
-                      <TabsContent value="cover-letter" className="space-y-4">
+                  <TabsContent value="cover-letter" className="space-y-4">
                         {/* Cover Letter Validation Badges */}
                         <div className="flex items-center gap-2 mb-4">
                           <Badge variant="success" className="flex items-center gap-1">
@@ -802,7 +854,7 @@ const ApplicationWizard = () => {
                             <CheckCircle className="w-3 h-3" />
                             Professional Format
                           </Badge>
-                        </div>
+                    </div>
 
                         {/* Included Keywords */}
                         <div className="mb-4">
@@ -820,8 +872,8 @@ const ApplicationWizard = () => {
                         <div className="border rounded-lg p-6 bg-muted/50 min-h-[400px]">
                           {coverLetter ? renderCoverLetter({ cover_letter: coverLetter }) : <div>No cover letter data available</div>}
                         </div>
-                      </TabsContent>
-                    </Tabs>
+                  </TabsContent>
+                </Tabs>
                   </div>
                 ) : (
                   <div className="border rounded-lg p-8 bg-muted/50 text-center">
@@ -833,18 +885,18 @@ const ApplicationWizard = () => {
                 <div className="flex gap-4">
                   {(cv || coverLetter) ? (
                     <>
-                      <Button
-                        variant="outline"
+                  <Button
+                    variant="outline"
                         onClick={handleRequestUpdates}
-                      >
+                  >
                         <Edit3 className="w-4 h-4 mr-2" />
                         Edit/Request Update
-                      </Button>
+                  </Button>
                       <Button
-                        onClick={() => window.location.href = '/cv-download'}
+                        onClick={handleSaveAndDownload}
                         className="flex-1"
                       >
-                        Go to Downloads
+                        Save & Go to Downloads
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </>
@@ -890,11 +942,11 @@ const ApplicationWizard = () => {
                 <p className="text-muted-foreground">
                   Please wait while we apply your requested updates...
                 </p>
-              </div>
+      </div>
             </CardContent>
           </Card>
         )}
-      </div>
+              </div>
 
       {/* Edit Request Modal */}
       <Dialog open={showUpdateModal} onOpenChange={setShowUpdateModal}>
@@ -909,24 +961,24 @@ const ApplicationWizard = () => {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">CV Updates:</label>
-              <Textarea
+                <Textarea
                 placeholder="Describe what you want changed in your CV..."
-                value={cvUpdateRequest}
-                onChange={(e) => setCvUpdateRequest(e.target.value)}
-                className="min-h-[100px]"
-              />
-            </div>
+                  value={cvUpdateRequest}
+                  onChange={(e) => setCvUpdateRequest(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Cover Letter Updates:</label>
-              <Textarea
+                <Textarea
                 placeholder="Describe what you want changed in your cover letter..."
-                value={coverLetterUpdateRequest}
-                onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
-                className="min-h-[100px]"
-              />
+                  value={coverLetterUpdateRequest}
+                  onChange={(e) => setCoverLetterUpdateRequest(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
             </div>
-          </div>
 
           <DialogFooter className="gap-2">
             <DialogClose asChild>
@@ -937,7 +989,7 @@ const ApplicationWizard = () => {
               disabled={!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim() || updateLoading}
             >
               Apply Update
-            </Button>
+              </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -945,4 +997,4 @@ const ApplicationWizard = () => {
   );
 };
 
-export default ApplicationWizard;
+export default ApplicationWizard; 
