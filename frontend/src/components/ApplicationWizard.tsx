@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
+import { Slider } from './ui/slider';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { useToast } from '../hooks/use-toast';
@@ -62,6 +63,7 @@ const ApplicationWizard = () => {
   const [cvUpdateRequest, setCvUpdateRequest] = useState('');
   const [coverLetterUpdateRequest, setCoverLetterUpdateRequest] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [maxRoles, setMaxRoles] = useState<number>(0); // 0 means show all roles
 
   const steps = [
     { number: 1, title: 'Paste Job Description' },
@@ -133,6 +135,10 @@ const ApplicationWizard = () => {
     try {
       if (sessionId) {
         await generateCV(sessionId, jobDescription, userToken);
+        
+        // Set max roles based on the generated CV
+        const totalRoles = (cv as any)?.professional_experience?.roles?.length || 0;
+        setMaxRoles(totalRoles); // Initialize to show all roles
         
         // Deduct 1 credit after successful generation
         await refreshCredits();
@@ -314,7 +320,9 @@ const ApplicationWizard = () => {
         {cv.professional_experience && Array.isArray(cv.professional_experience.roles) && (
           <div>
             <h3 className="font-semibold text-lg mb-2">Professional Experience</h3>
-            {cv.professional_experience.roles.map((role: any, i: number) => (
+            {cv.professional_experience.roles
+              .slice(0, maxRoles || cv.professional_experience.roles.length) // Trim to maxRoles
+              .map((role: any, i: number) => (
               <div key={i} className="mb-4 border-l-2 border-primary/20 pl-4">
                 <div className="font-medium text-base">
                   {role.title} | {role.company}
@@ -863,6 +871,29 @@ const ApplicationWizard = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Work Experience Trimmer */}
+                {(cv as any)?.professional_experience?.roles && (cv as any).professional_experience.roles.length > 0 && (
+                  <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">Number of Work Experiences to Include:</Label>
+                      <span className="text-sm font-semibold text-primary">
+                        {maxRoles || (cv as any).professional_experience.roles.length} of {(cv as any).professional_experience.roles.length} roles
+                      </span>
+                    </div>
+                    <Slider
+                      min={1}
+                      max={(cv as any).professional_experience.roles.length}
+                      step={1}
+                      value={[maxRoles || (cv as any).professional_experience.roles.length]}
+                      onValueChange={(value) => setMaxRoles(value[0])}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Adjust the slider to include fewer work experiences. The most recent roles will be shown first.
+                    </p>
+                  </div>
+                )}
 
                 {/* Document Preview with Tabs */}
                 {(cv || coverLetter) ? (
