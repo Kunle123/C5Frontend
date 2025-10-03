@@ -679,70 +679,115 @@ const ApplicationWizard = () => {
               </CardContent>
             </Card>
 
-            {/* Keyword Analysis */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Present Keywords */}
+            {/* Keyword Analysis - RAG Status */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Green Keywords - Strong Match */}
               <Card className="border-emerald-200">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-emerald-700 flex items-center gap-2">
-                    <span className="text-lg">✓</span>
-                    Present in Profile
+                    <CheckCircle className="w-4 h-4" />
+                    Strong Match
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Skills and experience found in your profile
-                  </p>
-                </CardHeader>
-                <CardContent>
-                      <div className="flex flex-wrap gap-2">
-                    {(preview.keyword_coverage?.present_in_profile || []).map((keyword, idx) => (
-                      <TooltipProvider key={idx}>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-sm border border-emerald-200 cursor-help hover:bg-emerald-100 transition-colors">
-                              {keyword}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="max-w-xs">Found in your {preview.keyword_coverage?.profile_references?.[keyword] || 'profile'}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                        ))}
-                      </div>
-                </CardContent>
-              </Card>
-
-              {/* Missing Keywords */}
-              <Card className="border-rose-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-rose-700 flex items-center gap-2">
-                    <span className="text-lg">✗</span>
-                    Missing from Profile
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Skills not found in your profile
+                    Direct evidence in your profile
                   </p>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {(preview.keyword_coverage?.missing_from_profile || []).map((keyword, idx) => (
+                    {((preview.keyword_coverage as any)?.keywords || preview.keyword_coverage?.present_in_profile || [])
+                      .filter((kw: any) => typeof kw === 'object' ? kw.status === 'green' : true)
+                      .map((keyword: any, idx: number) => (
                       <TooltipProvider key={idx}>
                         <Tooltip>
                           <TooltipTrigger>
-                            <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-full text-sm border border-rose-200 cursor-help hover:bg-rose-100 transition-colors">
-                              {keyword}
+                            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-sm border border-emerald-200 cursor-help hover:bg-emerald-100 transition-colors">
+                              {typeof keyword === 'object' ? keyword.keyword : keyword}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="max-w-xs">Consider highlighting related experience or learning agility for {keyword}</p>
+                            <p className="max-w-xs">
+                              {typeof keyword === 'object' && keyword.evidence 
+                                ? keyword.evidence 
+                                : `Found in your ${typeof keyword === 'object' ? keyword.profile_section : 'profile'}`}
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ))}
-                    </div>
-              </CardContent>
-            </Card>
-          </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Amber Keywords - Partial Match */}
+              <Card className="border-amber-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-amber-700 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    Partial Match
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Related experience found
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {((preview.keyword_coverage as any)?.keywords || [])
+                      .filter((kw: any) => kw.status === 'amber')
+                      .map((keyword: any, idx: number) => (
+                      <TooltipProvider key={idx}>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm border border-amber-200 cursor-help hover:bg-amber-100 transition-colors">
+                              {keyword.keyword}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">{keyword.evidence}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Red Keywords - No Match */}
+              <Card className="border-rose-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-rose-700 flex items-center gap-2">
+                    <XCircle className="w-4 h-4" />
+                    No Match
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Not found in your profile
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {((preview.keyword_coverage as any)?.keywords || preview.keyword_coverage?.missing_from_profile || [])
+                      .filter((kw: any) => typeof kw === 'object' ? kw.status === 'red' : true)
+                      .map((keyword: any, idx: number) => (
+                      <TooltipProvider key={idx}>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-full text-sm border border-rose-200 cursor-help hover:bg-rose-100 transition-colors">
+                              {typeof keyword === 'object' ? keyword.keyword : keyword}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">
+                              {typeof keyword === 'object' && keyword.evidence 
+                                ? keyword.evidence 
+                                : `Consider highlighting related experience or learning agility for ${typeof keyword === 'object' ? keyword.keyword : keyword}`}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Customization Options */}
             <Card>
