@@ -208,7 +208,11 @@ const ApplicationWizard = () => {
         }),
       });
 
-      if (!saveRes.ok) throw new Error('Failed to save CV');
+      if (!saveRes.ok) {
+        const errorData = await saveRes.json();
+        console.error('CV Save Error:', errorData);
+        throw new Error(errorData.detail || errorData.message || 'Failed to save CV');
+      }
       const saveResult = await saveRes.json();
 
       toast({
