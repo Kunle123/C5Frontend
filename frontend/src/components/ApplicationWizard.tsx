@@ -617,22 +617,36 @@ const ApplicationWizard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Job Title</label>
-                    <p className="font-semibold">{preview.job_analysis?.summary || 'Not specified'}</p>
-                    </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Keywords</label>
-                    <p className="font-semibold">{(preview.job_analysis?.keywords || []).join(', ') || 'No keywords found'}</p>
+                    <p className="font-semibold">{(preview.job_analysis as any)?.job_title || preview.job_analysis?.summary || 'Not specified'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Strengths</label>
-                    <p className="font-semibold">{(preview.profile_match?.strengths || []).join(', ') || 'No strengths identified'}</p>
+                    <label className="text-sm font-medium text-muted-foreground">Company</label>
+                    <p className="font-semibold">{(preview.job_analysis as any)?.company || 'Not specified'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Gaps</label>
-                    <p className="font-semibold">{(preview.profile_match?.gaps || []).join(', ') || 'No gaps identified'}</p>
+                    <label className="text-sm font-medium text-muted-foreground">Experience Level</label>
+                    <p className="font-semibold">{(preview.job_analysis as any)?.experience_level || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Industry</label>
+                    <p className="font-semibold">{(preview.job_analysis as any)?.industry || 'Not specified'}</p>
                   </div>
                 </div>
                 <div>
+                  <label className="text-sm font-medium text-muted-foreground">Key Requirements</label>
+                  <p className="text-sm">{(preview.job_analysis?.keywords || []).join(', ') || 'No requirements identified'}</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Strengths</label>
+                    <p className="text-sm">{(preview.profile_match?.strengths || []).join(', ') || 'No strengths identified'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Gaps</label>
+                    <p className="text-sm">{(preview.profile_match?.gaps || []).join(', ') || 'No gaps identified'}</p>
+                  </div>
+                </div>
+                <div className="mt-4">
                   <label className="text-sm font-medium text-muted-foreground">Evidence Source</label>
                   <p className="text-sm">{preview.profile_match?.evidence_source || 'No evidence source available'}</p>
                 </div>
