@@ -47,15 +47,21 @@ export function Navigation() {
 
   return (
     <nav className="w-full bg-white shadow-sm fixed top-0 left-0 z-50 min-h-[56px] flex items-center justify-between px-4 py-2 md:py-3">
-      <div className="flex items-center gap-2">
+      <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
         {/* Logo */}
         <img src="/C5Logo.png" alt="Candidate 5 Logo" className="h-8 w-auto" />
         <span className="font-bold text-lg text-primary">Candidate 5</span>
-      </div>
+      </a>
       <div className="flex items-center gap-4">
         <button
           className="hidden md:inline text-base text-foreground hover:underline"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => {
+            if (location.pathname === '/dashboard') {
+              window.location.reload();
+            } else {
+              navigate('/dashboard');
+            }
+          }}
         >
           Dashboard
         </button>
@@ -76,7 +82,7 @@ export function Navigation() {
         </button>
         {showMenu && (
           <div className="absolute right-0 top-12 bg-background border rounded shadow-lg z-50 min-w-[180px]">
-            <button onClick={() => { navigate("/dashboard"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/dashboard") ? "text-primary font-medium" : "text-foreground"}`}>Dashboard</button>
+            <button onClick={() => { if (isActive("/dashboard")) window.location.reload(); else navigate("/dashboard"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/dashboard") ? "text-primary font-medium" : "text-foreground"}`}>Dashboard</button>
             <button onClick={() => { navigate("/careerarcv2"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/careerarcv2") ? "text-primary font-medium" : "text-foreground"}`}>Career Arc</button>
             <button onClick={() => { localStorage.setItem('resetApplyStep', 'true'); navigate("/apply"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/apply") ? "text-primary font-medium" : "text-foreground"}`}>Apply</button>
             <button onClick={() => { navigate("/my-cvs-new"); setShowMenu(false); }} className={`block w-full text-left px-4 py-2 hover:bg-accent ${isActive("/my-cvs-new") ? "text-primary font-medium" : "text-foreground"}`}>My CVs</button>

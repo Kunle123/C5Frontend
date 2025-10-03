@@ -540,7 +540,7 @@ export function CandidateLanding() {
       <footer className="border-t border-border/50 bg-muted/30 py-8 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-muted-foreground">
-            © 2024 Candidate 5. All rights reserved.
+            © 2025 Candidate 5. All rights reserved.
           </p>
         </div>
       </footer>

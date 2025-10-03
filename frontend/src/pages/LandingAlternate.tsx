@@ -10,7 +10,7 @@ const LandingAlternate = () => {
       {/* Navigation */}
       <nav className="border-b sticky top-0 bg-background/95 backdrop-blur z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="text-2xl font-bold text-primary">Candidate5</div>
+          <a href="/" className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity">Candidate5</a>
           <div className="flex items-center gap-4">
             <a href="/login" className="text-sm text-muted-foreground hover:text-foreground">Log In</a>
             <Button asChild>
