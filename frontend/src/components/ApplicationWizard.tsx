@@ -180,9 +180,22 @@ const ApplicationWizard = () => {
         body: JSON.stringify({
           name: `CV for ${preview?.job_analysis?.summary || 'Job Application'}`,
           description: `Generated for ${preview?.job_analysis?.summary || 'job application'}`,
-          experience: (cv as any).professional_experience?.roles || [], // Required field
+          experience: ((cv as any).professional_experience?.roles || []).map((role: any) => ({
+            job_title: role.title,
+            company_name: role.company,
+            start_date: role.start_date,
+            end_date: role.end_date,
+            location: role.location || '',
+            description: role.bullets?.map((b: any) => b.content).join('\n') || '',
+            responsibilities: role.bullets?.map((b: any) => b.content) || []
+          })),
           summary: (cv as any).professional_summary?.content || '',
-          education: (cv as any).education || [],
+          education: ((cv as any).education || []).map((edu: any) => ({
+            degree: edu.degree,
+            institution: edu.institution,
+            year: edu.graduation_date || edu.year,
+            classification: edu.classification || ''
+          })),
           skills: {
             technical: [
               ...((cv as any).technical_skills?.priority_1 || []),
