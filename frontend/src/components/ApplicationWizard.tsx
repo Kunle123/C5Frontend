@@ -178,46 +178,37 @@ const ApplicationWizard = () => {
           'Authorization': `Bearer ${userToken}`,
         },
         body: JSON.stringify({
-          name: `CV for ${preview?.job_analysis?.summary || 'Job Application'}`,
-          description: `Generated for ${preview?.job_analysis?.summary || 'job application'}`,
-          experience: ((cv as any).professional_experience?.roles || []).map((role: any) => ({
-            job_title: role.title,
-            company_name: role.company,
-            start_date: role.start_date,
-            end_date: role.end_date,
-            location: role.location || '',
-            description: role.bullets?.map((b: any) => b.content).join('\n') || '',
-            responsibilities: role.bullets?.map((b: any) => b.content) || []
-          })),
+          name: `CV for ${(preview?.job_analysis as any)?.job_title || preview?.job_analysis?.summary || 'Job Application'}`,
+          description: `Generated for ${(preview?.job_analysis as any)?.job_title || 'job application'}`,
+          template_id: 'default',
+          is_default: false,
+          type: 'cv',
           summary: (cv as any).professional_summary?.content || '',
+          experience: ((cv as any).professional_experience?.roles || [])
+            .slice(0, maxRoles || ((cv as any).professional_experience?.roles || []).length)
+            .map((role: any) => ({
+              job_title: role.title || '',
+              company_name: role.company || '',
+              start_date: role.start_date || '',
+              end_date: role.end_date || '',
+              location: role.location || '',
+              description: (role.bullets || []).map((b: any) => b.content || '').filter((c: string) => c).join('\n')
+            })),
           education: ((cv as any).education || []).map((edu: any) => ({
-            degree: edu.degree,
-            institution: edu.institution,
-            year: edu.graduation_date || edu.year,
+            degree: edu.degree || '',
+            institution: edu.institution || '',
+            year: String(edu.graduation_date || edu.year || ''),
             classification: edu.classification || ''
           })),
-          skills: {
-            technical: [
-              ...((cv as any).technical_skills?.priority_1 || []),
-              ...((cv as any).technical_skills?.priority_2 || []),
-              ...((cv as any).technical_skills?.priority_3 || [])
-            ],
-            soft: [
-              ...((cv as any).soft_skills?.priority_1 || []),
-              ...((cv as any).soft_skills?.priority_2 || [])
-            ]
-          },
-          achievements: (cv as any).achievements || [],
-          certifications: (cv as any).certifications || [],
-          projects: (cv as any).projects || [],
-          contact: {
-            name: (cv as any).personal_information?.name || '',
-            email: (cv as any).personal_information?.contact || '',
-            location: (cv as any).personal_information?.location || ''
-          },
-          job_description: jobDescription,
+          skills: [
+            ...((cv as any).technical_skills?.priority_1 || []),
+            ...((cv as any).technical_skills?.priority_2 || []),
+            ...((cv as any).technical_skills?.priority_3 || []),
+            ...((cv as any).soft_skills?.priority_1 || []),
+            ...((cv as any).soft_skills?.priority_2 || [])
+          ].filter(s => s),
+          contact: (cv as any).personal_information?.name || 'Candidate',
           cover_letter: (coverLetter as any)?.content || '',
-          generation_options: generationOptions,
         }),
       });
 
