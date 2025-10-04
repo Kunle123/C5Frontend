@@ -192,7 +192,7 @@ const ApplicationWizard = () => {
               start_date: role.start_date || '',
               end_date: role.end_date || '',
               location: role.location || '',
-              description: (role.bullets || []).map((b: any) => b.content || '').filter((c: string) => c).join('\n')
+              bullets: (role.bullets || []).map((b: any) => b.content || b).filter((c: string) => c)
             })),
           education: ((cv as any).education || []).map((edu: any) => ({
             degree: edu.degree || '',
