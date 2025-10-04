@@ -14,12 +14,10 @@ const LandingAlternate = () => {
   return (
     <>
       <style>{`
-        .landing-alternate .text-primary,
-        .landing-alternate [class*="text-primary"] {
+        .landing-alternate .text-primary:not(button *):not(a *) {
           color: ${brandColor} !important;
         }
-        .landing-alternate .bg-primary,
-        .landing-alternate [class*="bg-primary"]:not([class*="bg-primary/"]) {
+        .landing-alternate .bg-primary {
           background-color: ${brandColor} !important;
         }
         .landing-alternate .bg-primary\\/10 {
@@ -28,8 +26,19 @@ const LandingAlternate = () => {
         .landing-alternate .border-primary {
           border-color: ${brandColor} !important;
         }
-        .landing-alternate .hover\\:bg-primary:hover {
+        .landing-alternate button.bg-primary:hover,
+        .landing-alternate a.bg-primary:hover {
           background-color: ${brandColorDark} !important;
+        }
+        /* Ensure button text stays white */
+        .landing-alternate button.bg-primary,
+        .landing-alternate a.bg-primary {
+          color: white !important;
+        }
+        /* Icons in buttons should be white too */
+        .landing-alternate button.bg-primary svg,
+        .landing-alternate a.bg-primary svg {
+          color: white !important;
         }
       `}</style>
       <div className="min-h-screen bg-background landing-alternate">
