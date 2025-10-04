@@ -36,28 +36,51 @@ export function CVDownload() {
   // Helper for authenticated download (fetch+blob)
   const handleDownload = async (docId: string) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`/api/cv/${docId}/download`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) {
-      alert('Download failed');
-      return;
+    try {
+      const res = await fetch(`/api/cv/${docId}/download`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        let errorMessage = 'Download failed';
+        
+        if (res.status === 502) {
+          errorMessage = 'CV service is temporarily unavailable. Please try again in a few moments.';
+        } else if (res.status === 404) {
+          errorMessage = 'CV not found. It may have been deleted.';
+        } else {
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.detail || errorData.message || errorMessage;
+          } catch {
+            errorMessage = `Download failed (${res.status})`;
+          }
+        }
+        
+        alert(errorMessage);
+        return;
+      }
+      
+      const blob = await res.blob();
+      // Extract filename from Content-Disposition header
+      let filename = 'cv.docx';
+      const disposition = res.headers.get('Content-Disposition');
+      if (disposition && disposition.indexOf('filename=') !== -1) {
+        filename = disposition.split('filename=')[1].replace(/['"]/g, '').trim();
+      }
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Network error. Please check your connection and try again.');
+      console.error('Download error:', err);
     }
-    const blob = await res.blob();
-    // Extract filename from Content-Disposition header
-    let filename = 'cv.docx';
-    const disposition = res.headers.get('Content-Disposition');
-    if (disposition && disposition.indexOf('filename=') !== -1) {
-      filename = disposition.split('filename=')[1].replace(/['"]/g, '').trim();
-    }
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
   };
 
   // Show all CVs where cover_letter_available is true
@@ -189,3 +212,4 @@ export function CVDownload() {
     </div>
   );
 }
+
