@@ -6,12 +6,37 @@ import { CheckCircle, AlertCircle, XCircle, Sparkles, Shield, Zap, Target, Layer
 import { StatsTiles } from '../components/landing/StatsTiles';
 
 const LandingAlternate = () => {
+  // Custom color palette to match hero image - sage/teal tones
+  const brandColor = '#6B9080'; // Sage green from plants in hero image
+  const brandColorLight = '#A4C3B2'; // Lighter sage
+  const brandColorDark = '#4A6B5C'; // Darker sage
+  
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <style>{`
+        .landing-alternate .text-primary,
+        .landing-alternate [class*="text-primary"] {
+          color: ${brandColor} !important;
+        }
+        .landing-alternate .bg-primary,
+        .landing-alternate [class*="bg-primary"]:not([class*="bg-primary/"]) {
+          background-color: ${brandColor} !important;
+        }
+        .landing-alternate .bg-primary\\/10 {
+          background-color: ${brandColor}20 !important;
+        }
+        .landing-alternate .border-primary {
+          border-color: ${brandColor} !important;
+        }
+        .landing-alternate .hover\\:bg-primary:hover {
+          background-color: ${brandColorDark} !important;
+        }
+      `}</style>
+      <div className="min-h-screen bg-background landing-alternate">
       {/* Navigation */}
       <nav className="border-b sticky top-0 bg-background/95 backdrop-blur z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <a href="/" className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity">Candidate5</a>
+          <a href="/" className="text-2xl font-bold hover:opacity-80 transition-opacity" style={{ color: brandColor }}>Candidate5</a>
           <div className="flex items-center gap-4">
             <a href="/login" className="text-sm text-muted-foreground hover:text-foreground">Log In</a>
             <Button asChild>
@@ -29,7 +54,7 @@ const LandingAlternate = () => {
             AI-Powered Career Intelligence
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            Land Interviews <span className="text-primary">Twice as Fast</span>
+            Land Interviews <span style={{ color: brandColor }}>Twice as Fast</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Stop rewriting your CV for every job. Our AI analyzes job descriptions, matches your experience with evidence-based precision, and generates perfectly tailored applications in minutes.
@@ -900,6 +925,7 @@ const LandingAlternate = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 
