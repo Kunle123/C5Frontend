@@ -3,6 +3,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { CheckCircle, AlertCircle, XCircle, Sparkles, Shield, Zap, Target, Layers, Settings, BarChart, Award, Clock, FileText, ArrowRight } from 'lucide-react';
+import { StatsTiles } from '../components/landing/StatsTiles';
 
 const LandingAlternate = () => {
   return (
@@ -46,89 +47,106 @@ const LandingAlternate = () => {
           </div>
           <p className="text-sm text-muted-foreground pt-2">No credit card required • 3 free applications</p>
         </div>
+        
+        {/* Hero Image */}
+        <div className="max-w-4xl mx-auto mt-12">
+          <img
+            src="/hero-woman-desk.png"
+            alt="Professional woman working at desk"
+            className="rounded-lg object-cover shadow-lg w-full"
+          />
+        </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="bg-muted/50 py-12">
+      {/* Stats Section - Using StatsTiles from deployed page */}
+      <section className="bg-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">85%+</div>
-              <div className="text-sm text-muted-foreground">Average Match Score</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">&lt;8 min</div>
-              <div className="text-sm text-muted-foreground">Time to Apply</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">100%</div>
-              <div className="text-sm text-muted-foreground">Evidence-Based</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">3</div>
-              <div className="text-sm text-muted-foreground">Simple Steps</div>
-            </div>
-          </div>
+          <StatsTiles />
         </div>
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Three simple steps to get your perfect, tailored application materials
-          </p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <Card>
-            <CardHeader>
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <FileText className="w-6 h-6 text-primary" />
+      <section id="how-it-works" className="bg-muted/30 py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Three simple steps to get your perfect, tailored application materials
+            </p>
+          </div>
+          
+          {/* Step 1: Paste Job Posting */}
+          <div className="max-w-5xl mx-auto mb-16">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="order-2 md:order-1">
+                <img
+                  src="/paste-job-posting.jpeg"
+                  alt="Paste a job posting"
+                  className="rounded-lg object-cover shadow-lg w-full"
+                />
               </div>
-              <CardTitle>1. Paste Job Description</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Simply paste the job posting. Our AI instantly analyzes requirements, extracts keywords, and identifies what matters most.
-              </p>
-              <div className="text-xs text-primary font-medium">⚡ Takes 2 seconds</div>
-            </CardContent>
-          </Card>
+              <div className="order-1 md:order-2">
+                <Badge className="mb-4">Step 1</Badge>
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">Paste a job posting</h3>
+                <p className="text-muted-foreground text-lg mb-4">
+                  Simply paste the job posting. Our AI instantly analyzes requirements, extracts keywords, and identifies what matters most.
+                </p>
+                <div className="flex gap-1 mb-4">
+                  <Badge className="bg-emerald-100 text-emerald-800">Green</Badge>
+                  <Badge className="bg-amber-100 text-amber-800">Amber</Badge>
+                  <Badge className="bg-rose-100 text-rose-800">Red</Badge>
+                </div>
+                <div className="text-sm text-primary font-medium">⚡ Takes 2 seconds</div>
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Target className="w-6 h-6 text-primary" />
+          {/* Step 2: Showcase Skills */}
+          <div className="max-w-5xl mx-auto mb-16">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <Badge className="mb-4">Step 2</Badge>
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">Review keyword match</h3>
+                <p className="text-muted-foreground text-lg mb-4">
+                  See your match score and RAG analysis (Green/Amber/Red keywords) with evidence from your profile for complete transparency.
+                </p>
+                <p className="text-muted-foreground mb-4">
+                  Candidate 5 will provide keyword and match analysis so you know which roles suit you best and how to improve your chances.
+                </p>
               </div>
-              <CardTitle>2. Review Keyword Match</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                See your match score and RAG analysis (Green/Amber/Red keywords) with evidence from your profile for complete transparency.
-              </p>
-              <div className="flex gap-1 pt-2">
-                <Badge className="bg-emerald-100 text-emerald-800">Green</Badge>
-                <Badge className="bg-amber-100 text-amber-800">Amber</Badge>
-                <Badge className="bg-rose-100 text-rose-800">Red</Badge>
+              <div>
+                <img
+                  src="/showcase-skills.png"
+                  alt="Showcase your skills"
+                  className="rounded-lg object-cover shadow-lg w-full"
+                />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-primary" />
+          {/* Step 3: Stay Informed */}
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="order-2 md:order-1">
+                <img
+                  src="/stay-informed.png"
+                  alt="Stay informed"
+                  className="rounded-lg object-cover shadow-lg w-full"
+                />
               </div>
-              <CardTitle>3. Generate & Customize</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Get your tailored CV and cover letter. Toggle sections, adjust length, trim work history, and download when perfect.
-              </p>
-              <div className="text-xs text-primary font-medium">🎯 100% Factual - Zero Fabrication</div>
-            </CardContent>
-          </Card>
+              <div className="order-1 md:order-2">
+                <Badge className="mb-4">Step 3</Badge>
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">Generate & Customize</h3>
+                <p className="text-muted-foreground text-lg mb-4">
+                  Get your tailored CV and cover letter. Toggle sections, adjust length, trim work history, and download when perfect.
+                </p>
+                <p className="text-muted-foreground mb-4">
+                  Review your covering letter and CV, we'll help make any last minute tweaks to ensure it's pitch perfect.
+                </p>
+                <div className="text-sm text-primary font-medium">🎯 100% Factual - Zero Fabrication</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
