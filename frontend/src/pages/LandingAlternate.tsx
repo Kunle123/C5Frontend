@@ -700,7 +700,7 @@ const LandingAlternate = () => {
       </section>
 
       {/* Pricing Preview */}
-      <section className="container mx-auto px-4 py-16">
+      <section id="pricing" className="container mx-auto px-4 py-16">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
           <p className="text-lg text-muted-foreground mb-12">
@@ -903,8 +903,14 @@ const LandingAlternate = () => {
               <Button size="lg" variant="secondary" className="text-lg" asChild>
                 <a href="/signup">Create Free Account</a>
               </Button>
-              <Button size="lg" variant="outline" className="text-lg border-white text-white hover:bg-white/10" asChild>
-                <a href="/pricing">View Pricing</a>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="text-lg border-white hover:bg-white/10"
+                style={{ color: 'white', borderColor: 'white' }}
+                onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                View Pricing
               </Button>
             </div>
             <p className="text-sm mt-6 opacity-75">No credit card required • Start with 3 free applications</p>
