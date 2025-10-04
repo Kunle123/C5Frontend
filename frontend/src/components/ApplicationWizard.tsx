@@ -225,7 +225,7 @@ const ApplicationWizard = () => {
       });
 
       // Redirect to My CVs page
-      window.location.href = '/my-cvs';
+      window.location.href = '/my-cvs-new';
       
     } catch (err) {
       toast({
