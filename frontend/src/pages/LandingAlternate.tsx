@@ -717,19 +717,19 @@ const LandingAlternate = () => {
               <CardContent>
                 <ul className="space-y-2 text-sm text-left">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
-                    <span>3 applications per month</span>
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span>3 applications per day</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
                     <span>Career Arc profile</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
                     <span>RAG keyword analysis</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
                     <span>All customization features</span>
                   </li>
                 </ul>
@@ -742,62 +742,62 @@ const LandingAlternate = () => {
             <Card className="border-primary shadow-lg">
               <CardHeader>
                 <Badge className="w-fit mb-2">Most Popular</Badge>
-                <CardTitle>Pro</CardTitle>
-                <div className="text-3xl font-bold mt-2">£19.99</div>
+                <CardTitle>Monthly</CardTitle>
+                <div className="text-3xl font-bold mt-2">£24.95</div>
                 <p className="text-sm text-muted-foreground">per month</p>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-left">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
-                    <span><strong>30 applications</strong> per month</span>
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span><strong>100 applications</strong> per month</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span><strong>+ 3 per day</strong> bonus</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
                     <span>Everything in Free</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
                     <span>Priority support</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
-                    <span>Advanced analytics</span>
                   </li>
                 </ul>
                 <Button className="w-full mt-6" asChild>
-                  <a href="/signup">Start Free Trial</a>
+                  <a href="/signup">Start Monthly Plan</a>
                 </Button>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Unlimited</CardTitle>
-                <div className="text-3xl font-bold mt-2">£39.99</div>
-                <p className="text-sm text-muted-foreground">per month</p>
+                <CardTitle>Annual</CardTitle>
+                <div className="text-3xl font-bold mt-2">£199</div>
+                <p className="text-sm text-muted-foreground">per year</p>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-left">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
-                    <span><strong>Unlimited applications</strong></span>
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span><strong>100 applications</strong> per month</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
-                    <span>Everything in Pro</span>
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span><strong>+ 5 per day</strong> bonus</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
-                    <span>1:1 career coaching call</span>
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span>Everything in Monthly</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
-                    <span>LinkedIn optimization</span>
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span><strong>Save £100</strong> per year</span>
                   </li>
                 </ul>
                 <Button className="w-full mt-6" variant="outline" asChild>
-                  <a href="/signup">Get Unlimited</a>
+                  <a href="/signup">Get Annual Plan</a>
                 </Button>
               </CardContent>
             </Card>
