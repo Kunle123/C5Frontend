@@ -718,7 +718,15 @@ const LandingAlternate = () => {
                 <ul className="space-y-2 text-sm text-left">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span>3 applications per day</span>
+                    <span>3 credits per month</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span>Up to 3 CVs per month</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span>Tailored cover letter with every CV</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
@@ -726,11 +734,7 @@ const LandingAlternate = () => {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span>RAG keyword analysis</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span>All customization features</span>
+                    <span>DOCX downloads</span>
                   </li>
                 </ul>
                 <Button className="w-full mt-6" variant="outline" asChild>
@@ -743,30 +747,38 @@ const LandingAlternate = () => {
               <CardHeader>
                 <Badge className="w-fit mb-2">Most Popular</Badge>
                 <CardTitle>Monthly</CardTitle>
-                <div className="text-3xl font-bold mt-2">£24.95</div>
+                <div className="text-3xl font-bold mt-2">£24.99</div>
                 <p className="text-sm text-muted-foreground">per month</p>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-left">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span><strong>100 applications</strong> per month</span>
+                    <span><strong>100 credits</strong> monthly recurring</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span><strong>+ 3 per day</strong> bonus</span>
+                    <span><strong>+ 3 credits per day</strong></span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span>Everything in Free</span>
+                    <span>Create up to 140 CVs per month</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span>Tailored cover letter with every CV</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
                     <span>Priority support</span>
                   </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span>Cancel anytime</span>
+                  </li>
                 </ul>
                 <Button className="w-full mt-6" asChild>
-                  <a href="/signup">Start Monthly Plan</a>
+                  <a href="/pricing">Start Monthly Plan</a>
                 </Button>
               </CardContent>
             </Card>
@@ -781,23 +793,31 @@ const LandingAlternate = () => {
                 <ul className="space-y-2 text-sm text-left">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span><strong>100 applications</strong> per month</span>
+                    <span><strong>100 credits</strong> monthly recurring</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span><strong>+ 5 per day</strong> bonus</span>
+                    <span><strong>+ 5 credits per day</strong></span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span>Everything in Monthly</span>
+                    <span>Create up to 200 CVs per month</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
-                    <span><strong>Save £100</strong> per year</span>
+                    <span>Tailored cover letter with every CV</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span><strong>33% discount</strong></span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" style={{ color: brandColor }} />
+                    <span>Cancel anytime</span>
                   </li>
                 </ul>
                 <Button className="w-full mt-6" variant="outline" asChild>
-                  <a href="/signup">Get Annual Plan</a>
+                  <a href="/pricing">Choose Annual - Save 33%!</a>
                 </Button>
               </CardContent>
             </Card>
