@@ -98,11 +98,16 @@ export function CareerArcPage() {
   };
 
   const handleDeleteExperience = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this work experience? This action cannot be undone.')) {
+      return;
+    }
+    
     try {
       await deleteWorkExperience(id);
       toast({ title: "Experience deleted", description: "The experience has been removed from your Career Arc™." });
       setRefreshFlag(f => f + 1);
     } catch (err: any) {
+      console.error('Delete error:', err);
       toast({ title: "Delete failed", description: err?.message || "Could not delete experience", variant: "destructive" });
     }
   };
