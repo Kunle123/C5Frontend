@@ -942,7 +942,7 @@ const LandingAlternate = () => {
               <div>
                 <h4 className="font-semibold mb-3">Legal</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="/privacy">Privacy</a></li>
+                  <li><a href="/privacy-policy">Privacy</a></li>
                   <li><a href="/terms">Terms</a></li>
                 </ul>
               </div>
