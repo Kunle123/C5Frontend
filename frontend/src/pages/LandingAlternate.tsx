@@ -150,8 +150,8 @@ const LandingAlternate = () => {
               </div>
               <div>
                 <img
-                  src="/showcase-skills.jpeg"
-                  alt="Showcase your skills"
+                  src="/KeywordMatch.png"
+                  alt="Keyword match analysis"
                   className="rounded-lg object-cover shadow-lg w-full"
                 />
               </div>
@@ -163,16 +163,16 @@ const LandingAlternate = () => {
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-2 md:order-1">
                 <img
-                  src="/stay-informed.jpeg"
-                  alt="Stay informed"
+                  src="/GenerateCustomise1.png"
+                  alt="Generate and customise"
                   className="rounded-lg object-cover shadow-lg w-full"
                 />
               </div>
               <div className="order-1 md:order-2">
                 <Badge className="mb-4">Step 3</Badge>
-                <h3 className="text-2xl md:text-3xl font-bold mb-4">Generate & Customize</h3>
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">Generate & Customise</h3>
                 <p className="text-muted-foreground text-lg mb-4">
-                  Get your tailored CV and cover letter. Toggle sections, adjust length, trim work history, and download when perfect.
+                  Get your tailored CV and cover letter. Toggle sections, adjust length, trim work history, and download when it's perfect.
                 </p>
                 <p className="text-muted-foreground mb-4">
                   Review your covering letter and CV, we'll help make any last minute tweaks to ensure it's pitch perfect.
