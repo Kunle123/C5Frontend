@@ -22,6 +22,7 @@ import FAQ from './pages/FAQ';
 import DebugCVAIResponse from './pages/DebugCVAIResponse';
 import SearchJobs from './pages/SearchJobs';
 import Landing from './pages/Landing';
+import LandingOriginal from './pages/LandingOriginal';
 import LandingAlternate from './pages/LandingAlternate';
 import ColorTest from './pages/ColorTest';
 import TailwindUiTest from './pages/TailwindUiTest';
@@ -75,6 +76,7 @@ function App() {
           <Routes>
             {/* Tailwind/shadcn/ui landing and auth pages - NO ChakraProvider */}
             <Route path="/" element={<Landing />} />
+            <Route path="/landing-original" element={<LandingOriginal />} />
             <Route path="/landing-alternate" element={<LandingAlternate />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />

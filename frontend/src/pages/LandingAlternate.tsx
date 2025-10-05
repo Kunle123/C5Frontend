@@ -321,7 +321,7 @@ const LandingAlternate = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Build your career profile once. Upload CVs, add experiences manually, or import from LinkedIn. Then generate unlimited tailored applications.
+                  Build your career profile once. Upload CVs or add experiences manually. Then generate unlimited tailored applications.
                 </p>
                 <div className="text-xs text-primary font-medium">One profile, unlimited applications</div>
               </CardContent>
