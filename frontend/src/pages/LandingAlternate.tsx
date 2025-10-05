@@ -254,7 +254,7 @@ const LandingAlternate = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Customize your CV on the fly. Toggle achievements, competencies, education, and certifications on or off instantly.
+                  Customise your CV on the fly. Toggle achievements, competencies, education, and certifications on or off instantly.
                 </p>
                 <div className="space-y-1 text-xs">
                   <div className="flex items-center gap-2">
@@ -410,7 +410,7 @@ const LandingAlternate = () => {
         </div>
       </section>
 
-      {/* Customization Features */}
+      {/* Customisation Features */}
       <section className="bg-muted/50 py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
@@ -595,7 +595,7 @@ const LandingAlternate = () => {
                   <Settings className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Full Customization Control</h3>
+                  <h3 className="font-semibold text-lg mb-2">Full Customisation Control</h3>
                   <p className="text-muted-foreground">
                     Toggle sections, adjust length, trim roles, add custom instructions. The AI adapts to your preferences in real-time.
                   </p>
@@ -824,7 +824,7 @@ const LandingAlternate = () => {
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
-            All plans include Career Arc, Application Wizard, and all customization features
+            All plans include Career Arc, Application Wizard, and all customisation features
           </p>
         </div>
       </section>
