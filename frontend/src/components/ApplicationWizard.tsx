@@ -111,8 +111,8 @@ const ApplicationWizard = () => {
       setIsAnalyzing(false);
     } catch (err) {
       toast({
-        title: "Error Analyzing Job Description",
-        description: err instanceof Error ? err.message : "Failed to analyze job description.",
+        title: "Error Analysing Job Description",
+        description: err instanceof Error ? err.message : "Failed to analyse job description.",
         variant: "destructive",
       });
       setIsAnalyzing(false);
@@ -837,9 +837,9 @@ const ApplicationWizard = () => {
             <CardContent className="py-12">
               <div className="text-center space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <h3 className="text-lg font-semibold">Analyzing Job Description</h3>
+                <h3 className="text-lg font-semibold">Analysing Job Description</h3>
                 <p className="text-muted-foreground">
-                  Please wait while we extract keywords and analyze the requirements...
+                  Please wait while we extract keywords and analyse the requirements...
                 </p>
                     </div>
             </CardContent>

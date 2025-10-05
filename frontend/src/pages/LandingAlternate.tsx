@@ -66,7 +66,7 @@ const LandingAlternate = () => {
             Land Interviews <span style={{ color: brandColor }}>Twice as Fast</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Stop rewriting your CV for every job. Our AI analyzes job descriptions, matches your experience with evidence-based precision, and generates perfectly tailored applications in minutes.
+            Stop rewriting your CV for every job. Our AI analyses job descriptions, matches your experience with evidence-based precision, and generates perfectly tailored applications in minutes.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button size="lg" className="text-lg" asChild>
@@ -123,7 +123,7 @@ const LandingAlternate = () => {
                 <Badge className="mb-4">Step 1</Badge>
                 <h3 className="text-2xl md:text-3xl font-bold mb-4">Paste a job posting</h3>
                 <p className="text-muted-foreground text-lg mb-4">
-                  Simply paste the job posting. Our AI instantly analyzes requirements, extracts keywords, and identifies what matters most.
+                  Simply paste the job posting. Our AI instantly analyses requirements, extracts keywords, and identifies what matters most.
                 </p>
                 <div className="flex gap-1 mb-4">
                   <Badge className="bg-emerald-100 text-emerald-800">Green</Badge>
@@ -495,7 +495,7 @@ const LandingAlternate = () => {
                       <div className="flex items-start gap-3">
                         <Target className="w-5 h-5 text-primary mt-0.5" />
                         <div>
-                          <h4 className="font-semibold mb-1">Job-Specific Optimization</h4>
+                          <h4 className="font-semibold mb-1">Job-Specific Optimisation</h4>
                           <p className="text-sm text-muted-foreground">
                             Every CV is tailored to the specific role. Keywords are naturally integrated where evidence exists.
                           </p>
@@ -609,7 +609,7 @@ const LandingAlternate = () => {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Multiple CV Variants</h3>
                   <p className="text-muted-foreground">
-                    Generate short, medium, or long versions instantly. Each optimized for different application contexts.
+                    Generate short, medium, or long versions instantly. Each optimised for different application contexts.
                   </p>
                 </div>
               </div>

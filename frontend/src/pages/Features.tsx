@@ -29,7 +29,7 @@ const Features = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-3">
-                See exactly which keywords you match (Green), partially match (Amber), or need to address (Red) - all with evidence from your profile.
+                See exactly which keywords you match (Green), partially match (Amber), or need to address (Red) — all with evidence from your profile.
               </p>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs">

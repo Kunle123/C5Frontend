@@ -11,7 +11,7 @@ const Blog = () => {
     {
       id: 1,
       title: "How to Write a CV That Gets Past ATS Systems",
-      excerpt: "Learn the secrets to optimizing your CV for Applicant Tracking Systems while maintaining readability for human recruiters.",
+      excerpt: "Learn the secrets to optimising your CV for Applicant Tracking Systems while maintaining readability for human recruiters.",
       date: "2025-10-01",
       readTime: "5 min read",
       category: "CV Tips"
