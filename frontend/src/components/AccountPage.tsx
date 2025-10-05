@@ -569,7 +569,7 @@ export function AccountPage() {
                     </Button>
                   </div>
                 ) : (
-                  <Button onClick={handleEditProfile} variant="outline">
+                  <Button onClick={handleEditProfile} className="bg-primary text-primary-foreground hover:bg-primary/90">
                     Edit Profile
                   </Button>
                 )}
@@ -678,7 +678,7 @@ export function AccountPage() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Status</span>
-                    <Badge variant="default" className="bg-success text-success-foreground">{status}</Badge>
+                    <Badge variant={status === 'error' || status === 'Error' ? 'destructive' : 'default'} className={status === 'error' || status === 'Error' ? '' : 'bg-success text-success-foreground'}>{status === 'error' || status === 'Error' ? 'Inactive' : status}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Next Billing</span>

@@ -333,7 +333,7 @@ export const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="gap-2 h-auto py-4 flex-col"
-                onClick={() => navigate("/account-new")}
+                onClick={() => navigate("/account")}
               >
                 <User className="h-6 w-6" />
                 <span>Account</span>
