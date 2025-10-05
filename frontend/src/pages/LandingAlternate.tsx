@@ -903,15 +903,6 @@ const LandingAlternate = () => {
               <Button size="lg" variant="secondary" className="text-lg" asChild>
                 <a href="/signup">Create Free Account</a>
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="text-lg border-white hover:bg-white/10"
-                style={{ color: 'white', borderColor: 'white' }}
-                onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                View Pricing
-              </Button>
             </div>
             <p className="text-sm mt-6 opacity-75">No credit card required • Start with 3 free applications</p>
           </CardContent>
