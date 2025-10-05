@@ -37,6 +37,8 @@ import { CreditsProvider } from './context/CreditsContext';
 import ApplicationHistory from './components/ApplicationHistory';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Features from './pages/Features';
+import Blog from './pages/Blog';
 import ATSProof from './pages/ATSProof';
 import CareerArcInfo from './pages/CareerArcInfo';
 import ApplicationTracker from './pages/ApplicationTracker';
@@ -92,6 +94,8 @@ function App() {
             <Route path="/privacy-policy" element={<ChakraProvider theme={theme}><PrivacyPolicy /></ChakraProvider>} />
             <Route path="/terms" element={<ChakraProvider theme={theme}><Terms /></ChakraProvider>} />
             <Route path="/faq" element={<ChakraProvider theme={theme}><FAQ /></ChakraProvider>} />
+            <Route path="/features" element={<Features />} />
+            <Route path="/blog" element={<Blog />} />
             <Route path="/debug-cv-ai" element={<ChakraProvider theme={theme}><DebugCVAIResponse /></ChakraProvider>} />
             <Route path="/search-jobs" element={<ChakraProvider theme={theme}><SearchJobs /></ChakraProvider>} />
             <Route path="/colortest" element={<ColorTest />} />
