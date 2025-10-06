@@ -268,50 +268,48 @@ const AdminUserDetail = () => {
             {creditHistory.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">No credit transactions yet</p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Reason</TableHead>
-                    <TableHead>Balance</TableHead>
-                    <TableHead>Notes</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {creditHistory.map((tx) => (
-                    <TableRow key={tx.id}>
-                      <TableCell className="text-sm">
-                        {new Date(tx.created_at).toLocaleString()}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          {tx.amount > 0 ? (
-                            <>
-                              <TrendingUp className="h-3 w-3 text-green-600" />
-                              <span className="text-green-600 font-semibold">+{tx.amount}</span>
-                            </>
-                          ) : (
-                            <>
-                              <TrendingDown className="h-3 w-3 text-red-600" />
-                              <span className="text-red-600 font-semibold">{tx.amount}</span>
-                            </>
-                          )}
+              <div className="space-y-3">
+                {creditHistory.map((tx) => (
+                  <Card key={tx.id}>
+                    <CardContent className="pt-4">
+                      <div className="grid grid-cols-5 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground block text-xs">Date</span>
+                          <span>{new Date(tx.created_at).toLocaleDateString()}</span>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{tx.reason}</Badge>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {tx.balance_before} → {tx.balance_after}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {tx.notes || '-'}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        <div>
+                          <span className="text-muted-foreground block text-xs">Amount</span>
+                          <div className="flex items-center gap-1">
+                            {tx.amount > 0 ? (
+                              <>
+                                <TrendingUp className="h-3 w-3 text-green-600" />
+                                <span className="text-green-600 font-semibold">+{tx.amount}</span>
+                              </>
+                            ) : (
+                              <>
+                                <TrendingDown className="h-3 w-3 text-red-600" />
+                                <span className="text-red-600 font-semibold">{tx.amount}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground block text-xs">Reason</span>
+                          <Badge variant="outline" className="text-xs">{tx.reason}</Badge>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground block text-xs">Balance</span>
+                          <span>{tx.balance_before} → {tx.balance_after}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground block text-xs">Notes</span>
+                          <span className="text-muted-foreground">{tx.notes || '-'}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>
