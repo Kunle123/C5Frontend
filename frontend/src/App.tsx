@@ -43,6 +43,10 @@ import Blog from './pages/Blog';
 import ATSProof from './pages/ATSProof';
 import CareerArcInfo from './pages/CareerArcInfo';
 import ApplicationTracker from './pages/ApplicationTracker';
+import { AdminRoute } from './components/AdminRoute';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminUserDetail from './pages/admin/AdminUserDetail';
 
 // Notification context
 export const NotificationContext = createContext<{ notify: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void }>({ notify: () => {} });
@@ -112,6 +116,12 @@ function App() {
             <Route path="/ats-proof" element={<ATSProof />} />
             <Route path="/career-arc" element={<CareerArcInfo />} />
             <Route path="/application-tracker" element={<ApplicationTracker />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+            <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+            <Route path="/admin/users/:userId" element={<AdminRoute><AdminUserDetail /></AdminRoute>} />
+            
             <Route path="*" element={<ChakraProvider theme={theme}><NotFound /></ChakraProvider>} />
           </Routes>
         </Router>
