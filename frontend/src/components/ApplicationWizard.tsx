@@ -140,12 +140,14 @@ const ApplicationWizard = () => {
         const totalRoles = (cv as any)?.professional_experience?.roles?.length || 0;
         setMaxRoles(totalRoles); // Initialize to show all roles
         
-        // Deduct 1 credit after successful generation
-        await refreshCredits();
+        // Refresh credits after successful generation (backend should have deducted automatically)
+        setTimeout(async () => {
+          await refreshCredits();
+        }, 1000); // Small delay to ensure backend has processed
         
         toast({
           title: "Documents Generated",
-          description: "All CV variations have been successfully generated!",
+          description: "All CV variations have been successfully generated! 1 credit used.",
         });
       }
       setIsGenerating(false);
