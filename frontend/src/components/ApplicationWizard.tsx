@@ -429,11 +429,20 @@ const ApplicationWizard = () => {
                 </div>
                 {Array.isArray(role.bullets) && role.bullets.length > 0 && (
                   <ul className="list-disc ml-4 space-y-1">
-                    {role.bullets.map((bullet: any, j: number) => (
-                      <li key={j} className="text-sm">
-                        {typeof bullet === 'string' ? bullet : bullet.content}
-                      </li>
-                    ))}
+                    {role.bullets
+                      .filter((bullet: any) => {
+                        // If bullet is a string, always show it
+                        if (typeof bullet === 'string') return true;
+                        // If bullet is an object with priority, filter by length selection
+                        if (bullet.priority) return shouldShowByPriority(bullet);
+                        // Otherwise show it
+                        return true;
+                      })
+                      .map((bullet: any, j: number) => (
+                        <li key={j} className="text-sm">
+                          {typeof bullet === 'string' ? bullet : bullet.content}
+                        </li>
+                      ))}
                   </ul>
                 )}
               </div>
