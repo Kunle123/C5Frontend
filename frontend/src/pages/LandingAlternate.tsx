@@ -845,7 +845,7 @@ const LandingAlternate = () => {
                   ))}
                 </div>
                 <p className="text-sm mb-4">
-                  "The RAG keyword system is brilliant! I could see exactly which skills I matched and which ones to emphasize. Got 3 interviews in my first week."
+                  "The RAG keyword system is brilliant! I could see exactly which skills I matched and which ones to emphasize."
                 </p>
                 <div className="text-xs text-muted-foreground">
                   <div className="font-semibold">Sarah M.</div>
@@ -862,7 +862,7 @@ const LandingAlternate = () => {
                   ))}
                 </div>
                 <p className="text-sm mb-4">
-                  "The work experience trimmer is genius. I could create a focused 2-page CV for startups and a comprehensive 4-pager for corporate roles from the same profile."
+                  "The work experience trimmer is genius. I could create a focused 2-page CV for startups and a comprehensive 4-pager for corporate roles."
                 </p>
                 <div className="text-xs text-muted-foreground">
                   <div className="font-semibold">James K.</div>
@@ -879,7 +879,7 @@ const LandingAlternate = () => {
                   ))}
                 </div>
                 <p className="text-sm mb-4">
-                  "Finally, an AI that doesn't make things up! Every statement was backed by my actual experience. Recruiters noticed the authenticity."
+                  "Finally, an AI that doesn't make things up! Every statement was backed by my actual experience. Recruiters notice the authenticity."
                 </p>
                 <div className="text-xs text-muted-foreground">
                   <div className="font-semibold">Rachel P.</div>
