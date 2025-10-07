@@ -199,9 +199,16 @@ const ApplicationWizard = () => {
           education: ((cv as any).education || []).map((edu: any) => ({
             degree: edu.degree || '',
             institution: edu.institution || '',
-            year: String(edu.graduation_date || edu.year || ''),
-            classification: edu.classification || ''
+            year: String(edu.end_date || edu.graduation_date || edu.year || ''),
+            classification: edu.classification || '',
+            field: edu.field || ''
           })),
+          achievements: generationOptions.sections.achievements 
+            ? ((cv as any).achievements || []).map((ach: any) => ({
+                content: ach.content || ach,
+                priority: ach.priority || 1
+              }))
+            : [],
           skills: [
             ...((cv as any).technical_skills?.priority_1 || []),
             ...((cv as any).technical_skills?.priority_2 || []),
@@ -209,6 +216,13 @@ const ApplicationWizard = () => {
             ...((cv as any).soft_skills?.priority_1 || []),
             ...((cv as any).soft_skills?.priority_2 || [])
           ].filter(s => s),
+          certifications: generationOptions.sections.certifications
+            ? ((cv as any).certifications || []).map((cert: any) => ({
+                name: cert.name || '',
+                issuer: cert.issuer || '',
+                year: String(cert.year || cert.date || '')
+              }))
+            : [],
           contact: (cv as any).personal_information?.name || 'Candidate',
           cover_letter: (coverLetter as any)?.content || '',
         }),
