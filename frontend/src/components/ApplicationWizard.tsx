@@ -326,36 +326,7 @@ const ApplicationWizard = () => {
           </div>
         )}
 
-        {/* Professional Experience - Always included */}
-        {cv.professional_experience && Array.isArray(cv.professional_experience.roles) && (
-          <div>
-            <h3 className="font-semibold text-lg mb-2">Professional Experience</h3>
-            {cv.professional_experience.roles
-              .slice(0, maxRoles || cv.professional_experience.roles.length) // Trim to maxRoles
-              .map((role: any, i: number) => (
-              <div key={i} className="mb-4 border-l-2 border-primary/20 pl-4">
-                <div className="font-medium text-base">
-                  {role.title} | {role.company}
-                </div>
-                <div className="text-muted-foreground text-sm mb-2">
-                  {role.start_date} - {role.end_date}
-                  {role.location && <span className="ml-2">| {role.location}</span>}
-                </div>
-                {Array.isArray(role.bullets) && (
-                  <ul className="list-disc ml-4 space-y-1">
-                    {role.bullets
-                      .filter((bullet: any) => shouldShowByPriority(bullet))
-                      .map((bullet: any, j: number) => (
-                        <li key={j} className="text-sm">{bullet.content}</li>
-                      ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Achievements Section - Toggleable */}
+        {/* Key Achievements - Toggleable, appears right after summary */}
         {cv.achievements && generationOptions.sections.achievements && (
           <div>
             <h3 className="font-semibold text-lg mb-2">Key Achievements</h3>
@@ -369,10 +340,10 @@ const ApplicationWizard = () => {
           </div>
         )}
 
-        {/* Technical Skills - Toggleable */}
+        {/* Core Competencies - Toggleable, appears after achievements */}
         {cv.technical_skills && generationOptions.sections.competencies && (
           <div>
-            <h3 className="font-semibold text-lg mb-2">Technical Skills</h3>
+            <h3 className="font-semibold text-lg mb-2">Core Competencies - Technical Skills</h3>
             <div className="space-y-2">
               {cv.technical_skills.priority_1 && cv.technical_skills.priority_1.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -405,10 +376,10 @@ const ApplicationWizard = () => {
           </div>
         )}
 
-        {/* Soft Skills - Toggleable */}
+        {/* Soft Skills - Part of Competencies */}
         {cv.soft_skills && generationOptions.sections.competencies && (
           <div>
-            <h3 className="font-semibold text-lg mb-2">Soft Skills</h3>
+            <h3 className="font-semibold text-lg mb-2">Core Competencies - Soft Skills</h3>
             <div className="space-y-2">
               {cv.soft_skills.priority_1 && cv.soft_skills.priority_1.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -432,6 +403,35 @@ const ApplicationWizard = () => {
           </div>
         )}
 
+        {/* Professional Experience - Always included, appears after competencies */}
+        {cv.professional_experience && Array.isArray(cv.professional_experience.roles) && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Professional Experience</h3>
+            {cv.professional_experience.roles
+              .slice(0, maxRoles || cv.professional_experience.roles.length) // Trim to maxRoles
+              .map((role: any, i: number) => (
+              <div key={i} className="mb-4 border-l-2 border-primary/20 pl-4">
+                <div className="font-medium text-base">
+                  {role.title} | {role.company}
+                </div>
+                <div className="text-muted-foreground text-sm mb-2">
+                  {role.start_date} - {role.end_date}
+                  {role.location && <span className="ml-2">| {role.location}</span>}
+                </div>
+                {Array.isArray(role.bullets) && (
+                  <ul className="list-disc ml-4 space-y-1">
+                    {role.bullets
+                      .filter((bullet: any) => shouldShowByPriority(bullet))
+                      .map((bullet: any, j: number) => (
+                        <li key={j} className="text-sm">{bullet.content}</li>
+                      ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Education Section - Toggleable */}
         {cv.education && generationOptions.sections.education && (
           <div>
@@ -440,8 +440,8 @@ const ApplicationWizard = () => {
               .filter((edu: any) => shouldShowByPriority(edu))
               .map((edu: any, i: number) => (
                 <div key={i} className="mb-2">
-                  <div className="font-medium">{edu.degree}</div>
-                  <div className="text-muted-foreground">{edu.institution} ({edu.graduation_date})</div>
+                  <div className="font-medium">{edu.degree} {edu.field && `in ${edu.field}`}</div>
+                  <div className="text-muted-foreground">{edu.institution} ({edu.end_date || edu.graduation_date || edu.year})</div>
                   {edu.classification && <div className="text-sm text-muted-foreground">{edu.classification}</div>}
                 </div>
               ))}
@@ -458,7 +458,7 @@ const ApplicationWizard = () => {
                 .map((cert: any, i: number) => (
                   <div key={i}>
                     <div className="font-medium">{cert.name}</div>
-                    <div className="text-muted-foreground text-sm">{cert.issuer} ({cert.date})</div>
+                    <div className="text-muted-foreground text-sm">{cert.issuer} ({cert.year || cert.date})</div>
                   </div>
                 ))}
             </div>
@@ -611,7 +611,7 @@ const ApplicationWizard = () => {
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Job Title</label>
                     <p className="font-semibold">{(preview.job_analysis as any)?.job_title || preview.job_analysis?.summary || 'Not specified'}</p>
-                  </div>
+                    </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Company</label>
                     <p className="font-semibold">{(preview.job_analysis as any)?.company || 'Not specified'}</p>
@@ -619,21 +619,21 @@ const ApplicationWizard = () => {
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Experience Level</label>
                     <p className="font-semibold">{(preview.job_analysis as any)?.experience_level || 'Not specified'}</p>
-                  </div>
+                        </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Industry</label>
                     <p className="font-semibold">{(preview.job_analysis as any)?.industry || 'Not specified'}</p>
-                  </div>
-                </div>
-                <div>
+                      </div>
+                    </div>
+                    <div>
                   <label className="text-sm font-medium text-muted-foreground">Key Requirements</label>
                   <p className="text-sm">{(preview.job_analysis?.keywords || []).join(', ') || 'No requirements identified'}</p>
-                </div>
+                      </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Strengths</label>
                     <p className="text-sm">{(preview.profile_match?.strengths || []).join(', ') || 'No strengths identified'}</p>
-                  </div>
+                    </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Gaps</label>
                     <p className="text-sm">{(preview.profile_match?.gaps || []).join(', ') || 'No gaps identified'}</p>
@@ -658,14 +658,14 @@ const ApplicationWizard = () => {
                     (preview.profile_match?.match_score || 0) >= 50 ? 'text-amber-600' : 'text-rose-600'
                   }`}>
                     {preview.profile_match?.match_score || 0}%
-                    </div>
+          </div>
                   <div className="flex-1">
                     <Progress value={preview.profile_match?.match_score || 0} className="h-3" />
-                  </div>
+              </div>
                   <div className="text-sm text-muted-foreground">
                     {(preview.keyword_coverage?.present_in_profile || []).length} / {((preview.keyword_coverage?.present_in_profile || []).length + (preview.keyword_coverage?.missing_from_profile || []).length)} keywords matched
-                        </div>
-                      </div>
+            </div>
+          </div>
                 <div className="mt-4 text-sm text-muted-foreground">
                   <div><strong>Evidence:</strong> {preview.profile_match?.evidence_source || 'No evidence available'}</div>
                     </div>
@@ -680,12 +680,12 @@ const ApplicationWizard = () => {
                   <CardTitle className="text-emerald-700 flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
                     Strong Match
-                  </CardTitle>
+                </CardTitle>
                   <p className="text-sm text-muted-foreground">
                     Direct evidence in your profile
                   </p>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {((preview.keyword_coverage as any)?.keywords || preview.keyword_coverage?.present_in_profile || [])
                       .filter((kw: any) => typeof kw === 'object' ? kw.status === 'green' : true)
@@ -707,7 +707,7 @@ const ApplicationWizard = () => {
                         </Tooltip>
                       </TooltipProvider>
                     ))}
-                  </div>
+                </div>
                 </CardContent>
               </Card>
 
@@ -777,7 +777,7 @@ const ApplicationWizard = () => {
                         </Tooltip>
                       </TooltipProvider>
                     ))}
-                  </div>
+                    </div>
                 </CardContent>
               </Card>
             </div>
@@ -961,8 +961,8 @@ const ApplicationWizard = () => {
                     <p className="text-xs text-muted-foreground">
                       Adjust the slider to include fewer work experiences. The most recent roles will be shown first.
                     </p>
-                  </div>
-                )}
+                    </div>
+                  )}
 
                 {/* Document Preview with Tabs */}
                 {(cv || coverLetter) ? (
@@ -1070,13 +1070,13 @@ const ApplicationWizard = () => {
                         <Edit3 className="w-4 h-4 mr-2" />
                         Edit/Request Update
                   </Button>
-                      <Button
+                  <Button
                         onClick={handleSaveAndDownload}
-                        className="flex-1"
-                      >
+                    className="flex-1"
+                  >
                         Save & Go to Downloads
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
                     </>
                   ) : (
                     <Button
