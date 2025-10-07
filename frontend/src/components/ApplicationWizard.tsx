@@ -427,13 +427,13 @@ const ApplicationWizard = () => {
                   {role.start_date} - {role.end_date}
                   {role.location && <span className="ml-2">| {role.location}</span>}
                 </div>
-                {Array.isArray(role.bullets) && (
+                {Array.isArray(role.bullets) && role.bullets.length > 0 && (
                   <ul className="list-disc ml-4 space-y-1">
-                    {role.bullets
-                      .filter((bullet: any) => shouldShowByPriority(bullet))
-                      .map((bullet: any, j: number) => (
-                        <li key={j} className="text-sm">{bullet.content}</li>
-                      ))}
+                    {role.bullets.map((bullet: any, j: number) => (
+                      <li key={j} className="text-sm">
+                        {typeof bullet === 'string' ? bullet : bullet.content}
+                      </li>
+                    ))}
                   </ul>
                 )}
               </div>
