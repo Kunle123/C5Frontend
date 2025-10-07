@@ -536,9 +536,11 @@ const ApplicationWizard = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Progress Indicator */}
-        <div className="mb-8">
+      {/* Main container with proper padding for fixed nav (56px) */}
+      <div className="pt-20 pb-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          {/* Progress Indicator - Sticky with proper offset */}
+          <div className="sticky top-20 z-30 bg-background pb-6 mb-6 -mx-4 px-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
@@ -563,6 +565,7 @@ const ApplicationWizard = () => {
             ))}
           </div>
           <Progress value={(currentStep / steps.length) * 100} className="w-full" />
+        </div>
         </div>
 
         {/* Step 1: Paste Job Description */}
@@ -609,7 +612,7 @@ const ApplicationWizard = () => {
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Job Title</label>
                     <p className="font-semibold">{(preview.job_analysis as any)?.job_title || preview.job_analysis?.summary || 'Not specified'}</p>
-                  </div>
+                    </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Company</label>
                     <p className="font-semibold">{(preview.job_analysis as any)?.company || 'Not specified'}</p>
@@ -617,21 +620,21 @@ const ApplicationWizard = () => {
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Experience Level</label>
                     <p className="font-semibold">{(preview.job_analysis as any)?.experience_level || 'Not specified'}</p>
-                  </div>
+                        </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Industry</label>
                     <p className="font-semibold">{(preview.job_analysis as any)?.industry || 'Not specified'}</p>
-                  </div>
-                </div>
-                <div>
+                      </div>
+                    </div>
+                    <div>
                   <label className="text-sm font-medium text-muted-foreground">Key Requirements</label>
                   <p className="text-sm">{(preview.job_analysis?.keywords || []).join(', ') || 'No requirements identified'}</p>
-                </div>
+                      </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Strengths</label>
                     <p className="text-sm">{(preview.profile_match?.strengths || []).join(', ') || 'No strengths identified'}</p>
-                  </div>
+                    </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Gaps</label>
                     <p className="text-sm">{(preview.profile_match?.gaps || []).join(', ') || 'No gaps identified'}</p>
@@ -656,14 +659,14 @@ const ApplicationWizard = () => {
                     (preview.profile_match?.match_score || 0) >= 50 ? 'text-amber-600' : 'text-rose-600'
                   }`}>
                     {preview.profile_match?.match_score || 0}%
-                    </div>
+          </div>
                   <div className="flex-1">
                     <Progress value={preview.profile_match?.match_score || 0} className="h-3" />
-                  </div>
+              </div>
                   <div className="text-sm text-muted-foreground">
                     {(preview.keyword_coverage?.present_in_profile || []).length} / {((preview.keyword_coverage?.present_in_profile || []).length + (preview.keyword_coverage?.missing_from_profile || []).length)} keywords matched
-                        </div>
-                      </div>
+            </div>
+          </div>
                 <div className="mt-4 text-sm text-muted-foreground">
                   <div><strong>Evidence:</strong> {preview.profile_match?.evidence_source || 'No evidence available'}</div>
                     </div>
@@ -678,12 +681,12 @@ const ApplicationWizard = () => {
                   <CardTitle className="text-emerald-700 flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
                     Strong Match
-                  </CardTitle>
+                </CardTitle>
                   <p className="text-sm text-muted-foreground">
                     Direct evidence in your profile
                   </p>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {((preview.keyword_coverage as any)?.keywords || preview.keyword_coverage?.present_in_profile || [])
                       .filter((kw: any) => typeof kw === 'object' ? kw.status === 'green' : true)
@@ -705,7 +708,7 @@ const ApplicationWizard = () => {
                         </Tooltip>
                       </TooltipProvider>
                     ))}
-                  </div>
+                </div>
                 </CardContent>
               </Card>
 
@@ -775,7 +778,7 @@ const ApplicationWizard = () => {
                         </Tooltip>
                       </TooltipProvider>
                     ))}
-                  </div>
+                    </div>
                 </CardContent>
               </Card>
             </div>
@@ -959,8 +962,8 @@ const ApplicationWizard = () => {
                     <p className="text-xs text-muted-foreground">
                       Adjust the slider to include fewer work experiences. The most recent roles will be shown first.
                     </p>
-                  </div>
-                )}
+                    </div>
+                  )}
 
                 {/* Document Preview with Tabs */}
                 {(cv || coverLetter) ? (
@@ -1068,13 +1071,13 @@ const ApplicationWizard = () => {
                         <Edit3 className="w-4 h-4 mr-2" />
                         Edit/Request Update
                   </Button>
-                      <Button
+                  <Button
                         onClick={handleSaveAndDownload}
-                        className="flex-1"
-                      >
+                    className="flex-1"
+                  >
                         Save & Go to Downloads
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
                     </>
                   ) : (
                     <Button
@@ -1169,6 +1172,7 @@ const ApplicationWizard = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 };
