@@ -89,11 +89,17 @@ const ApplicationWizard = () => {
   // Start session on mount
   useEffect(() => {
     if (!sessionId && userId && userToken) {
-      startSession(userId, userToken);
+      console.log('[CV Session] Starting session for user:', userId);
+      startSession(userId, userToken).then(sid => {
+        console.log('[CV Session] Session started with ID:', sid);
+      });
     }
     // End session on unmount
     return () => {
-      if (sessionId && userToken) endSession(userToken);
+      if (sessionId && userToken) {
+        console.log('[CV Session] Ending session:', sessionId);
+        endSession(userToken);
+      }
     };
     // eslint-disable-next-line
   }, [userId, userToken]);
@@ -134,7 +140,9 @@ const ApplicationWizard = () => {
     
     try {
       if (sessionId) {
+        console.log('[CV Generate] Generating CV with session:', sessionId);
         await generateCV(sessionId, jobDescription, userToken);
+        console.log('[CV Generate] CV generated successfully');
         
         // Set max roles based on the generated CV
         const totalRoles = (cv as any)?.professional_experience?.roles?.length || 0;
@@ -148,6 +156,13 @@ const ApplicationWizard = () => {
         toast({
           title: "Documents Generated",
           description: "All CV variations have been successfully generated! 1 credit used.",
+        });
+      } else {
+        console.error('[CV Generate] No session ID available');
+        toast({
+          title: "Session Error",
+          description: "No active session. Please refresh the page and try again.",
+          variant: "destructive"
         });
       }
       setIsGenerating(false);
