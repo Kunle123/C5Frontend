@@ -442,18 +442,17 @@ const ApplicationWizard = () => {
         )}
 
         {/* Education Section - Toggleable */}
-        {cv.education && generationOptions.sections.education && (
+        {cv.education && Array.isArray(cv.education) && cv.education.length > 0 && generationOptions.sections.education && (
           <div>
             <h3 className="font-semibold text-lg mb-2">Education</h3>
-            {cv.education
-              .filter((edu: any) => shouldShowByPriority(edu))
-              .map((edu: any, i: number) => (
-                <div key={i} className="mb-2">
-                  <div className="font-medium">{edu.degree} {edu.field && `in ${edu.field}`}</div>
-                  <div className="text-muted-foreground">{edu.institution} ({edu.end_date || edu.graduation_date || edu.year})</div>
-                  {edu.classification && <div className="text-sm text-muted-foreground">{edu.classification}</div>}
-                </div>
-              ))}
+            {cv.education.map((edu: any, i: number) => (
+              <div key={i} className="mb-2">
+                <div className="font-medium">{edu.degree} {edu.field && `in ${edu.field}`}</div>
+                <div className="text-muted-foreground">{edu.institution} ({edu.end_date || edu.graduation_date || edu.year || edu.start_date})</div>
+                {edu.classification && <div className="text-sm text-muted-foreground">{edu.classification}</div>}
+                {edu.description && <div className="text-sm text-muted-foreground mt-1">{edu.description}</div>}
+              </div>
+            ))}
           </div>
         )}
 
