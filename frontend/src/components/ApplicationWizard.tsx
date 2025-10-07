@@ -172,7 +172,20 @@ const ApplicationWizard = () => {
     }
 
     try {
-      // Save CV to database - use the structure that matches the API expectation
+      // Save CV to database - send in flat format for CV service
+      const trimmedCV = {
+        ...(cv as any),
+        professional_experience: {
+          roles: ((cv as any).professional_experience?.roles || [])
+            .slice(0, maxRoles || ((cv as any).professional_experience?.roles || []).length)
+        },
+        // Remove sections if toggles are OFF
+        ...(generationOptions.sections.achievements ? {} : { achievements: [] }),
+        ...(generationOptions.sections.competencies ? {} : { technical_skills: {}, soft_skills: {} }),
+        ...(generationOptions.sections.education ? {} : { education: [] }),
+        ...(generationOptions.sections.certifications ? {} : { certifications: [] })
+      };
+
       const saveRes = await fetch('https://api-gw-production.up.railway.app/api/cvs', {
         method: 'POST',
         headers: {
@@ -185,46 +198,13 @@ const ApplicationWizard = () => {
           template_id: 'default',
           is_default: false,
           type: 'cv',
-          summary: (cv as any).professional_summary?.content || '',
-          experience: ((cv as any).professional_experience?.roles || [])
-            .slice(0, maxRoles || ((cv as any).professional_experience?.roles || []).length)
-            .map((role: any) => ({
-              job_title: role.title || '',
-              company_name: role.company || '',
-              start_date: role.start_date || '',
-              end_date: role.end_date || '',
-              location: role.location || '',
-              bullets: (role.bullets || []).map((b: any) => b.content || b).filter((c: string) => c)
-            })),
-          education: ((cv as any).education || []).map((edu: any) => ({
-            degree: edu.degree || '',
-            institution: edu.institution || '',
-            year: String(edu.end_date || edu.graduation_date || edu.year || ''),
-            classification: edu.classification || '',
-            field: edu.field || ''
-          })),
-          achievements: generationOptions.sections.achievements 
-            ? ((cv as any).achievements || []).map((ach: any) => ({
-                content: ach.content || ach,
-                priority: ach.priority || 1
-              }))
-            : [],
-          skills: [
-            ...((cv as any).technical_skills?.priority_1 || []),
-            ...((cv as any).technical_skills?.priority_2 || []),
-            ...((cv as any).technical_skills?.priority_3 || []),
-            ...((cv as any).soft_skills?.priority_1 || []),
-            ...((cv as any).soft_skills?.priority_2 || [])
-          ].filter(s => s),
-          certifications: generationOptions.sections.certifications
-            ? ((cv as any).certifications || []).map((cert: any) => ({
-                name: cert.name || '',
-                issuer: cert.issuer || '',
-                year: String(cert.year || cert.date || '')
-              }))
-            : [],
-          contact: (cv as any).personal_information?.name || 'Candidate',
-          cover_letter: (coverLetter as any)?.content || '',
+          cv: trimmedCV, // Send complete CV object in ARC format
+          cover_letter: coverLetter,
+          job_alignment: {
+            job_title: (preview?.job_analysis as any)?.job_title || '',
+            company_name: (preview?.job_analysis as any)?.company || '',
+            match_score: preview?.profile_match?.match_score || 0
+          }
         }),
       });
 
