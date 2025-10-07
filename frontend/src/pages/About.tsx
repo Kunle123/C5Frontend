@@ -5,7 +5,20 @@ export default function About() {
     <div className="max-w-3xl mx-auto py-12 px-4">
       <h1 className="text-4xl font-bold mb-6">About Us</h1>
       <h2 className="text-2xl font-semibold mt-8 mb-2">Built from real experience, for real candidates.</h2>
-      <p className="mb-4">Hi, I'm Kunle, the founder of Candidate 5.</p>
+      
+      {/* Founder Photo */}
+      <div className="flex items-center gap-4 mb-6">
+        <img 
+          src="/8A4F63E6-31A8-41E5-8D6D-C9F8F8A10518_1_105_c.jpeg" 
+          alt="Kunle - Founder of Candidate 5" 
+          className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 shadow-sm"
+        />
+        <div>
+          <p className="text-lg font-semibold">Hi, I'm Kunle</p>
+          <p className="text-muted-foreground">Founder of Candidate 5</p>
+        </div>
+      </div>
+      
       <p className="mb-4">For over 20 years, I worked as a contractor across all kinds of industries. I must have written and rewritten my CV hundreds of times during that period. Every new role meant hours spent tailoring my CV and cover letter to match the job description, sometimes two hours or more for a single application.</p>
       <p className="mb-4">I got pretty good at it over time. I learned what recruiters look for, how job specs are written, and, most importantly, how Applicant Tracking Systems (ATS) actually work. I picked up most of that knowledge the hard way — through trial, error, and a lot of conversations with recruiters over the years.</p>
       <p className="mb-4">But I always thought there had to be a better way. Writing a CV shouldn't take up half your evening. Most people don't have the time or insider knowledge to know how to make their CV stand out or pass through an ATS.</p>
