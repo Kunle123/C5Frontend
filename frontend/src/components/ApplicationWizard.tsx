@@ -324,6 +324,90 @@ const ApplicationWizard = () => {
           </div>
         )}
 
+        {/* Key Achievements - Toggleable, appears right after summary */}
+        {cv.achievements && generationOptions.sections.achievements && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Key Achievements</h3>
+            <ul className="list-disc ml-4 space-y-1">
+              {cv.achievements
+                .filter((achievement: any) => shouldShowByPriority(achievement))
+                .map((achievement: any, i: number) => (
+                  <li key={i} className="text-sm">{achievement.content}</li>
+                ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Core Competencies - Toggleable, appears after achievements */}
+        {generationOptions.sections.competencies && (cv.technical_skills || cv.soft_skills) && (
+          <div>
+            <h3 className="font-semibold text-lg mb-2">Core Competencies</h3>
+            
+            {/* Technical Skills */}
+            {cv.technical_skills && (
+              <div className="mb-3">
+                <h4 className="font-medium text-base mb-2">Technical Skills</h4>
+                <div className="space-y-2">
+                  {cv.technical_skills.priority_1 && cv.technical_skills.priority_1.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {cv.technical_skills.priority_1.map((skill: string, i: number) => (
+                        <span key={i} className="px-3 py-1 bg-primary/10 text-primary rounded text-sm font-medium">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {selectedLength !== 'short' && cv.technical_skills.priority_2 && cv.technical_skills.priority_2.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {cv.technical_skills.priority_2.map((skill: string, i: number) => (
+                        <span key={i} className="px-3 py-1 bg-primary/20 text-primary rounded text-sm">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {selectedLength === 'long' && cv.technical_skills.priority_3 && cv.technical_skills.priority_3.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {cv.technical_skills.priority_3.map((skill: string, i: number) => (
+                        <span key={i} className="px-3 py-1 bg-primary/30 text-primary rounded text-sm">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Soft Skills */}
+            {cv.soft_skills && (
+              <div>
+                <h4 className="font-medium text-base mb-2">Soft Skills</h4>
+                <div className="space-y-2">
+                  {cv.soft_skills.priority_1 && cv.soft_skills.priority_1.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {cv.soft_skills.priority_1.map((skill: string, i: number) => (
+                        <span key={i} className="px-3 py-1 bg-secondary/10 text-secondary-foreground rounded text-sm font-medium">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {selectedLength !== 'short' && cv.soft_skills.priority_2 && cv.soft_skills.priority_2.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {cv.soft_skills.priority_2.map((skill: string, i: number) => (
+                        <span key={i} className="px-3 py-1 bg-secondary/20 text-secondary-foreground rounded text-sm">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Professional Experience - Always included */}
         {cv.professional_experience && Array.isArray(cv.professional_experience.roles) && (
           <div>
@@ -350,83 +434,6 @@ const ApplicationWizard = () => {
                 )}
               </div>
             ))}
-          </div>
-        )}
-
-        {/* Achievements Section - Toggleable */}
-        {cv.achievements && generationOptions.sections.achievements && (
-          <div>
-            <h3 className="font-semibold text-lg mb-2">Key Achievements</h3>
-            <ul className="list-disc ml-4 space-y-1">
-              {cv.achievements
-                .filter((achievement: any) => shouldShowByPriority(achievement))
-                .map((achievement: any, i: number) => (
-                  <li key={i} className="text-sm">{achievement.content}</li>
-                ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Technical Skills - Toggleable */}
-        {cv.technical_skills && generationOptions.sections.competencies && (
-          <div>
-            <h3 className="font-semibold text-lg mb-2">Technical Skills</h3>
-            <div className="space-y-2">
-              {cv.technical_skills.priority_1 && cv.technical_skills.priority_1.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {cv.technical_skills.priority_1.map((skill: string, i: number) => (
-                    <span key={i} className="px-3 py-1 bg-primary/10 text-primary rounded text-sm font-medium">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {selectedLength !== 'short' && cv.technical_skills.priority_2 && cv.technical_skills.priority_2.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {cv.technical_skills.priority_2.map((skill: string, i: number) => (
-                    <span key={i} className="px-3 py-1 bg-primary/20 text-primary rounded text-sm">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {selectedLength === 'long' && cv.technical_skills.priority_3 && cv.technical_skills.priority_3.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {cv.technical_skills.priority_3.map((skill: string, i: number) => (
-                    <span key={i} className="px-3 py-1 bg-primary/30 text-primary rounded text-sm">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Soft Skills - Toggleable */}
-        {cv.soft_skills && generationOptions.sections.competencies && (
-          <div>
-            <h3 className="font-semibold text-lg mb-2">Soft Skills</h3>
-            <div className="space-y-2">
-              {cv.soft_skills.priority_1 && cv.soft_skills.priority_1.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {cv.soft_skills.priority_1.map((skill: string, i: number) => (
-                    <span key={i} className="px-3 py-1 bg-secondary/10 text-secondary-foreground rounded text-sm font-medium">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {selectedLength !== 'short' && cv.soft_skills.priority_2 && cv.soft_skills.priority_2.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {cv.soft_skills.priority_2.map((skill: string, i: number) => (
-                    <span key={i} className="px-3 py-1 bg-secondary/20 text-secondary-foreground rounded text-sm">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         )}
 
@@ -1165,7 +1172,7 @@ const ApplicationWizard = () => {
             </DialogClose>
             <Button 
               onClick={handleApplyUpdates}
-              disabled={!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim() || updateLoading}
+              disabled={(!cvUpdateRequest.trim() && !coverLetterUpdateRequest.trim()) || updateLoading}
             >
               Apply Update
               </Button>
