@@ -150,7 +150,7 @@ const LandingAlternate = () => {
               </div>
               <div>
                 <img
-                  src="/KeywordMatch.png"
+                  src="/LadyKeywords.png"
                   alt="Keyword match analysis"
                   className="rounded-lg object-cover shadow-lg w-full"
                 />
