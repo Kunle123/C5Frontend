@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import React, { useEffect, useState, useRef } from 'react';
 import {
   Box,
@@ -707,7 +708,7 @@ const CareerArk: React.FC = () => {
                           <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
                           <Button onClick={async () => {
                             try {
-                              console.log('Deleting work experience', item.id);
+                              logger.log('Deleting work experience', item.id);
                               await deleteWorkExperience(item.id);
                               const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
                               const latest = await res.json();
@@ -715,7 +716,7 @@ const CareerArk: React.FC = () => {
                               setSelectedIdx(latest[0]?.id || null);
                               toast({ status: 'success', title: 'Work experience deleted' });
                             } catch (err: any) {
-                              console.log('Delete error', err);
+                              logger.log('Delete error', err);
                               if (err?.status === 404 || err?.message?.includes('404')) {
                                 toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
                                 const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/users/${profileId}/work_experience`, { headers: { Authorization: `Bearer ${token}` } });
@@ -755,7 +756,7 @@ const CareerArk: React.FC = () => {
                           <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
                           <Button onClick={async () => {
                             try {
-                              console.log('Deleting education', item.id);
+                              logger.log('Deleting education', item.id);
                               await deleteEducation(item.id);
                               const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/education`, { headers: { Authorization: `Bearer ${token}` } });
                               const latest = await res.json();
@@ -763,7 +764,7 @@ const CareerArk: React.FC = () => {
                               setSelectedIdx(latest[0]?.id || null);
                               toast({ status: 'success', title: 'Education deleted' });
                             } catch (err: any) {
-                              console.log('Delete error', err);
+                              logger.log('Delete error', err);
                               if (err?.status === 404 || err?.message?.includes('404')) {
                                 toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
                                 const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/education`, { headers: { Authorization: `Bearer ${token}` } });
@@ -819,7 +820,7 @@ const CareerArk: React.FC = () => {
                           <Button onClick={() => setEditMode(true)} colorScheme="blue" size="sm">Edit</Button>
                           <Button onClick={async () => {
                             try {
-                              console.log('Deleting training', item.id);
+                              logger.log('Deleting training', item.id);
                               await deleteTraining(item.id);
                               const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/training`, { headers: { Authorization: `Bearer ${token}` } });
                               const latest = await res.json();
@@ -827,7 +828,7 @@ const CareerArk: React.FC = () => {
                               setSelectedIdx(latest[0]?.id || null);
                               toast({ status: 'success', title: 'Training deleted' });
                             } catch (err: any) {
-                              console.log('Delete error', err);
+                              logger.log('Delete error', err);
                               if (err?.status === 404 || err?.message?.includes('404')) {
                                 toast({ status: 'error', title: 'This entry no longer exists. Refreshing data...' });
                                 const res = await fetch(`${API_GATEWAY_BASE}/api/career-ark/profiles/${profileId}/training`, { headers: { Authorization: `Bearer ${token}` } });

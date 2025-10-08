@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import React, { useState, useEffect } from "react";
 import { Navigation } from "./Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -45,7 +46,7 @@ export function AccountPage() {
 
   // Subscription state (static for now)
   const [subscription, setSubscription] = useState<any>(null);
-  console.log('AccountPage Subscription tile mounted!', subscription);
+  logger.log('AccountPage Subscription tile mounted!', subscription);
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const [subscriptionError, setSubscriptionError] = useState('');
 

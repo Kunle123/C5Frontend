@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -88,7 +89,7 @@ function getUniqueMonths(workExperiences: any[]) {
     const start = exp.start_date ? safeParseDate(exp.start_date) : null;
     const end = exp.end_date && exp.end_date !== 'Present' ? safeParseDate(exp.end_date) : new Date();
     // Debug log for browser comparison
-    console.log('[getUniqueMonths] exp:', exp, {
+    logger.log('[getUniqueMonths] exp:', exp, {
       start_date: exp.start_date,
       end_date: exp.end_date,
       parsed_start: start,
@@ -111,34 +112,34 @@ const persistImportedCVData = async (data: any) => {
   // Persist each section if present
   if (data.work_experience && Array.isArray(data.work_experience)) {
     for (const exp of data.work_experience) {
-      try { await addWorkExperience(exp); } catch (e) { console.error('Failed to save work experience', e); }
+      try { await addWorkExperience(exp); } catch (e) { logger.error('Failed to save work experience', e); }
     }
   }
   if (data.education && Array.isArray(data.education)) {
     for (const edu of data.education) {
-      try { await addEducation(edu); } catch (e) { console.error('Failed to save education', e); }
+      try { await addEducation(edu); } catch (e) { logger.error('Failed to save education', e); }
     }
   }
   if (data.training && Array.isArray(data.training)) {
     for (const training of data.training) {
-      try { await addTraining(training); } catch (e) { console.error('Failed to save training', e); }
+      try { await addTraining(training); } catch (e) { logger.error('Failed to save training', e); }
     }
   }
   if (data.skills && Array.isArray(data.skills)) {
     for (const skill of data.skills) {
       // Skill may be a string or object
       const skillObj = typeof skill === 'string' ? { name: skill } : skill;
-      try { await addSkill(skillObj); } catch (e) { console.error('Failed to save skill', e); }
+      try { await addSkill(skillObj); } catch (e) { logger.error('Failed to save skill', e); }
     }
   }
   if (data.projects && Array.isArray(data.projects)) {
     for (const project of data.projects) {
-      try { await addProject(project); } catch (e) { console.error('Failed to save project', e); }
+      try { await addProject(project); } catch (e) { logger.error('Failed to save project', e); }
     }
   }
   if (data.certifications && Array.isArray(data.certifications)) {
     for (const cert of data.certifications) {
-      try { await addCertification(cert); } catch (e) { console.error('Failed to save certification', e); }
+      try { await addCertification(cert); } catch (e) { logger.error('Failed to save certification', e); }
     }
   }
 };
@@ -358,7 +359,7 @@ const CareerArkV2: React.FC = () => {
   const allSkills: string[] = [...new Set((workExps.flatMap((exp: any) => Array.isArray(exp.skills) ? exp.skills : [])) as string[])];
 
   // Debug: log arcData before rendering
-  console.log('arcData for debug:', arcData);
+  logger.log('arcData for debug:', arcData);
   return (
     <div className="min-h-screen bg-background" key={refreshKey}>
       <Navigation />
@@ -691,7 +692,7 @@ const CareerArkV2: React.FC = () => {
                                   variant="outline" 
                                   size="sm"
                                   onClick={() => {
-                                    console.log('Editing work experience:', experience, 'start_date:', convertToMonthInput(experience.start_date), 'end_date:', convertToMonthInput(experience.end_date));
+                                    logger.log('Editing work experience:', experience, 'start_date:', convertToMonthInput(experience.start_date), 'end_date:', convertToMonthInput(experience.end_date));
                                     setEditItem(experience);
                                     setForm({
                                       company: experience.company,
@@ -780,7 +781,7 @@ const CareerArkV2: React.FC = () => {
                           </div>
                           <div className="flex gap-2">
                             <Button size="sm" variant="outline" onClick={() => {
-                              console.log('Editing education:', edu, 'start_date:', convertToMonthInput(edu.start_date), 'end_date:', convertToMonthInput(edu.end_date));
+                              logger.log('Editing education:', edu, 'start_date:', convertToMonthInput(edu.start_date), 'end_date:', convertToMonthInput(edu.end_date));
                               setEditEduItem(edu);
                               setEduForm({
                                 institution: edu.institution,

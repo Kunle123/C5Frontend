@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -79,7 +80,7 @@ export function CVDownload() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       alert('Network error. Please check your connection and try again.');
-      console.error('Download error:', err);
+      logger.error('Download error:', err);
     }
   };
 

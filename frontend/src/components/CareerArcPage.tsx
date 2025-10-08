@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,7 +54,7 @@ export function CareerArcPage() {
     getArcData()
       .then(data => {
         // Use data.arcData.work_experience for the new structure
-        console.log('API work_experience:', data.arcData.work_experience); // TEMP LOG
+        logger.log('API work_experience:', data.arcData.work_experience); // TEMP LOG
         const exp = (data.arcData.work_experience || []).map((item: any) => {
           // Ensure description and skills are arrays
           let description: string[] = [];
@@ -107,7 +108,7 @@ export function CareerArcPage() {
       toast({ title: "Experience deleted", description: "The experience has been removed from your Career Arc™." });
       setRefreshFlag(f => f + 1);
     } catch (err: any) {
-      console.error('Delete error:', err);
+      logger.error('Delete error:', err);
       toast({ title: "Delete failed", description: err?.message || "Could not delete experience", variant: "destructive" });
     }
   };
@@ -477,7 +478,7 @@ function ExperienceDialog({ experience, onSave }: ExperienceDialogProps) {
 
   useEffect(() => {
     // Log the raw values for debugging
-    console.log('Edit dialog startDate:', experience?.startDate, 'endDate:', experience?.endDate);
+    logger.log('Edit dialog startDate:', experience?.startDate, 'endDate:', experience?.endDate);
 
     // Robustly extract yyyy-MM from various formats
     const formatMonth = (date: string | undefined | null) => {

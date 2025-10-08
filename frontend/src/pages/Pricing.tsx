@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { Navigation } from "../components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -50,8 +51,8 @@ const Pricing = () => {
 
   // Payment handler for paid plans and top-up
   const handlePayment = async (plan: string, index?: number) => {
-    console.log('handlePayment called with:', plan, index);
-    console.log('Current planIdMap:', planIdMap);
+    logger.log('handlePayment called with:', plan, index);
+    logger.log('Current planIdMap:', planIdMap);
     if (typeof index === 'number') setLoadingIndex(index);
     if (plan === 'Top-up') setLoadingTopUp(true);
     try {
@@ -75,7 +76,7 @@ const Pricing = () => {
           Annual: "Annual Subscription"
         };
         const plan_id = planIdMap[PLAN_NAME_MAP[plan] || plan];
-        console.log('Selected plan_id:', plan_id);
+        logger.log('Selected plan_id:', plan_id);
         if (!plan_id) throw new Error("Plan ID not found for selected plan");
         const user_id = localStorage.getItem("user_id") || localStorage.getItem("userId") || localStorage.getItem("id") || "";
         res = await fetch(`/api/subscriptions/checkout`, {
