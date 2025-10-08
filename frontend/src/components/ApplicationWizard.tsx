@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { logger } from '../utils/logger';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -89,15 +90,15 @@ const ApplicationWizard = () => {
   // Start session on mount
   useEffect(() => {
     if (!sessionId && userId && userToken) {
-      console.log('[CV Session] Starting session for user:', userId);
+      logger.log('[CV Session] Starting session for user:', userId);
       startSession(userId, userToken).then(sid => {
-        console.log('[CV Session] Session started with ID:', sid);
+        logger.log('[CV Session] Session started with ID:', sid);
       });
     }
     // End session on unmount
     return () => {
       if (sessionId && userToken) {
-        console.log('[CV Session] Ending session:', sessionId);
+        logger.log('[CV Session] Ending session:', sessionId);
         endSession(userToken);
       }
     };
@@ -140,9 +141,9 @@ const ApplicationWizard = () => {
     
     try {
       if (sessionId) {
-        console.log('[CV Generate] Generating CV with session:', sessionId);
+        logger.log('[CV Generate] Generating CV with session:', sessionId);
         await generateCV(sessionId, jobDescription, userToken);
-        console.log('[CV Generate] CV generated successfully');
+        logger.log('[CV Generate] CV generated successfully');
         
         // Set max roles based on the generated CV
         const totalRoles = (cv as any)?.professional_experience?.roles?.length || 0;
@@ -158,7 +159,7 @@ const ApplicationWizard = () => {
           description: "All CV variations have been successfully generated! 1 credit used.",
         });
       } else {
-        console.error('[CV Generate] No session ID available');
+        logger.error('[CV Generate] No session ID available');
         toast({
           title: "Session Error",
           description: "No active session. Please refresh the page and try again.",
@@ -225,7 +226,7 @@ const ApplicationWizard = () => {
 
       if (!saveRes.ok) {
         const errorData = await saveRes.json();
-        console.error('CV Save Error:', errorData);
+        logger.error('CV Save Error:', errorData);
         throw new Error(errorData.detail || errorData.message || 'Failed to save CV');
       }
       const saveResult = await saveRes.json();
