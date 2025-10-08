@@ -122,7 +122,7 @@ export function CareerArcPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsImporting(true);
-    toast({ title: "CV Import Started", description: "We're uploading and analyzing your CV. Please do not close this page. This process may take up to several minutes depending on file size and server load." });
+    toast({ title: "CV Import Started", description: "We're uploading and analysing your CV. Please do not close this page. This could take several minutes depending on file size and server load." });
     try {
       const uploadRes = await uploadCV(file);
       const taskId = uploadRes.taskId;
