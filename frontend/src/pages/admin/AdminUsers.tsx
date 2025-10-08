@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { logger } from '../utils/logger';
 import { Navigation } from '../../components/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -34,7 +35,7 @@ const AdminUsers = () => {
       const data = await listUsers((page - 1) * pageSize, pageSize, search);
       setUsers(data);
     } catch (err) {
-      console.error('Error fetching users:', err);
+      logger.error('Error fetching users:', err);
     } finally {
       setLoading(false);
     }

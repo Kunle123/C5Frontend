@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { logger } from '../utils/logger';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Navigation } from '../../components/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -51,7 +52,7 @@ const AdminUserDetail = () => {
       setUser(userData);
       setCreditHistory(historyData);
     } catch (err) {
-      console.error('Error fetching user data:', err);
+      logger.error('Error fetching user data:', err);
       toast({
         title: "Error",
         description: "Failed to load user data",

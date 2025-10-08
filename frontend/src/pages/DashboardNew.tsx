@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { logger } from '../utils/logger';
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Navigation } from "../components/Navigation";
@@ -100,7 +101,7 @@ const DashboardNew = () => {
       actionText: userProgress.personalDetails ? "Edit Profile" : "Complete Profile",
       onAction: () => {
         // Navigate to profile settings or create profile page
-        console.log("Navigate to profile setup");
+        logger.log("Navigate to profile setup");
       }
     },
     {
@@ -118,7 +119,7 @@ const DashboardNew = () => {
       icon: <FileText className="h-6 w-6" />,
       actionText: userProgress.applicationReady ? "Create New Application" : "Start Application Wizard",
       onAction: () => {
-        console.log("Start application wizard");
+        logger.log("Start application wizard");
       }
     },
     {

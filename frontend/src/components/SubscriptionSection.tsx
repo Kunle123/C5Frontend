@@ -1,5 +1,6 @@
 // DEPRECATED: This SubscriptionSection component is inactive and not used in the current UI. Safe to remove after migration.
-console.warn('SubscriptionSection.tsx is deprecated and not used in the current UI.');
+import { logger } from '../utils/logger';
+logger.warn('SubscriptionSection.tsx is deprecated and not used in the current UI.');
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -33,8 +34,8 @@ import {
 } from '../api';
 
 const SubscriptionSection: React.FC = () => {
-  console.log('SubscriptionSection component is mounted!');
-  console.log('[SubscriptionSection] Rendered');
+  logger.log('SubscriptionSection component is mounted!');
+  logger.log('[SubscriptionSection] Rendered');
   const [subscription, setSubscription] = useState<any>(null);
   const [billing, setBilling] = useState<any[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
@@ -126,7 +127,7 @@ const SubscriptionSection: React.FC = () => {
   };
 
   if (!userId) {
-    console.warn('[SubscriptionSection] No userId found in token');
+    logger.warn('[SubscriptionSection] No userId found in token');
     return (
       <Box py={6} textAlign="center">
         <Alert status="error">Invalid or missing user ID in JWT. Please log in again.</Alert>
@@ -135,7 +136,7 @@ const SubscriptionSection: React.FC = () => {
   }
 
   if (loading) {
-    console.log('[SubscriptionSection] Loading...');
+    logger.log('[SubscriptionSection] Loading...');
     return (
       <Box py={6} textAlign="center">
         <Spinner />
@@ -144,7 +145,7 @@ const SubscriptionSection: React.FC = () => {
   }
 
   if (error) {
-    console.error('[SubscriptionSection] Error:', error);
+    logger.error('[SubscriptionSection] Error:', error);
     return (
       <Box py={6} textAlign="center">
         <Alert status="error">{error}</Alert>
@@ -152,7 +153,7 @@ const SubscriptionSection: React.FC = () => {
     );
   }
 
-  console.log('Subscription object:', subscription);
+  logger.log('Subscription object:', subscription);
   let plan = subscription?.plan?.name || subscription?.plan_name || 'None';
   let amount = subscription?.plan?.amount || subscription?.amount || 0;
   let interval = subscription?.plan?.interval || subscription?.interval || '';
@@ -195,7 +196,7 @@ const SubscriptionSection: React.FC = () => {
           </Thead>
           <Tbody>
             {billing.map((bill, idx) => {
-              console.log('[SubscriptionSection] Billing row:', bill);
+              logger.log('[SubscriptionSection] Billing row:', bill);
               return (
                 <Tr key={bill.id || idx}>
                   <Td>{bill.date || bill.created_at}</Td>
@@ -244,7 +245,7 @@ const SubscriptionSection: React.FC = () => {
         ) : (
           <VStack align="start" spacing={3} mt={2}>
             {paymentMethods.map((pm: any) => {
-              console.log('[SubscriptionSection] Payment method:', pm);
+              logger.log('[SubscriptionSection] Payment method:', pm);
               return (
                 <Flex key={pm.id} align="center">
                   <Text>{pm.brand} ****{pm.last4} (exp {pm.exp_month}/{pm.exp_year}) {pm.is_default && <strong>[Default]</strong>}</Text>

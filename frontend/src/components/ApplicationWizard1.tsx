@@ -1,4 +1,5 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import { Navigation } from './Navigation';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -296,10 +297,10 @@ function filterByPriority(data: CVData, maxPriority: number): CVData {
   };
 }
 
-console.log('ApplicationWizard: file loaded');
+logger.log('ApplicationWizard: file loaded');
 
 const ApplicationWizard = () => {
-  console.log('ApplicationWizard: component function called');
+  logger.log('ApplicationWizard: component function called');
   const { toast } = useToast();
   const { refreshCredits } = useContext(CreditsContext);
   // Commenting out all state and effects for minimal test
@@ -344,22 +345,22 @@ const ApplicationWizard = () => {
   // const [showEducation, setShowEducation] = useState(true);
 
   // useEffect(() => {
-  //   console.log('ApplicationWizard mounted');
+  //   logger.log('ApplicationWizard mounted');
   // }, []);
 
   // useEffect(() => {
-  //   console.log('Current step:', currentStep);
+  //   logger.log('Current step:', currentStep);
   // }, [currentStep]);
 
   // useEffect(() => {
   //   if (structuredCV) {
-  //     console.log('structuredCV updated:', structuredCV);
+  //     logger.log('structuredCV updated:', structuredCV);
   //   }
   // }, [structuredCV]);
 
   // useEffect(() => {
   //   if (error) {
-  //     console.error('ApplicationWizard error:', error);
+  //     logger.error('ApplicationWizard error:', error);
   //   }
   // }, [error]);
 
@@ -370,7 +371,7 @@ const ApplicationWizard = () => {
   //       setError(null);
   //       const token = localStorage.getItem('token');
   //       if (!token) throw new Error('Not authenticated');
-  //       console.log('Fetching user profile...');
+  //       logger.log('Fetching user profile...');
   //       const profileRes = await fetch('https://api-gw-production.up.railway.app/api/user/profile', {
   //         headers: { 'Authorization': `Bearer ${token}` },
   //         credentials: 'include',
@@ -378,19 +379,19 @@ const ApplicationWizard = () => {
   //       if (!profileRes.ok) throw new Error('Failed to fetch user profile');
   //       const userProfile = await profileRes.json();
   //       setProfile(userProfile);
-  //       console.log('Fetched user profile:', userProfile);
+  //       logger.log('Fetched user profile:', userProfile);
   //       // 2. Get arc data
-  //       console.log('Fetching arc data...');
+  //       logger.log('Fetching arc data...');
   //       const arcRes = await fetch(`https://api-gw-production.up.railway.app/api/v1/users/${userProfile.id}/all_sections`, {
   //         headers: { 'Authorization': `Bearer ${token}` },
   //       });
   //       if (!arcRes.ok) throw new Error('Failed to fetch arc data');
   //       const arc = await arcRes.json();
   //       setArcData(arc);
-  //       console.log('Fetched arc data:', arc);
+  //       logger.log('Fetched arc data:', arc);
   //     } catch (err: any) {
   //       setError(err.message || 'Failed to load profile/arc data');
-  //       console.error('Error fetching profile/arc data:', err);
+  //       logger.error('Error fetching profile/arc data:', err);
   //     }
   //   };
   //   fetchProfileAndArc();
@@ -468,7 +469,7 @@ const ApplicationWizard = () => {
   //       const piiError = validatePIIFreeProfile(piiFreeProfile);
   //       if (piiError) {
   //         // eslint-disable-next-line no-console
-  //         console.warn('PII validation failed:', piiError, piiFreeProfile);
+  //         logger.warn('PII validation failed:', piiError, piiFreeProfile);
   //       }
   //     }
   //     const result = await extractKeywords(piiFreeProfile, jobDescription, token);
@@ -482,10 +483,10 @@ const ApplicationWizard = () => {
   //     setSalary(result.salary || '');
   //     setContactName(result.contact_name || '');
   //     setContactNumber(result.contact_number || '');
-  //     console.log('Extracted keywords result:', result);
+  //     logger.log('Extracted keywords result:', result);
   //   } catch (err: any) {
   //     setError(err.message || 'Keyword extraction failed');
-  //     console.error('Error extracting keywords:', err);
+  //     logger.error('Error extracting keywords:', err);
   //     toast({ title: 'Error', description: err.message || 'Keyword extraction failed' });
   //   } finally {
   //     setIsAnalyzing(false);
@@ -546,12 +547,12 @@ const ApplicationWizard = () => {
   //     setJobTitle(normalizedData.job_title || '');
   //     setCompanyName(normalizedData.company_name || '');
   //     setStructuredCV(normalizedData); // Store structured data
-  //     console.log('Generated CV data:', normalizedData);
+  //     logger.log('Generated CV data:', normalizedData);
   //     // Advance to preview step (step 3)
   //     setCurrentStep(3);
   //   } catch (err: any) {
   //     setError(err.message || 'Document generation failed');
-  //     console.error('Error generating CV:', err);
+  //     logger.error('Error generating CV:', err);
   //     toast({ title: 'Error', description: err.message || 'Document generation failed' });
   //   } finally {
   //     setIsGenerating(false);
@@ -564,7 +565,7 @@ const ApplicationWizard = () => {
   //   const validationError = validateFinalCV(structuredCV);
   //   if (validationError) {
   //     setError(validationError);
-  //     console.error('CV validation failed:', validationError, structuredCV);
+  //     logger.error('CV validation failed:', validationError, structuredCV);
   //     toast({ title: 'Error', description: validationError });
   //     return;
   //   }
@@ -574,7 +575,7 @@ const ApplicationWizard = () => {
   //     const token = localStorage.getItem('token');
   //     if (!token) throw new Error('Not authenticated');
   //     // Debug log the payload
-  //     console.log('Sending structuredCV to /api/cv/generate-docx:', structuredCV);
+  //     logger.log('Sending structuredCV to /api/cv/generate-docx:', structuredCV);
   //     // 1. Generate DOCX blob
   //     const docxRes = await fetch('https://api-gw-production.up.railway.app/api/cv/generate-docx', {
   //       method: 'POST',
@@ -624,7 +625,7 @@ const ApplicationWizard = () => {
   //       // Inject real name in cover letter signature
   //       cover_letter: injectNameInCoverLetter(structuredCV?.cover_letter, profile?.name),
   //     };
-  //     console.log('Persist payload for /api/cv:', persistPayload);
+  //     logger.log('Persist payload for /api/cv:', persistPayload);
   //     // 4. Persist the CV
   //     const persistRes = await fetch('/api/cv', {
   //       method: 'POST',
@@ -642,7 +643,7 @@ const ApplicationWizard = () => {
   //         errorMsg = error.detail || error.message || errorMsg;
   //       } catch {}
   //       setError(errorMsg);
-  //       console.error('Error saving CV:', errorMsg);
+  //       logger.error('Error saving CV:', errorMsg);
   //       toast({ title: 'Error', description: errorMsg });
   //       throw new Error(errorMsg);
   //     }
@@ -662,7 +663,7 @@ const ApplicationWizard = () => {
   //       }
   //       await refreshCredits();
   //     } catch (e) {
-  //       console.error('Error deducting credits:', e);
+  //       logger.error('Error deducting credits:', e);
   //       setShowOutOfCreditsModal(true);
   //     }
   //     // In handleSaveAndDownload, after successful save (after toast for Documents Generated & Saved)
@@ -677,17 +678,17 @@ const ApplicationWizard = () => {
   //         contact_name: contactName,
   //         contact_number: contactNumber,
   //       };
-  //       console.log('POST to application-history endpoint:', 'https://api-gw-production.up.railway.app/api/application-history');
-  //       console.log('POST to application-history payload:', applicationHistoryPayload);
+  //       logger.log('POST to application-history endpoint:', 'https://api-gw-production.up.railway.app/api/application-history');
+  //       logger.log('POST to application-history payload:', applicationHistoryPayload);
   //       const response = await createApplicationHistory(applicationHistoryPayload, token);
-  //       console.log('Application history response:', response);
+  //       logger.log('Application history response:', response);
   //     } catch (e) {
-  //       console.error('Failed to save job application history', e);
+  //       logger.error('Failed to save job application history', e);
   //     }
   //     window.location.href = '/my-cvs-new';
   //   } catch (err: any) {
   //     setError(err.message || 'Document save failed');
-  //     console.error('Error saving documents:', err);
+  //     logger.error('Error saving documents:', err);
   //     toast({ title: 'Error', description: err.message || 'Document save failed' });
   //   } finally {
   //     setIsGenerating(false);
@@ -868,7 +869,7 @@ const ApplicationWizard = () => {
   //     setCurrentStep(3);
   //   } catch (err: any) {
   //     setError(err.message || 'Document generation failed');
-  //     console.error('Error generating CV with language:', err);
+  //     logger.error('Error generating CV with language:', err);
   //     toast({ title: 'Error', description: err.message || 'Document generation failed' });
   //   } finally {
   //     setIsGenerating(false);
@@ -904,21 +905,21 @@ const ApplicationWizard = () => {
   // }
 
   // Log all key state values before rendering
-  // console.log('ApplicationWizard: currentStep', currentStep);
-  // console.log('ApplicationWizard: error', error);
-  // console.log('ApplicationWizard: profile', profile);
-  // console.log('ApplicationWizard: arcData', arcData);
-  // console.log('ApplicationWizard: structuredCV', structuredCV);
+  // logger.log('ApplicationWizard: currentStep', currentStep);
+  // logger.log('ApplicationWizard: error', error);
+  // logger.log('ApplicationWizard: profile', profile);
+  // logger.log('ApplicationWizard: arcData', arcData);
+  // logger.log('ApplicationWizard: structuredCV', structuredCV);
 
   // Early return logs
   // if (error) {
-  //   console.error('ApplicationWizard: returning early due to error', error);
+  //   logger.error('ApplicationWizard: returning early due to error', error);
   //   return <div>Error: {error}</div>;
   // }
 
   // Defensive early return to prevent TypeError on initial render
   // if (structuredCV == null) {
-  //   console.log('ApplicationWizard: structuredCV is null, rendering loading state');
+  //   logger.log('ApplicationWizard: structuredCV is null, rendering loading state');
   //   return <div>Loading...</div>;
   // }
 

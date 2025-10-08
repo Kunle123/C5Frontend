@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { logger } from '../utils/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -17,7 +18,7 @@ import {
 import { getUser, updateUser, getUserIdFromToken, getSubscription, getPaymentMethods, getPaymentHistory, cancelSubscription } from "../api";
 
 function ProfileSettings() {
-  console.log('ProfileSettings Subscription tile mounted!');
+  logger.log('ProfileSettings Subscription tile mounted!');
   const [profile, setProfile] = useState({ name: "", email: "", phone_number: "", emailVerified: false });
   const [subscription, setSubscription] = useState({ plan: "NONE", status: "INACTIVE", renewal: "N/A" });
   const [billing, setBilling] = useState<any[]>([]);
@@ -72,7 +73,7 @@ function ProfileSettings() {
     setError("");
     setSuccess("");
     try {
-      console.log('Updating profile with:', profile); // Debug log
+      logger.log('Updating profile with:', profile); // Debug log
       const updated = await updateUser(profile, token);
       setProfile({
         name: updated.name || profile.name || '',

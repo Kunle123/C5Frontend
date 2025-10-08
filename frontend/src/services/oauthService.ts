@@ -1,4 +1,5 @@
 import React from "react";
+import { logger } from '../utils/logger';
 
 interface OAuthConfig {
   clientId: string;
@@ -70,7 +71,7 @@ class OAuthService {
 
       return await response.json();
     } catch (error) {
-      console.error("Google OAuth callback error:", error);
+      logger.error("Google OAuth callback error:", error);
       throw error;
     }
   }
@@ -98,7 +99,7 @@ class OAuthService {
 
       return await response.json();
     } catch (error) {
-      console.error("LinkedIn OAuth callback error:", error);
+      logger.error("LinkedIn OAuth callback error:", error);
       throw error;
     }
   }
