@@ -212,3 +212,4 @@ export function CVDownload() {
       </div>
     </div>
   );
+}
