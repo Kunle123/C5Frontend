@@ -393,3 +393,4 @@ export type MitigationPotential = 'HIGH' | 'MEDIUM' | 'LOW' | 'NONE';
 export type CVLength = 'SHORT' | 'MEDIUM' | 'LONG' | 'EXTENDED';
 export type ChangeType = 'EMPHASIS' | 'REORGANIZATION' | 'ADDITION' | 'LANGUAGE_IMPROVEMENT';
 
+

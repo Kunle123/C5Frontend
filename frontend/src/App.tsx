@@ -73,6 +73,21 @@ function App() {
     return () => clearInterval(checkInterval);
   }, []);
 
+  // Load Custoq chatbot
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://custoq.com/js/chat.js";
+    script.dataset.companyName = "candidate5.co.uk";
+    script.dataset.companyId = "fc1aa323-3320-4a2b-85e8-6ac313a68e28";
+    script.async = true;
+    document.body.appendChild(script);
+
+    // Cleanup: remove script when component unmounts
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return (
     <NotificationContext.Provider value={{ notify }}>
       <CreditsProvider>

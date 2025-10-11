@@ -189,3 +189,4 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
   return response.json();
 };
 
+

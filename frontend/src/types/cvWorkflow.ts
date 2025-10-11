@@ -76,3 +76,4 @@ export interface CVUpdateResponse extends CVObject {
   update_request: string;
   updated_at: number;
 }
+

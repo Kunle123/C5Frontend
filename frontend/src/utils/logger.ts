@@ -41,3 +41,4 @@ if (!isDevelopment) {
   console.info = () => {};
   // Keep console.error and console.warn for critical issues
 }
+
